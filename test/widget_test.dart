@@ -667,12 +667,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v1.0.8', () {
+    test('AppConfig provides accurate release and version telemetry for v1.0.9', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v1.0.8');
-      expect(AppConfig.buildNumber, '9');
-      expect(AppConfig.fullVersion, 'v1.0.8 (Build 9)');
-      expect(AppConfig.releaseTag, 'v1.0.8');
+      expect(AppConfig.appVersion, 'v1.0.9');
+      expect(AppConfig.buildNumber, '10');
+      expect(AppConfig.fullVersion, 'v1.0.9 (Build 10)');
+      expect(AppConfig.releaseTag, 'v1.0.9');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });

@@ -38,10 +38,19 @@ class GitPulseLogo extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(
-        painter: _GitPulseLogoPainter(
-          color: color,
-          progress: progress,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(size * 0.22),
+        child: Image.asset(
+          'assets/icons/app_icon.png',
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => CustomPaint(
+            painter: _GitPulseLogoPainter(
+              color: color,
+              progress: progress,
+            ),
+          ),
         ),
       ),
     );
@@ -142,14 +151,16 @@ class _GitPulseLogoPainter extends CustomPainter {
 
     // 4. Live traveling pulse spark along the pulse branch
     for (final metric in pulsePath.computeMetrics()) {
-      final t = (progress * 1.5) % 1.0;
+      final t = (progress * 2.0) % 1.0;
       final tangent = metric.getTangentForOffset(metric.length * t);
       if (tangent != null) {
+        final sparkAlpha = (math.sin(t * math.pi) * 0.9).clamp(0.0, 1.0);
         _sparkGlow
-          ..color = Colors.white.withValues(alpha: 0.8)
+          ..color = Colors.white.withValues(alpha: sparkAlpha * 0.8)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
 
         canvas.drawCircle(tangent.position, 1.8, _sparkGlow);
+        _sparkCore.color = Colors.white.withValues(alpha: sparkAlpha);
         canvas.drawCircle(tangent.position, 1.1, _sparkCore);
       }
       break;
@@ -356,8 +367,8 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
     Color accentColor,
     double progress,
   ) {
-    final cycle = (progress * 2) % 1.0;
-    final gradientColors = _getTitleGradient(mode, accentColor, cycle);
+    final wave = 0.5 + 0.5 * math.sin(progress * 2 * math.pi);
+    final gradientColors = _getTitleGradient(mode, accentColor, wave);
 
     return ShaderMask(
       shaderCallback: (bounds) {
@@ -464,51 +475,84 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
     ..strokeCap = StrokeCap.round;
 
   static const List<_ParticleConfig> _petals = [
-    _ParticleConfig(baseX: 0.06, speed: 0.75, sway: 12.0, size: 6.0, phase: 0.12),
-    _ParticleConfig(baseX: 0.16, speed: 1.10, sway: 16.0, size: 7.5, phase: 0.42),
-    _ParticleConfig(baseX: 0.28, speed: 0.85, sway: 14.0, size: 6.8, phase: 0.75),
-    _ParticleConfig(baseX: 0.40, speed: 1.25, sway: 18.0, size: 8.5, phase: 0.20),
-    _ParticleConfig(baseX: 0.52, speed: 0.70, sway: 11.0, size: 5.8, phase: 0.88),
-    _ParticleConfig(baseX: 0.64, speed: 1.15, sway: 17.0, size: 7.8, phase: 0.35),
-    _ParticleConfig(baseX: 0.74, speed: 0.90, sway: 15.0, size: 6.5, phase: 0.60),
-    _ParticleConfig(baseX: 0.84, speed: 1.30, sway: 19.0, size: 8.2, phase: 0.15),
-    _ParticleConfig(baseX: 0.92, speed: 0.80, sway: 13.0, size: 6.2, phase: 0.80),
-    _ParticleConfig(baseX: 0.97, speed: 1.05, sway: 14.0, size: 7.0, phase: 0.50),
+    _ParticleConfig(baseX: 0.06, speed: 1, sway: 12.0, size: 6.0, phase: 0.12),
+    _ParticleConfig(baseX: 0.16, speed: 2, sway: 16.0, size: 7.5, phase: 0.42),
+    _ParticleConfig(baseX: 0.28, speed: 1, sway: 14.0, size: 6.8, phase: 0.75),
+    _ParticleConfig(baseX: 0.40, speed: 2, sway: 18.0, size: 8.5, phase: 0.20),
+    _ParticleConfig(baseX: 0.52, speed: 1, sway: 11.0, size: 5.8, phase: 0.88),
+    _ParticleConfig(baseX: 0.64, speed: 2, sway: 17.0, size: 7.8, phase: 0.35),
+    _ParticleConfig(baseX: 0.74, speed: 1, sway: 15.0, size: 6.5, phase: 0.60),
+    _ParticleConfig(baseX: 0.84, speed: 2, sway: 19.0, size: 8.2, phase: 0.15),
+    _ParticleConfig(baseX: 0.92, speed: 1, sway: 13.0, size: 6.2, phase: 0.80),
+    _ParticleConfig(baseX: 0.97, speed: 2, sway: 14.0, size: 7.0, phase: 0.50),
   ];
 
-  static const List<Offset> _stars = [
-    Offset(0.08, 0.28),
-    Offset(0.18, 0.72),
-    Offset(0.28, 0.32),
-    Offset(0.38, 0.78),
-    Offset(0.48, 0.24),
-    Offset(0.68, 0.26),
-    Offset(0.76, 0.74),
-    Offset(0.85, 0.35),
-    Offset(0.93, 0.68),
-    Offset(0.97, 0.22),
+  static const List<_StarConfig> _stars = [
+    // Left cluster (near logo & title)
+    _StarConfig(x: 0.04, y: 0.22, size: 2.4, phase: 0.12, hasSparkle: true),
+    _StarConfig(x: 0.07, y: 0.78, size: 1.4, phase: 0.65),
+    _StarConfig(x: 0.11, y: 0.35, size: 1.8, phase: 0.38),
+    _StarConfig(x: 0.15, y: 0.82, size: 1.2, phase: 0.85),
+    _StarConfig(x: 0.19, y: 0.26, size: 2.6, phase: 0.05, hasSparkle: true),
+    _StarConfig(x: 0.23, y: 0.68, size: 1.5, phase: 0.48),
+
+    // Mid-left span
+    _StarConfig(x: 0.27, y: 0.20, size: 1.3, phase: 0.72),
+    _StarConfig(x: 0.31, y: 0.84, size: 2.5, phase: 0.28, hasSparkle: true),
+    _StarConfig(x: 0.35, y: 0.38, size: 1.6, phase: 0.90),
+    _StarConfig(x: 0.39, y: 0.72, size: 1.2, phase: 0.15),
+    _StarConfig(x: 0.43, y: 0.25, size: 2.2, phase: 0.58),
+    _StarConfig(x: 0.47, y: 0.80, size: 1.5, phase: 0.33),
+
+    // Center header sky (near crescent moon at x: 0.58, y: 0.40)
+    _StarConfig(x: 0.51, y: 0.28, size: 1.4, phase: 0.78),
+    _StarConfig(x: 0.54, y: 0.75, size: 2.8, phase: 0.42, hasSparkle: true),
+    _StarConfig(x: 0.62, y: 0.22, size: 1.6, phase: 0.18),
+    _StarConfig(x: 0.65, y: 0.82, size: 1.3, phase: 0.62),
+
+    // Mid-right span
+    _StarConfig(x: 0.69, y: 0.32, size: 2.4, phase: 0.88, hasSparkle: true),
+    _StarConfig(x: 0.72, y: 0.68, size: 1.5, phase: 0.08),
+    _StarConfig(x: 0.76, y: 0.24, size: 1.2, phase: 0.52),
+    _StarConfig(x: 0.79, y: 0.85, size: 2.6, phase: 0.95, hasSparkle: true),
+    _StarConfig(x: 0.82, y: 0.36, size: 1.4, phase: 0.22),
+    _StarConfig(x: 0.85, y: 0.70, size: 1.7, phase: 0.68),
+
+    // Far right cluster
+    _StarConfig(x: 0.88, y: 0.20, size: 1.3, phase: 0.35),
+    _StarConfig(x: 0.91, y: 0.78, size: 2.7, phase: 0.80, hasSparkle: true),
+    _StarConfig(x: 0.94, y: 0.30, size: 1.5, phase: 0.12),
+    _StarConfig(x: 0.97, y: 0.65, size: 1.2, phase: 0.50),
+
+    // Ambient stardust pinpoints (soft shimmer)
+    _StarConfig(x: 0.13, y: 0.55, size: 1.0, phase: 0.25, color: Color(0xFF80DEEA)),
+    _StarConfig(x: 0.25, y: 0.45, size: 0.9, phase: 0.70, color: Color(0xFFE0F7FA)),
+    _StarConfig(x: 0.41, y: 0.50, size: 1.1, phase: 0.40, color: Color(0xFF80DEEA)),
+    _StarConfig(x: 0.60, y: 0.60, size: 1.0, phase: 0.85, color: Color(0xFFE0F7FA)),
+    _StarConfig(x: 0.74, y: 0.48, size: 0.9, phase: 0.30, color: Color(0xFF80DEEA)),
+    _StarConfig(x: 0.87, y: 0.52, size: 1.0, phase: 0.75, color: Color(0xFFE0F7FA)),
   ];
 
   static const List<_ParticleConfig> _bubbles = [
-    _ParticleConfig(baseX: 0.12, speed: 0.85, sway: 7.0, size: 3.2, phase: 0.15),
-    _ParticleConfig(baseX: 0.24, speed: 1.15, sway: 9.0, size: 4.2, phase: 0.55),
-    _ParticleConfig(baseX: 0.38, speed: 0.75, sway: 6.0, size: 2.8, phase: 0.80),
-    _ParticleConfig(baseX: 0.52, speed: 1.25, sway: 10.0, size: 4.5, phase: 0.30),
-    _ParticleConfig(baseX: 0.66, speed: 0.90, sway: 8.0, size: 3.6, phase: 0.65),
-    _ParticleConfig(baseX: 0.78, speed: 1.10, sway: 9.0, size: 4.0, phase: 0.10),
-    _ParticleConfig(baseX: 0.90, speed: 0.80, sway: 7.0, size: 3.0, phase: 0.70),
-    _ParticleConfig(baseX: 0.96, speed: 1.05, sway: 8.0, size: 3.8, phase: 0.40),
+    _ParticleConfig(baseX: 0.12, speed: 1, sway: 7.0, size: 3.2, phase: 0.15),
+    _ParticleConfig(baseX: 0.24, speed: 2, sway: 9.0, size: 4.2, phase: 0.55),
+    _ParticleConfig(baseX: 0.38, speed: 1, sway: 6.0, size: 2.8, phase: 0.80),
+    _ParticleConfig(baseX: 0.52, speed: 2, sway: 10.0, size: 4.5, phase: 0.30),
+    _ParticleConfig(baseX: 0.66, speed: 1, sway: 8.0, size: 3.6, phase: 0.65),
+    _ParticleConfig(baseX: 0.78, speed: 2, sway: 9.0, size: 4.0, phase: 0.10),
+    _ParticleConfig(baseX: 0.90, speed: 1, sway: 7.0, size: 3.0, phase: 0.70),
+    _ParticleConfig(baseX: 0.96, speed: 2, sway: 8.0, size: 3.8, phase: 0.40),
   ];
 
   static const List<_LeafConfig> _leaves = [
-    _LeafConfig(baseX: 0.08, speed: 0.85, sway: 14.0, size: 6.8, phase: 0.10, color: Color(0xFF2EA043)),
-    _LeafConfig(baseX: 0.22, speed: 1.15, sway: 16.0, size: 8.2, phase: 0.45, color: Color(0xFFE28743)),
-    _LeafConfig(baseX: 0.36, speed: 0.75, sway: 12.0, size: 6.2, phase: 0.80, color: Color(0xFF1A7F37)),
-    _LeafConfig(baseX: 0.50, speed: 1.20, sway: 18.0, size: 8.5, phase: 0.25, color: Color(0xFFD97706)),
-    _LeafConfig(baseX: 0.65, speed: 0.90, sway: 15.0, size: 7.2, phase: 0.65, color: Color(0xFF2EA043)),
-    _LeafConfig(baseX: 0.78, speed: 1.10, sway: 16.0, size: 8.0, phase: 0.15, color: Color(0xFFE28743)),
-    _LeafConfig(baseX: 0.88, speed: 0.80, sway: 13.0, size: 6.5, phase: 0.70, color: Color(0xFF1A7F37)),
-    _LeafConfig(baseX: 0.96, speed: 1.05, sway: 15.0, size: 7.4, phase: 0.35, color: Color(0xFFD97706)),
+    _LeafConfig(baseX: 0.08, speed: 1, sway: 14.0, size: 6.8, phase: 0.10, color: Color(0xFF2EA043)),
+    _LeafConfig(baseX: 0.22, speed: 2, sway: 16.0, size: 8.2, phase: 0.45, color: Color(0xFFE28743)),
+    _LeafConfig(baseX: 0.36, speed: 1, sway: 12.0, size: 6.2, phase: 0.80, color: Color(0xFF1A7F37)),
+    _LeafConfig(baseX: 0.50, speed: 2, sway: 18.0, size: 8.5, phase: 0.25, color: Color(0xFFD97706)),
+    _LeafConfig(baseX: 0.65, speed: 1, sway: 15.0, size: 7.2, phase: 0.65, color: Color(0xFF2EA043)),
+    _LeafConfig(baseX: 0.78, speed: 2, sway: 16.0, size: 8.0, phase: 0.15, color: Color(0xFFE28743)),
+    _LeafConfig(baseX: 0.88, speed: 1, sway: 13.0, size: 6.5, phase: 0.70, color: Color(0xFF1A7F37)),
+    _LeafConfig(baseX: 0.96, speed: 2, sway: 15.0, size: 7.4, phase: 0.35, color: Color(0xFFD97706)),
   ];
 
   _HeaderThemeParticlesPainter({
@@ -545,7 +589,7 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
     for (final p in _petals) {
       final t = (progress * p.speed + p.phase) % 1.0;
       final x = (p.baseX * size.width) + math.sin(t * 2 * math.pi + p.phase) * p.sway;
-      final y = t * size.height;
+      final y = -p.size + t * (size.height + p.size * 2);
       final opacity = (math.sin(t * math.pi) * 0.85).clamp(0.0, 1.0);
       final rotation = (t * 2 * math.pi) + p.phase;
 
@@ -626,13 +670,18 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
       ..close();
     canvas.drawPath(crescent, _moonPaint);
 
-    // 2. Twinkling Cosmic Stars distributed across the entire header width
-    for (int i = 0; i < _stars.length; i++) {
-      final pos = Offset(_stars[i].dx * size.width, _stars[i].dy * size.height);
-      final phase = (progress + (i * 0.18)) % 1.0;
-      final alpha = (math.sin(phase * 2 * math.pi).abs() * 0.85).clamp(0.0, 1.0);
-      final starColor = const Color(0xFF00E5FF).withValues(alpha: alpha);
-      _drawSparkle(canvas, pos, phase, starColor);
+    // 2. Rich Twinkling Cosmic Stars distributed across the entire header width
+    for (final s in _stars) {
+      final pos = Offset(s.x * size.width, s.y * size.height);
+      final twinkle = 0.25 + 0.75 * (0.5 + 0.5 * math.sin((progress + s.phase) * 2 * math.pi));
+      final alpha = (twinkle * 0.9).clamp(0.0, 1.0);
+      final starColor = s.color.withValues(alpha: alpha);
+
+      if (s.hasSparkle) {
+        _drawSparkle(canvas, pos, (progress + s.phase) % 1.0, starColor);
+      }
+      _fillPaint.color = starColor;
+      canvas.drawCircle(pos, s.size * (0.7 + 0.3 * twinkle), _fillPaint);
     }
 
     // Tap burst stars
@@ -649,11 +698,12 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
   }
 
   void _drawSparkle(Canvas canvas, Offset center, double phase, Color color) {
-    final arm = 3.5 + 1.8 * math.sin(phase * 2 * math.pi);
+    final arm = 2.2 + 2.0 * (0.5 + 0.5 * math.sin(phase * 2 * math.pi));
     _sparklePaint.color = color;
 
     canvas.drawLine(Offset(center.dx - arm, center.dy), Offset(center.dx + arm, center.dy), _sparklePaint);
     canvas.drawLine(Offset(center.dx, center.dy - arm), Offset(center.dx, center.dy + arm), _sparklePaint);
+    canvas.drawCircle(center, 1.0, _sparklePaint);
   }
 
   // ==========================================
@@ -664,10 +714,10 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
     final rippleCenter = Offset(28.0, size.height * 0.55);
     _strokePaint.strokeWidth = 1.0;
 
-    for (int i = 0; i < 3; i++) {
-      final ringProgress = (progress + (i * 0.33)) % 1.0;
-      final radius = 14.0 + (ringProgress * 70.0);
-      final ringAlpha = ((1.0 - ringProgress) * 0.32).clamp(0.0, 1.0);
+    for (int i = 0; i < 4; i++) {
+      final ringProgress = (progress + (i * 0.25)) % 1.0;
+      final radius = 10.0 + (ringProgress * 85.0);
+      final ringAlpha = (math.sin(ringProgress * math.pi) * 0.32).clamp(0.0, 1.0);
 
       _strokePaint.color = const Color(0xFF58A6FF).withValues(alpha: ringAlpha);
       canvas.drawCircle(rippleCenter, radius, _strokePaint);
@@ -675,9 +725,9 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
 
     // 2. Rising aquatic bubbles across the entire header width
     for (final b in _bubbles) {
-      final t = (1.0 - ((progress * b.speed + b.phase) % 1.0));
-      final x = (b.baseX * size.width) + math.sin(t * 3 * math.pi) * b.sway;
-      final y = t * size.height;
+      final t = (progress * b.speed + b.phase) % 1.0;
+      final y = size.height + b.size - t * (size.height + b.size * 2);
+      final x = (b.baseX * size.width) + math.sin(t * 2 * math.pi + b.phase) * b.sway;
       final alpha = (math.sin(t * math.pi) * 0.55).clamp(0.0, 1.0);
 
       _fillPaint.color = const Color(0xFF58A6FF).withValues(alpha: alpha);
@@ -710,7 +760,7 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
     for (final l in _leaves) {
       final t = (progress * l.speed + l.phase) % 1.0;
       final x = (l.baseX * size.width) + math.sin(t * 2 * math.pi + l.phase) * l.sway;
-      final y = t * size.height;
+      final y = -l.size + t * (size.height + l.size * 2);
       final alpha = (math.sin(t * math.pi) * 0.8).clamp(0.0, 1.0);
       final rotation = (t * 2 * math.pi) + l.phase;
 
@@ -770,7 +820,7 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
 
 class _ParticleConfig {
   final double baseX;
-  final double speed;
+  final int speed;
   final double sway;
   final double size;
   final double phase;
@@ -786,7 +836,7 @@ class _ParticleConfig {
 
 class _LeafConfig {
   final double baseX;
-  final double speed;
+  final int speed;
   final double sway;
   final double size;
   final double phase;
@@ -799,5 +849,23 @@ class _LeafConfig {
     required this.size,
     required this.phase,
     required this.color,
+  });
+}
+
+class _StarConfig {
+  final double x;
+  final double y;
+  final double size;
+  final double phase;
+  final bool hasSparkle;
+  final Color color;
+
+  const _StarConfig({
+    required this.x,
+    required this.y,
+    required this.size,
+    required this.phase,
+    this.hasSparkle = false,
+    this.color = const Color(0xFF00E5FF),
   });
 }

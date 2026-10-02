@@ -12,8 +12,8 @@
 
 ### The Rhythm of Your Code. On-Device Developer Telemetry & Productivity Analytics.
 
-[![Release](https://img.shields.io/badge/Release-v1.0.8-38BDF8?style=flat-square&logo=github)](https://github.com/zerabyte88/gitpulse_mobile/releases)
-[![Build](https://img.shields.io/badge/Build-9-34D399?style=flat-square)](pubspec.yaml)
+[![Release](https://img.shields.io/badge/Release-v1.0.9-38BDF8?style=flat-square&logo=github)](https://github.com/zerabyte88/gitpulse_mobile/releases)
+[![Build](https://img.shields.io/badge/Build-10-34D399?style=flat-square)](pubspec.yaml)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.24.0-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-%3E%3D3.5.0-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
 [![Platform](https://img.shields.io/badge/Platform-Android%2064--bit%20%7C%20Web-10B981?style=flat-square&logo=android&logoColor=white)](https://developer.android.com)
@@ -144,8 +144,8 @@ sequenceDiagram
 
     User->>App: Launch App / Tap "Check for Updates"
     App->>GitHub: GET /repos/zerabyte88/gitpulse_mobile/releases/latest
-    GitHub-->>App: Tag Name (e.g., v1.0.8), Release Notes, APK Asset URL
-    alt Version is newer (v1.0.8 > v1.0.7)
+    GitHub-->>App: Tag Name (e.g., v1.0.9), Release Notes, APK Asset URL
+    alt Version is newer (v1.0.9 > v1.0.8)
         App->>User: Display Update Notification Card
         User->>App: Tap "Update Now"
         App->>GitHub: Stream APK Binary via ota_update
@@ -155,7 +155,7 @@ sequenceDiagram
     else Version is current
         App-->>User: "App is already up to date"
     end
-    Note over App,Storage: On Next App Startup (v1.0.8):
+    Note over App,Storage: On Next App Startup (v1.0.9):
     App->>Storage: Scan for GitPulse-*.apk where fileVersion <= currentVersion
     App->>Storage: Safely Purge Installed APK & Delete Empty Folder
     Note over Storage: User Photos, Documents & Other Downloads Remain Untouched
@@ -299,7 +299,7 @@ gitpulse_mobile/
 │       └── tech_news_card.dart      # Trending digest & news cards
 ├── test/
 │   └── widget_test.dart             # Comprehensive test suite (31/31 passing)
-└── pubspec.yaml                     # Dependency manifest & version metadata (v1.0.8+9)
+└── pubspec.yaml                     # Dependency manifest & version metadata (v1.0.9+10)
 ```
 
 ---
