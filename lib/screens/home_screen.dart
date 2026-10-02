@@ -6,6 +6,7 @@ import '../services/github_api_service.dart';
 import '../services/storage_service.dart';
 import '../services/tech_news_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/animated_app_header.dart';
 import '../widgets/settings_sheet.dart';
 import '../widgets/tech_news_card.dart';
 import 'stats_detail_screen.dart';
@@ -212,49 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceElevated,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppTheme.border, width: 1),
-                ),
-                child: Icon(
-                  Icons.terminal_rounded,
-                  color: AppTheme.primaryCyan,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'GitPulse',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 17.5,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceElevated,
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(color: AppTheme.border, width: 0.8),
-                ),
-                child: Text(
-                  AppConfig.appVersion,
-                  style: TextStyle(
-                    color: AppTheme.textMuted,
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          title: const AnimatedAppHeader(),
           actions: [
             if (rateLimit != null)
               GestureDetector(

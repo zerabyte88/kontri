@@ -470,54 +470,60 @@ GitHub: https://github.com/${u.login}
               ],
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: StatCard(
-                    label: loc.currentStreak,
-                    value: '${cStats.currentStreak} ${loc.daysUnit}',
-                    icon: Icons.whatshot_rounded,
-                    accentColor: AppTheme.accentOrange,
-                    subtitle: cStats.currentStreak > 0
-                        ? loc.activeNowBadge
-                        : loc.notActiveYetBadge,
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: StatCard(
+                      label: loc.currentStreak,
+                      value: '${cStats.currentStreak} ${loc.daysUnit}',
+                      icon: Icons.whatshot_rounded,
+                      accentColor: AppTheme.accentOrange,
+                      subtitle: cStats.currentStreak > 0
+                          ? loc.activeNowBadge
+                          : loc.notActiveYetBadge,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: StatCard(
-                    label: loc.longestStreak,
-                    value: '${cStats.longestStreak} ${loc.daysUnit}',
-                    icon: Icons.emoji_events_rounded,
-                    accentColor: AppTheme.accentAmber,
-                    subtitle: loc.consistencyRecord,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: StatCard(
+                      label: loc.longestStreak,
+                      value: '${cStats.longestStreak} ${loc.daysUnit}',
+                      icon: Icons.emoji_events_rounded,
+                      accentColor: AppTheme.accentAmber,
+                      subtitle: loc.consistencyRecord,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: StatCard(
-                    label: '${loc.thisYearContributions} ($currentYear)',
-                    value: '${cStats.thisYearContributions}',
-                    icon: Icons.calendar_today_rounded,
-                    accentColor: AppTheme.primaryCyan,
-                    subtitle: loc.thisYearSubtitle,
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: StatCard(
+                      label: '${loc.thisYearContributions} ($currentYear)',
+                      value: '${cStats.thisYearContributions}',
+                      icon: Icons.calendar_today_rounded,
+                      accentColor: AppTheme.primaryCyan,
+                      subtitle: loc.thisYearSubtitle,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: StatCard(
-                    label: loc.allYearsContributions,
-                    value: '${cStats.totalContributions}',
-                    icon: Icons.all_inclusive_rounded,
-                    accentColor: AppTheme.primaryViolet,
-                    subtitle: loc.allTimeSubtitle,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: StatCard(
+                      label: loc.allYearsContributions,
+                      value: '${cStats.totalContributions}',
+                      icon: Icons.all_inclusive_rounded,
+                      accentColor: AppTheme.primaryViolet,
+                      subtitle: loc.allTimeSubtitle,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -545,50 +551,56 @@ GitHub: https://github.com/${u.login}
               ],
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: StatCard(
-                    label: loc.totalStars,
-                    value: '${widget.stats.totalStars}',
-                    icon: Icons.star_outline_rounded,
-                    accentColor: AppTheme.accentAmber,
-                    subtitle: loc.acrossAllRepos,
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: StatCard(
+                      label: loc.totalStars,
+                      value: '${widget.stats.totalStars}',
+                      icon: Icons.star_outline_rounded,
+                      accentColor: AppTheme.accentAmber,
+                      subtitle: loc.acrossAllRepos,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: StatCard(
-                    label: loc.publicRepos,
-                    value: '${user.publicRepos}',
-                    icon: Icons.folder_open_rounded,
-                    accentColor: AppTheme.primaryCyan,
-                    subtitle: loc.registeredReposSubtitle,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: StatCard(
+                      label: loc.publicRepos,
+                      value: '${user.publicRepos}',
+                      icon: Icons.folder_open_rounded,
+                      accentColor: AppTheme.primaryCyan,
+                      subtitle: loc.registeredReposSubtitle,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: StatCard(
-                    label: loc.followers,
-                    value: '${user.followers}',
-                    icon: Icons.people_outline_rounded,
-                    accentColor: AppTheme.accentGreen,
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: StatCard(
+                      label: loc.followers,
+                      value: '${user.followers}',
+                      icon: Icons.people_outline_rounded,
+                      accentColor: AppTheme.accentGreen,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: StatCard(
-                    label: loc.totalForks,
-                    value: '${widget.stats.totalForks}',
-                    icon: Icons.call_split_rounded,
-                    accentColor: AppTheme.primaryViolet,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: StatCard(
+                      label: loc.totalForks,
+                      value: '${widget.stats.totalForks}',
+                      icon: Icons.call_split_rounded,
+                      accentColor: AppTheme.primaryViolet,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 18),
 

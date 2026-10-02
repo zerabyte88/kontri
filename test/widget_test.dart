@@ -12,11 +12,15 @@ import 'package:gitpulse_mobile/models/tech_news.dart';
 import 'package:gitpulse_mobile/models/user_stats.dart';
 import 'package:gitpulse_mobile/screens/stats_detail_screen.dart';
 import 'package:gitpulse_mobile/services/storage_service.dart';
+import 'package:gitpulse_mobile/services/app_theme_service.dart';
 import 'package:gitpulse_mobile/services/tech_news_service.dart';
 import 'package:gitpulse_mobile/services/update_service.dart';
 import 'package:gitpulse_mobile/theme/app_theme.dart';
+import 'package:flutter/rendering.dart';
+import 'package:gitpulse_mobile/widgets/animated_app_header.dart';
 import 'package:gitpulse_mobile/widgets/animated_tier_title.dart';
 import 'package:gitpulse_mobile/widgets/language_chart.dart';
+import 'package:gitpulse_mobile/widgets/stat_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -663,12 +667,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v1.0.6', () {
+    test('AppConfig provides accurate release and version telemetry for v1.0.7', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v1.0.6');
-      expect(AppConfig.buildNumber, '7');
-      expect(AppConfig.fullVersion, 'v1.0.6 (Build 7)');
-      expect(AppConfig.releaseTag, 'v1.0.6');
+      expect(AppConfig.appVersion, 'v1.0.7');
+      expect(AppConfig.buildNumber, '8');
+      expect(AppConfig.fullVersion, 'v1.0.7 (Build 8)');
+      expect(AppConfig.releaseTag, 'v1.0.7');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -877,6 +881,116 @@ void main() {
 
       // Developer avatar URL points to avatars.githubusercontent.com for reliable CDN delivery
       expect(AppConfig.developerAvatarUrl, 'https://avatars.githubusercontent.com/zerabyte88');
+    });
+
+    test('TechNews.sanitizeImageUrl unwraps Dev.to proxy URLs to direct AWS S3 URLs', () {
+      const proxyUrl = 'https://media2.dev.to/dynamic/image/width=1000,fit=scale/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fsample.png';
+      final sanitized = TechNews.sanitizeImageUrl(proxyUrl);
+      expect(sanitized, 'https://dev-to-uploads.s3.us-east-2.amazonaws.com/uploads/articles/sample.png');
+
+      const regularUrl = 'https://example.com/image.jpg';
+      expect(TechNews.sanitizeImageUrl(regularUrl), 'https://example.com/image.jpg');
+
+      expect(TechNews.sanitizeImageUrl(null), isNull);
+      expect(TechNews.sanitizeImageUrl(''), isNull);
+    });
+
+    testWidgets('AnimatedAppHeader renders terminal icon, GitPulse title, and version badge', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      AppThemeService.init(storage);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            appBar: AppBar(
+              title: const AnimatedAppHeader(),
+            ),
+          ),
+        ),
+      );
+
+      // Verify GitPulse title and version are rendered
+      expect(find.text('GitPulse'), findsOneWidget);
+      expect(find.text(AppConfig.appVersion), findsOneWidget);
+      expect(find.byIcon(Icons.terminal_rounded), findsOneWidget);
+
+      // Test theme mode toggling
+      await AppThemeService.changeTheme(AppThemeMode.amoledJapanese, storage);
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.text('GitPulse'), findsOneWidget);
+
+      await AppThemeService.changeTheme(AppThemeMode.amoled, storage);
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.text('GitPulse'), findsOneWidget);
+
+      await AppThemeService.changeTheme(AppThemeMode.light, storage);
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.text('GitPulse'), findsOneWidget);
+    });
+
+    testWidgets('StatCard renders long English and multi-language contribution titles without truncation', (tester) async {
+      final currentYear = DateTime.now().year;
+
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.75;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      for (final lang in [AppLanguage.english, AppLanguage.indonesian, AppLanguage.japanese]) {
+        final loc = AppLocalizations(lang);
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: StatCard(
+                          label: '${loc.thisYearContributions} ($currentYear)',
+                          value: '370',
+                          icon: Icons.calendar_today_rounded,
+                          accentColor: Colors.cyan,
+                          subtitle: loc.thisYearSubtitle,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: StatCard(
+                          label: loc.allYearsContributions,
+                          value: '371',
+                          icon: Icons.all_inclusive_rounded,
+                          accentColor: Colors.purple,
+                          subtitle: loc.allTimeSubtitle,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        final leftLabelFinder = find.text('${loc.thisYearContributions} ($currentYear)');
+        final rightLabelFinder = find.text(loc.allYearsContributions);
+        expect(leftLabelFinder, findsOneWidget);
+        expect(rightLabelFinder, findsOneWidget);
+
+        // Verify that neither label exceeded maxLines (i.e. did not truncate with ellipsis)
+        final leftParagraph = tester.renderObject<RenderParagraph>(leftLabelFinder);
+        final rightParagraph = tester.renderObject<RenderParagraph>(rightLabelFinder);
+        expect(leftParagraph.didExceedMaxLines, isFalse,
+            reason: 'Left card label for ${lang.code} should not be truncated');
+        expect(rightParagraph.didExceedMaxLines, isFalse,
+            reason: 'Right card label for ${lang.code} should not be truncated');
+      }
     });
   });
 }

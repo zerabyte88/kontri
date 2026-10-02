@@ -12,13 +12,13 @@
 
 ### Enterprise-Grade Developer Telemetry & Productivity Analytics
 
-[![Release](https://img.shields.io/badge/Release-v1.0.6-blue?style=flat-square)](https://github.com/zerabyte88/gitpulse_mobile/releases)
-[![Build](https://img.shields.io/badge/Build-7-brightgreen?style=flat-square)](pubspec.yaml)
+[![Release](https://img.shields.io/badge/Release-v1.0.7-blue?style=flat-square)](https://github.com/zerabyte88/gitpulse_mobile/releases)
+[![Build](https://img.shields.io/badge/Build-8-brightgreen?style=flat-square)](pubspec.yaml)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.24.0-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-%3E%3D3.5.0-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
 [![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20Web-10B981?style=flat-square&logo=android&logoColor=white)](https://developer.android.com)
 [![CI/CD Status](https://img.shields.io/badge/CI%2FCD-Passing-brightgreen?style=flat-square&logo=githubactions&logoColor=white)](.github/workflows/main.yml)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(28%2F28)-success?style=flat-square)](test/widget_test.dart)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(31%2F31)-success?style=flat-square)](test/widget_test.dart)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Layered-orange?style=flat-square)](#system-architecture--data-flow)
 [![License](https://img.shields.io/badge/License-MIT-8B5CF6?style=flat-square)](LICENSE)
 
@@ -233,7 +233,7 @@ GitPulse Mobile follows **Clean Layered Architecture** principles to separate co
 │   │  • Deterministic Persona Classifier (Star Magnet, Midnight Owl, Polyglot, etc.)│   │
 │   ├────────────────────────────────────────────────────────────────────────────────┤   │
 │   │                              UpdateService & OTA Engine                        │   │
-│   │  • Semantic Version Comparator (e.g., v1.0.6 > v1.0.5)                         │   │
+│   │  • Semantic Version Comparator (e.g., v1.0.7 > v1.0.6)                         │   │
 │   │  • PackageInstaller Stream & Primary APK in /Download/GitPulse                 │   │
 │   │  • Safe Auto-Cleanup Routine for Installed APKs & Empty Directories            │   │
 │   ├────────────────────────────────────────────────────────────────────────────────┤   │
@@ -299,7 +299,7 @@ GitPulse Mobile features a centralized `AppThemeService` paired with dynamic col
                     │
                     ▼
        2. Semantic Version Comparator
-         (Compares Tag e.g. v1.0.6 vs Installed v1.0.5)
+         (Compares Tag e.g. v1.0.7 vs Installed v1.0.6)
                     │
        ┌────────────┴────────────┐
        ▼                         ▼
@@ -307,7 +307,7 @@ Already Up-to-Date       New Version Available!
  "Already up to date"            │
                                  ▼
                          3. Extract APK Asset URL
-                         (e.g., GitPulse-v1.0.6.apk)
+                         (e.g., GitPulse-v1.0.7.apk)
                                  │
                                  ▼
                          4. Background Download Stream
@@ -327,7 +327,7 @@ Already Up-to-Date       New Version Available!
 ```
 
 - **In-Place Upgrade**: Directly upgrades the app without requiring an uninstall, keeping tokens, bookmarks, and preferences completely intact.
-- **Dedicated `/Download/GitPulse` Folder**: The primary downloaded APK file is automatically saved into `/storage/emulated/0/Download/GitPulse/GitPulse-v1.0.6.apk`.
+- **Dedicated `/Download/GitPulse` Folder**: The primary downloaded APK file is automatically saved into `/storage/emulated/0/Download/GitPulse/GitPulse-v1.0.7.apk`.
 - **Post-Install Storage Auto-Cleanup**: Once the app launches on the updated version, installed APK packages are automatically purged and empty folders are removed, with zero risk to user documents or personal media.
 - **Browser Fallback**: If system installer permissions are restricted by OEM device policies, a dedicated button opens the release asset directly in the system browser.
 
@@ -433,19 +433,20 @@ gitpulse_mobile/
 │   │   ├── tech_news_service.dart   # Curated tech news & GitHub trending fetcher
 │   │   └── update_service.dart      # Semantic version check, OTA download & auto-cleanup
 │   ├── theme/                       # Design system tokens & application metadata
-│   │   └── app_theme.dart           # 4-theme color definitions, typography & AppConfig (v1.0.6)
+│   │   └── app_theme.dart           # 4-theme color definitions, typography & AppConfig (v1.0.7)
 │   └── widgets/                     # Modular reusable UI components
 │       ├── activity_chart.dart      # 24-hour activity bar chart (fl_chart)
+│       ├── animated_app_header.dart # Themed dynamic logo & title particle animations
 │       ├── animated_tier_title.dart # Level-tailored animated status badge (Tiers 1-6)
 │       ├── language_chart.dart      # Language distribution donut chart (fl_chart)
 │       ├── repo_tile.dart           # GitHub native repository card (RepaintBoundary)
 │       ├── settings_sheet.dart      # Modal sheet for theme, updates, PAT, & About
-│       ├── stat_card.dart           # Summary metric card
+│       ├── stat_card.dart           # Summary metric card (stretch-aligned, auto-wrapped)
 │       └── tech_news_card.dart      # Engineering digest & trending card widget
 ├── test/
-│   └── widget_test.dart             # Complete unit, model, and OTA update test suite (28 tests)
+│   └── widget_test.dart             # Complete unit, model, and OTA update test suite (31 tests)
 ├── web/                             # Web/PWA deployment entrypoint
-└── pubspec.yaml                     # Dependency manifest & version metadata (v1.0.6+7)
+└── pubspec.yaml                     # Dependency manifest & version metadata (v1.0.7+8)
 ```
 
 ---

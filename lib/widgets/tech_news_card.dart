@@ -71,23 +71,32 @@ class TechNewsCard extends StatelessWidget {
                         child: Image.network(
                           news.coverImage!,
                           fit: BoxFit.cover,
-                          cacheWidth: 450,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            color: AppTheme.surfaceElevated,
-                            child: Center(
-                              child: Icon(
-                                Icons.image_outlined,
-                                size: 24,
-                                color: AppTheme.textMuted.withValues(alpha: 0.4),
+                          cacheWidth: 600,
+                          headers: const {
+                            'User-Agent':
+                                'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+                            'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              height: 130,
+                              color: AppTheme.surfaceElevated,
+                              child: Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppTheme.primaryCyan.withValues(alpha: 0.4),
+                                  ),
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) =>
-                            const SizedBox.shrink(),
-                      ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildFallbackThumbnail(),
+                        ),
                     ),
                     Positioned(
                       bottom: 0,
@@ -257,8 +266,64 @@ class TechNewsCard extends StatelessWidget {
         ),
       ),
     ),
+  );
+}
+
+  Widget _buildFallbackThumbnail() {
+    return Container(
+      height: 130,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.surfaceElevated,
+            AppTheme.surface,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            right: -10,
+            bottom: -15,
+            child: Icon(
+              Icons.terminal_rounded,
+              size: 90,
+              color: AppTheme.primaryCyan.withValues(alpha: 0.05),
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryCyan.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.article_rounded,
+                  size: 22,
+                  color: AppTheme.primaryCyan,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'GitPulse Tech Digest',
+                style: TextStyle(
+                  color: AppTheme.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
-
-
 }

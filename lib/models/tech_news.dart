@@ -37,17 +37,44 @@ class TechNews {
           .toList();
     }
 
+    final rawCover = json['cover_image'] as String? ?? json['social_image'] as String?;
+
     return TechNews(
       id: json['id'] as int? ?? 0,
       title: json['title'] as String? ?? 'No Title',
       description: json['description'] as String? ?? '',
       url: json['url'] as String? ?? '',
-      coverImage: json['cover_image'] as String? ?? json['social_image'] as String?,
+      coverImage: sanitizeImageUrl(rawCover),
       authorName: user?['name'] as String? ?? user?['username'] as String? ?? 'Tech Contributor',
       authorAvatar: user?['profile_image_90'] as String? ?? user?['profile_image'] as String?,
       publishedDate: json['readable_publish_date'] as String? ?? 'Terbaru',
       readingTimeMinutes: json['reading_time_minutes'] as int? ?? 3,
       tags: tags,
     );
+  }
+
+  /// Extracts direct CDN / S3 URLs from dev.to dynamic proxy wrappers
+  /// preventing image timeouts and 403 blocks.
+  static String? sanitizeImageUrl(String? rawUrl) {
+    if (rawUrl == null || rawUrl.trim().isEmpty) return null;
+    final trimmed = rawUrl.trim();
+
+    final match = RegExp(
+      r'/https(?:%3A|:)(?:%2F|/)(?:%2F|/)(.+)$',
+      caseSensitive: false,
+    ).firstMatch(trimmed);
+
+    if (match != null) {
+      final inner = match.group(1);
+      if (inner != null) {
+        try {
+          final decoded = Uri.decodeFull('https://$inner');
+          if (decoded.startsWith('http://') || decoded.startsWith('https://')) {
+            return decoded;
+          }
+        } catch (_) {}
+      }
+    }
+    return trimmed;
   }
 }
