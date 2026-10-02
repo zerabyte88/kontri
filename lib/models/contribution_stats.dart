@@ -138,8 +138,6 @@ class ContributionStats {
     int current = 0;
     final nowLocal = DateTime.now();
     final todayLocal = DateTime.utc(nowLocal.year, nowLocal.month, nowLocal.day);
-    final nowUtc = nowLocal.toUtc();
-    final todayUtc = DateTime.utc(nowUtc.year, nowUtc.month, nowUtc.day);
 
     DateTime? lastActiveDate;
     for (int i = sortedDates.length - 1; i >= 0; i--) {
@@ -152,11 +150,9 @@ class ContributionStats {
 
     if (lastActiveDate != null) {
       final diffLocal = todayLocal.difference(lastActiveDate).inDays;
-      final diffUtc = todayUtc.difference(lastActiveDate).inDays;
-      final daysDiff = diffLocal.abs() <= diffUtc.abs() ? diffLocal : diffUtc;
 
       // Active streak: last commit is today (0), yesterday (1), or within 1 day timezone skew (-1)
-      if (daysDiff >= -1 && daysDiff <= 1) {
+      if (diffLocal >= -1 && diffLocal <= 1) {
         DateTime cur = lastActiveDate;
         while (true) {
           final count = dayCounts[cur] ?? 0;

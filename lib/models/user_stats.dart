@@ -36,20 +36,18 @@ class UserStats {
     int totalForks = 0;
     final Map<String, int> langCounts = {};
 
+    final hasAggregated = aggregatedLanguages != null && aggregatedLanguages.isNotEmpty;
+    if (hasAggregated) {
+      langCounts.addAll(aggregatedLanguages);
+    }
+
     for (final repo in repos) {
       totalStars += repo.stargazersCount;
       totalForks += repo.forksCount;
-    }
 
-    if (aggregatedLanguages != null && aggregatedLanguages.isNotEmpty) {
-      langCounts.addAll(aggregatedLanguages);
-    } else {
-      // Fallback: weight by repo size in KB, or at least 1, excluding forks
-      for (final repo in repos) {
-        if (!repo.isFork && repo.language != null && repo.language!.isNotEmpty) {
-          final weight = repo.size > 0 ? repo.size : 1;
-          langCounts[repo.language!] = (langCounts[repo.language!] ?? 0) + weight;
-        }
+      if (!hasAggregated && !repo.isFork && repo.language != null && repo.language!.isNotEmpty) {
+        final weight = repo.size > 0 ? repo.size : 1;
+        langCounts[repo.language!] = (langCounts[repo.language!] ?? 0) + weight;
       }
     }
 

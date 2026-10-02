@@ -667,12 +667,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v1.0.7', () {
+    test('AppConfig provides accurate release and version telemetry for v1.0.8', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v1.0.7');
-      expect(AppConfig.buildNumber, '8');
-      expect(AppConfig.fullVersion, 'v1.0.7 (Build 8)');
-      expect(AppConfig.releaseTag, 'v1.0.7');
+      expect(AppConfig.appVersion, 'v1.0.8');
+      expect(AppConfig.buildNumber, '9');
+      expect(AppConfig.fullVersion, 'v1.0.8 (Build 9)');
+      expect(AppConfig.releaseTag, 'v1.0.8');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -905,16 +905,18 @@ void main() {
         MaterialApp(
           home: Scaffold(
             appBar: AppBar(
+              flexibleSpace: const AnimatedHeaderBackground(),
               title: const AnimatedAppHeader(),
             ),
           ),
         ),
       );
 
-      // Verify GitPulse title and version are rendered
+      // Verify GitPulse logo, background, title, and version are rendered
+      expect(find.byType(GitPulseLogo), findsOneWidget);
+      expect(find.byType(AnimatedHeaderBackground), findsOneWidget);
       expect(find.text('GitPulse'), findsOneWidget);
       expect(find.text(AppConfig.appVersion), findsOneWidget);
-      expect(find.byIcon(Icons.terminal_rounded), findsOneWidget);
 
       // Test theme mode toggling
       await AppThemeService.changeTheme(AppThemeMode.amoledJapanese, storage);

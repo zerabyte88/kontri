@@ -3,14 +3,251 @@ import 'package:flutter/material.dart';
 import '../services/app_theme_service.dart';
 import '../theme/app_theme.dart';
 
-/// Interactive, theme-adaptive animated header widget for GitPulse.
+/// Global controller to synchronize interactive particle bursts across the header.
+class HeaderAnimationState {
+  static final ValueNotifier<double> burstProgressNotifier = ValueNotifier<double>(1.0);
+  static DateTime _lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
+
+  static void triggerBurst() {
+    final now = DateTime.now();
+    if (now.difference(_lastTapTime).inMilliseconds > 300) {
+      _lastTapTime = now;
+      burstProgressNotifier.value = 0.0;
+    }
+  }
+}
+
+/// Bespoke vector logo for GitPulse.
 ///
-/// Dynamically animates the application name and logo at the top-left based on
-/// the currently active [AppThemeMode]:
-/// - [AppThemeMode.amoledJapanese]: Floating sakura cherry blossom petals & pink glow.
-/// - [AppThemeMode.amoled]: Crescent moon halo & twinkling cosmic stardust.
-/// - [AppThemeMode.dark]: Concentric expanding water ripples & rising aquatic bubbles.
-/// - [AppThemeMode.light]: Gentle breeze with fluttering, falling autumn & green leaves.
+/// Combines Git branch topology (nodes and branches) with an active
+/// cardiac pulse rhythm (vital ECG waveform) and a dynamic traveling pulse spark.
+class GitPulseLogo extends StatelessWidget {
+  final double size;
+  final Color color;
+  final double progress;
+
+  const GitPulseLogo({
+    super.key,
+    this.size = 20,
+    required this.color,
+    this.progress = 0.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: _GitPulseLogoPainter(
+          color: color,
+          progress: progress,
+        ),
+      ),
+    );
+  }
+}
+
+class _GitPulseLogoPainter extends CustomPainter {
+  final Color color;
+  final double progress;
+
+  static final Paint _linePaint = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeCap = StrokeCap.round
+    ..strokeJoin = StrokeJoin.round;
+  static final Paint _fillPaint = Paint()..style = PaintingStyle.fill;
+  static final Paint _strokePaint = Paint()..style = PaintingStyle.stroke;
+  static final Paint _glowPaint = Paint();
+  static final Paint _sparkGlow = Paint();
+  static final Paint _sparkCore = Paint()
+    ..color = Colors.white
+    ..style = PaintingStyle.fill;
+
+  _GitPulseLogoPainter({
+    required this.color,
+    required this.progress,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    final strokeWidth = (w * 0.09).clamp(1.4, 2.4);
+
+    _linePaint
+      ..color = color.withValues(alpha: 0.95)
+      ..strokeWidth = strokeWidth;
+
+    final baseNode = Offset(w * 0.20, h * 0.74);
+    final bottomNode = Offset(w * 0.80, h * 0.74);
+    final headNode = Offset(w * 0.82, h * 0.38);
+
+    // 1. Lower Git master branch line
+    canvas.drawLine(baseNode, bottomNode, _linePaint);
+
+    // 2. Upper Git branch with ECG pulse waveform
+    final pulsePath = Path()..moveTo(baseNode.dx, baseNode.dy);
+
+    // Branch curve upward
+    pulsePath.cubicTo(
+      w * 0.22,
+      h * 0.52,
+      w * 0.30,
+      h * 0.46,
+      w * 0.38,
+      h * 0.46,
+    );
+
+    // ECG cardiac pulse spike
+    pulsePath.lineTo(w * 0.44, h * 0.52); // Pre-dip
+    pulsePath.lineTo(w * 0.54, h * 0.14); // High pulse spike (R-wave peak)
+    pulsePath.lineTo(w * 0.64, h * 0.70); // Deep S-wave valley
+    pulsePath.lineTo(w * 0.72, h * 0.38); // Recovery
+    pulsePath.lineTo(headNode.dx, headNode.dy); // Connecting to HEAD release node
+
+    canvas.drawPath(pulsePath, _linePaint);
+
+    // 3. Draw commit nodes (Origin, Main Branch, and HEAD Pulse Node)
+    final nodeRadius = w * 0.12;
+    final innerDotRadius = w * 0.055;
+
+    _fillPaint.color = AppTheme.surfaceElevated;
+    _strokePaint
+      ..color = color
+      ..strokeWidth = strokeWidth * 0.9;
+    final dotPaint = _glowPaint..color = color;
+
+    // Origin / Root Node
+    canvas.drawCircle(baseNode, nodeRadius, _fillPaint);
+    canvas.drawCircle(baseNode, nodeRadius, _strokePaint);
+    canvas.drawCircle(baseNode, innerDotRadius, dotPaint);
+
+    // Bottom branch node
+    canvas.drawCircle(bottomNode, nodeRadius * 0.85, _fillPaint);
+    canvas.drawCircle(bottomNode, nodeRadius * 0.85, _strokePaint);
+    canvas.drawCircle(bottomNode, innerDotRadius * 0.8, dotPaint);
+
+    // Active HEAD Pulse node with glowing aura
+    final pulseBreath = 0.5 + 0.5 * math.sin(progress * 2 * math.pi);
+    final headGlowPaint = Paint()
+      ..color = color.withValues(alpha: 0.35 * pulseBreath)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+    canvas.drawCircle(headNode, nodeRadius + 2.5 * pulseBreath, headGlowPaint);
+
+    canvas.drawCircle(headNode, nodeRadius, _fillPaint);
+    canvas.drawCircle(headNode, nodeRadius, _strokePaint);
+    canvas.drawCircle(headNode, innerDotRadius, dotPaint);
+
+    // 4. Live traveling pulse spark along the pulse branch
+    for (final metric in pulsePath.computeMetrics()) {
+      final t = (progress * 1.5) % 1.0;
+      final tangent = metric.getTangentForOffset(metric.length * t);
+      if (tangent != null) {
+        _sparkGlow
+          ..color = Colors.white.withValues(alpha: 0.8)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+
+        canvas.drawCircle(tangent.position, 1.8, _sparkGlow);
+        canvas.drawCircle(tangent.position, 1.1, _sparkCore);
+      }
+      break;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GitPulseLogoPainter oldDelegate) {
+    return oldDelegate.color != color || oldDelegate.progress != progress;
+  }
+}
+
+/// Full-width header background ambient particle animation widget for [AppBar.flexibleSpace].
+///
+/// Fills the entire AppBar header width and height with theme-adaptive visual effects:
+/// - 🌸 AMOLED Sakura: Drifting cherry blossom petals across the full header sky.
+/// - 🌙 AMOLED: Glowing crescent moon hovering in the night horizon & twinkling diamond stars across the entire width.
+/// - 💧 Dark Mode: Concentric water ripple waves washing across the header & rising aquatic micro-bubbles.
+/// - 🍃 Light Mode: Autumn and green leaves swirling across the header in a gentle breeze.
+class AnimatedHeaderBackground extends StatefulWidget {
+  const AnimatedHeaderBackground({super.key});
+
+  @override
+  State<AnimatedHeaderBackground> createState() => _AnimatedHeaderBackgroundState();
+}
+
+class _AnimatedHeaderBackgroundState extends State<AnimatedHeaderBackground>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  double _burstProgress = 1.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 6),
+    )..repeat();
+
+    HeaderAnimationState.burstProgressNotifier.addListener(_onBurstTriggered);
+  }
+
+  void _onBurstTriggered() {
+    if (mounted) {
+      setState(() {
+        _burstProgress = HeaderAnimationState.burstProgressNotifier.value;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    HeaderAnimationState.burstProgressNotifier.removeListener(_onBurstTriggered);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<AppThemeMode>(
+      valueListenable: AppThemeService.currentThemeNotifier,
+      builder: (context, currentTheme, _) {
+        final accentColor = _getThemeAccentColor(currentTheme);
+
+        return IgnorePointer(
+          child: RepaintBoundary(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, _) {
+                final t = _controller.value;
+                if (_burstProgress < 1.0) {
+                  _burstProgress = math.min(1.0, _burstProgress + 0.04);
+                }
+
+                return ClipRect(
+                  child: CustomPaint(
+                    size: Size.infinite,
+                    painter: _HeaderThemeParticlesPainter(
+                      progress: t,
+                      burstProgress: _burstProgress,
+                      themeMode: currentTheme,
+                      accentColor: accentColor,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Interactive header title widget for GitPulse.
+///
+/// Displays the custom [GitPulseLogo], animated title, and version badge,
+/// and triggers interactive burst animations across the entire header on tap.
 class AnimatedAppHeader extends StatefulWidget {
   final VoidCallback? onTap;
 
@@ -23,8 +260,6 @@ class AnimatedAppHeader extends StatefulWidget {
 class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  double _burstProgress = 1.0;
-  DateTime _lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
 
   @override
   void initState() {
@@ -42,13 +277,7 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
   }
 
   void _handleTap() {
-    final now = DateTime.now();
-    if (now.difference(_lastTapTime).inMilliseconds > 400) {
-      _lastTapTime = now;
-      setState(() {
-        _burstProgress = 0.0;
-      });
-    }
+    HeaderAnimationState.triggerBurst();
     widget.onTap?.call();
   }
 
@@ -67,45 +296,17 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
               animation: _controller,
               builder: (context, _) {
                 final t = _controller.value;
-                if (_burstProgress < 1.0) {
-                  _burstProgress = math.min(1.0, _burstProgress + 0.04);
-                }
 
                 return SizedBox(
                   height: 40,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Background theme particle layer
-                      Positioned(
-                        left: -12,
-                        top: -12,
-                        right: -16,
-                        bottom: -12,
-                        child: IgnorePointer(
-                          child: CustomPaint(
-                            painter: _HeaderThemeParticlesPainter(
-                              progress: t,
-                              burstProgress: _burstProgress,
-                              themeMode: currentTheme,
-                              accentColor: accentColor,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Core Header: Logo Box + App Title + Version Badge
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildLogoContainer(currentTheme, accentColor, t),
-                          const SizedBox(width: 9),
-                          _buildAnimatedTitle(currentTheme, accentColor, t),
-                          const SizedBox(width: 8),
-                          _buildVersionBadge(accentColor),
-                        ],
-                      ),
+                      _buildLogoContainer(currentTheme, accentColor, t),
+                      const SizedBox(width: 9),
+                      _buildAnimatedTitle(currentTheme, accentColor, t),
+                      const SizedBox(width: 8),
+                      _buildVersionBadge(accentColor),
                     ],
                   ),
                 );
@@ -122,7 +323,6 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
     Color accentColor,
     double progress,
   ) {
-    // Subtle pulsating glow based on active theme
     final pulse = 0.5 + 0.5 * math.sin(progress * 2 * math.pi);
     final glowAlpha = (0.12 + 0.16 * pulse).clamp(0.0, 1.0);
 
@@ -143,10 +343,10 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
           ),
         ],
       ),
-      child: Icon(
-        Icons.terminal_rounded,
+      child: GitPulseLogo(
+        size: 19,
         color: accentColor,
-        size: 18,
+        progress: progress,
       ),
     );
   }
@@ -156,7 +356,6 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
     Color accentColor,
     double progress,
   ) {
-    // Shimmer gradient highlights based on theme
     final cycle = (progress * 2) % 1.0;
     final gradientColors = _getTitleGradient(mode, accentColor, cycle);
 
@@ -199,60 +398,118 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
       ),
     );
   }
+}
 
-  Color _getThemeAccentColor(AppThemeMode mode) {
-    switch (mode) {
-      case AppThemeMode.amoledJapanese:
-        return const Color(0xFFFF5C8A);
-      case AppThemeMode.amoled:
-        return const Color(0xFF00E5FF);
-      case AppThemeMode.light:
-        return const Color(0xFF0969DA);
-      case AppThemeMode.dark:
-        return const Color(0xFF58A6FF);
-    }
-  }
-
-  List<Color> _getTitleGradient(
-    AppThemeMode mode,
-    Color accentColor,
-    double cycle,
-  ) {
-    switch (mode) {
-      case AppThemeMode.amoledJapanese:
-        return [
-          Colors.white,
-          Color.lerp(const Color(0xFFFFB6C1), const Color(0xFFFF5C8A), cycle)!,
-          Colors.white,
-        ];
-      case AppThemeMode.amoled:
-        return [
-          Colors.white,
-          Color.lerp(const Color(0xFF80DEEA), const Color(0xFF00E5FF), cycle)!,
-          Colors.white,
-        ];
-      case AppThemeMode.light:
-        return [
-          const Color(0xFF1F2328),
-          Color.lerp(const Color(0xFF0969DA), const Color(0xFF1F2328), cycle)!,
-          const Color(0xFF1F2328),
-        ];
-      case AppThemeMode.dark:
-        return [
-          const Color(0xFFF0F6FC),
-          Color.lerp(const Color(0xFF79C0FF), const Color(0xFF58A6FF), cycle)!,
-          const Color(0xFFF0F6FC),
-        ];
-    }
+Color _getThemeAccentColor(AppThemeMode mode) {
+  switch (mode) {
+    case AppThemeMode.amoledJapanese:
+      return const Color(0xFFFF5C8A);
+    case AppThemeMode.amoled:
+      return const Color(0xFF00E5FF);
+    case AppThemeMode.light:
+      return const Color(0xFF0969DA);
+    case AppThemeMode.dark:
+      return const Color(0xFF58A6FF);
   }
 }
 
-/// GPU-accelerated lightweight Canvas painter for theme-tailored ambient particle effects.
+List<Color> _getTitleGradient(
+  AppThemeMode mode,
+  Color accentColor,
+  double cycle,
+) {
+  switch (mode) {
+    case AppThemeMode.amoledJapanese:
+      return [
+        Colors.white,
+        Color.lerp(const Color(0xFFFFB6C1), const Color(0xFFFF5C8A), cycle)!,
+        Colors.white,
+      ];
+    case AppThemeMode.amoled:
+      return [
+        Colors.white,
+        Color.lerp(const Color(0xFF80DEEA), const Color(0xFF00E5FF), cycle)!,
+        Colors.white,
+      ];
+    case AppThemeMode.light:
+      return [
+        const Color(0xFF1F2328),
+        Color.lerp(const Color(0xFF0969DA), const Color(0xFF1F2328), cycle)!,
+        const Color(0xFF1F2328),
+      ];
+    case AppThemeMode.dark:
+      return [
+        const Color(0xFFF0F6FC),
+        Color.lerp(const Color(0xFF79C0FF), const Color(0xFF58A6FF), cycle)!,
+        const Color(0xFFF0F6FC),
+      ];
+  }
+}
+
+/// GPU-accelerated lightweight Canvas painter for full-width theme ambient particle effects.
 class _HeaderThemeParticlesPainter extends CustomPainter {
   final double progress;
   final double burstProgress;
   final AppThemeMode themeMode;
   final Color accentColor;
+
+  static final Paint _fillPaint = Paint()..style = PaintingStyle.fill;
+  static final Paint _strokePaint = Paint()..style = PaintingStyle.stroke;
+  static final Paint _glowPaint = Paint();
+  static final Paint _moonPaint = Paint()
+    ..color = const Color(0xFFE0F7FA).withValues(alpha: 0.92)
+    ..style = PaintingStyle.fill;
+  static final Paint _sparklePaint = Paint()
+    ..strokeWidth = 1.0
+    ..strokeCap = StrokeCap.round;
+
+  static const List<_ParticleConfig> _petals = [
+    _ParticleConfig(baseX: 0.06, speed: 0.75, sway: 12.0, size: 6.0, phase: 0.12),
+    _ParticleConfig(baseX: 0.16, speed: 1.10, sway: 16.0, size: 7.5, phase: 0.42),
+    _ParticleConfig(baseX: 0.28, speed: 0.85, sway: 14.0, size: 6.8, phase: 0.75),
+    _ParticleConfig(baseX: 0.40, speed: 1.25, sway: 18.0, size: 8.5, phase: 0.20),
+    _ParticleConfig(baseX: 0.52, speed: 0.70, sway: 11.0, size: 5.8, phase: 0.88),
+    _ParticleConfig(baseX: 0.64, speed: 1.15, sway: 17.0, size: 7.8, phase: 0.35),
+    _ParticleConfig(baseX: 0.74, speed: 0.90, sway: 15.0, size: 6.5, phase: 0.60),
+    _ParticleConfig(baseX: 0.84, speed: 1.30, sway: 19.0, size: 8.2, phase: 0.15),
+    _ParticleConfig(baseX: 0.92, speed: 0.80, sway: 13.0, size: 6.2, phase: 0.80),
+    _ParticleConfig(baseX: 0.97, speed: 1.05, sway: 14.0, size: 7.0, phase: 0.50),
+  ];
+
+  static const List<Offset> _stars = [
+    Offset(0.08, 0.28),
+    Offset(0.18, 0.72),
+    Offset(0.28, 0.32),
+    Offset(0.38, 0.78),
+    Offset(0.48, 0.24),
+    Offset(0.68, 0.26),
+    Offset(0.76, 0.74),
+    Offset(0.85, 0.35),
+    Offset(0.93, 0.68),
+    Offset(0.97, 0.22),
+  ];
+
+  static const List<_ParticleConfig> _bubbles = [
+    _ParticleConfig(baseX: 0.12, speed: 0.85, sway: 7.0, size: 3.2, phase: 0.15),
+    _ParticleConfig(baseX: 0.24, speed: 1.15, sway: 9.0, size: 4.2, phase: 0.55),
+    _ParticleConfig(baseX: 0.38, speed: 0.75, sway: 6.0, size: 2.8, phase: 0.80),
+    _ParticleConfig(baseX: 0.52, speed: 1.25, sway: 10.0, size: 4.5, phase: 0.30),
+    _ParticleConfig(baseX: 0.66, speed: 0.90, sway: 8.0, size: 3.6, phase: 0.65),
+    _ParticleConfig(baseX: 0.78, speed: 1.10, sway: 9.0, size: 4.0, phase: 0.10),
+    _ParticleConfig(baseX: 0.90, speed: 0.80, sway: 7.0, size: 3.0, phase: 0.70),
+    _ParticleConfig(baseX: 0.96, speed: 1.05, sway: 8.0, size: 3.8, phase: 0.40),
+  ];
+
+  static const List<_LeafConfig> _leaves = [
+    _LeafConfig(baseX: 0.08, speed: 0.85, sway: 14.0, size: 6.8, phase: 0.10, color: Color(0xFF2EA043)),
+    _LeafConfig(baseX: 0.22, speed: 1.15, sway: 16.0, size: 8.2, phase: 0.45, color: Color(0xFFE28743)),
+    _LeafConfig(baseX: 0.36, speed: 0.75, sway: 12.0, size: 6.2, phase: 0.80, color: Color(0xFF1A7F37)),
+    _LeafConfig(baseX: 0.50, speed: 1.20, sway: 18.0, size: 8.5, phase: 0.25, color: Color(0xFFD97706)),
+    _LeafConfig(baseX: 0.65, speed: 0.90, sway: 15.0, size: 7.2, phase: 0.65, color: Color(0xFF2EA043)),
+    _LeafConfig(baseX: 0.78, speed: 1.10, sway: 16.0, size: 8.0, phase: 0.15, color: Color(0xFFE28743)),
+    _LeafConfig(baseX: 0.88, speed: 0.80, sway: 13.0, size: 6.5, phase: 0.70, color: Color(0xFF1A7F37)),
+    _LeafConfig(baseX: 0.96, speed: 1.05, sway: 15.0, size: 7.4, phase: 0.35, color: Color(0xFFD97706)),
+  ];
 
   _HeaderThemeParticlesPainter({
     required this.progress,
@@ -263,6 +520,8 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+
     switch (themeMode) {
       case AppThemeMode.amoledJapanese:
         _drawSakuraEffect(canvas, size);
@@ -283,43 +542,34 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
   // 1. SAKURA CHERRY BLOSSOM PETALS EFFECT
   // ==========================================
   void _drawSakuraEffect(Canvas canvas, Size size) {
-    final petalPaint = Paint()..style = PaintingStyle.fill;
-
-    // Fixed particle anchors with deterministic continuous offsets
-    const petals = [
-      _ParticleConfig(baseX: 0.15, speed: 0.8, sway: 14.0, size: 7.0, phase: 0.1),
-      _ParticleConfig(baseX: 0.38, speed: 1.1, sway: 18.0, size: 8.5, phase: 0.4),
-      _ParticleConfig(baseX: 0.62, speed: 0.7, sway: 12.0, size: 6.5, phase: 0.7),
-      _ParticleConfig(baseX: 0.82, speed: 0.95, sway: 16.0, size: 7.5, phase: 0.25),
-      _ParticleConfig(baseX: 0.48, speed: 1.3, sway: 20.0, size: 9.0, phase: 0.85),
-    ];
-
-    for (final p in petals) {
+    for (final p in _petals) {
       final t = (progress * p.speed + p.phase) % 1.0;
       final x = (p.baseX * size.width) + math.sin(t * 2 * math.pi + p.phase) * p.sway;
       final y = t * size.height;
       final opacity = (math.sin(t * math.pi) * 0.85).clamp(0.0, 1.0);
       final rotation = (t * 2 * math.pi) + p.phase;
 
-      petalPaint.color = const Color(0xFFFF85A2).withValues(alpha: opacity);
-      _drawSinglePetal(canvas, Offset(x, y), p.size, rotation, petalPaint);
+      _fillPaint.color = const Color(0xFFFF85A2).withValues(alpha: opacity);
+      _drawSinglePetal(canvas, Offset(x, y), p.size, rotation, _fillPaint);
     }
 
     // Interactive Tap Burst Petals
     if (burstProgress < 1.0) {
       final burstAlpha = (1.0 - burstProgress) * 0.9;
-      petalPaint.color = const Color(0xFFFF5C8A).withValues(alpha: burstAlpha);
-      for (int i = 0; i < 6; i++) {
-        final angle = (i * math.pi / 3) + (burstProgress * 0.5);
-        final dist = 10.0 + burstProgress * 32.0;
-        final bx = 22.0 + math.cos(angle) * dist;
-        final by = 20.0 + math.sin(angle) * dist;
-        _drawSinglePetal(canvas, Offset(bx, by), 6.5, angle, petalPaint);
+      _fillPaint.color = const Color(0xFFFF5C8A).withValues(alpha: burstAlpha);
+      final origin = Offset(28.0, size.height * 0.55);
+      for (int i = 0; i < 8; i++) {
+        final angle = (i * math.pi / 4) + (burstProgress * 0.6);
+        final dist = 10.0 + burstProgress * 48.0;
+        final bx = origin.dx + math.cos(angle) * dist;
+        final by = origin.dy + math.sin(angle) * dist;
+        _drawSinglePetal(canvas, Offset(bx, by), 7.0, angle, _fillPaint);
       }
     }
 
-    // Twinkling sparkle star near the title
-    _drawSparkle(canvas, Offset(size.width * 0.72, size.height * 0.22), progress, const Color(0xFFFFD1DC));
+    // Delicate sparkling glints in the header sky
+    _drawSparkle(canvas, Offset(size.width * 0.45, size.height * 0.30), progress, const Color(0xFFFFD1DC));
+    _drawSparkle(canvas, Offset(size.width * 0.88, size.height * 0.45), progress + 0.4, const Color(0xFFFFD1DC));
   }
 
   void _drawSinglePetal(
@@ -347,45 +597,39 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
   // 2. AMOLED LUNAR MOON & TWINKLING STARS
   // ==========================================
   void _drawMoonAndStarsEffect(Canvas canvas, Size size) {
-    // 1. Miniature Glowing Crescent Moon floating over the top-right of the logo
-    final moonCenter = Offset(size.width * 0.68, size.height * 0.24);
-    final moonRadius = 6.0;
+    // 1. Crescent Moon floating peacefully in the open header sky
+    final moonCenter = Offset(
+      size.width * 0.58,
+      size.height * 0.40 + 2.5 * math.sin(progress * 2 * math.pi),
+    );
+    const moonRadius = 7.0;
     final pulse = 0.7 + 0.3 * math.sin(progress * 2 * math.pi);
 
-    final moonGlowPaint = Paint()
-      ..color = const Color(0xFF00E5FF).withValues(alpha: 0.25 * pulse)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
-    canvas.drawCircle(moonCenter, moonRadius + 2, moonGlowPaint);
+    _glowPaint
+      ..color = const Color(0xFF00E5FF).withValues(alpha: 0.28 * pulse)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+    canvas.drawCircle(moonCenter, moonRadius + 3, _glowPaint);
 
-    final moonPaint = Paint()
-      ..color = const Color(0xFFE0F7FA).withValues(alpha: 0.9)
-      ..style = PaintingStyle.fill;
+    // Direct vector crescent moon without expensive boolean CSG operations
+    final crescent = Path()
+      ..moveTo(moonCenter.dx, moonCenter.dy - moonRadius)
+      ..arcToPoint(
+        Offset(moonCenter.dx, moonCenter.dy + moonRadius),
+        radius: const Radius.circular(moonRadius),
+        clockwise: false,
+      )
+      ..arcToPoint(
+        Offset(moonCenter.dx, moonCenter.dy - moonRadius),
+        radius: const Radius.circular(moonRadius * 1.35),
+        clockwise: true,
+      )
+      ..close();
+    canvas.drawPath(crescent, _moonPaint);
 
-    // Draw clean crescent moon using clip path subtraction
-    canvas.save();
-    final moonPath = Path()
-      ..addOval(Rect.fromCircle(center: moonCenter, radius: moonRadius));
-    final cutoutPath = Path()
-      ..addOval(Rect.fromCircle(
-        center: Offset(moonCenter.dx + 2.5, moonCenter.dy - 1.5),
-        radius: moonRadius * 0.9,
-      ));
-    final crescent = Path.combine(PathOperation.difference, moonPath, cutoutPath);
-    canvas.drawPath(crescent, moonPaint);
-    canvas.restore();
-
-    // 2. Twinkling Cosmic Stars
-    const stars = [
-      Offset(0.12, 0.22),
-      Offset(0.28, 0.82),
-      Offset(0.45, 0.18),
-      Offset(0.85, 0.76),
-      Offset(0.92, 0.32),
-    ];
-
-    for (int i = 0; i < stars.length; i++) {
-      final pos = Offset(stars[i].dx * size.width, stars[i].dy * size.height);
-      final phase = (progress + (i * 0.22)) % 1.0;
+    // 2. Twinkling Cosmic Stars distributed across the entire header width
+    for (int i = 0; i < _stars.length; i++) {
+      final pos = Offset(_stars[i].dx * size.width, _stars[i].dy * size.height);
+      final phase = (progress + (i * 0.18)) % 1.0;
       final alpha = (math.sin(phase * 2 * math.pi).abs() * 0.85).clamp(0.0, 1.0);
       final starColor = const Color(0xFF00E5FF).withValues(alpha: alpha);
       _drawSparkle(canvas, pos, phase, starColor);
@@ -394,79 +638,65 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
     // Tap burst stars
     if (burstProgress < 1.0) {
       final burstAlpha = (1.0 - burstProgress) * 0.9;
-      for (int i = 0; i < 5; i++) {
-        final angle = (i * math.pi * 2 / 5) + (burstProgress * 0.4);
-        final dist = 8.0 + burstProgress * 28.0;
-        final pos = Offset(22.0 + math.cos(angle) * dist, 20.0 + math.sin(angle) * dist);
+      final origin = Offset(28.0, size.height * 0.55);
+      for (int i = 0; i < 7; i++) {
+        final angle = (i * math.pi * 2 / 7) + (burstProgress * 0.5);
+        final dist = 10.0 + burstProgress * 42.0;
+        final pos = Offset(origin.dx + math.cos(angle) * dist, origin.dy + math.sin(angle) * dist);
         _drawSparkle(canvas, pos, 0.5, const Color(0xFF00E5FF).withValues(alpha: burstAlpha));
       }
     }
   }
 
   void _drawSparkle(Canvas canvas, Offset center, double phase, Color color) {
-    final arm = 3.5 + 1.5 * math.sin(phase * 2 * math.pi);
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.0
-      ..strokeCap = StrokeCap.round;
+    final arm = 3.5 + 1.8 * math.sin(phase * 2 * math.pi);
+    _sparklePaint.color = color;
 
-    canvas.drawLine(Offset(center.dx - arm, center.dy), Offset(center.dx + arm, center.dy), paint);
-    canvas.drawLine(Offset(center.dx, center.dy - arm), Offset(center.dx, center.dy + arm), paint);
+    canvas.drawLine(Offset(center.dx - arm, center.dy), Offset(center.dx + arm, center.dy), _sparklePaint);
+    canvas.drawLine(Offset(center.dx, center.dy - arm), Offset(center.dx, center.dy + arm), _sparklePaint);
   }
 
   // ==========================================
   // 3. DARK FLUID WATER RIPPLES & BUBBLES
   // ==========================================
   void _drawWaterRipplesAndBubbles(Canvas canvas, Size size) {
-    // 1. Concentric water ripple rings expanding outward behind the logo box
-    final rippleCenter = const Offset(22.0, 20.0);
-    final ripplePaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
+    // 1. Concentric ripples radiating outward across the header from the logo
+    final rippleCenter = Offset(28.0, size.height * 0.55);
+    _strokePaint.strokeWidth = 1.0;
 
-    for (int i = 0; i < 2; i++) {
-      final ringProgress = (progress + (i * 0.5)) % 1.0;
-      final radius = 12.0 + (ringProgress * 20.0);
-      final ringAlpha = ((1.0 - ringProgress) * 0.35).clamp(0.0, 1.0);
+    for (int i = 0; i < 3; i++) {
+      final ringProgress = (progress + (i * 0.33)) % 1.0;
+      final radius = 14.0 + (ringProgress * 70.0);
+      final ringAlpha = ((1.0 - ringProgress) * 0.32).clamp(0.0, 1.0);
 
-      ripplePaint.color = const Color(0xFF58A6FF).withValues(alpha: ringAlpha);
-      canvas.drawCircle(rippleCenter, radius, ripplePaint);
+      _strokePaint.color = const Color(0xFF58A6FF).withValues(alpha: ringAlpha);
+      canvas.drawCircle(rippleCenter, radius, _strokePaint);
     }
 
-    // 2. Rising aquatic bubbles
-    final bubblePaint = Paint()..style = PaintingStyle.fill;
-    final highlightPaint = Paint()..style = PaintingStyle.fill;
-
-    const bubbles = [
-      _ParticleConfig(baseX: 0.32, speed: 0.9, sway: 8.0, size: 3.5, phase: 0.15),
-      _ParticleConfig(baseX: 0.54, speed: 1.2, sway: 10.0, size: 4.5, phase: 0.45),
-      _ParticleConfig(baseX: 0.74, speed: 0.75, sway: 7.0, size: 3.0, phase: 0.8),
-      _ParticleConfig(baseX: 0.88, speed: 1.05, sway: 9.0, size: 4.0, phase: 0.3),
-    ];
-
-    for (final b in bubbles) {
-      final t = (1.0 - ((progress * b.speed + b.phase) % 1.0)); // Rising upwards
+    // 2. Rising aquatic bubbles across the entire header width
+    for (final b in _bubbles) {
+      final t = (1.0 - ((progress * b.speed + b.phase) % 1.0));
       final x = (b.baseX * size.width) + math.sin(t * 3 * math.pi) * b.sway;
       final y = t * size.height;
       final alpha = (math.sin(t * math.pi) * 0.55).clamp(0.0, 1.0);
 
-      bubblePaint.color = const Color(0xFF58A6FF).withValues(alpha: alpha);
-      highlightPaint.color = Colors.white.withValues(alpha: alpha * 0.7);
+      _fillPaint.color = const Color(0xFF58A6FF).withValues(alpha: alpha);
+      _glowPaint.color = Colors.white.withValues(alpha: alpha * 0.75);
 
-      canvas.drawCircle(Offset(x, y), b.size, bubblePaint);
-      canvas.drawCircle(Offset(x - b.size * 0.3, y - b.size * 0.3), b.size * 0.3, highlightPaint);
+      canvas.drawCircle(Offset(x, y), b.size, _fillPaint);
+      canvas.drawCircle(Offset(x - b.size * 0.3, y - b.size * 0.3), b.size * 0.3, _glowPaint);
     }
 
     // Tap burst fluid droplet splash
     if (burstProgress < 1.0) {
-      final burstAlpha = (1.0 - burstProgress) * 0.8;
-      bubblePaint.color = const Color(0xFF79C0FF).withValues(alpha: burstAlpha);
-      for (int i = 0; i < 6; i++) {
-        final angle = (i * math.pi / 3);
-        final dist = 10.0 + burstProgress * 26.0;
-        final bx = 22.0 + math.cos(angle) * dist;
-        final by = 20.0 + math.sin(angle) * dist;
-        canvas.drawCircle(Offset(bx, by), 3.0, bubblePaint);
+      final burstAlpha = (1.0 - burstProgress) * 0.85;
+      _fillPaint.color = const Color(0xFF79C0FF).withValues(alpha: burstAlpha);
+      for (int i = 0; i < 8; i++) {
+        final angle = (i * math.pi / 4);
+        final dist = 10.0 + burstProgress * 38.0;
+        final bx = rippleCenter.dx + math.cos(angle) * dist;
+        final by = rippleCenter.dy + math.sin(angle) * dist;
+        canvas.drawCircle(Offset(bx, by), 3.2, _fillPaint);
       }
     }
   }
@@ -475,42 +705,33 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
   // 4. LIGHT MODE FALLING LEAVES & BREEZE
   // ==========================================
   void _drawFallingLeavesEffect(Canvas canvas, Size size) {
-    final leafPaint = Paint()..style = PaintingStyle.fill;
-    final veinPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.8;
+    _strokePaint.strokeWidth = 0.8;
 
-    const leaves = [
-      _LeafConfig(baseX: 0.20, speed: 0.85, sway: 14.0, size: 7.0, phase: 0.1, color: Color(0xFF2EA043)),
-      _LeafConfig(baseX: 0.44, speed: 1.1, sway: 16.0, size: 8.5, phase: 0.5, color: Color(0xFFE28743)),
-      _LeafConfig(baseX: 0.68, speed: 0.75, sway: 12.0, size: 6.5, phase: 0.8, color: Color(0xFF1A7F37)),
-      _LeafConfig(baseX: 0.86, speed: 0.95, sway: 15.0, size: 7.5, phase: 0.3, color: Color(0xFFD97706)),
-    ];
-
-    for (final l in leaves) {
+    for (final l in _leaves) {
       final t = (progress * l.speed + l.phase) % 1.0;
       final x = (l.baseX * size.width) + math.sin(t * 2 * math.pi + l.phase) * l.sway;
       final y = t * size.height;
       final alpha = (math.sin(t * math.pi) * 0.8).clamp(0.0, 1.0);
       final rotation = (t * 2 * math.pi) + l.phase;
 
-      leafPaint.color = l.color.withValues(alpha: alpha);
-      veinPaint.color = Colors.white.withValues(alpha: alpha * 0.6);
+      _fillPaint.color = l.color.withValues(alpha: alpha);
+      _strokePaint.color = Colors.white.withValues(alpha: alpha * 0.6);
 
-      _drawSingleLeaf(canvas, Offset(x, y), l.size, rotation, leafPaint, veinPaint);
+      _drawSingleLeaf(canvas, Offset(x, y), l.size, rotation, _fillPaint, _strokePaint);
     }
 
     // Tap burst leaves
     if (burstProgress < 1.0) {
       final burstAlpha = (1.0 - burstProgress) * 0.85;
-      leafPaint.color = const Color(0xFF2EA043).withValues(alpha: burstAlpha);
-      veinPaint.color = Colors.white.withValues(alpha: burstAlpha * 0.6);
-      for (int i = 0; i < 5; i++) {
-        final angle = (i * math.pi * 2 / 5);
-        final dist = 10.0 + burstProgress * 30.0;
-        final bx = 22.0 + math.cos(angle) * dist;
-        final by = 20.0 + math.sin(angle) * dist;
-        _drawSingleLeaf(canvas, Offset(bx, by), 6.5, angle, leafPaint, veinPaint);
+      _fillPaint.color = const Color(0xFF2EA043).withValues(alpha: burstAlpha);
+      _strokePaint.color = Colors.white.withValues(alpha: burstAlpha * 0.6);
+      final origin = Offset(28.0, size.height * 0.55);
+      for (int i = 0; i < 7; i++) {
+        final angle = (i * math.pi * 2 / 7);
+        final dist = 10.0 + burstProgress * 42.0;
+        final bx = origin.dx + math.cos(angle) * dist;
+        final by = origin.dy + math.sin(angle) * dist;
+        _drawSingleLeaf(canvas, Offset(bx, by), 6.5, angle, _fillPaint, _strokePaint);
       }
     }
   }
@@ -534,7 +755,6 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
       ..close();
 
     canvas.drawPath(path, fillPaint);
-    // Draw leaf center vein
     canvas.drawLine(Offset(0, -radius * 0.7), Offset(0, radius * 0.7), veinPaint);
     canvas.restore();
   }

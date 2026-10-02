@@ -213,6 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
+          flexibleSpace: const AnimatedHeaderBackground(),
           title: const AnimatedAppHeader(),
           actions: [
             if (rateLimit != null)
