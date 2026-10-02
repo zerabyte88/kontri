@@ -1111,40 +1111,54 @@ class _SettingsSheetState extends State<SettingsSheet> {
                           ],
                         ),
                       ] else ...[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            if (_updateInfo!.apkDownloadUrl != null)
-                              ElevatedButton.icon(
-                                icon: const Icon(Icons.download_rounded, size: 15),
-                                label: Text(loc.updateNow),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppTheme.accentGreen,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            if (_updateInfo!.apkDownloadUrl != null) ...[
+                              SizedBox(
+                                height: 40,
+                                child: ElevatedButton.icon(
+                                  icon: const Icon(Icons.download_rounded, size: 16),
+                                  label: Text(
+                                    loc.updateNow,
+                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppTheme.accentGreen,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  onPressed: () => _runOtaUpdate(
+                                    _updateInfo!.apkDownloadUrl!,
+                                    loc,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                            ],
+                            SizedBox(
+                              height: 38,
+                              child: OutlinedButton.icon(
+                                icon: const Icon(Icons.open_in_browser_rounded, size: 15),
+                                label: Text(
+                                  loc.openInBrowser,
+                                  style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12.5),
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppTheme.primaryCyan,
+                                  side: BorderSide(color: AppTheme.border, width: 1.0),
+                                  padding: EdgeInsets.zero,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                onPressed: () => _runOtaUpdate(
-                                  _updateInfo!.apkDownloadUrl!,
-                                  loc,
+                                onPressed: () => UpdateService.openReleaseInBrowser(
+                                  _updateInfo!.releaseUrl,
                                 ),
-                              ),
-                            if (_updateInfo!.apkDownloadUrl != null) const SizedBox(width: 10),
-                            OutlinedButton.icon(
-                              icon: const Icon(Icons.open_in_browser_rounded, size: 14),
-                              label: Text(loc.openInBrowser),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: AppTheme.primaryCyan,
-                                side: BorderSide(color: AppTheme.border, width: 1.0),
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              onPressed: () => UpdateService.openReleaseInBrowser(
-                                _updateInfo!.releaseUrl,
                               ),
                             ),
                           ],

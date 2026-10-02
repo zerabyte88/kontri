@@ -37,18 +37,12 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystoreFile = file("gitpulse-release.jks")
-            if (keystoreFile.exists()) {
-                storeFile = keystoreFile
-                storePassword = "***REDACTED***"
-                keyAlias = "gitpulse"
-                keyPassword = "***REDACTED***"
-            } else {
-                storeFile = signingConfigs.getByName("debug").storeFile
-                storePassword = signingConfigs.getByName("debug").storePassword
-                keyAlias = signingConfigs.getByName("debug").keyAlias
-                keyPassword = signingConfigs.getByName("debug").keyPassword
-            }
+            storeFile = file("gitpulse-release.jks")
+            storePassword = "***REDACTED***"
+            keyAlias = "gitpulse"
+            keyPassword = "***REDACTED***"
+            enableV1Signing = true
+            enableV2Signing = true
         }
     }
 
@@ -57,10 +51,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
         debug {
-            val keystoreFile = file("gitpulse-release.jks")
-            if (keystoreFile.exists()) {
-                signingConfig = signingConfigs.getByName("release")
-            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
