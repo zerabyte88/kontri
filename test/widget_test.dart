@@ -663,12 +663,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v1.0.5', () {
+    test('AppConfig provides accurate release and version telemetry for v1.0.6', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v1.0.5');
-      expect(AppConfig.buildNumber, '6');
-      expect(AppConfig.fullVersion, 'v1.0.5 (Build 6)');
-      expect(AppConfig.releaseTag, 'v1.0.5');
+      expect(AppConfig.appVersion, 'v1.0.6');
+      expect(AppConfig.buildNumber, '7');
+      expect(AppConfig.fullVersion, 'v1.0.6 (Build 7)');
+      expect(AppConfig.releaseTag, 'v1.0.6');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -861,6 +861,22 @@ void main() {
 
       expect(idLoc.profileSavedToFavorites('zerabyte88'), contains('Profil @zerabyte88 ditambahkan ke favorit!'));
       expect(enLoc.profileSavedToFavorites('zerabyte88'), contains('Profile @zerabyte88 added to favorites!'));
+    });
+
+    test('Typography and Developer Avatar assets conform to updater standards', () {
+      for (final lang in AppLanguage.values) {
+        final loc = AppLocalizations(lang);
+        // Exclamation mark must not be present in updateAvailable string
+        expect(loc.updateAvailable.contains('!'), isFalse,
+            reason: 'Language ${lang.code} should not have an exclamation mark in updateAvailable');
+      }
+
+      // Indonesian language has both nativeName and English name for grid consistency
+      expect(AppLanguage.indonesian.nativeName, 'Bahasa Indonesia');
+      expect(AppLanguage.indonesian.name, 'Indonesian');
+
+      // Developer avatar URL points to avatars.githubusercontent.com for reliable CDN delivery
+      expect(AppConfig.developerAvatarUrl, 'https://avatars.githubusercontent.com/zerabyte88');
     });
   });
 }

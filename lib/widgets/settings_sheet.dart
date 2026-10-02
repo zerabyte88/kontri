@@ -479,69 +479,102 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     const SizedBox(height: 12),
 
                     // Theme Options Grid
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        // 1. Gelap Biasa
-                        _buildThemeOptionTile(
-                          title: loc.themeDark,
-                          subtitle: loc.themeDarkSubtitle,
-                          icon: Icons.dark_mode_outlined,
-                          isSelected: currentTheme == AppThemeMode.dark,
-                          onTap: () async {
-                            await AppThemeService.changeTheme(
-                              AppThemeMode.dark,
-                              widget.storageService,
-                            );
-                            widget.onSettingsChanged?.call();
-                            if (mounted) setState(() {});
-                          },
-                        ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final itemWidth = (constraints.maxWidth - 8) / 2;
+                        return Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            // 1. Gelap
+                            _buildOptionCard(
+                              width: itemWidth,
+                              title: loc.themeDark,
+                              subtitle: loc.themeDarkSubtitle,
+                              leading: Icon(
+                                Icons.dark_mode_outlined,
+                                size: 17,
+                                color: currentTheme == AppThemeMode.dark
+                                    ? AppTheme.primaryCyan
+                                    : AppTheme.textMuted,
+                              ),
+                              isSelected: currentTheme == AppThemeMode.dark,
+                              onTap: () async {
+                                await AppThemeService.changeTheme(
+                                  AppThemeMode.dark,
+                                  widget.storageService,
+                                );
+                                widget.onSettingsChanged?.call();
+                                if (mounted) setState(() {});
+                              },
+                            ),
 
-                        // 2. Gelap AMOLED (With Easter Egg tap listener)
-                        _buildThemeOptionTile(
-                          title: loc.themeAmoled,
-                          subtitle: loc.themeAmoledSubtitle,
-                          icon: Icons.brightness_2_rounded,
-                          isSelected: currentTheme == AppThemeMode.amoled,
-                          onTap: () => _onAmoledTapped(loc),
-                        ),
+                            // 2. AMOLED (With Easter Egg tap listener)
+                            _buildOptionCard(
+                              width: itemWidth,
+                              title: loc.themeAmoled,
+                              subtitle: loc.themeAmoledSubtitle,
+                              leading: Icon(
+                                Icons.brightness_2_rounded,
+                                size: 17,
+                                color: currentTheme == AppThemeMode.amoled
+                                    ? AppTheme.primaryCyan
+                                    : AppTheme.textMuted,
+                              ),
+                              isSelected: currentTheme == AppThemeMode.amoled,
+                              onTap: () => _onAmoledTapped(loc),
+                            ),
 
-                        // 3. Terang
-                        _buildThemeOptionTile(
-                          title: loc.themeLight,
-                          subtitle: loc.themeLightSubtitle,
-                          icon: Icons.light_mode_outlined,
-                          isSelected: currentTheme == AppThemeMode.light,
-                          onTap: () async {
-                            await AppThemeService.changeTheme(
-                              AppThemeMode.light,
-                              widget.storageService,
-                            );
-                            widget.onSettingsChanged?.call();
-                            if (mounted) setState(() {});
-                          },
-                        ),
+                            // 3. Terang
+                            _buildOptionCard(
+                              width: itemWidth,
+                              title: loc.themeLight,
+                              subtitle: loc.themeLightSubtitle,
+                              leading: Icon(
+                                Icons.light_mode_outlined,
+                                size: 17,
+                                color: currentTheme == AppThemeMode.light
+                                    ? AppTheme.primaryCyan
+                                    : AppTheme.textMuted,
+                              ),
+                              isSelected: currentTheme == AppThemeMode.light,
+                              onTap: () async {
+                                await AppThemeService.changeTheme(
+                                  AppThemeMode.light,
+                                  widget.storageService,
+                                );
+                                widget.onSettingsChanged?.call();
+                                if (mounted) setState(() {});
+                              },
+                            ),
 
-                        // 4. Gelap AMOLED Sakura (Shown if unlocked or currently active)
-                        if (isJapaneseUnlocked || currentTheme == AppThemeMode.amoledJapanese)
-                          _buildThemeOptionTile(
-                            title: loc.themeAmoledJapanese,
-                            subtitle: loc.themeAmoledJapaneseSubtitle,
-                            icon: Icons.auto_awesome_rounded,
-                            isSelected: currentTheme == AppThemeMode.amoledJapanese,
-                            isEasterEgg: true,
-                            onTap: () async {
-                              await AppThemeService.changeTheme(
-                                AppThemeMode.amoledJapanese,
-                                widget.storageService,
-                              );
-                              widget.onSettingsChanged?.call();
-                              if (mounted) setState(() {});
-                            },
-                          ),
-                      ],
+                            // 4. AMOLED Sakura (Shown if unlocked or currently active)
+                            if (isJapaneseUnlocked || currentTheme == AppThemeMode.amoledJapanese)
+                              _buildOptionCard(
+                                width: itemWidth,
+                                title: loc.themeAmoledJapanese,
+                                subtitle: loc.themeAmoledJapaneseSubtitle,
+                                leading: Icon(
+                                  Icons.auto_awesome_rounded,
+                                  size: 17,
+                                  color: currentTheme == AppThemeMode.amoledJapanese
+                                      ? const Color(0xFFFF5C8A)
+                                      : AppTheme.textMuted,
+                                ),
+                                isSelected: currentTheme == AppThemeMode.amoledJapanese,
+                                activeColor: const Color(0xFFFF5C8A),
+                                onTap: () async {
+                                  await AppThemeService.changeTheme(
+                                    AppThemeMode.amoledJapanese,
+                                    widget.storageService,
+                                  );
+                                  widget.onSettingsChanged?.call();
+                                  if (mounted) setState(() {});
+                                },
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -614,112 +647,36 @@ class _SettingsSheetState extends State<SettingsSheet> {
                           runSpacing: 8,
                           children: AppLanguage.values.map((lang) {
                             final isSelected = lang == currentLang;
-                            return SizedBox(
+                            return _buildOptionCard(
                               width: itemWidth,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(8),
-                                onTap: () async {
-                                  if (lang == currentLang) return;
-                                  final messenger = ScaffoldMessenger.of(context);
-                                  final toastText =
-                                      '${loc.languageChangedToast}: ${lang.nativeName} (${lang.name})';
-                                  await AppLanguageService.changeLanguage(
-                                    lang,
-                                    widget.storageService,
-                                  );
-                                  widget.onSettingsChanged?.call();
-                                  if (!mounted) return;
-                                  setState(() {});
-                                  messenger.showSnackBar(
-                                    SnackBar(
-                                      content: Text(toastText),
-                                      backgroundColor: AppTheme.surfaceElevated,
-                                      behavior: SnackBarBehavior.floating,
-                                      duration: const Duration(seconds: 2),
-                                    ),
-                                  );
-                                },
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 150),
-                                  constraints: const BoxConstraints(minHeight: 52),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? AppTheme.primaryCyan.withValues(alpha: 0.10)
-                                        : AppTheme.surface,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: isSelected ? AppTheme.primaryCyan : AppTheme.border,
-                                      width: isSelected ? 1.2 : 0.8,
-                                    ),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                lang.flag,
-                                                style: const TextStyle(fontSize: 16),
-                                              ),
-                                              const SizedBox(width: 7),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Text(
-                                                      lang.nativeName,
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(
-                                                        color: isSelected
-                                                            ? AppTheme.primaryCyan
-                                                            : AppTheme.textPrimary,
-                                                        fontSize: 11.5,
-                                                        fontWeight: isSelected
-                                                            ? FontWeight.w600
-                                                            : FontWeight.w500,
-                                                        height: 1.15,
-                                                      ),
-                                                      maxLines: 2,
-                                                      softWrap: true,
-                                                    ),
-                                                    if (lang.name != lang.nativeName) ...[
-                                                      const SizedBox(height: 1),
-                                                      Text(
-                                                        lang.name,
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          color: AppTheme.textMuted,
-                                                          fontSize: 9.5,
-                                                        ),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
-                                                    ],
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      if (isSelected)
-                                        Positioned(
-                                          top: 5,
-                                          right: 5,
-                                          child: Icon(
-                                            Icons.check_circle_rounded,
-                                            size: 13,
-                                            color: AppTheme.primaryCyan,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
+                              title: lang.nativeName,
+                              subtitle: lang.name != lang.nativeName ? lang.name : null,
+                              leading: Text(
+                                lang.flag,
+                                style: const TextStyle(fontSize: 16),
                               ),
+                              isSelected: isSelected,
+                              onTap: () async {
+                                if (lang == currentLang) return;
+                                final messenger = ScaffoldMessenger.of(context);
+                                final toastText =
+                                    '${loc.languageChangedToast}: ${lang.nativeName} (${lang.name})';
+                                await AppLanguageService.changeLanguage(
+                                  lang,
+                                  widget.storageService,
+                                );
+                                widget.onSettingsChanged?.call();
+                                if (!mounted) return;
+                                setState(() {});
+                                messenger.showSnackBar(
+                                  SnackBar(
+                                    content: Text(toastText),
+                                    backgroundColor: AppTheme.surfaceElevated,
+                                    behavior: SnackBarBehavior.floating,
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
                             );
                           }).toList(),
                         );
@@ -1366,15 +1323,55 @@ class _SettingsSheetState extends State<SettingsSheet> {
                               child: ClipOval(
                                 child: Image.network(
                                   AppConfig.developerAvatarUrl,
-                                  width: 28,
-                                  height: 28,
-                                  cacheWidth: 80,
-                                  cacheHeight: 80,
+                                  width: 30,
+                                  height: 30,
+                                  headers: const {
+                                    'Accept': 'image/*,*/*;q=0.8',
+                                    'User-Agent': 'GitPulseMobile/1.0',
+                                  },
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, _, _) => CircleAvatar(
-                                    radius: 14,
-                                    backgroundColor: AppTheme.surface,
-                                    child: Icon(Icons.person, size: 14, color: AppTheme.primaryCyan),
+                                  loadingBuilder: (context, child, progress) {
+                                    if (progress == null) return child;
+                                    return Container(
+                                      width: 30,
+                                      height: 30,
+                                      color: AppTheme.surface,
+                                      alignment: Alignment.center,
+                                      child: SizedBox(
+                                        width: 12,
+                                        height: 12,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 1.5,
+                                          color: AppTheme.primaryCyan,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (_, _, _) => Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          AppTheme.primaryCyan.withValues(alpha: 0.25),
+                                          AppTheme.primaryCyan.withValues(alpha: 0.08),
+                                        ],
+                                      ),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      AppConfig.developerUsername.isNotEmpty
+                                          ? AppConfig.developerUsername[0].toUpperCase()
+                                          : 'Z',
+                                      style: TextStyle(
+                                        color: AppTheme.primaryCyan,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -1443,108 +1440,105 @@ class _SettingsSheetState extends State<SettingsSheet> {
     );
   }
 
-  Widget _buildThemeOptionTile({
+  Widget _buildOptionCard({
+    required double width,
+    required Widget leading,
     required String title,
-    required String subtitle,
-    required IconData icon,
+    String? subtitle,
     required bool isSelected,
     required VoidCallback onTap,
-    bool isEasterEgg = false,
+    Color? activeColor,
   }) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final itemWidth = (constraints.maxWidth - 8) / 2;
-        return SizedBox(
-          width: itemWidth,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            onTap: onTap,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              constraints: const BoxConstraints(minHeight: 52),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? (isEasterEgg
-                        ? const Color(0xFFFF5C8A).withValues(alpha: 0.15)
-                        : AppTheme.primaryCyan.withValues(alpha: 0.10))
-                    : AppTheme.surface,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: isSelected
-                      ? (isEasterEgg ? const Color(0xFFFF5C8A) : AppTheme.primaryCyan)
-                      : AppTheme.border,
-                  width: isSelected ? 1.2 : 0.8,
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-                      child: Row(
+    final accent = activeColor ?? AppTheme.primaryCyan;
+    return SizedBox(
+      width: width,
+      height: 56.0,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? accent.withValues(alpha: 0.12)
+                : AppTheme.surface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: isSelected ? accent : AppTheme.border,
+              width: isSelected ? 1.2 : 0.8,
+            ),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: Center(child: leading),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            icon,
-                            size: 16,
-                            color: isSelected
-                                ? (isEasterEgg ? const Color(0xFFFF5C8A) : AppTheme.primaryCyan)
-                                : AppTheme.textMuted,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  title,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? (isEasterEgg ? const Color(0xFFFF5C8A) : AppTheme.primaryCyan)
-                                        : AppTheme.textPrimary,
-                                    fontSize: 11,
-                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                    height: 1.15,
-                                  ),
-                                  maxLines: 2,
-                                  softWrap: true,
-                                ),
-                                const SizedBox(height: 1),
-                                Text(
-                                  subtitle,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: AppTheme.textMuted,
-                                    fontSize: 9.5,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
+                          Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: isSelected ? accent : AppTheme.textPrimary,
+                              fontSize: 11.0,
+                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                              height: 1.15,
                             ),
                           ),
+                          if (subtitle != null && subtitle.isNotEmpty) ...[
+                            const SizedBox(height: 1.5),
+                            Text(
+                              subtitle,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: AppTheme.textMuted,
+                                fontSize: 9.5,
+                                height: 1.1,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
-                  ),
-                  if (isSelected)
-                    Positioned(
-                      top: 5,
-                      right: 5,
-                      child: Icon(
-                        Icons.check_circle_rounded,
-                        size: 13,
-                        color: isEasterEgg ? const Color(0xFFFF5C8A) : AppTheme.primaryCyan,
-                      ),
-                    ),
-                ],
+                    if (isSelected)
+                      const SizedBox(width: 14)
+                    else
+                      const SizedBox(width: 4),
+                  ],
+                ),
               ),
-            ),
+              if (isSelected)
+                Positioned(
+                  top: 5,
+                  right: 6,
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    size: 13,
+                    color: accent,
+                  ),
+                ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

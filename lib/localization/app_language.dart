@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 enum AppLanguage {
   indonesian(
     code: 'id',
-    name: 'Bahasa Indonesia',
+    name: 'Indonesian',
     nativeName: 'Bahasa Indonesia',
     flag: '🇮🇩',
     locale: Locale('id'),

@@ -556,12 +556,12 @@ class AppLocalizations {
   });
 
   String get updateAvailable => _str({
-    AppLanguage.indonesian: 'Versi baru tersedia!',
-    AppLanguage.english: 'New version available!',
-    AppLanguage.japanese: '新しいバージョンがあります！',
-    AppLanguage.chineseSimplified: '发现新版本！',
-    AppLanguage.chineseTraditional: '發現新版本！',
-    AppLanguage.korean: '새 버전이 출시되었습니다!',
+    AppLanguage.indonesian: 'Versi baru tersedia',
+    AppLanguage.english: 'New version available',
+    AppLanguage.japanese: '新しいバージョンがあります',
+    AppLanguage.chineseSimplified: '发现新版本',
+    AppLanguage.chineseTraditional: '發現新版本',
+    AppLanguage.korean: '새 버전이 출시되었습니다',
   });
 
   String get alreadyLatestVersion => _str({
