@@ -334,28 +334,14 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
     Color accentColor,
     double progress,
   ) {
-    final pulse = 0.5 + 0.5 * math.sin(progress * 2 * math.pi);
-    final glowAlpha = (0.12 + 0.16 * pulse).clamp(0.0, 1.0);
-
     return Container(
-      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: accentColor.withValues(alpha: 0.5 + 0.4 * pulse),
-          width: 1.1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: accentColor.withValues(alpha: glowAlpha),
-            blurRadius: 8 + 4 * pulse,
-            spreadRadius: 0.5,
-          ),
-        ],
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(7),
       ),
+      clipBehavior: Clip.antiAlias,
       child: GitPulseLogo(
-        size: 19,
+        size: 28,
         color: accentColor,
         progress: progress,
       ),

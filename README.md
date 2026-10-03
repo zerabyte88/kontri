@@ -12,12 +12,12 @@
 
 ### The Rhythm of Your Code. On-Device Developer Telemetry & Productivity Analytics.
 
-[![Release](https://img.shields.io/badge/Release-v1.0.9-38BDF8?style=flat-square&logo=github)](https://github.com/zerabyte88/gitpulse_mobile/releases)
-[![Build](https://img.shields.io/badge/Build-10-34D399?style=flat-square)](pubspec.yaml)
+[![Release](https://img.shields.io/badge/Release-v1.0.10-38BDF8?style=flat-square&logo=github)](https://github.com/zerabyte88/gitpulse_mobile/releases)
+[![Build](https://img.shields.io/badge/Build-11-34D399?style=flat-square)](pubspec.yaml)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.24.0-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-%3E%3D3.5.0-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
 [![Platform](https://img.shields.io/badge/Platform-Android%2064--bit%20%7C%20Web-10B981?style=flat-square&logo=android&logoColor=white)](https://developer.android.com)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(31%2F31)-success?style=flat-square&logo=checkmarx&logoColor=white)](test/widget_test.dart)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(35%2F35)-success?style=flat-square&logo=checkmarx&logoColor=white)](test/widget_test.dart)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Layered-F59E0B?style=flat-square)](#system-architecture)
 [![License](https://img.shields.io/badge/License-MIT-8B5CF6?style=flat-square)](LICENSE)
 
@@ -144,8 +144,8 @@ sequenceDiagram
 
     User->>App: Launch App / Tap "Check for Updates"
     App->>GitHub: GET /repos/zerabyte88/gitpulse_mobile/releases/latest
-    GitHub-->>App: Tag Name (e.g., v1.0.9), Release Notes, APK Asset URL
-    alt Version is newer (v1.0.9 > v1.0.8)
+    GitHub-->>App: Tag Name (e.g., v1.0.10), Release Notes, APK Asset URL
+    alt Version is newer (v1.0.10 > v1.0.9)
         App->>User: Display Update Notification Card
         User->>App: Tap "Update Now"
         App->>GitHub: Stream APK Binary via ota_update
@@ -155,7 +155,7 @@ sequenceDiagram
     else Version is current
         App-->>User: "App is already up to date"
     end
-    Note over App,Storage: On Next App Startup (v1.0.9):
+    Note over App,Storage: On Next App Startup (v1.0.10):
     App->>Storage: Scan for GitPulse-*.apk where fileVersion <= currentVersion
     App->>Storage: Safely Purge Installed APK & Delete Empty Folder
     Note over Storage: User Photos, Documents & Other Downloads Remain Untouched
@@ -251,7 +251,8 @@ GitPulse Mobile is optimized for 60fps rendering even on low-spec mobile hardwar
 | **Persistence** | [shared_preferences](https://pub.dev/packages/shared_preferences) | `^2.5.5` | Sandboxed local storage for bookmarks, themes, & tokens |
 | **Formatting** | [intl](https://pub.dev/packages/intl) | `^0.20.3` | Localized number formatting & date manipulation |
 | **Browser Links** | [url_launcher](https://pub.dev/packages/url_launcher) | `^6.3.2` | External browser routing for repositories & articles |
-| **Testing** | [flutter_test](https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html) | SDK | 31/31 unit, model, and widget verification tests |
+| **Markdown** | [flutter_markdown](https://pub.dev/packages/flutter_markdown) | `^0.7.7+1` | In-app native GitHub README.md markdown parsing & rendering |
+| **Testing** | [flutter_test](https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html) | SDK | 35/35 unit, model, and widget verification tests |
 
 ---
 
@@ -272,17 +273,18 @@ gitpulse_mobile/
 │   │   ├── bookmarked_user.dart     # Bookmarked profile serialization
 │   │   ├── contribution_stats.dart  # Streak calculator & tier determination
 │   │   ├── github_rate_limit.dart   # API rate-limit state tracking
-│   │   ├── github_repo.dart         # Repository schema parser
+│   │   ├── github_repo.dart         # Repository schema parser & owner/size extractors
 │   │   ├── github_user.dart         # User profile schema parser
 │   │   ├── tech_news.dart           # Curated tech news & trending model
 │   │   └── user_stats.dart          # Aggregated user statistics & languages
 │   ├── screens/                     # UI screen controllers
 │   │   ├── home_screen.dart         # Search, bookmarks, tech news & animated header
+│   │   ├── repo_detail_screen.dart  # Native in-app repository detail & README.md markdown viewer
 │   │   └── stats_detail_screen.dart # Interactive analytics dashboard (Virtualized Sliver)
 │   ├── services/                    # Data access & persistence layer
 │   │   ├── app_language_service.dart# Language preference state manager
 │   │   ├── app_theme_service.dart   # 4-mode theme state notifier & easter egg unlocker
-│   │   ├── github_api_service.dart  # GitHub REST API v3 client with error mapping
+│   │   ├── github_api_service.dart  # GitHub REST API v3 client with error mapping & README decoder
 │   │   ├── storage_service.dart     # SharedPreferences persistence wrapper
 │   │   ├── tech_news_service.dart   # Trending repositories & dev.to article fetcher
 │   │   └── update_service.dart      # In-app updater, APK downloads & safe cleanup
@@ -293,13 +295,13 @@ gitpulse_mobile/
 │       ├── animated_app_header.dart # Bespoke GitPulse vector logo & dynamic particle Canvas
 │       ├── animated_tier_title.dart # 6-level continuous animated tier badges
 │       ├── language_chart.dart      # Language distribution donut chart (fl_chart)
-│       ├── repo_tile.dart           # Isolated repository tile (RepaintBoundary)
+│       ├── repo_tile.dart           # Interactive repository tile with in-app & external navigation
 │       ├── settings_sheet.dart      # Settings modal sheet (Theme, Language, PAT, Update)
 │       ├── stat_card.dart           # Non-truncating summary metric cards
 │       └── tech_news_card.dart      # Trending digest & news cards
 ├── test/
-│   └── widget_test.dart             # Comprehensive test suite (31/31 passing)
-└── pubspec.yaml                     # Dependency manifest & version metadata (v1.0.9+10)
+│   └── widget_test.dart             # Comprehensive test suite (35/35 passing)
+└── pubspec.yaml                     # Dependency manifest & version metadata (v1.0.10+11)
 ```
 
 ---

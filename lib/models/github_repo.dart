@@ -10,6 +10,10 @@ class GitHubRepo {
   final DateTime? updatedAt;
   final DateTime? pushedAt;
   final DateTime? createdAt;
+  final String? defaultBranch;
+  final int openIssuesCount;
+  final List<String> topics;
+  final String? license;
 
   GitHubRepo({
     required this.name,
@@ -23,9 +27,20 @@ class GitHubRepo {
     this.updatedAt,
     this.pushedAt,
     this.createdAt,
+    this.defaultBranch,
+    this.openIssuesCount = 0,
+    this.topics = const [],
+    this.license,
   });
 
   factory GitHubRepo.fromJson(Map<String, dynamic> json) {
+    final rawTopics = json['topics'] as List<dynamic>?;
+    final List<String> topics = rawTopics != null
+        ? rawTopics.map((e) => e.toString()).toList()
+        : const [];
+    final licenseObj = json['license'] as Map<String, dynamic>?;
+    final licenseName = licenseObj?['spdx_id'] as String? ?? licenseObj?['name'] as String?;
+
     return GitHubRepo(
       name: json['name'] as String? ?? 'Untitled',
       description: json['description'] as String?,
@@ -44,7 +59,31 @@ class GitHubRepo {
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'] as String)?.toLocal()
           : null,
+      defaultBranch: json['default_branch'] as String?,
+      openIssuesCount: json['open_issues_count'] as int? ?? 0,
+      topics: topics,
+      license: (licenseName != null && licenseName != 'NOASSERTION') ? licenseName : null,
     );
+  }
+
+  /// Extracts repository owner from htmlUrl (e.g., https://github.com/torvalds/linux -> torvalds)
+  String? get owner {
+    try {
+      final uri = Uri.tryParse(htmlUrl);
+      if (uri != null && uri.pathSegments.isNotEmpty) {
+        return uri.pathSegments[0];
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  /// Formatted repository size string (e.g. 512 KB, 14.2 MB)
+  String get formattedSize {
+    if (size < 1024) {
+      return '$size KB';
+    } else {
+      return '${(size / 1024).toStringAsFixed(1)} MB';
+    }
   }
 
   /// The timestamp of the latest commit pushed or repo update

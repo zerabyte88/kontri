@@ -1254,6 +1254,78 @@ class AppLocalizations {
     AppLanguage.korean: '간략히 보기',
   });
 
+  String get repositoryDetails => _str({
+    AppLanguage.indonesian: 'Detail Repositori',
+    AppLanguage.english: 'Repository Details',
+    AppLanguage.japanese: 'リポジトリ詳細',
+    AppLanguage.chineseSimplified: '仓库详情',
+    AppLanguage.chineseTraditional: '倉庫詳情',
+    AppLanguage.korean: '저장소 상세',
+  });
+
+  String get repositoryOverview => _str({
+    AppLanguage.indonesian: 'Ringkasan Repositori',
+    AppLanguage.english: 'Repository Overview',
+    AppLanguage.japanese: 'リポジトリ概要',
+    AppLanguage.chineseSimplified: '仓库概览',
+    AppLanguage.chineseTraditional: '倉庫概覽',
+    AppLanguage.korean: '저장소 개요',
+  });
+
+  String get readmeTitle => _str({
+    AppLanguage.indonesian: 'README.md',
+    AppLanguage.english: 'README.md',
+    AppLanguage.japanese: 'README.md',
+    AppLanguage.chineseSimplified: 'README.md',
+    AppLanguage.chineseTraditional: 'README.md',
+    AppLanguage.korean: 'README.md',
+  });
+
+  String get loadingReadme => _str({
+    AppLanguage.indonesian: 'Memuat README...',
+    AppLanguage.english: 'Loading README...',
+    AppLanguage.japanese: 'READMEを読み込み中...',
+    AppLanguage.chineseSimplified: '正在加载 README...',
+    AppLanguage.chineseTraditional: '正在載入 README...',
+    AppLanguage.korean: 'README 불러오는 중...',
+  });
+
+  String get noReadmeFound => _str({
+    AppLanguage.indonesian: 'Tidak ada file README ditemukan untuk repositori ini.',
+    AppLanguage.english: 'No README found for this repository.',
+    AppLanguage.japanese: 'このリポジトリにREADMEは見つかりませんでした。',
+    AppLanguage.chineseSimplified: '此仓库未找到 README 文件。',
+    AppLanguage.chineseTraditional: '此倉庫未找到 README 檔案。',
+    AppLanguage.korean: '이 저장소의 README 파일을 찾을 수 없습니다.',
+  });
+
+  String get defaultBranchLabel => _str({
+    AppLanguage.indonesian: 'Branch Utama',
+    AppLanguage.english: 'Default Branch',
+    AppLanguage.japanese: 'デフォルトブランチ',
+    AppLanguage.chineseSimplified: '默认分支',
+    AppLanguage.chineseTraditional: '預設分支',
+    AppLanguage.korean: '기본 브랜치',
+  });
+
+  String get copyRepoUrl => _str({
+    AppLanguage.indonesian: 'Salin URL Repositori',
+    AppLanguage.english: 'Copy Repository URL',
+    AppLanguage.japanese: 'リポジトリURLをコピー',
+    AppLanguage.chineseSimplified: '复制仓库链接',
+    AppLanguage.chineseTraditional: '複製倉庫連結',
+    AppLanguage.korean: '저장소 URL 복사',
+  });
+
+  String get repoUrlCopied => _str({
+    AppLanguage.indonesian: 'URL repositori berhasil disalin ke clipboard.',
+    AppLanguage.english: 'Repository URL copied to clipboard.',
+    AppLanguage.japanese: 'リポジトリURLをコピーしました。',
+    AppLanguage.chineseSimplified: '仓库链接已复制到剪贴板。',
+    AppLanguage.chineseTraditional: '倉庫連結已複製到剪貼簿。',
+    AppLanguage.korean: '저장소 URL이 클립보드에 복사되었습니다.',
+  });
+
   String get shareProfile => _str({
     AppLanguage.indonesian: 'Bagikan Profil',
     AppLanguage.english: 'Share Profile',

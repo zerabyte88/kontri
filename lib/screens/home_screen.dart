@@ -145,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context) => StatsDetailScreen(
             stats: stats,
             storageService: widget.storageService,
+            apiService: widget.apiService,
           ),
         ),
       ).then((_) {

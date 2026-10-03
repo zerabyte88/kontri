@@ -1,6 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:gitpulse_mobile/localization/app_language.dart';
 import 'package:gitpulse_mobile/localization/app_localizations.dart';
 import 'package:gitpulse_mobile/models/bookmarked_user.dart';
@@ -10,7 +15,9 @@ import 'package:gitpulse_mobile/models/github_repo.dart';
 import 'package:gitpulse_mobile/models/github_user.dart';
 import 'package:gitpulse_mobile/models/tech_news.dart';
 import 'package:gitpulse_mobile/models/user_stats.dart';
+import 'package:gitpulse_mobile/screens/repo_detail_screen.dart';
 import 'package:gitpulse_mobile/screens/stats_detail_screen.dart';
+import 'package:gitpulse_mobile/services/github_api_service.dart';
 import 'package:gitpulse_mobile/services/storage_service.dart';
 import 'package:gitpulse_mobile/services/app_theme_service.dart';
 import 'package:gitpulse_mobile/services/tech_news_service.dart';
@@ -20,6 +27,7 @@ import 'package:flutter/rendering.dart';
 import 'package:gitpulse_mobile/widgets/animated_app_header.dart';
 import 'package:gitpulse_mobile/widgets/animated_tier_title.dart';
 import 'package:gitpulse_mobile/widgets/language_chart.dart';
+import 'package:gitpulse_mobile/widgets/repo_tile.dart';
 import 'package:gitpulse_mobile/widgets/stat_card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -667,12 +675,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v1.0.9', () {
+    test('AppConfig provides accurate release and version telemetry for v1.0.10', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v1.0.9');
-      expect(AppConfig.buildNumber, '10');
-      expect(AppConfig.fullVersion, 'v1.0.9 (Build 10)');
-      expect(AppConfig.releaseTag, 'v1.0.9');
+      expect(AppConfig.appVersion, 'v1.0.10');
+      expect(AppConfig.buildNumber, '11');
+      expect(AppConfig.fullVersion, 'v1.0.10 (Build 11)');
+      expect(AppConfig.releaseTag, 'v1.0.10');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -993,6 +1001,147 @@ void main() {
         expect(rightParagraph.didExceedMaxLines, isFalse,
             reason: 'Right card label for ${lang.code} should not be truncated');
       }
+    });
+
+    testWidgets('RepoTile renders repo details, link icon, and handles tap to open', (tester) async {
+      final repo = GitHubRepo(
+        name: 'flutter_gitpulse',
+        description: 'Developer telemetry mobile app',
+        htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+        language: 'Dart',
+        stargazersCount: 42,
+        forksCount: 7,
+        isFork: false,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: RepoTile(repo: repo),
+          ),
+        ),
+      );
+
+      expect(find.text('flutter_gitpulse'), findsOneWidget);
+      expect(find.text('Dart'), findsOneWidget);
+      expect(find.text('42'), findsOneWidget);
+      expect(find.text('7'), findsOneWidget);
+      expect(find.byIcon(Icons.open_in_new_rounded), findsOneWidget);
+      expect(find.byType(InkWell), findsOneWidget);
+
+      await tester.tap(find.byType(RepoTile));
+      await tester.pump();
+    });
+
+    test('GitHubRepo parses extended fields, owner, and formattedSize', () {
+      final json = {
+        'name': 'gitpulse_mobile',
+        'description': 'Mobile telemetry',
+        'html_url': 'https://github.com/zerabyte88/gitpulse_mobile',
+        'language': 'Dart',
+        'stargazers_count': 100,
+        'forks_count': 15,
+        'fork': false,
+        'size': 2048,
+        'default_branch': 'main',
+        'open_issues_count': 3,
+        'topics': ['flutter', 'github', 'dart'],
+        'license': {'spdx_id': 'MIT', 'name': 'MIT License'},
+      };
+
+      final repo = GitHubRepo.fromJson(json);
+      expect(repo.name, 'gitpulse_mobile');
+      expect(repo.owner, 'zerabyte88');
+      expect(repo.defaultBranch, 'main');
+      expect(repo.openIssuesCount, 3);
+      expect(repo.topics, contains('flutter'));
+      expect(repo.license, 'MIT');
+      expect(repo.formattedSize, '2.0 MB');
+    });
+
+    test('GitHubApiService fetchRepositoryReadme decodes base64 markdown and handles 404', () async {
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/repos/testowner/testrepo/readme') {
+          const readmeMarkdown = '# Hello GitPulse\nThis is a test readme.';
+          final base64Content = base64Encode(utf8.encode(readmeMarkdown));
+          return http.Response(
+            jsonEncode({
+              'name': 'README.md',
+              'encoding': 'base64',
+              'content': base64Content,
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final api = GitHubApiService(client: mockClient);
+      final readme = await api.fetchRepositoryReadme(owner: 'testowner', repo: 'testrepo');
+      expect(readme, contains('# Hello GitPulse'));
+      expect(readme, contains('This is a test readme.'));
+
+      final missing = await api.fetchRepositoryReadme(owner: 'testowner', repo: 'unknown');
+      expect(missing, isNull);
+    });
+
+    testWidgets('RepoDetailScreen displays repository details and markdown README', (tester) async {
+      final repo = GitHubRepo(
+        name: 'flutter_gitpulse',
+        description: 'Developer telemetry mobile app',
+        htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+        language: 'Dart',
+        stargazersCount: 42,
+        forksCount: 7,
+        isFork: false,
+        topics: ['flutter', 'mobile'],
+        defaultBranch: 'main',
+        license: 'MIT',
+      );
+
+      final mockClient = MockClient((request) async {
+        final content = base64Encode(utf8.encode('### Welcome to GitPulse\n- Fast\n- Beautiful'));
+        return http.Response(
+          jsonEncode({
+            'name': 'README.md',
+            'encoding': 'base64',
+            'content': content,
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiService = GitHubApiService(client: mockClient);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          supportedLocales: AppLanguage.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: RepoDetailScreen(
+            repo: repo,
+            username: 'zerabyte88',
+            apiService: apiService,
+          ),
+        ),
+      );
+
+      expect(find.text('flutter_gitpulse'), findsAtLeastNWidgets(1));
+      expect(find.text('zerabyte88'), findsAtLeastNWidgets(1));
+      expect(find.text('Developer telemetry mobile app'), findsOneWidget);
+      expect(find.text('flutter'), findsOneWidget);
+      expect(find.text('mobile'), findsOneWidget);
+      expect(find.text('MIT'), findsOneWidget);
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MarkdownBody), findsOneWidget);
+      expect(find.textContaining('Welcome to GitPulse'), findsOneWidget);
     });
   });
 }

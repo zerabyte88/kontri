@@ -1,12 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../localization/app_localizations.dart';
 import '../models/github_repo.dart';
+import '../screens/repo_detail_screen.dart';
+import '../services/github_api_service.dart';
 import '../theme/app_theme.dart';
 
 class RepoTile extends StatelessWidget {
   final GitHubRepo repo;
+  final String? username;
+  final GitHubApiService? apiService;
+  final VoidCallback? onTap;
 
-  const RepoTile({super.key, required this.repo});
+  const RepoTile({
+    super.key,
+    required this.repo,
+    this.username,
+    this.apiService,
+    this.onTap,
+  });
+
+  void _openRepoDetails(BuildContext context) {
+    if (onTap != null) {
+      onTap!();
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RepoDetailScreen(
+          repo: repo,
+          username: username,
+          apiService: apiService,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openRepoExternal(BuildContext context) async {
+    final targetUrl = repo.htmlUrl.isNotEmpty
+        ? repo.htmlUrl
+        : 'https://github.com/${repo.name}';
+    final uri = Uri.tryParse(targetUrl);
+    if (uri != null) {
+      final loc = AppLocalizations.of(context);
+      try {
+        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (!launched && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(loc.cannotOpenLink(targetUrl)),
+              backgroundColor: AppTheme.accentRed,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(loc.failedToOpenLink(e.toString())),
+              backgroundColor: AppTheme.accentRed,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
+  }
 
   // Authentic language color mapper for common programming languages
   Color _getLanguageColor(String? language) {
@@ -59,55 +120,81 @@ class RepoTile extends StatelessWidget {
     return RepaintBoundary(
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.book_outlined,
-                size: 16,
-                color: AppTheme.textSecondary,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  repo.name,
-                  style: TextStyle(
-                    color: AppTheme.primaryCyan,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppTheme.border, width: 1),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _openRepoDetails(context),
+            splashColor: AppTheme.primaryCyan.withValues(alpha: 0.10),
+            highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.book_outlined,
+                        size: 16,
+                        color: AppTheme.textSecondary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          repo.name,
+                          style: TextStyle(
+                            color: AppTheme.primaryCyan,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (repo.isFork)
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceElevated,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppTheme.border, width: 0.8),
+                          ),
+                          child: Text(
+                            'Fork',
+                            style: TextStyle(
+                              color: AppTheme.textMuted,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(width: 6),
+                      InkResponse(
+                        radius: 16,
+                        onTap: () => _openRepoExternal(context),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.open_in_new_rounded,
+                            size: 14,
+                            color: AppTheme.textMuted,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 18,
+                        color: AppTheme.textMuted,
+                      ),
+                    ],
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              if (repo.isFork)
-                Container(
-                  margin: const EdgeInsets.only(left: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceElevated,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: AppTheme.border, width: 0.8),
-                  ),
-                  child: Text(
-                    'Fork',
-                    style: TextStyle(
-                      color: AppTheme.textMuted,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-            ],
-          ),
           if (repo.description != null && repo.description!.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(
@@ -238,6 +325,9 @@ class RepoTile extends StatelessWidget {
         ],
       ),
     ),
-    );
+  ),
+),
+),
+);
   }
 }

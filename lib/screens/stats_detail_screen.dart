@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../localization/app_localizations.dart';
 import '../models/github_repo.dart';
 import '../models/user_stats.dart';
+import '../services/github_api_service.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/activity_chart.dart';
@@ -20,11 +22,13 @@ enum RepoSortFilter {
 class StatsDetailScreen extends StatefulWidget {
   final UserStats stats;
   final StorageService storageService;
+  final GitHubApiService? apiService;
 
   const StatsDetailScreen({
     super.key,
     required this.stats,
     required this.storageService,
+    this.apiService,
   });
 
   @override
@@ -174,6 +178,47 @@ GitHub: https://github.com/${u.login}
       iconColor: AppTheme.primaryCyan,
       message: loc.summaryCopiedToast,
     );
+  }
+
+  Future<void> _openUrl(String targetUrl) async {
+    final uri = Uri.tryParse(targetUrl);
+    if (uri != null) {
+      final loc = AppLocalizations.of(context);
+      try {
+        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (!launched && mounted) {
+          _showThemedSnackBar(
+            icon: Icons.error_outline_rounded,
+            iconColor: AppTheme.accentRed,
+            message: loc.cannotOpenLink(targetUrl),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          _showThemedSnackBar(
+            icon: Icons.error_outline_rounded,
+            iconColor: AppTheme.accentRed,
+            message: loc.failedToOpenLink(e.toString()),
+          );
+        }
+      }
+    }
+  }
+
+  void _openUserRepositories() {
+    final login = widget.stats.user.login;
+    final url = widget.stats.user.htmlUrl.isNotEmpty
+        ? '${widget.stats.user.htmlUrl}?tab=repositories'
+        : 'https://github.com/$login?tab=repositories';
+    _openUrl(url);
+  }
+
+  void _openUserProfile() {
+    final login = widget.stats.user.login;
+    final url = widget.stats.user.htmlUrl.isNotEmpty
+        ? widget.stats.user.htmlUrl
+        : 'https://github.com/$login';
+    _openUrl(url);
   }
 
   String _getFilterLabel(RepoSortFilter filter, AppLocalizations loc) {
@@ -360,12 +405,27 @@ GitHub: https://github.com/${u.login}
                               ],
                             ),
                             const SizedBox(height: 3),
-                            Text(
-                              '@${user.login}',
-                              style: TextStyle(
-                                color: AppTheme.primaryCyan,
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w500,
+                            InkWell(
+                              borderRadius: BorderRadius.circular(4),
+                              onTap: _openUserProfile,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    '@${user.login}',
+                                    style: TextStyle(
+                                      color: AppTheme.primaryCyan,
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.open_in_new_rounded,
+                                    size: 11,
+                                    color: AppTheme.primaryCyan.withValues(alpha: 0.7),
+                                  ),
+                                ],
                               ),
                             ),
                             if (user.location != null && user.location!.trim().isNotEmpty) ...[
@@ -752,7 +812,11 @@ GitHub: https://github.com/${u.login}
           padding: const EdgeInsets.symmetric(horizontal: 16),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
-              (context, index) => RepoTile(repo: displayedRepos[index]),
+              (context, index) => RepoTile(
+                repo: displayedRepos[index],
+                username: widget.stats.user.login,
+                apiService: widget.apiService,
+              ),
               childCount: displayedRepos.length,
             ),
           ),
@@ -762,35 +826,80 @@ GitHub: https://github.com/${u.login}
             child: Padding(
               padding: const EdgeInsets.only(top: 6, bottom: 24),
               child: Center(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _showAllRepos = !_showAllRepos;
+                        });
+                      },
+                      icon: Icon(
+                        _showAllRepos
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        size: 16,
+                        color: AppTheme.primaryCyan,
+                      ),
+                      label: Text(
+                        _showAllRepos
+                            ? loc.showFewerRepos
+                            : loc.showAllReposCount(repos.length),
+                        style: TextStyle(
+                          color: AppTheme.primaryCyan,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: _openUserRepositories,
+                      icon: Icon(
+                        Icons.open_in_new_rounded,
+                        size: 14,
+                        color: AppTheme.textSecondary,
+                      ),
+                      label: Text(
+                        loc.openInGithub,
+                        style: TextStyle(
+                          color: AppTheme.textSecondary,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 6, bottom: 24),
+              child: Center(
                 child: TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _showAllRepos = !_showAllRepos;
-                    });
-                  },
+                  onPressed: _openUserRepositories,
                   icon: Icon(
-                    _showAllRepos
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded,
-                    size: 16,
-                    color: AppTheme.primaryCyan,
+                    Icons.open_in_new_rounded,
+                    size: 14,
+                    color: AppTheme.textSecondary,
                   ),
                   label: Text(
-                    _showAllRepos
-                        ? loc.showFewerRepos
-                        : loc.showAllReposCount(repos.length),
+                    loc.openInGithub,
                     style: TextStyle(
-                      color: AppTheme.primaryCyan,
-                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textSecondary,
+                      fontWeight: FontWeight.w500,
                       fontSize: 12.5,
                     ),
                   ),
                 ),
               ),
             ),
-          )
-        else
-          const SliverToBoxAdapter(child: SizedBox(height: 24)),
+          ),
       ],
     ],
   ),

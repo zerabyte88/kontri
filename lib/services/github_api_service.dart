@@ -97,6 +97,50 @@ class GitHubApiService {
         );
   }
 
+  Future<String?> fetchRepositoryReadme({
+    required String owner,
+    required String repo,
+  }) async {
+    final cleanOwner = owner.trim();
+    final cleanRepo = repo.trim();
+    if (cleanOwner.isEmpty || cleanRepo.isEmpty) return null;
+
+    try {
+      final uri = Uri.parse('$_baseUrl/repos/$cleanOwner/$cleanRepo/readme');
+      final res = await _client.get(uri, headers: _headers).timeout(_timeoutDuration);
+      _updateRateLimitFromHeaders(res.headers);
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body) as Map<String, dynamic>;
+        final content = data['content'] as String?;
+        final encoding = data['encoding'] as String?;
+
+        if (content != null && encoding == 'base64') {
+          final cleanBase64 = content.replaceAll(RegExp(r'\s+'), '');
+          return utf8.decode(base64.decode(cleanBase64));
+        } else if (content != null) {
+          return content;
+        }
+      } else if (res.statusCode == 404) {
+        return null;
+      } else if (res.statusCode == 403 || res.statusCode == 429) {
+        throw GitHubApiException(
+          'Batas kuota token / API telah habis.',
+          statusCode: res.statusCode,
+          isRateLimit: true,
+        );
+      }
+    } on SocketException {
+      throw GitHubApiException('Tidak ada koneksi internet.');
+    } on TimeoutException {
+      throw GitHubApiException('Koneksi timeout saat memuat README.');
+    } catch (e) {
+      if (e is GitHubApiException) rethrow;
+      return null;
+    }
+    return null;
+  }
+
   Future<ContributionStats?> _fetchContributions(String username) async {
     try {
       final uri = Uri.parse('https://github-contributions-api.jogruber.de/v4/$username');
