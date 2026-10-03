@@ -1326,6 +1326,78 @@ class AppLocalizations {
     AppLanguage.korean: '저장소 URL이 클립보드에 복사되었습니다.',
   });
 
+  String get filesTab => _str({
+    AppLanguage.indonesian: 'File',
+    AppLanguage.english: 'Files',
+    AppLanguage.japanese: 'ファイル',
+    AppLanguage.chineseSimplified: '文件',
+    AppLanguage.chineseTraditional: '檔案',
+    AppLanguage.korean: '파일',
+  });
+
+  String get loadingContents => _str({
+    AppLanguage.indonesian: 'Memuat isi repositori...',
+    AppLanguage.english: 'Loading repository contents...',
+    AppLanguage.japanese: 'リポジトリ内容を読み込み中...',
+    AppLanguage.chineseSimplified: '正在加载仓库内容...',
+    AppLanguage.chineseTraditional: '正在載入倉庫內容...',
+    AppLanguage.korean: '저장소 내용 불러오는 중...',
+  });
+
+  String get emptyDirectory => _str({
+    AppLanguage.indonesian: 'Direktori ini kosong.',
+    AppLanguage.english: 'This directory is empty.',
+    AppLanguage.japanese: 'このディレクトリは空です。',
+    AppLanguage.chineseSimplified: '此目录为空。',
+    AppLanguage.chineseTraditional: '此目錄為空。',
+    AppLanguage.korean: '이 디렉터리가 비어 있습니다.',
+  });
+
+  String get fileContent => _str({
+    AppLanguage.indonesian: 'Isi File',
+    AppLanguage.english: 'File Content',
+    AppLanguage.japanese: 'ファイル内容',
+    AppLanguage.chineseSimplified: '文件内容',
+    AppLanguage.chineseTraditional: '檔案內容',
+    AppLanguage.korean: '파일 내용',
+  });
+
+  String get loadingFile => _str({
+    AppLanguage.indonesian: 'Memuat file...',
+    AppLanguage.english: 'Loading file...',
+    AppLanguage.japanese: 'ファイルを読み込み中...',
+    AppLanguage.chineseSimplified: '正在加载文件...',
+    AppLanguage.chineseTraditional: '正在載入檔案...',
+    AppLanguage.korean: '파일 불러오는 중...',
+  });
+
+  String get cannotPreviewBinary => _str({
+    AppLanguage.indonesian: 'File biner tidak dapat ditampilkan sebagai teks.',
+    AppLanguage.english: 'Binary files cannot be displayed as text.',
+    AppLanguage.japanese: 'バイナリファイルはテキストとして表示できません。',
+    AppLanguage.chineseSimplified: '二进制文件无法作为文本显示。',
+    AppLanguage.chineseTraditional: '二進位檔案無法作為文字顯示。',
+    AppLanguage.korean: '바이너리 파일은 텍스트로 표시할 수 없습니다.',
+  });
+
+  String get copyCode => _str({
+    AppLanguage.indonesian: 'Salin Kode',
+    AppLanguage.english: 'Copy Code',
+    AppLanguage.japanese: 'コードをコピー',
+    AppLanguage.chineseSimplified: '复制代码',
+    AppLanguage.chineseTraditional: '複製程式碼',
+    AppLanguage.korean: '코드 복사',
+  });
+
+  String get codeCopied => _str({
+    AppLanguage.indonesian: 'Kode berhasil disalin ke clipboard.',
+    AppLanguage.english: 'Code copied to clipboard.',
+    AppLanguage.japanese: 'コードをコピーしました。',
+    AppLanguage.chineseSimplified: '代码已复制到剪贴板。',
+    AppLanguage.chineseTraditional: '程式碼已複製到剪貼簿。',
+    AppLanguage.korean: '코드가 클립보드에 복사되었습니다.',
+  });
+
   String get shareProfile => _str({
     AppLanguage.indonesian: 'Bagikan Profil',
     AppLanguage.english: 'Share Profile',

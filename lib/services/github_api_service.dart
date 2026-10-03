@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/contribution_stats.dart';
+import '../models/github_content_item.dart';
 import '../models/github_rate_limit.dart';
 import '../models/github_repo.dart';
 import '../models/github_user.dart';
@@ -134,6 +135,112 @@ class GitHubApiService {
       throw GitHubApiException('Tidak ada koneksi internet.');
     } on TimeoutException {
       throw GitHubApiException('Koneksi timeout saat memuat README.');
+    } catch (e) {
+      if (e is GitHubApiException) rethrow;
+      return null;
+    }
+    return null;
+  }
+
+  Future<List<GitHubContentItem>> fetchRepositoryContents({
+    required String owner,
+    required String repo,
+    String path = '',
+    String? ref,
+  }) async {
+    final cleanOwner = owner.trim();
+    final cleanRepo = repo.trim();
+    final cleanPath = path.trim().replaceAll(RegExp(r'^/+|/+$'), '');
+
+    if (cleanOwner.isEmpty || cleanRepo.isEmpty) return [];
+
+    try {
+      final endpoint = cleanPath.isEmpty
+          ? '$_baseUrl/repos/$cleanOwner/$cleanRepo/contents'
+          : '$_baseUrl/repos/$cleanOwner/$cleanRepo/contents/$cleanPath';
+      final uri = Uri.parse(ref != null && ref.trim().isNotEmpty
+          ? '$endpoint?ref=${Uri.encodeComponent(ref.trim())}'
+          : endpoint);
+
+      final res = await _client.get(uri, headers: _headers).timeout(_timeoutDuration);
+      _updateRateLimitFromHeaders(res.headers);
+
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(res.body);
+        if (decoded is List) {
+          final List<GitHubContentItem> items = [];
+          for (final item in decoded) {
+            if (item is Map<String, dynamic>) {
+              items.add(GitHubContentItem.fromJson(item));
+            }
+          }
+          items.sort((a, b) {
+            if (a.isDirectory && !b.isDirectory) return -1;
+            if (!a.isDirectory && b.isDirectory) return 1;
+            return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+          });
+          return items;
+        }
+      } else if (res.statusCode == 404) {
+        return [];
+      } else if (res.statusCode == 403 || res.statusCode == 429) {
+        throw GitHubApiException(
+          'Batas kuota token / API telah habis.',
+          statusCode: res.statusCode,
+          isRateLimit: true,
+        );
+      }
+    } on SocketException {
+      throw GitHubApiException('Tidak ada koneksi internet.');
+    } on TimeoutException {
+      throw GitHubApiException('Koneksi timeout saat memuat isi repositori.');
+    } catch (e) {
+      if (e is GitHubApiException) rethrow;
+      return [];
+    }
+    return [];
+  }
+
+  Future<String?> fetchFileContent({
+    required String owner,
+    required String repo,
+    required String path,
+    String? ref,
+    String? downloadUrl,
+  }) async {
+    final cleanOwner = owner.trim();
+    final cleanRepo = repo.trim();
+    final cleanPath = path.trim().replaceAll(RegExp(r'^/+|/+$'), '');
+
+    try {
+      if (downloadUrl != null && downloadUrl.isNotEmpty) {
+        final uri = Uri.parse(downloadUrl);
+        final res = await _client.get(uri).timeout(_timeoutDuration);
+        if (res.statusCode == 200) {
+          return utf8.decode(res.bodyBytes, allowMalformed: true);
+        }
+      }
+
+      final endpoint = '$_baseUrl/repos/$cleanOwner/$cleanRepo/contents/$cleanPath';
+      final uri = Uri.parse(ref != null && ref.trim().isNotEmpty
+          ? '$endpoint?ref=${Uri.encodeComponent(ref.trim())}'
+          : endpoint);
+
+      final res = await _client.get(uri, headers: _headers).timeout(_timeoutDuration);
+      _updateRateLimitFromHeaders(res.headers);
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body) as Map<String, dynamic>;
+        final content = data['content'] as String?;
+        final encoding = data['encoding'] as String?;
+
+        if (content != null && encoding == 'base64') {
+          final cleanBase64 = content.replaceAll(RegExp(r'\s+'), '');
+          return utf8.decode(base64.decode(cleanBase64), allowMalformed: true);
+        } else if (content != null) {
+          return content;
+        }
+      }
     } catch (e) {
       if (e is GitHubApiException) rethrow;
       return null;

@@ -12,12 +12,12 @@
 
 ### The Rhythm of Your Code. On-Device Developer Telemetry & Productivity Analytics.
 
-[![Release](https://img.shields.io/badge/Release-v1.0.10-38BDF8?style=flat-square&logo=github)](https://github.com/zerabyte88/gitpulse_mobile/releases)
-[![Build](https://img.shields.io/badge/Build-11-34D399?style=flat-square)](pubspec.yaml)
+[![Release](https://img.shields.io/badge/Release-v1.0.12-38BDF8?style=flat-square&logo=github)](https://github.com/zerabyte88/gitpulse_mobile/releases)
+[![Build](https://img.shields.io/badge/Build-13-34D399?style=flat-square)](pubspec.yaml)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.24.0-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-%3E%3D3.5.0-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
 [![Platform](https://img.shields.io/badge/Platform-Android%2064--bit%20%7C%20Web-10B981?style=flat-square&logo=android&logoColor=white)](https://developer.android.com)
-[![Tests](https://img.shields.io/badge/Tests-Passing%20(35%2F35)-success?style=flat-square&logo=checkmarx&logoColor=white)](test/widget_test.dart)
+[![Tests](https://img.shields.io/badge/Tests-Passing%20(39%2F39)-success?style=flat-square&logo=checkmarx&logoColor=white)](test/widget_test.dart)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Layered-F59E0B?style=flat-square)](#system-architecture)
 [![License](https://img.shields.io/badge/License-MIT-8B5CF6?style=flat-square)](LICENSE)
 
@@ -66,6 +66,17 @@ The standard GitHub contribution graph provides a daily snapshot of activity fre
 - **Language Distribution**: Multi-language donut chart weighted by repository codebase volume with authentic language colors.
 - **Portfolio Aggregation**: Real-time summation of cumulative stargazers, forks, repository counts (original vs. forked), and follower ratios.
 - **Sliver Virtualization**: Smooth 60fps scrolling across 100+ repositories using `CustomScrollView` and `SliverList.builder`.
+
+### 📂 Native In-App Repository Explorer & Code Viewer
+- **Instant In-App Inspection**: Tap any repository from a user's portfolio or the news feed to open it directly inside the app—no external browser redirect required.
+- **Dual-Tab Experience**: Seamlessly toggle between **README** documentation and the **Files** codebase tree.
+- **Interactive Directory Tree**: Browse nested folders and subdirectories with custom breadcrumbs and type-specific folder/file icons (`GitHubContentItem`).
+- **Syntax-Highlighted In-App File Viewer**: Inspect source files directly with line numbering, file size metadata, character counts, and quick actions to copy or open on GitHub (`FileViewerScreen`).
+
+### 📖 Rich Markdown Engine with Full Image Support
+- **Automatic Relative Asset Resolution**: Automatically resolves relative paths (e.g., `./assets/preview.png`, `docs/architecture.svg`) against GitHub's raw CDN (`raw.githubusercontent.com/<owner>/<repo>/<branch>/`).
+- **Dark/Light Theme Adaptive Images**: Automatically handles GitHub context markers such as `#gh-dark-mode-only` and `#gh-light-mode-only` matching the user's active theme.
+- **Rich Elements**: Renders badges, tables, task lists, blockquotes, and fenced code blocks with precision on-device typography.
 
 ### ⚡ Smart Rate-Limit & Token Management
 - Strongly-typed `GitHubApiException` intercepts HTTP 403, 429, and `x-ratelimit-remaining == 0`.
@@ -144,8 +155,8 @@ sequenceDiagram
 
     User->>App: Launch App / Tap "Check for Updates"
     App->>GitHub: GET /repos/zerabyte88/gitpulse_mobile/releases/latest
-    GitHub-->>App: Tag Name (e.g., v1.0.10), Release Notes, APK Asset URL
-    alt Version is newer (v1.0.10 > v1.0.9)
+    GitHub-->>App: Tag Name (e.g., v1.0.12), Release Notes, APK Asset URL
+    alt Version is newer (v1.0.12 > v1.0.10)
         App->>User: Display Update Notification Card
         User->>App: Tap "Update Now"
         App->>GitHub: Stream APK Binary via ota_update
@@ -155,7 +166,7 @@ sequenceDiagram
     else Version is current
         App-->>User: "App is already up to date"
     end
-    Note over App,Storage: On Next App Startup (v1.0.10):
+    Note over App,Storage: On Next App Startup (v1.0.12):
     App->>Storage: Scan for GitPulse-*.apk where fileVersion <= currentVersion
     App->>Storage: Safely Purge Installed APK & Delete Empty Folder
     Note over Storage: User Photos, Documents & Other Downloads Remain Untouched
@@ -177,19 +188,21 @@ graph TD
     subgraph Presentation_Layer ["Presentation Layer (Flutter 3.24+)"]
         UI_Home["HomeScreen<br/>(Search, Bookmarks, Feed, Version Badge)"]
         UI_Detail["StatsDetailScreen<br/>(Sliver Virtualization, 24h Chart, Donut)"]
+        UI_Repo["RepoDetailScreen & FileViewerScreen<br/>(Markdown Engine, Code Tree, Syntax Highlighter)"]
         UI_Widgets["Custom Widgets<br/>(GitPulseLogo, AnimatedTierTitle, StatCard)"]
         UI_Header["AnimatedHeaderBackground<br/>(4-Theme Canvas Particle Physics)"]
     end
 
     subgraph Domain_Layer ["Domain & Logic Layer"]
         Model_Stats["UserStats & ContributionStats<br/>(Streak Calculator, Tier Title Evaluator)"]
+        Model_Content["GitHubContentItem<br/>(Directory & File Tree Entity)"]
         Service_Update["UpdateService<br/>(Semantic Version Check, Storage Pipeline)"]
         Service_Theme["AppThemeService<br/>(Reactive 4-Mode Theme & Secret Easter Egg)"]
         Service_Lang["AppLanguageService<br/>(6-Language Reactive Localization)"]
     end
 
     subgraph Data_Layer ["Data & Persistence Layer"]
-        API_GitHub["GitHubApiService<br/>(Users, Repos, Events, Rate Limit Inspection)"]
+        API_GitHub["GitHubApiService<br/>(Users, Repos, Events, Contents, Rate Limits)"]
         API_News["TechNewsService<br/>(Trending GitHub Repos & dev.to Digest)"]
         Storage_Prefs["StorageService<br/>(SharedPreferences Token & Bookmark Cache)"]
     end
@@ -206,6 +219,9 @@ graph TD
     UI_Home --> API_News
     UI_Detail --> Model_Stats
     UI_Detail --> UI_Widgets
+    UI_Detail --> UI_Repo
+    UI_Repo --> Model_Content
+    UI_Repo --> API_GitHub
     UI_Home --> UI_Header
 
     Service_Update --> Storage_Disk
@@ -219,13 +235,16 @@ graph TD
 
 ## Performance & Engineering
 
-GitPulse Mobile is optimized for 60fps rendering even on low-spec mobile hardware:
+GitPulse Mobile is optimized for ultra-fluid 60–120fps rendering even on low-spec mobile hardware:
 
 1. **Sliver List Virtualization**: The repository view uses `CustomScrollView` and `SliverList.builder`. Only visible repository cards are laid out and rendered, preventing memory spikes on profiles with up to 100 repositories.
-2. **Memoized Repository Sorting**: Repository sorting operations are memoized and recomputed only when the user changes sorting criteria (Stars, Forks, Updated), avoiding recalculations during screen transitions.
-3. **RepaintBoundary Isolation**: Each repository tile and animated tier title is wrapped in a `RepaintBoundary` to isolate canvas repaints and prevent cascading UI rebuilds.
-4. **Constrained Image Decoding**: Dev.to and GitHub thumbnails decode with `cacheWidth: 450` with lightweight placeholders, reducing GPU cache memory pressure.
-5. **In-Memory History & Bookmark Caching**: Recent searches and bookmarked profiles are cached in memory after reading from disk, eliminating redundant JSON deserialization on every frame build.
+2. **Reactive Header Animation Pausing**: When modal sheets (such as `SettingsSheet`) or sub-routes open, background particle loops pause completely via `HeaderAnimationState`, eliminating competing frame rendering and dropping background GPU/CPU utilization to 0%.
+3. **Zero-saveLayer Header Rendering**: The animated app header operates with 0 offscreen GPU allocations (`ShaderMask`/`saveLayer()`) and replaces CPU Gaussian blurs (`MaskFilter.blur`) with native concentric GPU alpha rings.
+4. **Single-Pass Flex Grids**: Settings theme and language option selectors compute in a single layout pass with linear `Row` + `Expanded` flex structures isolated inside `RepaintBoundary`.
+5. **Memoized Repository Sorting**: Repository sorting operations are memoized and recomputed only when the user changes sorting criteria (Stars, Forks, Updated), avoiding recalculations during screen transitions.
+6. **RepaintBoundary Isolation**: Each repository tile, markdown container, and animated tier title is wrapped in a `RepaintBoundary` to isolate canvas repaints and prevent cascading UI rebuilds.
+7. **Constrained Image Decoding**: Dev.to, GitHub thumbnails, and developer avatars decode with explicit dimensions (`cacheWidth: 450`, `cacheWidth: 80`), eliminating uncompressed image bloat in RAM.
+8. **In-Memory History & Bookmark Caching**: Recent searches, release tags, and bookmarked profiles are cached in memory after reading from disk, eliminating redundant JSON deserialization.
 
 ---
 
@@ -252,7 +271,7 @@ GitPulse Mobile is optimized for 60fps rendering even on low-spec mobile hardwar
 | **Formatting** | [intl](https://pub.dev/packages/intl) | `^0.20.3` | Localized number formatting & date manipulation |
 | **Browser Links** | [url_launcher](https://pub.dev/packages/url_launcher) | `^6.3.2` | External browser routing for repositories & articles |
 | **Markdown** | [flutter_markdown](https://pub.dev/packages/flutter_markdown) | `^0.7.7+1` | In-app native GitHub README.md markdown parsing & rendering |
-| **Testing** | [flutter_test](https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html) | SDK | 35/35 unit, model, and widget verification tests |
+| **Testing** | [flutter_test](https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html) | SDK | 39/39 unit, model, and widget verification tests |
 
 ---
 
@@ -272,14 +291,16 @@ gitpulse_mobile/
 │   ├── models/                      # Domain entities & telemetry engines
 │   │   ├── bookmarked_user.dart     # Bookmarked profile serialization
 │   │   ├── contribution_stats.dart  # Streak calculator & tier determination
+│   │   ├── github_content_item.dart # Repository file & directory tree model
 │   │   ├── github_rate_limit.dart   # API rate-limit state tracking
 │   │   ├── github_repo.dart         # Repository schema parser & owner/size extractors
 │   │   ├── github_user.dart         # User profile schema parser
 │   │   ├── tech_news.dart           # Curated tech news & trending model
 │   │   └── user_stats.dart          # Aggregated user statistics & languages
 │   ├── screens/                     # UI screen controllers
+│   │   ├── file_viewer_screen.dart  # Syntax-highlighted code viewer & line numbering
 │   │   ├── home_screen.dart         # Search, bookmarks, tech news & animated header
-│   │   ├── repo_detail_screen.dart  # Native in-app repository detail & README.md markdown viewer
+│   │   ├── repo_detail_screen.dart  # Dual-tab repository detail, README markdown & file tree
 │   │   └── stats_detail_screen.dart # Interactive analytics dashboard (Virtualized Sliver)
 │   ├── services/                    # Data access & persistence layer
 │   │   ├── app_language_service.dart# Language preference state manager
@@ -300,8 +321,8 @@ gitpulse_mobile/
 │       ├── stat_card.dart           # Non-truncating summary metric cards
 │       └── tech_news_card.dart      # Trending digest & news cards
 ├── test/
-│   └── widget_test.dart             # Comprehensive test suite (35/35 passing)
-└── pubspec.yaml                     # Dependency manifest & version metadata (v1.0.10+11)
+│   └── widget_test.dart             # Comprehensive test suite (39/39 passing)
+└── pubspec.yaml                     # Dependency manifest & version metadata (v1.0.12+13)
 ```
 
 ---

@@ -139,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
 
+      HeaderAnimationState.pauseAnimation();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -149,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ).then((_) {
+        HeaderAnimationState.resumeAnimation();
         _refreshLocalData();
         setState(() {});
       });
@@ -180,16 +182,21 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _openSettingsSheet() {
-    SettingsSheet.show(
-      context,
-      storageService: widget.storageService,
-      apiService: widget.apiService,
-      onSettingsChanged: () {
-        _refreshLocalData();
-        setState(() {});
-      },
-    );
+  void _openSettingsSheet() async {
+    HeaderAnimationState.pauseAnimation();
+    try {
+      await SettingsSheet.show(
+        context,
+        storageService: widget.storageService,
+        apiService: widget.apiService,
+        onSettingsChanged: () {
+          _refreshLocalData();
+          setState(() {});
+        },
+      );
+    } finally {
+      HeaderAnimationState.resumeAnimation();
+    }
   }
 
   @override

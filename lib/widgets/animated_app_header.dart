@@ -3,10 +3,19 @@ import 'package:flutter/material.dart';
 import '../services/app_theme_service.dart';
 import '../theme/app_theme.dart';
 
-/// Global controller to synchronize interactive particle bursts across the header.
+/// Global controller to synchronize interactive particle bursts and lifecycle state across the header.
 class HeaderAnimationState {
   static final ValueNotifier<double> burstProgressNotifier = ValueNotifier<double>(1.0);
+  static final ValueNotifier<bool> isPausedNotifier = ValueNotifier<bool>(false);
   static DateTime _lastTapTime = DateTime.fromMillisecondsSinceEpoch(0);
+
+  static void pauseAnimation() {
+    isPausedNotifier.value = true;
+  }
+
+  static void resumeAnimation() {
+    isPausedNotifier.value = false;
+  }
 
   static void triggerBurst() {
     final now = DateTime.now();
@@ -138,12 +147,10 @@ class _GitPulseLogoPainter extends CustomPainter {
     canvas.drawCircle(bottomNode, nodeRadius * 0.85, _strokePaint);
     canvas.drawCircle(bottomNode, innerDotRadius * 0.8, dotPaint);
 
-    // Active HEAD Pulse node with glowing aura
+    // Active HEAD Pulse node with glowing aura (GPU-accelerated, zero blur overhead)
     final pulseBreath = 0.5 + 0.5 * math.sin(progress * 2 * math.pi);
-    final headGlowPaint = Paint()
-      ..color = color.withValues(alpha: 0.35 * pulseBreath)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
-    canvas.drawCircle(headNode, nodeRadius + 2.5 * pulseBreath, headGlowPaint);
+    _glowPaint.color = color.withValues(alpha: 0.22 * pulseBreath);
+    canvas.drawCircle(headNode, nodeRadius + 3.0 * pulseBreath, _glowPaint);
 
     canvas.drawCircle(headNode, nodeRadius, _fillPaint);
     canvas.drawCircle(headNode, nodeRadius, _strokePaint);
@@ -155,13 +162,10 @@ class _GitPulseLogoPainter extends CustomPainter {
       final tangent = metric.getTangentForOffset(metric.length * t);
       if (tangent != null) {
         final sparkAlpha = (math.sin(t * math.pi) * 0.9).clamp(0.0, 1.0);
-        _sparkGlow
-          ..color = Colors.white.withValues(alpha: sparkAlpha * 0.8)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
-
-        canvas.drawCircle(tangent.position, 1.8, _sparkGlow);
+        _sparkGlow.color = Colors.white.withValues(alpha: sparkAlpha * 0.4);
+        canvas.drawCircle(tangent.position, 2.4, _sparkGlow);
         _sparkCore.color = Colors.white.withValues(alpha: sparkAlpha);
-        canvas.drawCircle(tangent.position, 1.1, _sparkCore);
+        canvas.drawCircle(tangent.position, 1.2, _sparkCore);
       }
       break;
     }
@@ -201,6 +205,7 @@ class _AnimatedHeaderBackgroundState extends State<AnimatedHeaderBackground>
     )..repeat();
 
     HeaderAnimationState.burstProgressNotifier.addListener(_onBurstTriggered);
+    HeaderAnimationState.isPausedNotifier.addListener(_onPauseStateChanged);
   }
 
   void _onBurstTriggered() {
@@ -211,9 +216,23 @@ class _AnimatedHeaderBackgroundState extends State<AnimatedHeaderBackground>
     }
   }
 
+  void _onPauseStateChanged() {
+    if (!mounted) return;
+    if (HeaderAnimationState.isPausedNotifier.value) {
+      if (_controller.isAnimating) {
+        _controller.stop();
+      }
+    } else {
+      if (!_controller.isAnimating) {
+        _controller.repeat();
+      }
+    }
+  }
+
   @override
   void dispose() {
     HeaderAnimationState.burstProgressNotifier.removeListener(_onBurstTriggered);
+    HeaderAnimationState.isPausedNotifier.removeListener(_onPauseStateChanged);
     _controller.dispose();
     super.dispose();
   }
@@ -259,37 +278,18 @@ class _AnimatedHeaderBackgroundState extends State<AnimatedHeaderBackground>
 ///
 /// Displays the custom [GitPulseLogo], animated title, and version badge,
 /// and triggers interactive burst animations across the entire header on tap.
-class AnimatedAppHeader extends StatefulWidget {
+/// Interactive header title widget for GitPulse.
+///
+/// Displays the custom [GitPulseLogo], title, and version badge,
+/// and triggers interactive burst animations across the flexibleSpace background on tap.
+class AnimatedAppHeader extends StatelessWidget {
   final VoidCallback? onTap;
 
   const AnimatedAppHeader({super.key, this.onTap});
 
-  @override
-  State<AnimatedAppHeader> createState() => _AnimatedAppHeaderState();
-}
-
-class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 6),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   void _handleTap() {
     HeaderAnimationState.triggerBurst();
-    widget.onTap?.call();
+    onTap?.call();
   }
 
   @override
@@ -302,26 +302,17 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
         return GestureDetector(
           onTap: _handleTap,
           behavior: HitTestBehavior.opaque,
-          child: RepaintBoundary(
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) {
-                final t = _controller.value;
-
-                return SizedBox(
-                  height: 40,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildLogoContainer(currentTheme, accentColor, t),
-                      const SizedBox(width: 9),
-                      _buildAnimatedTitle(currentTheme, accentColor, t),
-                      const SizedBox(width: 8),
-                      _buildVersionBadge(accentColor),
-                    ],
-                  ),
-                );
-              },
+          child: SizedBox(
+            height: 40,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildLogoContainer(accentColor),
+                const SizedBox(width: 9),
+                _buildTitle(),
+                const SizedBox(width: 8),
+                _buildVersionBadge(accentColor),
+              ],
             ),
           ),
         );
@@ -329,11 +320,7 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
     );
   }
 
-  Widget _buildLogoContainer(
-    AppThemeMode mode,
-    Color accentColor,
-    double progress,
-  ) {
+  Widget _buildLogoContainer(Color accentColor) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.black,
@@ -343,36 +330,18 @@ class _AnimatedAppHeaderState extends State<AnimatedAppHeader>
       child: GitPulseLogo(
         size: 28,
         color: accentColor,
-        progress: progress,
       ),
     );
   }
 
-  Widget _buildAnimatedTitle(
-    AppThemeMode mode,
-    Color accentColor,
-    double progress,
-  ) {
-    final wave = 0.5 + 0.5 * math.sin(progress * 2 * math.pi);
-    final gradientColors = _getTitleGradient(mode, accentColor, wave);
-
-    return ShaderMask(
-      shaderCallback: (bounds) {
-        return LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: gradientColors,
-          stops: const [0.0, 0.5, 1.0],
-        ).createShader(bounds);
-      },
-      child: const Text(
-        'GitPulse',
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
-          fontSize: 17.5,
-          letterSpacing: -0.3,
-        ),
+  Widget _buildTitle() {
+    return const Text(
+      'GitPulse',
+      style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.w700,
+        fontSize: 17.5,
+        letterSpacing: -0.3,
       ),
     );
   }
@@ -410,39 +379,6 @@ Color _getThemeAccentColor(AppThemeMode mode) {
   }
 }
 
-List<Color> _getTitleGradient(
-  AppThemeMode mode,
-  Color accentColor,
-  double cycle,
-) {
-  switch (mode) {
-    case AppThemeMode.amoledJapanese:
-      return [
-        Colors.white,
-        Color.lerp(const Color(0xFFFFB6C1), const Color(0xFFFF5C8A), cycle)!,
-        Colors.white,
-      ];
-    case AppThemeMode.amoled:
-      return [
-        Colors.white,
-        Color.lerp(const Color(0xFF80DEEA), const Color(0xFF00E5FF), cycle)!,
-        Colors.white,
-      ];
-    case AppThemeMode.light:
-      return [
-        const Color(0xFF1F2328),
-        Color.lerp(const Color(0xFF0969DA), const Color(0xFF1F2328), cycle)!,
-        const Color(0xFF1F2328),
-      ];
-    case AppThemeMode.dark:
-      return [
-        const Color(0xFFF0F6FC),
-        Color.lerp(const Color(0xFF79C0FF), const Color(0xFF58A6FF), cycle)!,
-        const Color(0xFFF0F6FC),
-      ];
-  }
-}
-
 /// GPU-accelerated lightweight Canvas painter for full-width theme ambient particle effects.
 class _HeaderThemeParticlesPainter extends CustomPainter {
   final double progress;
@@ -475,48 +411,34 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
 
   static const List<_StarConfig> _stars = [
     // Left cluster (near logo & title)
-    _StarConfig(x: 0.04, y: 0.22, size: 2.4, phase: 0.12, hasSparkle: true),
-    _StarConfig(x: 0.07, y: 0.78, size: 1.4, phase: 0.65),
-    _StarConfig(x: 0.11, y: 0.35, size: 1.8, phase: 0.38),
-    _StarConfig(x: 0.15, y: 0.82, size: 1.2, phase: 0.85),
-    _StarConfig(x: 0.19, y: 0.26, size: 2.6, phase: 0.05, hasSparkle: true),
-    _StarConfig(x: 0.23, y: 0.68, size: 1.5, phase: 0.48),
+    _StarConfig(x: 0.05, y: 0.24, size: 2.2, phase: 0.12, hasSparkle: true),
+    _StarConfig(x: 0.12, y: 0.75, size: 1.4, phase: 0.65),
+    _StarConfig(x: 0.18, y: 0.30, size: 2.4, phase: 0.38, hasSparkle: true),
+    _StarConfig(x: 0.25, y: 0.70, size: 1.2, phase: 0.85),
 
     // Mid-left span
-    _StarConfig(x: 0.27, y: 0.20, size: 1.3, phase: 0.72),
-    _StarConfig(x: 0.31, y: 0.84, size: 2.5, phase: 0.28, hasSparkle: true),
-    _StarConfig(x: 0.35, y: 0.38, size: 1.6, phase: 0.90),
-    _StarConfig(x: 0.39, y: 0.72, size: 1.2, phase: 0.15),
-    _StarConfig(x: 0.43, y: 0.25, size: 2.2, phase: 0.58),
-    _StarConfig(x: 0.47, y: 0.80, size: 1.5, phase: 0.33),
+    _StarConfig(x: 0.32, y: 0.25, size: 1.5, phase: 0.28),
+    _StarConfig(x: 0.38, y: 0.80, size: 2.0, phase: 0.90),
+    _StarConfig(x: 0.45, y: 0.32, size: 1.3, phase: 0.55),
 
-    // Center header sky (near crescent moon at x: 0.58, y: 0.40)
-    _StarConfig(x: 0.51, y: 0.28, size: 1.4, phase: 0.78),
-    _StarConfig(x: 0.54, y: 0.75, size: 2.8, phase: 0.42, hasSparkle: true),
-    _StarConfig(x: 0.62, y: 0.22, size: 1.6, phase: 0.18),
-    _StarConfig(x: 0.65, y: 0.82, size: 1.3, phase: 0.62),
+    // Center header sky (near crescent moon)
+    _StarConfig(x: 0.52, y: 0.76, size: 2.4, phase: 0.42, hasSparkle: true),
+    _StarConfig(x: 0.64, y: 0.22, size: 1.6, phase: 0.18),
 
     // Mid-right span
-    _StarConfig(x: 0.69, y: 0.32, size: 2.4, phase: 0.88, hasSparkle: true),
-    _StarConfig(x: 0.72, y: 0.68, size: 1.5, phase: 0.08),
-    _StarConfig(x: 0.76, y: 0.24, size: 1.2, phase: 0.52),
-    _StarConfig(x: 0.79, y: 0.85, size: 2.6, phase: 0.95, hasSparkle: true),
-    _StarConfig(x: 0.82, y: 0.36, size: 1.4, phase: 0.22),
-    _StarConfig(x: 0.85, y: 0.70, size: 1.7, phase: 0.68),
+    _StarConfig(x: 0.70, y: 0.72, size: 1.4, phase: 0.88),
+    _StarConfig(x: 0.77, y: 0.28, size: 2.3, phase: 0.08, hasSparkle: true),
+    _StarConfig(x: 0.83, y: 0.82, size: 1.5, phase: 0.52),
 
     // Far right cluster
-    _StarConfig(x: 0.88, y: 0.20, size: 1.3, phase: 0.35),
-    _StarConfig(x: 0.91, y: 0.78, size: 2.7, phase: 0.80, hasSparkle: true),
-    _StarConfig(x: 0.94, y: 0.30, size: 1.5, phase: 0.12),
-    _StarConfig(x: 0.97, y: 0.65, size: 1.2, phase: 0.50),
+    _StarConfig(x: 0.90, y: 0.25, size: 1.3, phase: 0.35),
+    _StarConfig(x: 0.96, y: 0.70, size: 1.8, phase: 0.75),
 
     // Ambient stardust pinpoints (soft shimmer)
-    _StarConfig(x: 0.13, y: 0.55, size: 1.0, phase: 0.25, color: Color(0xFF80DEEA)),
-    _StarConfig(x: 0.25, y: 0.45, size: 0.9, phase: 0.70, color: Color(0xFFE0F7FA)),
-    _StarConfig(x: 0.41, y: 0.50, size: 1.1, phase: 0.40, color: Color(0xFF80DEEA)),
-    _StarConfig(x: 0.60, y: 0.60, size: 1.0, phase: 0.85, color: Color(0xFFE0F7FA)),
-    _StarConfig(x: 0.74, y: 0.48, size: 0.9, phase: 0.30, color: Color(0xFF80DEEA)),
-    _StarConfig(x: 0.87, y: 0.52, size: 1.0, phase: 0.75, color: Color(0xFFE0F7FA)),
+    _StarConfig(x: 0.15, y: 0.52, size: 1.0, phase: 0.25, color: Color(0xFF80DEEA)),
+    _StarConfig(x: 0.40, y: 0.55, size: 0.9, phase: 0.70, color: Color(0xFFE0F7FA)),
+    _StarConfig(x: 0.61, y: 0.58, size: 1.0, phase: 0.40, color: Color(0xFF80DEEA)),
+    _StarConfig(x: 0.86, y: 0.48, size: 0.9, phase: 0.85, color: Color(0xFFE0F7FA)),
   ];
 
   static const List<_ParticleConfig> _bubbles = [
@@ -612,14 +534,10 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(rotation);
-
-    final path = Path()
-      ..moveTo(0, -radius)
-      ..cubicTo(radius * 0.75, -radius * 0.6, radius, radius * 0.4, 0, radius)
-      ..cubicTo(-radius, radius * 0.4, -radius * 0.75, -radius * 0.6, 0, -radius)
-      ..close();
-
-    canvas.drawPath(path, paint);
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset.zero, width: radius * 1.5, height: radius * 0.8),
+      paint,
+    );
     canvas.restore();
   }
 
@@ -635,10 +553,12 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
     const moonRadius = 7.0;
     final pulse = 0.7 + 0.3 * math.sin(progress * 2 * math.pi);
 
-    _glowPaint
-      ..color = const Color(0xFF00E5FF).withValues(alpha: 0.28 * pulse)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
-    canvas.drawCircle(moonCenter, moonRadius + 3, _glowPaint);
+    // Soft concentric glow circles (GPU-accelerated, zero blur overhead)
+    final glowColor = const Color(0xFF00E5FF);
+    _glowPaint.color = glowColor.withValues(alpha: 0.08 * pulse);
+    canvas.drawCircle(moonCenter, moonRadius + 5.5, _glowPaint);
+    _glowPaint.color = glowColor.withValues(alpha: 0.18 * pulse);
+    canvas.drawCircle(moonCenter, moonRadius + 2.5, _glowPaint);
 
     // Direct vector crescent moon without expensive boolean CSG operations
     final crescent = Path()
@@ -656,7 +576,7 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
       ..close();
     canvas.drawPath(crescent, _moonPaint);
 
-    // 2. Rich Twinkling Cosmic Stars distributed across the entire header width
+    // 2. Rich Twinkling Cosmic Stars distributed across the header width
     for (final s in _stars) {
       final pos = Offset(s.x * size.width, s.y * size.height);
       final twinkle = 0.25 + 0.75 * (0.5 + 0.5 * math.sin((progress + s.phase) * 2 * math.pi));
@@ -684,12 +604,11 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
   }
 
   void _drawSparkle(Canvas canvas, Offset center, double phase, Color color) {
-    final arm = 2.2 + 2.0 * (0.5 + 0.5 * math.sin(phase * 2 * math.pi));
+    final arm = 2.0 + 1.5 * (0.5 + 0.5 * math.sin(phase * 2 * math.pi));
     _sparklePaint.color = color;
 
     canvas.drawLine(Offset(center.dx - arm, center.dy), Offset(center.dx + arm, center.dy), _sparklePaint);
     canvas.drawLine(Offset(center.dx, center.dy - arm), Offset(center.dx, center.dy + arm), _sparklePaint);
-    canvas.drawCircle(center, 1.0, _sparklePaint);
   }
 
   // ==========================================
@@ -783,15 +702,11 @@ class _HeaderThemeParticlesPainter extends CustomPainter {
     canvas.save();
     canvas.translate(center.dx, center.dy);
     canvas.rotate(rotation);
-
-    final path = Path()
-      ..moveTo(0, -radius)
-      ..quadraticBezierTo(radius * 0.8, 0, 0, radius)
-      ..quadraticBezierTo(-radius * 0.8, 0, 0, -radius)
-      ..close();
-
-    canvas.drawPath(path, fillPaint);
-    canvas.drawLine(Offset(0, -radius * 0.7), Offset(0, radius * 0.7), veinPaint);
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset.zero, width: radius * 1.8, height: radius * 0.7),
+      fillPaint,
+    );
+    canvas.drawLine(Offset(-radius * 0.7, 0), Offset(radius * 0.7, 0), veinPaint);
     canvas.restore();
   }
 

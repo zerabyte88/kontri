@@ -64,6 +64,10 @@ class _SettingsSheetState extends State<SettingsSheet> {
   String? _downloadedApkPath;
   StreamSubscription<OtaEvent>? _otaSubscription;
 
+  // Cached update check state across bottom sheet opens
+  static DateTime? _lastUpdateCheckTime;
+  static AppUpdateInfo? _cachedUpdateInfo;
+
   // Easter Egg State
   int _amoledTapCount = 0;
   DateTime? _lastAmoledTap;
@@ -76,8 +80,19 @@ class _SettingsSheetState extends State<SettingsSheet> {
     );
     _updateService = UpdateService();
     _rateLimit = widget.apiService.lastRateLimit;
-    _refreshRateLimit();
-    _checkUpdateSilently();
+    _updateInfo = _cachedUpdateInfo;
+
+    // Defer network requests until after modal slide-in animation finishes
+    // so the sheet opens with zero frame-drops or setState interruptions.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 320), () {
+        if (!mounted) return;
+        if (_rateLimit == null) {
+          _refreshRateLimit();
+        }
+        _checkUpdateSilently();
+      });
+    });
   }
 
   @override
@@ -88,9 +103,18 @@ class _SettingsSheetState extends State<SettingsSheet> {
   }
 
   Future<void> _checkUpdateSilently() async {
+    // Avoid hammering the GitHub API if already checked recently
+    if (_lastUpdateCheckTime != null &&
+        DateTime.now().difference(_lastUpdateCheckTime!) < const Duration(minutes: 15) &&
+        _cachedUpdateInfo != null) {
+      return;
+    }
+
     final info = await _updateService.checkForUpdate(
       personalAccessToken: widget.storageService.getToken(),
     );
+    _lastUpdateCheckTime = DateTime.now();
+    _cachedUpdateInfo = info;
     if (mounted) {
       setState(() {
         _updateInfo = info;
@@ -332,7 +356,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
     final currentTheme = AppThemeService.currentTheme;
     final isJapaneseUnlocked = AppThemeService.isJapaneseUnlocked(widget.storageService);
 
-    return Container(
+    return RepaintBoundary(
+      child: Container(
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -479,16 +504,13 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     const SizedBox(height: 12),
 
                     // Theme Options Grid
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final itemWidth = (constraints.maxWidth - 8) / 2;
-                        return Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
+                    Column(
+                      children: [
+                        Row(
                           children: [
                             // 1. Gelap
-                            _buildOptionCard(
-                              width: itemWidth,
+                            Expanded(
+                              child: _buildOptionCard(
                               title: loc.themeDark,
                               subtitle: loc.themeDarkSubtitle,
                               leading: Icon(
@@ -508,10 +530,12 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                 if (mounted) setState(() {});
                               },
                             ),
+                            ),
+                            const SizedBox(width: 8),
 
                             // 2. AMOLED (With Easter Egg tap listener)
-                            _buildOptionCard(
-                              width: itemWidth,
+                            Expanded(
+                              child: _buildOptionCard(
                               title: loc.themeAmoled,
                               subtitle: loc.themeAmoledSubtitle,
                               leading: Icon(
@@ -524,10 +548,15 @@ class _SettingsSheetState extends State<SettingsSheet> {
                               isSelected: currentTheme == AppThemeMode.amoled,
                               onTap: () => _onAmoledTapped(loc),
                             ),
-
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
                             // 3. Terang
-                            _buildOptionCard(
-                              width: itemWidth,
+                            Expanded(
+                              child: _buildOptionCard(
                               title: loc.themeLight,
                               subtitle: loc.themeLightSubtitle,
                               leading: Icon(
@@ -547,34 +576,39 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                 if (mounted) setState(() {});
                               },
                             ),
+                            ),
+                            const SizedBox(width: 8),
 
                             // 4. AMOLED Sakura (Shown if unlocked or currently active)
                             if (isJapaneseUnlocked || currentTheme == AppThemeMode.amoledJapanese)
-                              _buildOptionCard(
-                                width: itemWidth,
-                                title: loc.themeAmoledJapanese,
-                                subtitle: loc.themeAmoledJapaneseSubtitle,
-                                leading: Icon(
-                                  Icons.auto_awesome_rounded,
-                                  size: 17,
-                                  color: currentTheme == AppThemeMode.amoledJapanese
-                                      ? const Color(0xFFFF5C8A)
-                                      : AppTheme.textMuted,
+                              Expanded(
+                                child: _buildOptionCard(
+                                  title: loc.themeAmoledJapanese,
+                                  subtitle: loc.themeAmoledJapaneseSubtitle,
+                                  leading: Icon(
+                                    Icons.auto_awesome_rounded,
+                                    size: 17,
+                                    color: currentTheme == AppThemeMode.amoledJapanese
+                                        ? const Color(0xFFFF5C8A)
+                                        : AppTheme.textMuted,
+                                  ),
+                                  isSelected: currentTheme == AppThemeMode.amoledJapanese,
+                                  activeColor: const Color(0xFFFF5C8A),
+                                  onTap: () async {
+                                    await AppThemeService.changeTheme(
+                                      AppThemeMode.amoledJapanese,
+                                      widget.storageService,
+                                    );
+                                    widget.onSettingsChanged?.call();
+                                    if (mounted) setState(() {});
+                                  },
                                 ),
-                                isSelected: currentTheme == AppThemeMode.amoledJapanese,
-                                activeColor: const Color(0xFFFF5C8A),
-                                onTap: () async {
-                                  await AppThemeService.changeTheme(
-                                    AppThemeMode.amoledJapanese,
-                                    widget.storageService,
-                                  );
-                                  widget.onSettingsChanged?.call();
-                                  if (mounted) setState(() {});
-                                },
-                              ),
+                              )
+                            else
+                              const Expanded(child: SizedBox()),
                           ],
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -639,48 +673,34 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     const SizedBox(height: 12),
 
                     // Grid of 6 Languages
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final itemWidth = (constraints.maxWidth - 8) / 2;
-                        return Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: AppLanguage.values.map((lang) {
-                            final isSelected = lang == currentLang;
-                            return _buildOptionCard(
-                              width: itemWidth,
-                              title: lang.nativeName,
-                              subtitle: lang.name != lang.nativeName ? lang.name : null,
-                              leading: Text(
-                                lang.flag,
-                                style: const TextStyle(fontSize: 16),
+                    Column(
+                      children: [
+                        for (int i = 0; i < AppLanguage.values.length; i += 2) ...[
+                          if (i > 0) const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildLanguageOptionCard(
+                                  lang: AppLanguage.values[i],
+                                  currentLang: currentLang,
+                                  loc: loc,
+                                ),
                               ),
-                              isSelected: isSelected,
-                              onTap: () async {
-                                if (lang == currentLang) return;
-                                final messenger = ScaffoldMessenger.of(context);
-                                final toastText =
-                                    '${loc.languageChangedToast}: ${lang.nativeName} (${lang.name})';
-                                await AppLanguageService.changeLanguage(
-                                  lang,
-                                  widget.storageService,
-                                );
-                                widget.onSettingsChanged?.call();
-                                if (!mounted) return;
-                                setState(() {});
-                                messenger.showSnackBar(
-                                  SnackBar(
-                                    content: Text(toastText),
-                                    backgroundColor: AppTheme.surfaceElevated,
-                                    behavior: SnackBarBehavior.floating,
-                                    duration: const Duration(seconds: 2),
+                              const SizedBox(width: 8),
+                              if (i + 1 < AppLanguage.values.length)
+                                Expanded(
+                                  child: _buildLanguageOptionCard(
+                                    lang: AppLanguage.values[i + 1],
+                                    currentLang: currentLang,
+                                    loc: loc,
                                   ),
-                                );
-                              },
-                            );
-                          }).toList(),
-                        );
-                      },
+                                )
+                              else
+                                const Expanded(child: SizedBox()),
+                            ],
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
@@ -1339,6 +1359,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                   AppConfig.developerAvatarUrl,
                                   width: 30,
                                   height: 30,
+                                  cacheWidth: 80,
+                                  cacheHeight: 80,
                                   headers: const {
                                     'Accept': 'image/*,*/*;q=0.8',
                                     'User-Agent': 'GitPulseMobile/1.0',
@@ -1451,11 +1473,50 @@ class _SettingsSheetState extends State<SettingsSheet> {
           ),
         ),
       ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageOptionCard({
+    required AppLanguage lang,
+    required AppLanguage currentLang,
+    required AppLocalizations loc,
+  }) {
+    final isSelected = lang == currentLang;
+    return _buildOptionCard(
+      title: lang.nativeName,
+      subtitle: lang.name != lang.nativeName ? lang.name : null,
+      leading: Text(
+        lang.flag,
+        style: const TextStyle(fontSize: 16),
+      ),
+      isSelected: isSelected,
+      onTap: () async {
+        if (lang == currentLang) return;
+        final messenger = ScaffoldMessenger.of(context);
+        final toastText =
+            '${loc.languageChangedToast}: ${lang.nativeName} (${lang.name})';
+        await AppLanguageService.changeLanguage(
+          lang,
+          widget.storageService,
+        );
+        widget.onSettingsChanged?.call();
+        if (!mounted) return;
+        setState(() {});
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(toastText),
+            backgroundColor: AppTheme.surfaceElevated,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildOptionCard({
-    required double width,
+    double? width,
     required Widget leading,
     required String title,
     String? subtitle,
@@ -1467,21 +1528,22 @@ class _SettingsSheetState extends State<SettingsSheet> {
     return SizedBox(
       width: width,
       height: 56.0,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? accent.withValues(alpha: 0.12)
-                : AppTheme.surface,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isSelected ? accent : AppTheme.border,
-              width: isSelected ? 1.2 : 0.8,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? accent.withValues(alpha: 0.12)
+                  : AppTheme.surface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isSelected ? accent : AppTheme.border,
+                width: isSelected ? 1.2 : 0.8,
+              ),
             ),
-          ),
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -1553,6 +1615,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

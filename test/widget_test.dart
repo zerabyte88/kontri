@@ -10,11 +10,13 @@ import 'package:gitpulse_mobile/localization/app_language.dart';
 import 'package:gitpulse_mobile/localization/app_localizations.dart';
 import 'package:gitpulse_mobile/models/bookmarked_user.dart';
 import 'package:gitpulse_mobile/models/contribution_stats.dart';
+import 'package:gitpulse_mobile/models/github_content_item.dart';
 import 'package:gitpulse_mobile/models/github_rate_limit.dart';
 import 'package:gitpulse_mobile/models/github_repo.dart';
 import 'package:gitpulse_mobile/models/github_user.dart';
 import 'package:gitpulse_mobile/models/tech_news.dart';
 import 'package:gitpulse_mobile/models/user_stats.dart';
+import 'package:gitpulse_mobile/screens/file_viewer_screen.dart';
 import 'package:gitpulse_mobile/screens/repo_detail_screen.dart';
 import 'package:gitpulse_mobile/screens/stats_detail_screen.dart';
 import 'package:gitpulse_mobile/services/github_api_service.dart';
@@ -675,12 +677,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v1.0.10', () {
+    test('AppConfig provides accurate release and version telemetry for v1.0.12', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v1.0.10');
-      expect(AppConfig.buildNumber, '11');
-      expect(AppConfig.fullVersion, 'v1.0.10 (Build 11)');
-      expect(AppConfig.releaseTag, 'v1.0.10');
+      expect(AppConfig.appVersion, 'v1.0.12');
+      expect(AppConfig.buildNumber, '13');
+      expect(AppConfig.fullVersion, 'v1.0.12 (Build 13)');
+      expect(AppConfig.releaseTag, 'v1.0.12');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -1142,6 +1144,209 @@ void main() {
 
       expect(find.byType(MarkdownBody), findsOneWidget);
       expect(find.textContaining('Welcome to GitPulse'), findsOneWidget);
+    });
+
+    test('GitHubContentItem parses directory and file correctly', () {
+      final dirJson = {
+        'name': 'lib',
+        'path': 'lib',
+        'sha': '123456',
+        'size': 0,
+        'type': 'dir',
+        'html_url': 'https://github.com/zerabyte88/gitpulse/tree/main/lib',
+      };
+      final dirItem = GitHubContentItem.fromJson(dirJson);
+      expect(dirItem.name, 'lib');
+      expect(dirItem.isDirectory, true);
+      expect(dirItem.formattedSize, '');
+
+      final fileJson = {
+        'name': 'main.dart',
+        'path': 'lib/main.dart',
+        'sha': '789012',
+        'size': 2048,
+        'type': 'file',
+        'download_url': 'https://raw.githubusercontent.com/.../main.dart',
+        'html_url': 'https://github.com/zerabyte88/gitpulse/blob/main/lib/main.dart',
+      };
+      final fileItem = GitHubContentItem.fromJson(fileJson);
+      expect(fileItem.name, 'main.dart');
+      expect(fileItem.isDirectory, false);
+      expect(fileItem.formattedSize, '2.0 KB');
+      expect(fileItem.isImage, false);
+
+      final imgJson = {
+        'name': 'logo.png',
+        'path': 'assets/logo.png',
+        'sha': 'abcde',
+        'size': 512,
+        'type': 'file',
+      };
+      final imgItem = GitHubContentItem.fromJson(imgJson);
+      expect(imgItem.isImage, true);
+    });
+
+    test('GitHubApiService fetchRepositoryContents and fetchFileContent work correctly', () async {
+      final mockClient = MockClient((request) async {
+        if (request.url.path.endsWith('/contents/lib/main.dart')) {
+          final content = base64Encode(utf8.encode('void main() { runApp(MyApp()); }'));
+          return http.Response(
+            jsonEncode({
+              'name': 'main.dart',
+              'encoding': 'base64',
+              'content': content,
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        } else if (request.url.path.endsWith('/contents/lib')) {
+          return http.Response(
+            jsonEncode([
+              {'name': 'main.dart', 'path': 'lib/main.dart', 'type': 'file', 'size': 1200},
+              {'name': 'screens', 'path': 'lib/screens', 'type': 'dir', 'size': 0},
+            ]),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final service = GitHubApiService(client: mockClient);
+      final items = await service.fetchRepositoryContents(
+        owner: 'zerabyte88',
+        repo: 'gitpulse',
+        path: 'lib',
+      );
+
+      // Verify directories sorted first
+      expect(items.length, 2);
+      expect(items.first.name, 'screens');
+      expect(items.first.isDirectory, true);
+      expect(items.last.name, 'main.dart');
+      expect(items.last.isDirectory, false);
+
+      final fileContent = await service.fetchFileContent(
+        owner: 'zerabyte88',
+        repo: 'gitpulse',
+        path: 'lib/main.dart',
+      );
+      expect(fileContent, contains('void main()'));
+    });
+
+    testWidgets('FileViewerScreen renders code and lines correctly', (WidgetTester tester) async {
+      final item = GitHubContentItem(
+        name: 'sample.dart',
+        path: 'lib/sample.dart',
+        sha: 'abc',
+        size: 50,
+        type: 'file',
+        downloadUrl: 'https://example.com/sample.dart',
+        htmlUrl: 'https://github.com/sample.dart',
+      );
+
+      final mockClient = MockClient((request) async {
+        return http.Response('line 1\nline 2\nline 3', 200);
+      });
+
+      final apiService = GitHubApiService(client: mockClient);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          supportedLocales: AppLanguage.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: FileViewerScreen(
+            item: item,
+            repo: 'gitpulse',
+            owner: 'zerabyte88',
+            apiService: apiService,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('sample.dart'), findsOneWidget);
+      expect(find.text('lib/sample.dart'), findsOneWidget);
+      expect(find.textContaining('3 lines'), findsOneWidget);
+      expect(find.textContaining('line 1'), findsOneWidget);
+    });
+
+    testWidgets('RepoDetailScreen tab switching renders files explorer', (WidgetTester tester) async {
+      final repo = GitHubRepo(
+        name: 'flutter_gitpulse',
+        description: 'Developer telemetry mobile app',
+        htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+        language: 'Dart',
+        stargazersCount: 128,
+        forksCount: 34,
+        openIssuesCount: 3,
+        isFork: false,
+        topics: ['flutter', 'mobile'],
+        defaultBranch: 'main',
+        license: 'MIT',
+      );
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/readme')) {
+          return http.Response(
+            jsonEncode({
+              'name': 'README.md',
+              'encoding': 'base64',
+              'content': base64Encode(utf8.encode('# Readme Title')),
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        } else if (request.url.path.contains('/contents')) {
+          return http.Response(
+            jsonEncode([
+              {'name': 'lib', 'path': 'lib', 'type': 'dir', 'size': 0},
+              {'name': 'pubspec.yaml', 'path': 'pubspec.yaml', 'type': 'file', 'size': 500},
+            ]),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final apiService = GitHubApiService(client: mockClient);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          supportedLocales: AppLanguage.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: RepoDetailScreen(
+            repo: repo,
+            username: 'zerabyte88',
+            apiService: apiService,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // README tab is default
+      expect(find.text('README.md'), findsAtLeastNWidgets(1));
+
+      // Tap Files tab
+      final filesTabFinder = find.text('Files');
+      expect(filesTabFinder, findsOneWidget);
+      await tester.tap(filesTabFinder);
+      await tester.pumpAndSettle();
+
+      // Should show directory contents
+      expect(find.text('lib'), findsOneWidget);
+      expect(find.text('pubspec.yaml'), findsOneWidget);
     });
   });
 }
