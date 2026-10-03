@@ -52,6 +52,8 @@ class GitPulseApp extends StatelessWidget {
               title: 'GitPulse',
               debugShowCheckedModeBanner: false,
               theme: AppTheme.getTheme(currentThemeMode),
+              themeAnimationDuration: const Duration(milliseconds: 350),
+              themeAnimationCurve: Curves.easeInOut,
               locale: currentLang.locale,
               supportedLocales: AppLanguage.supportedLocales,
               localizationsDelegates: const [

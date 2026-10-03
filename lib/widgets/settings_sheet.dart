@@ -357,8 +357,10 @@ class _SettingsSheetState extends State<SettingsSheet> {
     final isJapaneseUnlocked = AppThemeService.isJapaneseUnlocked(widget.storageService);
 
     return RepaintBoundary(
-      child: Container(
-      decoration: BoxDecoration(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+        decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         border: Border(
@@ -392,7 +394,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
               // Sheet Header
               Row(
                 children: [
-                  Container(
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeInOut,
                     padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
                       color: AppTheme.surfaceElevated,
@@ -442,7 +446,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
               const SizedBox(height: 16),
 
               // CARD 1: Theme Selection (Dark, AMOLED, Japanese AMOLED Easter Egg, Light)
-              Container(
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceElevated,
@@ -470,7 +476,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             ),
                           ),
                         ),
-                        Container(
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 350),
+                          curve: Curves.easeInOut,
                           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                           decoration: BoxDecoration(
                             color: AppTheme.surface,
@@ -616,7 +624,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
               const SizedBox(height: 14),
 
               // CARD 2: Language Selection
-              Container(
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceElevated,
@@ -644,7 +654,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             ),
                           ),
                         ),
-                        Container(
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 350),
+                          curve: Curves.easeInOut,
                           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                           decoration: BoxDecoration(
                             color: AppTheme.surface,
@@ -708,7 +720,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
               const SizedBox(height: 14),
 
               // CARD 3: GitHub API Rate Limit Tracker
-              Container(
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceElevated,
@@ -813,7 +827,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
               const SizedBox(height: 14),
 
               // CARD 4: GitHub Personal Access Token
-              Container(
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceElevated,
@@ -841,7 +857,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             ),
                           ),
                         ),
-                        Container(
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 350),
+                          curve: Curves.easeInOut,
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: hasToken
@@ -997,7 +1015,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
               const SizedBox(height: 14),
 
               // CARD 5: App Updates & OTA In-App Installation
-              Container(
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceElevated,
@@ -1266,7 +1286,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
               const SizedBox(height: 14),
 
               // CARD 6: About GitPulse & Build Version Info & Developer
-              Container(
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeInOut,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceElevated,
@@ -1485,7 +1507,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
     final isSelected = lang == currentLang;
     return _buildOptionCard(
       title: lang.nativeName,
-      subtitle: lang.name != lang.nativeName ? lang.name : null,
+      subtitle: lang == AppLanguage.english
+          ? 'Global'
+          : (lang.name != lang.nativeName ? lang.name : null),
       leading: Text(
         lang.flag,
         style: const TextStyle(fontSize: 16),
@@ -1533,7 +1557,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: onTap,
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
             decoration: BoxDecoration(
               color: isSelected
                   ? accent.withValues(alpha: 0.12)
@@ -1541,81 +1567,66 @@ class _SettingsSheetState extends State<SettingsSheet> {
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: isSelected ? accent : AppTheme.border,
-                width: isSelected ? 1.2 : 0.8,
+                width: isSelected ? 1.4 : 0.8,
               ),
             ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: Center(child: leading),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: Center(child: leading),
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: isSelected ? accent : AppTheme.textPrimary,
+                            fontSize: 12.0,
+                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                            height: 1.15,
+                          ),
+                        ),
+                        if (subtitle != null && subtitle.isNotEmpty) ...[
+                          const SizedBox(height: 1.5),
                           Text(
-                            title,
+                            subtitle,
                             textAlign: TextAlign.center,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: isSelected ? accent : AppTheme.textPrimary,
-                              fontSize: 11.0,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                              height: 1.15,
+                              color: isSelected
+                                  ? accent.withValues(alpha: 0.8)
+                                  : AppTheme.textMuted,
+                              fontSize: 9.8,
+                              letterSpacing: -0.2,
+                              height: 1.1,
                             ),
                           ),
-                          if (subtitle != null && subtitle.isNotEmpty) ...[
-                            const SizedBox(height: 1.5),
-                            Text(
-                              subtitle,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: AppTheme.textMuted,
-                                fontSize: 9.5,
-                                height: 1.1,
-                              ),
-                            ),
-                          ],
                         ],
-                      ),
+                      ],
                     ),
-                    if (isSelected)
-                      const SizedBox(width: 14)
-                    else
-                      const SizedBox(width: 4),
-                  ],
-                ),
-              ),
-              if (isSelected)
-                Positioned(
-                  top: 5,
-                  right: 6,
-                  child: Icon(
-                    Icons.check_circle_rounded,
-                    size: 13,
-                    color: accent,
                   ),
-                ),
-            ],
+                  const SizedBox(width: 4),
+                ],
+              ),
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

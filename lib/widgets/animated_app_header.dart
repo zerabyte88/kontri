@@ -255,13 +255,17 @@ class _AnimatedHeaderBackgroundState extends State<AnimatedHeaderBackground>
                 }
 
                 return ClipRect(
-                  child: CustomPaint(
-                    size: Size.infinite,
-                    painter: _HeaderThemeParticlesPainter(
-                      progress: t,
-                      burstProgress: _burstProgress,
-                      themeMode: currentTheme,
-                      accentColor: accentColor,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 350),
+                    child: CustomPaint(
+                      key: ValueKey(currentTheme),
+                      size: Size.infinite,
+                      painter: _HeaderThemeParticlesPainter(
+                        progress: t,
+                        burstProgress: _burstProgress,
+                        themeMode: currentTheme,
+                        accentColor: accentColor,
+                      ),
                     ),
                   ),
                 );
