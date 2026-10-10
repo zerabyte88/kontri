@@ -160,12 +160,12 @@ class StorageService {
 
   int getFavoriteGridColumns() {
     final cols = _prefs.getInt(_keyFavoriteGridColumns) ?? 2;
-    if (cols < 1 || cols > 4) return 2;
+    if (cols < 1 || cols > 2) return 2;
     return cols;
   }
 
   Future<void> setFavoriteGridColumns(int columns) async {
-    final clamped = columns.clamp(1, 4);
+    final clamped = columns.clamp(1, 2);
     await _prefs.setInt(_keyFavoriteGridColumns, clamped);
   }
 

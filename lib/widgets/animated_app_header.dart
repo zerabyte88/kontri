@@ -198,7 +198,7 @@ class AnimatedAppHeader extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildLogoContainer(accentColor),
+              _buildLogoContainer(accentColor, isLight: currentTheme == AppThemeMode.light),
               const SizedBox(width: 9),
               _buildTitle(),
               const SizedBox(width: 8),
@@ -210,11 +210,12 @@ class AnimatedAppHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoContainer(Color accentColor) {
+  Widget _buildLogoContainer(Color accentColor, {required bool isLight}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: isLight ? AppTheme.surfaceElevated : Colors.black,
         borderRadius: BorderRadius.circular(7),
+        border: isLight ? Border.all(color: AppTheme.border, width: 0.8) : null,
       ),
       clipBehavior: Clip.antiAlias,
       child: GitPulseLogo(
@@ -225,10 +226,10 @@ class AnimatedAppHeader extends StatelessWidget {
   }
 
   Widget _buildTitle() {
-    return const Text(
+    return Text(
       'GitPulse',
       style: TextStyle(
-        color: Colors.white,
+        color: AppTheme.textPrimary,
         fontWeight: FontWeight.w700,
         fontSize: 17.5,
         letterSpacing: -0.3,

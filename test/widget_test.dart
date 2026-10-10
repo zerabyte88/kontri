@@ -389,10 +389,12 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       final storage = await StorageService.init();
 
-      // Test default and setting grid columns
+      // Test default and setting grid columns (clamped to 1-2)
       expect(storage.getFavoriteGridColumns(), 2);
+      await storage.setFavoriteGridColumns(1);
+      expect(storage.getFavoriteGridColumns(), 1);
       await storage.setFavoriteGridColumns(4);
-      expect(storage.getFavoriteGridColumns(), 4);
+      expect(storage.getFavoriteGridColumns(), 2);
 
       // Add bookmark with full details
       await storage.toggleBookmark(
@@ -728,12 +730,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v2.0.0', () {
+    test('AppConfig provides accurate release and version telemetry for v2.1.0', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v2.0.0');
-      expect(AppConfig.buildNumber, '15');
-      expect(AppConfig.fullVersion, 'v2.0.0 (Build 15)');
-      expect(AppConfig.releaseTag, 'v2.0.0');
+      expect(AppConfig.appVersion, 'v2.1.0');
+      expect(AppConfig.buildNumber, '16');
+      expect(AppConfig.fullVersion, 'v2.1.0 (Build 16)');
+      expect(AppConfig.releaseTag, 'v2.1.0');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -762,7 +764,7 @@ void main() {
       expect(UpdateService.compareVersions('1.0.1', 'v1.0.1'), 0);
       expect(UpdateService.compareVersions('v1.0.1', 'v1.0.2'), -1);
       expect(UpdateService.compareVersions('v1.0.10', 'v1.0.2'), 1);
-      expect(UpdateService.compareVersions('v2.0.0', 'v1.9.9'), 1);
+      expect(UpdateService.compareVersions('v2.1.0', 'v2.0.0'), 1);
     });
 
     test('UpdateService cleanDownloadedApk removes leftover apk files successfully', () async {
@@ -1021,8 +1023,8 @@ void main() {
       expect(amoledTheme.cardTheme.color, const Color(0xEB101012));
       expect(sakuraTheme.cardTheme.color, const Color(0xEB180C1A));
 
-      // Verify Plus Jakarta Sans typography is configured
-      expect(darkTheme.textTheme.bodyMedium?.fontFamily, contains('PlusJakartaSans'));
+      // Verify Poppins typography is configured
+      expect(darkTheme.textTheme.bodyMedium?.fontFamily, contains('Poppins'));
     });
 
     test('AppLocalizations renders beautiful copy profile and favorite toast messages', () {
@@ -1555,21 +1557,21 @@ void main() {
       expect(find.text('Zerabyte Dev'), findsOneWidget);
       expect(find.text('Jakarta, Indonesia'), findsOneWidget);
 
-      // Check column control buttons 1, 2, 3, 4 via ValueKey
+      // Check column control buttons 1 and 2 via ValueKey
       expect(find.byKey(const ValueKey('col_btn_1')), findsOneWidget);
       expect(find.byKey(const ValueKey('col_btn_2')), findsOneWidget);
-      expect(find.byKey(const ValueKey('col_btn_3')), findsOneWidget);
-      expect(find.byKey(const ValueKey('col_btn_4')), findsOneWidget);
+      expect(find.byKey(const ValueKey('col_btn_3')), findsNothing);
+      expect(find.byKey(const ValueKey('col_btn_4')), findsNothing);
 
       // Tap 1 column
       await tester.tap(find.byKey(const ValueKey('col_btn_1')));
       await tester.pumpAndSettle();
       expect(storage.getFavoriteGridColumns(), 1);
 
-      // Tap 4 column
-      await tester.tap(find.byKey(const ValueKey('col_btn_4')));
+      // Tap 2 column
+      await tester.tap(find.byKey(const ValueKey('col_btn_2')));
       await tester.pumpAndSettle();
-      expect(storage.getFavoriteGridColumns(), 4);
+      expect(storage.getFavoriteGridColumns(), 2);
     });
 
     testWidgets('RunningText renders static text when content fits constraints', (tester) async {
@@ -1860,7 +1862,7 @@ void main() {
       expect(find.byKey(const ValueKey('github')), findsOneWidget);
 
       // Swipe right on the news content area with velocity
-      await tester.fling(find.byKey(const ValueKey('github')), const Offset(400, 0), 1000);
+      await tester.fling(find.byKey(const ValueKey('github')), const Offset(400, 0), 1000, warnIfMissed: false);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 

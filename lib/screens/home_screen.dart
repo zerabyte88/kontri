@@ -36,15 +36,16 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _errorMessage;
   bool _isSearchFocused = false;
 
-  // News State
+  // News State & In-Memory Cache per Category
   String _selectedCategory = 'trending';
-  int _slideDirection = 1;
-  List<TechNews> _newsList = [];
-  bool _isNewsLoading = true;
+  late final PageController _newsPageController;
+  final Map<String, List<TechNews>> _categoryNewsCache = {};
+  final Map<String, bool> _categoryLoadingMap = {};
 
   // Local Storage Cache
   List<BookmarkedUser> _bookmarkedUsers = [];
   List<String> _allRecents = [];
+  String? _loadingFavoriteUsername;
 
   void _refreshLocalData() {
     _bookmarkedUsers = widget.storageService.getBookmarkedUsers();
@@ -63,11 +64,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _newsPageController = PageController();
     _newsService = TechNewsService(storageService: widget.storageService);
     _refreshLocalData();
     _searchFocusNode.addListener(_onSearchFocusChanged);
     _searchController.addListener(_onSearchTextChanged);
-    _loadNews();
+    _loadCategoryNews(_selectedCategory);
     widget.apiService.fetchRateLimit().then((_) {
       if (mounted) setState(() {});
     });
@@ -87,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _newsPageController.dispose();
     _searchFocusNode.removeListener(_onSearchFocusChanged);
     _searchFocusNode.dispose();
     _searchController.removeListener(_onSearchTextChanged);
@@ -95,50 +98,70 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  Future<void> _loadNews({bool refresh = false}) async {
-    if (!refresh) {
+  Future<void> _loadCategoryNews(String category, {bool refresh = false}) async {
+    if (!refresh &&
+        _categoryNewsCache.containsKey(category) &&
+        _categoryNewsCache[category]!.isNotEmpty) {
+      return;
+    }
+
+    if (mounted) {
       setState(() {
-        _isNewsLoading = true;
+        _categoryLoadingMap[category] = true;
       });
     }
 
     try {
       _newsService.personalAccessToken = widget.storageService.getToken();
       final news = await _newsService.fetchNews(
-        tag: _selectedCategory,
+        tag: category,
         forceRefresh: refresh,
       );
       if (mounted) {
         setState(() {
-          _newsList = news;
-          _isNewsLoading = false;
+          _categoryNewsCache[category] = news;
+          _categoryLoadingMap[category] = false;
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _isNewsLoading = false;
+          _categoryLoadingMap[category] = false;
         });
       }
     }
   }
 
-  void _changeCategoryByIndex(
-    int newIndex,
-    List<Map<String, String>> categories, {
-    bool isSwipeLeft = true,
-  }) {
-    if (newIndex < 0 || newIndex >= categories.length) return;
-    final targetCategory = categories[newIndex]['id']!;
+  void _onCategoryChipTapped(int index, List<Map<String, String>> categories) {
+    if (index < 0 || index >= categories.length) return;
+    final targetCategory = categories[index]['id']!;
     if (targetCategory == _selectedCategory) return;
 
     setState(() {
-      _slideDirection = isSwipeLeft ? 1 : -1;
       _selectedCategory = targetCategory;
     });
 
-    _animateCategoryChipToView(newIndex, categories.length);
-    _loadNews();
+    _animateCategoryChipToView(index, categories.length);
+    if (_newsPageController.hasClients) {
+      _newsPageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeOutCubic,
+      );
+    }
+    _loadCategoryNews(targetCategory);
+  }
+
+  void _onPageChanged(int index, List<Map<String, String>> categories) {
+    if (index < 0 || index >= categories.length) return;
+    final targetCategory = categories[index]['id']!;
+    if (targetCategory != _selectedCategory) {
+      setState(() {
+        _selectedCategory = targetCategory;
+      });
+      _animateCategoryChipToView(index, categories.length);
+      _loadCategoryNews(targetCategory);
+    }
   }
 
   void _animateCategoryChipToView(int index, int totalCount) {
@@ -154,28 +177,6 @@ class _HomeScreenState extends State<HomeScreen> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutCubic,
     );
-  }
-
-  void _handleHorizontalSwipe(
-    DragEndDetails details,
-    List<Map<String, String>> categories,
-  ) {
-    final velocity = details.primaryVelocity ?? 0;
-    if (velocity < -120) {
-      // Swiped Left -> Advance to next category
-      final currentIndex =
-          categories.indexWhere((c) => c['id'] == _selectedCategory);
-      if (currentIndex != -1 && currentIndex < categories.length - 1) {
-        _changeCategoryByIndex(currentIndex + 1, categories, isSwipeLeft: true);
-      }
-    } else if (velocity > 120) {
-      // Swiped Right -> Return to previous category
-      final currentIndex =
-          categories.indexWhere((c) => c['id'] == _selectedCategory);
-      if (currentIndex > 0) {
-        _changeCategoryByIndex(currentIndex - 1, categories, isSwipeLeft: false);
-      }
-    }
   }
 
   void _searchUser(String username) async {
@@ -239,6 +240,74 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
         _errorMessage = displayErr;
       });
+    }
+  }
+
+  Future<void> _openFavoriteProfile(String username) async {
+    final clean = username.trim();
+    if (clean.isEmpty || _loadingFavoriteUsername != null) return;
+
+    _searchFocusNode.unfocus();
+    setState(() {
+      _loadingFavoriteUsername = clean;
+    });
+
+    try {
+      final stats = await widget.apiService.fetchUserStats(clean);
+      await widget.storageService.addRecentSearch(clean);
+      _refreshLocalData();
+
+      if (!mounted) return;
+      setState(() {
+        _loadingFavoriteUsername = null;
+      });
+
+      HeaderAnimationState.pauseAnimation();
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StatsDetailScreen(
+            stats: stats,
+            storageService: widget.storageService,
+            apiService: widget.apiService,
+          ),
+        ),
+      );
+      HeaderAnimationState.resumeAnimation();
+      _refreshLocalData();
+      if (mounted) setState(() {});
+    } catch (e) {
+      if (!mounted) return;
+      final msg = e.toString().toLowerCase();
+      final loc = AppLocalizations.of(context);
+      String displayErr;
+      if (e is GitHubApiException && e.isNotFound) {
+        displayErr = loc.userNotFound;
+      } else if (e is GitHubApiException && e.isRateLimit) {
+        displayErr = loc.rateLimitExceeded;
+      } else if (msg.contains('not found') || msg.contains('404')) {
+        displayErr = loc.userNotFound;
+      } else if (msg.contains('rate limit') ||
+          msg.contains('limit') ||
+          msg.contains('403') ||
+          msg.contains('429') ||
+          msg.contains('kuota') ||
+          msg.contains('habis')) {
+        displayErr = loc.rateLimitExceeded;
+      } else {
+        displayErr = loc.networkError;
+      }
+      setState(() {
+        _loadingFavoriteUsername = null;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(displayErr),
+          backgroundColor: AppTheme.accentRed,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -332,7 +401,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onRefresh: () async {
             _refreshLocalData();
             await Future.wait([
-              _loadNews(refresh: true),
+              _loadCategoryNews(_selectedCategory, refresh: true),
               widget.apiService.fetchRateLimit(),
             ]);
             _refreshLocalData();
@@ -405,35 +474,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // News Content wrapped in horizontal swipe gesture detector with animated slide transition
+              // News Content in Smooth Interactive PageView
               SliverToBoxAdapter(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onHorizontalDragEnd: (details) =>
-                      _handleHorizontalSwipe(details, categories),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    transitionBuilder: (child, animation) {
-                      final offsetAnimation = Tween<Offset>(
-                        begin: Offset(_slideDirection * 0.25, 0),
-                        end: Offset.zero,
-                      ).animate(CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOutCubic,
-                      ));
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: KeyedSubtree(
-                      key: ValueKey(_selectedCategory),
-                      child: _buildNewsContent(loc),
-                    ),
-                  ),
+                child: ExpandablePageView(
+                  controller: _newsPageController,
+                  itemCount: categories.length,
+                  onPageChanged: (index) => _onPageChanged(index, categories),
+                  itemBuilder: (context, index) {
+                    final catId = categories[index]['id']!;
+                    return KeyedSubtree(
+                      key: ValueKey(catId),
+                      child: _buildCategoryNewsPage(catId, loc),
+                    );
+                  },
                 ),
               ),
             ],
@@ -771,12 +824,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppTheme.accentAmber,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  loc.favoriteProfiles,
-                  style: TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
+                Flexible(
+                  child: Text(
+                    loc.favoriteProfiles,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -796,6 +852,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 const Spacer(),
                 Text(
                   loc.viewAllFavorites,
@@ -825,113 +882,153 @@ class _HomeScreenState extends State<HomeScreen> {
             separatorBuilder: (context, index) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final user = bookmarks[index];
-              return InkWell(
-                borderRadius: BorderRadius.circular(10),
-                onTap: () {
-                  _searchController.text = user.username;
-                  _searchUser(user.username);
-                },
-                child: Container(
-                  width: 190,
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surface,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppTheme.border, width: 1),
+              final isCardLoading = _loadingFavoriteUsername == user.username;
+              return Container(
+                width: 190,
+                decoration: BoxDecoration(
+                  color: AppTheme.surface,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isCardLoading
+                        ? AppTheme.primaryCyan.withValues(alpha: 0.6)
+                        : AppTheme.border,
+                    width: 1,
                   ),
-                  child: Row(
-                    children: [
-                      // Avatar Photo with subtle border
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppTheme.border,
-                            width: 1,
-                          ),
-                        ),
-                        child: ClipOval(
-                          child: Image.network(
-                            user.avatarUrl,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    splashColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
+                    highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
+                    onTap: isCardLoading ? null : () => _openFavoriteProfile(user.username),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      child: Row(
+                        children: [
+                          // Avatar Photo with subtle border & loading overlay
+                          SizedBox(
                             width: 38,
                             height: 38,
-                            cacheWidth: 100,
-                            cacheHeight: 100,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                color: AppTheme.surfaceElevated,
-                                child: Center(child: SizedBox(width: 14,
-                                    height: 14,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1.5,
-                                      color: AppTheme.primaryCyan,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppTheme.border,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.network(
+                                      user.avatarUrl,
+                                      width: 38,
+                                      height: 38,
+                                      cacheWidth: 100,
+                                      cacheHeight: 100,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Container(
+                                          color: AppTheme.surfaceElevated,
+                                          child: Center(
+                                            child: SizedBox(
+                                              width: 14,
+                                              height: 14,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 1.5,
+                                                color: AppTheme.primaryCyan,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (context, error, stackTrace) => Container(
+                                        color: AppTheme.surfaceElevated,
+                                        child: Icon(
+                                          Icons.person_outline_rounded,
+                                          size: 18,
+                                          color: AppTheme.textMuted,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) => Container(
-                              color: AppTheme.surfaceElevated,
-                              child: Icon(
-                                Icons.person_outline_rounded,
-                                size: 18,
-                                color: AppTheme.textMuted,
-                              ),
+                                if (isCardLoading)
+                                  Container(
+                                    width: 38,
+                                    height: 38,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppTheme.background.withValues(alpha: 0.75),
+                                    ),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: AppTheme.primaryCyan,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
+                          const SizedBox(width: 10),
 
-                      // User Info
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user.username,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: AppTheme.textPrimary,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          // User Info
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user.username,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: AppTheme.textPrimary,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'github.com',
+                                  style: TextStyle(
+                                    color: AppTheme.textMuted,
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'github.com',
-                              style: TextStyle(
-                                color: AppTheme.textMuted,
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                          ),
 
-                      // Remove favorite button
-                      IconButton(
-                        icon: Icon(
-                          Icons.close_rounded,
-                          size: 14,
-                          color: AppTheme.textMuted,
-                        ),
-                        visualDensity: VisualDensity.compact,
-                        tooltip: loc.removeFavorite,
-                        onPressed: () async {
-                          await widget.storageService.removeBookmark(user.username);
-                          _refreshLocalData();
-                          setState(() {});
-                        },
+                          // Remove favorite button
+                          IconButton(
+                            icon: Icon(
+                              Icons.close_rounded,
+                              size: 14,
+                              color: AppTheme.textMuted,
+                            ),
+                            visualDensity: VisualDensity.compact,
+                            tooltip: loc.removeFavorite,
+                            onPressed: () async {
+                              await widget.storageService.removeBookmark(user.username);
+                              _refreshLocalData();
+                              setState(() {});
+                            },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               );
@@ -942,37 +1039,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNewsContent(AppLocalizations loc) {
-    if (_isNewsLoading) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 36),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: AppTheme.primaryCyan,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                loc.loadingNews,
-                style: TextStyle(
-                  color: AppTheme.textMuted.withValues(alpha: 0.8),
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
+  Widget _buildCategoryNewsPage(String category, AppLocalizations loc) {
+    final isLoading = _categoryLoadingMap[category] ?? false;
+    final newsList = _categoryNewsCache[category] ?? [];
+
+    if (isLoading && newsList.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            TechNewsShimmerCard(),
+            SizedBox(height: 12),
+            TechNewsShimmerCard(),
+            SizedBox(height: 12),
+            TechNewsShimmerCard(),
+          ],
         ),
       );
     }
 
-    if (_newsList.isEmpty) {
+    if (newsList.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 28),
@@ -992,10 +1079,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (int i = 0; i < _newsList.length; i++)
+          for (int i = 0; i < newsList.length; i++)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: TechNewsCard(news: _newsList[i]),
+              child: TechNewsCard(news: newsList[i]),
             ),
         ],
       ),
@@ -1013,84 +1100,79 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header
-        GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onHorizontalDragEnd: (details) =>
-              _handleHorizontalSwipe(details, categories),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.feed_outlined,
-                      size: 18,
-                      color: AppTheme.primaryCyan,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.feed_outlined,
+                    size: 18,
+                    color: AppTheme.primaryCyan,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      loc.techNewsTitle,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
+                  ),
+                  if (isCachedOffline) ...[
                     const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        loc.techNewsTitle,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.accentAmber.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: AppTheme.accentAmber.withValues(alpha: 0.3),
+                          width: 0.8,
                         ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.cloud_off_rounded,
+                            size: 11,
+                            color: AppTheme.accentAmber,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            loc.offlineCached,
+                            style: TextStyle(
+                              color: AppTheme.accentAmber,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    if (isCachedOffline) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.accentAmber.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: AppTheme.accentAmber.withValues(alpha: 0.3),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.cloud_off_rounded,
-                              size: 11,
-                              color: AppTheme.accentAmber,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              loc.offlineCached,
-                              style: TextStyle(
-                                color: AppTheme.accentAmber,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
                   ],
-                ),
+                ],
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.refresh_rounded,
-                  size: 18,
-                  color: AppTheme.textSecondary,
-                ),
-                tooltip: loc.refresh,
-                onPressed: () => _loadNews(refresh: true),
-                visualDensity: VisualDensity.compact,
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.refresh_rounded,
+                size: 18,
+                color: AppTheme.textSecondary,
               ),
-            ],
-          ),
+              tooltip: loc.refresh,
+              onPressed: () => _loadCategoryNews(_selectedCategory, refresh: true),
+              visualDensity: VisualDensity.compact,
+            ),
+          ],
         ),
         const SizedBox(height: 10),
 
@@ -1130,13 +1212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 showCheckmark: false,
                 onSelected: (selected) {
                   if (selected && _selectedCategory != cat['id']) {
-                    final currentIndex =
-                        categories.indexWhere((c) => c['id'] == _selectedCategory);
-                    _changeCategoryByIndex(
-                      index,
-                      categories,
-                      isSwipeLeft: index > currentIndex,
-                    );
+                    _onCategoryChipTapped(index, categories);
                   }
                 },
               );
@@ -1144,6 +1220,187 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Dynamic-height PageView that measures its active page and animates container height smoothly.
+class ExpandablePageView extends StatefulWidget {
+  final int itemCount;
+  final Widget Function(BuildContext, int) itemBuilder;
+  final PageController controller;
+  final ValueChanged<int>? onPageChanged;
+
+  const ExpandablePageView({
+    super.key,
+    required this.itemCount,
+    required this.itemBuilder,
+    required this.controller,
+    this.onPageChanged,
+  });
+
+  @override
+  State<ExpandablePageView> createState() => _ExpandablePageViewState();
+}
+
+class _ExpandablePageViewState extends State<ExpandablePageView> {
+  late List<double> _heights;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPage = widget.controller.hasClients ? widget.controller.page?.round() ?? 0 : 0;
+    _heights = List.filled(widget.itemCount, 520.0);
+    widget.controller.addListener(_onPageScroll);
+  }
+
+  void _onPageScroll() {
+    if (!mounted || !widget.controller.hasClients) return;
+    final page = widget.controller.page;
+    if (page != null) {
+      final newPage = page.round();
+      if (newPage != _currentPage && newPage >= 0 && newPage < widget.itemCount) {
+        setState(() {
+          _currentPage = newPage;
+        });
+      }
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ExpandablePageView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.itemCount != _heights.length) {
+      final newHeights = List.filled(widget.itemCount, 520.0);
+      for (int i = 0; i < widget.itemCount && i < _heights.length; i++) {
+        newHeights[i] = _heights[i];
+      }
+      _heights = newHeights;
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onPageScroll);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentHeight = (_currentPage < _heights.length && _heights[_currentPage] > 0)
+        ? _heights[_currentPage]
+        : 520.0;
+
+    return TweenAnimationBuilder<double>(
+      curve: Curves.easeOutCubic,
+      duration: const Duration(milliseconds: 250),
+      tween: Tween<double>(begin: currentHeight, end: currentHeight),
+      builder: (context, height, child) {
+        return SizedBox(
+          height: height,
+          child: child,
+        );
+      },
+      child: PageView.builder(
+        controller: widget.controller,
+        itemCount: widget.itemCount,
+        onPageChanged: widget.onPageChanged,
+        physics: const BouncingScrollPhysics(),
+        itemBuilder: (context, index) {
+          return _KeepAlivePage(
+            child: _PageMeasureWidget(
+              onSizeChanged: (size) {
+                if (index < _heights.length && (_heights[index] - size.height).abs() > 1.0) {
+                  if (mounted) {
+                    setState(() {
+                      _heights[index] = size.height;
+                    });
+                  }
+                }
+              },
+              child: widget.itemBuilder(context, index),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _KeepAlivePage extends StatefulWidget {
+  final Widget child;
+  const _KeepAlivePage({required this.child});
+
+  @override
+  State<_KeepAlivePage> createState() => _KeepAlivePageState();
+}
+
+class _KeepAlivePageState extends State<_KeepAlivePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+}
+
+class _PageMeasureWidget extends StatefulWidget {
+  final Widget child;
+  final ValueChanged<Size> onSizeChanged;
+
+  const _PageMeasureWidget({
+    required this.child,
+    required this.onSizeChanged,
+  });
+
+  @override
+  State<_PageMeasureWidget> createState() => _PageMeasureWidgetState();
+}
+
+class _PageMeasureWidgetState extends State<_PageMeasureWidget> {
+  final GlobalKey _key = GlobalKey();
+  Size? _lastSize;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSize();
+  }
+
+  @override
+  void didUpdateWidget(covariant _PageMeasureWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _checkSize();
+  }
+
+  void _checkSize() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final renderBox = _key.currentContext?.findRenderObject() as RenderBox?;
+      if (renderBox != null && renderBox.hasSize) {
+        final size = renderBox.size;
+        if (_lastSize != size) {
+          _lastSize = size;
+          widget.onSizeChanged(size);
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return OverflowBox(
+      minHeight: 0,
+      maxHeight: double.infinity,
+      alignment: Alignment.topCenter,
+      child: Container(
+        key: _key,
+        child: widget.child,
+      ),
     );
   }
 }

@@ -183,13 +183,16 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
               size: 20,
             ),
             const SizedBox(width: 8),
-            Text(
-              loc.favoriteProfiles,
-              style: TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.3,
+            Flexible(
+              child: Text(
+                loc.favoriteProfiles,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -254,9 +257,9 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
             ),
           ),
           const Spacer(),
-          // 1 to 4 Segmented Control Buttons
+          // 1 to 2 Segmented Control Buttons
           Row(
-            children: [1, 2, 3, 4].map((col) {
+            children: [1, 2].map((col) {
               final isSelected = _columns == col;
               return Padding(
                 padding: const EdgeInsets.only(left: 6),
@@ -267,7 +270,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     curve: Curves.easeOutCubic,
-                    width: 32,
+                    width: 36,
                     height: 28,
                     decoration: BoxDecoration(
                       color: isSelected
@@ -350,22 +353,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
   }
 
   Widget _buildGridContent(AppLocalizations loc) {
-    final double childAspectRatio;
-    switch (_columns) {
-      case 1:
-        childAspectRatio = 2.9;
-        break;
-      case 2:
-        childAspectRatio = 0.88;
-        break;
-      case 3:
-        childAspectRatio = 0.72;
-        break;
-      case 4:
-      default:
-        childAspectRatio = 0.62;
-        break;
-    }
+    final double childAspectRatio = _columns == 1 ? 2.9 : 0.88;
 
     return GridView.builder(
       physics: const BouncingScrollPhysics(),
@@ -391,6 +379,8 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
+        splashColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
+        highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
         onTap: () => _openUser(user.username),
         child: Container(
           decoration: BoxDecoration(
@@ -408,7 +398,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AppTheme.background.withValues(alpha: 0.7),
+                      color: AppTheme.background.withValues(alpha: 0.72),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -431,17 +421,10 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
   }
 
   Widget _buildAdaptiveCardBody(AppLocalizations loc, BookmarkedUser user) {
-    switch (_columns) {
-      case 1:
-        return _buildSingleColumnCard(loc, user);
-      case 2:
-        return _buildTwoColumnCard(loc, user);
-      case 3:
-        return _buildThreeColumnCard(loc, user);
-      case 4:
-      default:
-        return _buildFourColumnCard(loc, user);
+    if (_columns == 1) {
+      return _buildSingleColumnCard(loc, user);
     }
+    return _buildTwoColumnCard(loc, user);
   }
 
   Widget _buildSingleColumnCard(AppLocalizations loc, BookmarkedUser user) {
@@ -604,157 +587,6 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                   color: AppTheme.textSecondary,
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildThreeColumnCard(AppLocalizations loc, BookmarkedUser user) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildAvatar(user.avatarUrl, size: 36),
-            _buildRemoveButton(user, size: 13),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Text(
-          user.name != null && user.name!.trim().isNotEmpty
-              ? user.name!
-              : user.username,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 11.5,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        Text(
-          '@${user.username}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 9.5,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Expanded(
-          child: Text(
-            user.bio != null && user.bio!.trim().isNotEmpty
-                ? user.bio!.trim()
-                : loc.noBio,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: AppTheme.textMuted,
-              fontSize: 9.5,
-            ),
-          ),
-        ),
-        const SizedBox(height: 2),
-        Row(
-          children: [
-            Icon(
-              Icons.location_on_rounded,
-              size: 10,
-              color: user.location != null && user.location!.trim().isNotEmpty
-                  ? AppTheme.accentAmber
-                  : AppTheme.textMuted,
-            ),
-            const SizedBox(width: 2),
-            Expanded(
-              child: Text(
-                user.location != null && user.location!.trim().isNotEmpty
-                    ? user.location!.trim()
-                    : loc.noLocation,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 9,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFourColumnCard(AppLocalizations loc, BookmarkedUser user) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Stack(
-          alignment: Alignment.topRight,
-          children: [
-            Align(
-              alignment: Alignment.center,
-              child: _buildAvatar(user.avatarUrl, size: 32),
-            ),
-            Positioned(
-              right: 0,
-              top: 0,
-              child: _buildRemoveButton(user, size: 11),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          user.name != null && user.name!.trim().isNotEmpty
-              ? user.name!
-              : user.username,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        Text(
-          '@${user.username}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 8.5,
-          ),
-        ),
-        const Spacer(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.location_on_rounded,
-              size: 9,
-              color: user.location != null && user.location!.trim().isNotEmpty
-                  ? AppTheme.accentAmber
-                  : AppTheme.textMuted,
-            ),
-            const SizedBox(width: 1),
-            Flexible(
-              child: Text(
-                user.location != null && user.location!.trim().isNotEmpty
-                    ? user.location!.trim()
-                    : '-',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AppTheme.textMuted,
-                  fontSize: 8.5,
                 ),
               ),
             ),

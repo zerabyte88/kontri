@@ -1372,25 +1372,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             ),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                          decoration: BoxDecoration(
-                            color: AppTheme.accentGreen.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              color: AppTheme.accentGreen.withValues(alpha: 0.3),
-                              width: 0.8,
-                            ),
-                          ),
-                          child: Text(
-                            AppConfig.appVersion,
-                            style: TextStyle(
-                              color: AppTheme.accentGreen,
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 4),

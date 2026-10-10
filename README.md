@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.0.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.1.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -135,6 +135,22 @@ storeFile=path/to/keystore.jks
 ---
 
 # Version History
+
+* ### v2.1.0 (Build 16)
+  - **Overhauled Ambient Canvas Background Animations Across All 4 Themes:**
+    - *AMOLED Sakura (Radiant Pink 🌸):* Replaced the thin tree with an organic, majestic Sakura tree with natural bark grain lines and volumetric cherry blossom canopy masses (`volumetric blossom clouds`) featuring layered spring green leaves, rich magenta petal base, soft pink blooms, and sunlit highlight puffs.
+    - *AMOLED Night (Starry Cosmos 🌌):* Enhanced diagonal shooting stars into a continuous full-screen multi-meteor shower (6 staggered meteors) crossing edge-to-edge from outside the upper-right canvas completely off the bottom-left boundary without vanishing mid-screen, with radiant glowing heads and smooth tapered gradient trails.
+    - *Dark Mode (Thunderstorm ⛈️):* Revamped atmospheric storm visuals with multi-tiered drifting storm clouds, realistic forked branching lightning strikes with dual-stage flashes and ambient illumination, and wind-swept angled rain streaks (~15° tilt) with impact splash ripples.
+    - *Light Mode (Sunny Grove 🍃):* Added a fruit tree on the left side with lush canopy foliage, branches, and glossy ripe red apples/cherries with specular shine dots, rolling green grass foothills at the footer with wind-swayed grass tufts, and soft white cumulus clouds drifting across the upper sky.
+  - **Global Poppins Typography Migration:** Migrated the app-wide font family from Plus Jakarta Sans to Google Fonts' Poppins across all screens, cards, headers, code detail views, and modal sheets for modern geometric balance and crisp numbers.
+  - **Favorite Profiles UI Polish & Interaction Feedback:**
+    - Added interactive cyan ripple touch feedback (`splashColor` & `highlightColor`) to favorite profile cards across both `FavoriteProfilesScreen` and `HomeScreen`.
+    - Added an inline mini avatar loading spinner overlay when a favorite profile card is tapped while fetching telemetry data before navigating to `StatsDetailScreen`.
+    - Streamlined grid layout options to strictly 1 and 2 columns per row with optimized card aspect ratios (`2.9` for single column, `0.88` for double column), removing the crowded 4-column layout.
+    - Polished favorite profiles header alignment and wrapped titles in `Flexible` with ellipsis to prevent text overflow across various localized languages and screen sizes.
+  - **About GitPulse Card Cleanup:** Removed redundant green version badge in the top right of the About card in `SettingsSheet`, streamlining header presentation while preserving full application version, release build, architecture, and license metadata below.
+  - **Smooth PageView Tech News Carousel:** Replaced abrupt animated switcher in home screen tech news with interactive, physics-based `PageView` featuring smooth drag transitions and synchronized active category chip snapping.
+  - **Light Theme Header Contrast:** Darkened GitPulse logo title text in light theme mode to crisp high-contrast black (`#1F2328`) for optimal clarity against light surfaces.
 
 * ### v2.0.0 (Build 15)
   - **Full-Screen Seamless Animated App Background:** Replaced isolated header animations with a continuous, looping ambient canvas across the entire application from top to bottom (status bar down to navigation bar), tailored per theme:

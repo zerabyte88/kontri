@@ -4,10 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppConfig {
   static const String appName = 'GitPulse';
-  static const String appVersion = 'v2.0.0';
-  static const String buildNumber = '15';
-  static const String fullVersion = 'v2.0.0 (Build 15)';
-  static const String releaseTag = 'v2.0.0';
+  static const String appVersion = 'v2.1.0';
+  static const String buildNumber = '16';
+  static const String fullVersion = 'v2.1.0 (Build 16)';
+  static const String releaseTag = 'v2.1.0';
   static const String githubRepoUrl = 'https://github.com/zerabyte88/gitpulse-mobile';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';
@@ -190,7 +190,7 @@ class AppTheme {
       AppThemeMode.dark => const Color(0xFF6E7681),
     };
 
-    final appTextTheme = GoogleFonts.plusJakartaSansTextTheme(baseTextTheme).apply(
+    final appTextTheme = GoogleFonts.poppinsTextTheme(baseTextTheme).apply(
       bodyColor: txtPrim,
       displayColor: txtPrim,
     );

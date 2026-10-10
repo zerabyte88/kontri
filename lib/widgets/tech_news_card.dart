@@ -327,3 +327,142 @@ class TechNewsCard extends StatelessWidget {
     );
   }
 }
+
+/// Skeleton shimmer placeholder card for news while loading or transitioning.
+class TechNewsShimmerCard extends StatefulWidget {
+  const TechNewsShimmerCard({super.key});
+
+  @override
+  State<TechNewsShimmerCard> createState() => _TechNewsShimmerCardState();
+}
+
+class _TechNewsShimmerCardState extends State<TechNewsShimmerCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final opacity = 0.35 + (_controller.value * 0.40);
+        final baseColor = AppTheme.surfaceElevated.withValues(alpha: opacity);
+        final highlightColor = AppTheme.border.withValues(alpha: opacity * 0.7);
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.border, width: 1),
+          ),
+          clipBehavior: Clip.antiAlias,
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Tag placeholders
+              Row(
+                children: [
+                  Container(
+                    width: 58,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: baseColor,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 42,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: highlightColor,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Title lines
+              Container(
+                width: double.infinity,
+                height: 15,
+                decoration: BoxDecoration(
+                  color: baseColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                width: MediaQuery.of(context).size.width * 0.55,
+                height: 15,
+                decoration: BoxDecoration(
+                  color: baseColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Description line
+              Container(
+                width: double.infinity,
+                height: 11,
+                decoration: BoxDecoration(
+                  color: highlightColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 14),
+              // Meta row
+              Row(
+                children: [
+                  Container(
+                    width: 18,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: baseColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 65,
+                    height: 11,
+                    decoration: BoxDecoration(
+                      color: highlightColor,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    width: 36,
+                    height: 11,
+                    decoration: BoxDecoration(
+                      color: highlightColor,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
