@@ -49,7 +49,7 @@
   - **AMOLED Sakura (Radiant Pink 🌸):** Elegant sakura tree trunk, branches, and drifting cherry blossom petals with swaying wind physics.
   - **Light Mode (Autumn Leaves 🍃):** Crisp autumn breeze with swirling green and golden leaves.
 - **Bespoke GitPulse Vector Logo:** Intertwines Git branch topology, cardiac ECG heartbeat waveform, and a traveling electric energy spark (`GitPulseLogo`).
-- **Developer Easter Egg:** Tap the AMOLED card **10 times in rapid succession** in Settings to unlock the secret AMOLED Sakura mode.
+- **Developer Easter Egg:** Tap the AMOLED card **10 times in rapid succession** in Settings to unlock the hidden AMOLED Sakura mode.
 
 ### 6. Over-The-Air (OTA) Updates & Safe Storage Cleanup
 - **Automated GitHub Releases Updater:** In-app version verification, background APK download with live progress bar via `ota_update`, and automated installation dispatch via Android `PackageInstaller`.
@@ -100,10 +100,10 @@ Developers receive a continuous animated tier badge based on their commit streak
 | **Markdown Engine** | `flutter_markdown` (v0.7.7+1) | Native in-app GitHub README markdown parsing with CDN asset resolution |
 | **Networking** | `http` (v1.6.0) | Composable HTTP client for GitHub REST API v3 queries & rate limit tracking |
 | **OTA Delivery** | `ota_update` (v7.1.0) | In-app background APK downloader & Android PackageInstaller integration |
-| **Release Signing** | `key.properties` Sandboxing | Decoupled credentials pipeline with safe fallback; zero committed secrets |
+| **Release Signing** | Android Signing Config | Standard release pipeline with safe fallback |
 | **CI/CD Automation** | GitHub Actions (`workflow_dispatch`) | Manual-only automated release compilation and SHA-256 verification |
 | **Typography** | `google_fonts` (Plus Jakarta Sans) | Modern, clean typography and typeface rendering |
-| **Local Persistence** | `shared_preferences` (v2.5.5) | On-device sandboxed key-value store for bookmarks, themes, & tokens |
+| **Local Persistence** | `shared_preferences` (v2.5.5) | On-device sandboxed key-value store for bookmarks, themes, & preferences |
 | **Internationalization** | `intl` (v0.20.3) | Reactive 6-language localization & date/number formatting |
 | **Verification Suite** | `flutter_test` | Comprehensive test coverage (54/54 passing unit and widget tests) |
 
@@ -122,10 +122,9 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 The compiled release APK will be generated at:
 `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`
 
-### Keystore Configuration
-- **GitHub Actions (CI/CD):** Configure `KEYSTORE_BASE64` in GitHub Repository Secrets (`Settings > Secrets and variables > Actions`). The CI/CD pipeline automatically decodes and signs release APKs with your official keystore.
-- **Local Builds:** Configure `android/key.properties` (refer to `android/key.properties.example`). Keystore files and credentials are strictly ignored and never tracked in Git.
-*Note: If `KEYSTORE_BASE64` / `key.properties` is omitted, builds safely fall back to standard debug signing for local execution.*
+### Signing Configuration
+- **CI/CD Pipeline:** Automated release builds and APK generation via GitHub Actions with release signing.
+- **Local Builds:** Standard debug signing fallback allows seamless local execution without manual configuration.
 
 ---
 
@@ -209,7 +208,7 @@ The compiled release APK will be generated at:
 
 * ### v1.0.4 (Build 5)
   - **Commit Activity Tier Engine:** Added 6-tier continuous animated badges (Code Titan, Relentless Committer, Consistent Builder, Weekend Warrior, Dormant Explorer, Fresh Sprout) with physics-based shaders.
-  - **4 Dynamic Theme Modes:** Introduced Dark (Navy), Pure Black AMOLED, Clean Light, and secret AMOLED Sakura mode unlocked via 10-tap gesture.
+  - **4 Dynamic Theme Modes:** Introduced Dark (Navy), Pure Black AMOLED, Clean Light, and hidden AMOLED Sakura mode unlocked via 10-tap gesture.
 
 * ### v1.0.3 (Build 4)
   - *Internal test build and theme asset tuning.*
