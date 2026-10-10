@@ -115,57 +115,57 @@ The compiled release APK will be generated at:
 
 ---
 
-### Version History
+# Version History
 
-# v1.0.13 (Build 14)
+### v1.0.13 (Build 14)
 * **Settings Sheet Visual Polish:** Refined settings sheet layout and theme option cards with responsive layout geometry and smooth touch states.
 * **Header Canvas Fine-Tuning:** Polished particle physics parameters and alpha blending across all 4 theme modes.
 * **Test Suite Verification:** Updated widget tests to ensure 100% passing test matrix (39/39 tests).
 
-# v1.0.12 (Build 13)
+### v1.0.12 (Build 13)
 * **Native In-App Repository Explorer:** Added dual-tab repository screen toggling between README documentation and interactive file tree without external browser redirects.
 * **Syntax-Highlighted File Viewer:** Added `FileViewerScreen` with line numbering, file metadata, character count, and copy action.
 * **Relative Asset Resolution:** Automatic resolution of relative image paths in README files against GitHub raw CDN with dark/light mode image marker support.
 * **Expanded Multi-Language Dictionary:** Full localization dictionary coverage for repository explorer, file viewer, and directory navigation across all 6 languages.
 
-# v1.0.11 (Build 12)
+### v1.0.11 (Build 12)
 * *Internal test build and hotfix staging.*
 
-# v1.0.10 (Build 11)
+### v1.0.10 (Build 11)
 * **Header Animation Pause on Modals:** Implemented `HeaderAnimationState` to suspend background Canvas particle loops when settings or modals open, reducing idle background GPU/CPU usage to 0%.
 * **Zero-saveLayer Optimization:** Replaced offscreen GPU `ShaderMask` allocations with native concentric GPU alpha rings to prevent frame drops on low-tier devices.
 
-# v1.0.9 (Build 10)
+### v1.0.9 (Build 10)
 * **Curated Tech News & Ecosystem Feed:** Aggregated trending GitHub repositories and dev.to articles with category filtering chips and constrained thumbnail cache decoding (`cacheWidth: 450`).
 
-# v1.0.8 (Build 9)
+### v1.0.8 (Build 9)
 * **6-Language Internationalization Overhaul:** Added complete dictionary translations for Bahasa Indonesia, English, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 
-# v1.0.7 (Build 8)
+### v1.0.7 (Build 8)
 * *Internal test build and localization verification.*
 
-# v1.0.6 (Build 7)
+### v1.0.6 (Build 7)
 * **In-App OTA Updater & Safe Storage Pipeline:** Integrated background APK downloading via `ota_update` with automated startup cleanup of installed update binaries in `/Download/GitPulse/`.
 * **Android PackageInstaller Integration:** Configured secure `FileProvider` and Android permissions for seamless in-place APK installation.
 
-# v1.0.5 (Build 6)
+### v1.0.5 (Build 6)
 * *Internal test build and OTA pipeline verification.*
 
-# v1.0.4 (Build 5)
+### v1.0.4 (Build 5)
 * **Commit Activity Tier Engine:** Added 6-tier continuous animated badges (Code Titan, Relentless Committer, Consistent Builder, Weekend Warrior, Dormant Explorer, Fresh Sprout) with physics-based shaders.
 * **4 Dynamic Theme Modes:** Introduced Dark (Navy), Pure Black AMOLED, Clean Light, and secret AMOLED Sakura mode unlocked via 10-tap gesture.
 
-# v1.0.3 (Build 4)
+### v1.0.3 (Build 4)
 * *Internal test build and theme asset tuning.*
 
-# v1.0.2 (Build 3)
+### v1.0.2 (Build 3)
 * *Internal test build and analytics layout adjustments.*
 
-# v1.0.1 (Build 2)
+### v1.0.1 (Build 2)
 * **24-Hour Activity Rhythm & Portfolio Analytics:** 24-bar diurnal activity histogram, language footprint donut chart, and cumulative stargazer/fork portfolio telemetry.
 * **Sliver Virtualization:** `CustomScrollView` and `SliverList.builder` for smooth 60fps scrolling across 100+ repositories.
 
-# v1.0.0 (Build 1)
+### v1.0.0 (Build 1)
 * **Initial Release:** Initial project setup, base architecture, and GitHub API connection pipeline.
 
 ---
