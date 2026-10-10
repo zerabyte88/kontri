@@ -42,12 +42,12 @@
 - **Precision Typography:** Renders badges, tables, task lists, blockquotes, and fenced code blocks with pixel-perfect on-device typography.
 
 ### 5. Commit Activity Tier Engine & Dynamic Visuals
-- **6-Level Animated Tier Badges:** Continuous streak and annual contribution volume ranking (`Code Titan`, `Relentless Committer`, `Consistent Builder`, `Weekend Warrior`, `Dormant Explorer`, `Fresh Sprout`).
-- **Dynamic Theme Particle System:** GPU-accelerated Canvas particle background in `AppBar.flexibleSpace` tailored to each active theme:
-  - **Dark (Midnight Navy):** Flowing water ripples & ambient bubbles.
-  - **AMOLED (Pure Black):** Crescent moon & twinkling stars in deep space.
-  - **AMOLED Sakura 🌸:** Falling sakura blossom petals with swaying wind physics.
-  - **Light (GitHub Pure):** Autumn falling leaves with rotational drift.
+- **6-Level Animated Tier Badges:** Continuous streak and annual contribution volume ranking with custom canvas shaders (`Mythic Archmage`, `Diamond Vanguard`, `Platinum Artisan`, `Gold Adventurer`, `Silver Explorer`, `Bronze Novice`).
+- **Full-Screen Dynamic Ambient Background:** GPU-accelerated continuous looping canvas across the entire application viewport tailored to each active theme:
+  - **Dark Mode (Thunderstorm ⛈️):** Atmospheric rain streaks, brooding storm clouds, and periodic electric-blue lightning flashes.
+  - **AMOLED (Pure Black Cosmos 🌌):** Starry cosmos with twinkling diamond stars, crescent moon, and diagonal shooting stars / meteors.
+  - **AMOLED Sakura (Radiant Pink 🌸):** Elegant sakura tree trunk, branches, and drifting cherry blossom petals with swaying wind physics.
+  - **Light Mode (Autumn Leaves 🍃):** Crisp autumn breeze with swirling green and golden leaves.
 - **Bespoke GitPulse Vector Logo:** Intertwines Git branch topology, cardiac ECG heartbeat waveform, and a traveling electric energy spark (`GitPulseLogo`).
 - **Developer Easter Egg:** Tap the AMOLED card **10 times in rapid succession** in Settings to unlock the secret AMOLED Sakura mode.
 
@@ -81,12 +81,12 @@ Developers receive a continuous animated tier badge based on their commit streak
 
 | Tier Level | Badge Title | Qualifying Criteria | Real-Time Canvas Shader Effect |
 | :--- | :--- | :--- | :--- |
-| **Tier 1** | **Code Titan** | `Streak >= 14d` or `Max >= 30d` or `Year >= 350` | 🔥 **Blazing Flame & Magma Physics**: Vertical heatwave shader with rising ember sparks |
-| **Tier 2** | **Relentless Committer** | `Streak >= 5d` or `Max >= 14d` or `Year >= 100` | ⚡ **Electric Plasma Arc**: High-voltage electrical crackle with fast micro-sparks |
-| **Tier 3** | **Consistent Builder** | `Streak >= 2d` or `Max >= 7d` or `Year >= 30` | 💻 **Emerald Cyber Matrix**: Digital scanline beam sweep with matrix illumination |
-| **Tier 4** | **Weekend Warrior** | `Streak >= 1d` or `Max >= 2d` or `Year >= 8` | ☀️ **Solar Amber Shimmer**: Radiant golden sunburst with sweeping angular gleam |
-| **Tier 5** | **Dormant Explorer** | `This Year > 0` or `Total Contributions > 0` | ✨ **Cosmic Starlight Nebula**: Calm cosmic drift with gently pulsating stellar dust |
-| **Tier 6** | **Fresh Sprout** | *Default / 0 Contributions Recorded* | 🌱 **Spring Dewdrop**: Gentle organic scale breathing with spring dew shimmer |
+| **Tier 1** | **Mythic Archmage** | `Streak >= 30d` or `Max >= 60d` or `Year >= 500` | 🔮 **Arcane Dragonflame & Rune Sparks**: Multi-hue violet-crimson-gold heatwave shader with orbiting floating magic embers |
+| **Tier 2** | **Diamond Vanguard** | `Streak >= 14d` or `Max >= 30d` or `Year >= 200` | ⚡ **Glacial Thunderstorm & Diamond Arc**: Diamond crystal cyan & electric blue lightning arc with high-frequency micro-crackle |
+| **Tier 3** | **Platinum Artisan** | `Streak >= 7d` or `Max >= 14d` or `Year >= 60` | ⚔️ **Sacred Emerald Blade Sweep**: Gleaming holy blade light sweep with emerald forge glints and platinum sheen |
+| **Tier 4** | **Gold Adventurer** | `Streak >= 3d` or `Max >= 7d` or `Year >= 20` | 🛡️ **Sunburst Guild Crest Radiance**: Warm golden sunfire sweep with radiant adventurer crest glow |
+| **Tier 5** | **Silver Explorer** | `This Year > 0` or `Total Contributions > 0` | 🌌 **Moonlit Silver Mist**: Calm ethereal starlight mist wave with gentle cosmic lavender drift |
+| **Tier 6** | **Bronze Novice** | *Default / 0 Contributions Recorded* | 🌿 **Living Verdant Dewdrop**: Earthy bronze casing with organic living sprout breath & morning dew gleam |
 
 ---
 
@@ -102,10 +102,10 @@ Developers receive a continuous animated tier badge based on their commit streak
 | **OTA Delivery** | `ota_update` (v7.1.0) | In-app background APK downloader & Android PackageInstaller integration |
 | **Release Signing** | `key.properties` Sandboxing | Decoupled credentials pipeline with safe fallback; zero committed secrets |
 | **CI/CD Automation** | GitHub Actions (`workflow_dispatch`) | Manual-only automated release compilation and SHA-256 verification |
-| **Typography** | `google_fonts` (Inter) | Professional typography and clean typeface rendering |
+| **Typography** | `google_fonts` (Plus Jakarta Sans) | Modern, clean typography and typeface rendering |
 | **Local Persistence** | `shared_preferences` (v2.5.5) | On-device sandboxed key-value store for bookmarks, themes, & tokens |
 | **Internationalization** | `intl` (v0.20.3) | Reactive 6-language localization & date/number formatting |
-| **Verification Suite** | `flutter_test` | Comprehensive test coverage (40/40 passing unit and widget tests) |
+| **Verification Suite** | `flutter_test` | Comprehensive test coverage (54/54 passing unit and widget tests) |
 
 ---
 
@@ -137,14 +137,20 @@ storeFile=path/to/keystore.jks
 # Version History
 
 * ### v2.0.0 (Build 15)
-  - **BREAKING CHANGE - Application ID Migration:** Standardized Android namespace and application package identifier to `com.phantek.orion.rigel`.
   - **Full-Screen Seamless Animated App Background:** Replaced isolated header animations with a continuous, looping ambient canvas across the entire application from top to bottom (status bar down to navigation bar), tailored per theme:
-    - *AMOLED Sakura:* Drifting cherry blossom petals with an elegant sakura tree trunk, branches, and blossom clusters on pure AMOLED black.
-    - *AMOLED Night:* Full-height starry cosmos with twinkling diamond stars, glowing crescent moon, and diagonal shooting stars / meteors crossing the screen.
-    - *Dark Mode (Thunderstorm):* Atmospheric dark rain with animated rain streaks, dark storm clouds, and periodic electric-blue jagged lightning strikes with ambient flash lighting.
-    - *Light Mode:* Gentle swirling green and autumn breeze leaves.
-  - **Glassmorphism Theme System:** Scaffold and AppBar backgrounds rendered transparent with subtly translucent card surfaces (`~92%` opacity) allowing the live animated background to shine through seamlessly.
+    - *AMOLED Sakura (Radiant Pink 🌸):* Drifting cherry blossom petals with an elegant sakura tree trunk, branches, and blossom clusters on pure AMOLED black.
+    - *AMOLED Night (Starry Cosmos 🌌):* Full-height starry cosmos with twinkling diamond stars, glowing crescent moon, and diagonal shooting stars / meteors crossing the screen.
+    - *Dark Mode (Thunderstorm ⛈️):* Atmospheric dark rain with animated rain streaks, brooding storm clouds, and periodic electric-blue jagged lightning strikes with ambient flash lighting.
+    - *Light Mode (Autumn Leaves 🍃):* Gentle swirling green and autumn breeze leaves with natural drift.
+  - **RPG Arcane Aura Commit Tier Engine & Overhauled Matrix:** Complete overhaul of the 6-level Commit Activity Tier Matrix with strictly calibrated seasonal streak/commit thresholds and custom GPU canvas shader animations:
+    - *Tier 1 (Mythic Archmage):* Multi-hue arcane dragonflame gradient (Ruby, Violet, Gold, Starfire) with orbital floating rune embers.
+    - *Tier 2 (Diamond Vanguard):* Glacial diamond crystal cyan and electric blue lightning arc with high-frequency micro-crackle.
+    - *Tier 3 (Platinum Artisan):* Sacred emerald blade reflection sweep with jade-platinum dual-hue sheen.
+    - *Tier 4 (Gold Adventurer):* Sunburst guild crest radiance with warm golden solar flare gleam.
+    - *Tier 5 (Silver Explorer):* Moonlit silver mist wave with soft twilight stardust drift.
+    - *Tier 6 (Bronze Novice):* Rustic bronze casing with living green sprout breathing rhythm and morning dewdrop shimmer.
   - **Dedicated Favorite Profiles Grid:** Brand-new `FavoriteProfilesScreen` featuring dynamic 1 to 4 columns per row density slider, enriched developer cards (avatar, full name, GitHub handle, bio, location), unfavorite with floating SnackBar undo, and persistent on-device storage.
+  - **Glassmorphism Theme System:** Scaffold and AppBar backgrounds rendered transparent with subtly translucent card surfaces (`~92%` opacity) allowing the live animated background to shine through seamlessly.
   - **Plus Jakarta Sans Typography:** Upgraded core application font to Google Fonts' Plus Jakarta Sans for razor-sharp telemetry numbers, higher readability, and modern tech aesthetics, while preserving fixed monospace for code viewers and technical data.
   - **Radiant Sakura Pink Palette Refinement:** Replaced coral/reddish tones in AMOLED Sakura mode with authentic radiant cherry blossom pink (`#FF65A3`), harmonizing card borders, dark wisteria surfaces, and ambient canvas petals.
   - **Running Text (Marquee) for Repository Titles:** Added reusable `RunningText` widget supporting smooth ping-pong auto-scroll for long repository and file titles in AppBars, and interactive touch-scrollable text in overview cards to prevent text truncation.
@@ -154,6 +160,7 @@ storeFile=path/to/keystore.jks
   - **Clean Header Identity:** Removed logo tap animation for a static, elegant header identity with synchronized animation lifecycle pause/resume during modal navigation to conserve battery and GPU.
   - **Silent Profile Background Enrichment:** Automatically fetches missing location and bio details from GitHub REST API in the background for existing bookmarks.
   - **Streamlined Search UX:** Simplified search placeholder hint across all 6 supported languages to clean action verbs (`Search...`, `Cari...`, `検索...`, etc.) removing verbose examples.
+  - **Application Package Identifier Migration:** Standardized Android namespace and application package identifier to `com.phantek.orion.rigel`.
 
 * ### v1.0.13 (Build 14)
   - **Settings Sheet Visual Polish:** Refined settings sheet layout and theme option cards with responsive layout geometry and smooth touch states.

@@ -49,63 +49,63 @@ class ContributionStats {
     required int totalContributions,
   }) {
     // Tier 1: Sangat Rajin Ekstrem (Mythic/Legendary)
-    if (currentStreak >= 14 || longestStreak >= 30 || thisYearContributions >= 350) {
+    if (currentStreak >= 30 || longestStreak >= 60 || thisYearContributions >= 500) {
       return const CommitTitleInfo(
-        title: 'Code Titan',
+        title: 'Mythic Archmage',
         levelName: 'Sangat Rajin (Master)',
         badgeText: 'Tier: Mythic',
         tier: 1,
-        description: 'Komitmen baja! Tiada hari tanpa baris kode, konsistensi luar biasa.',
+        description: 'Kekuatan magis kode tak tertandingi! Konsistensi mutlak tanpa putus.',
       );
     }
-    // Tier 2: Rajin & Berkelanjutan
-    else if (currentStreak >= 5 || longestStreak >= 14 || thisYearContributions >= 100) {
+    // Tier 2: Rajin & Berkelanjutan (Diamond)
+    else if (currentStreak >= 14 || longestStreak >= 30 || thisYearContributions >= 200) {
       return const CommitTitleInfo(
-        title: 'Relentless Committer',
+        title: 'Diamond Vanguard',
         levelName: 'Sangat Rajin',
         badgeText: 'Tier: Diamond',
         tier: 2,
-        description: 'Sangat aktif commit dan membangun proyek hampir setiap hari.',
+        description: 'Garda terdepan pengembangan perangkat lunak, aktif meluncurkan commit.',
       );
     }
-    // Tier 3: Rutin & Teratur
-    else if (currentStreak >= 2 || longestStreak >= 7 || thisYearContributions >= 30) {
+    // Tier 3: Rutin & Teratur (Platinum)
+    else if (currentStreak >= 7 || longestStreak >= 14 || thisYearContributions >= 60) {
       return const CommitTitleInfo(
-        title: 'Consistent Builder',
+        title: 'Platinum Artisan',
         levelName: 'Rajin & Stabil',
         badgeText: 'Tier: Platinum',
         tier: 3,
-        description: 'Rutin memelihara ritme commit kode secara teratur dan stabil.',
+        description: 'Mahir menempa karya kode dengan ritme yang konsisten dan stabil.',
       );
     }
-    // Tier 4: Terkadang / Sewaktu-waktu (Casual)
-    else if (currentStreak >= 1 || longestStreak >= 2 || thisYearContributions >= 8) {
+    // Tier 4: Terkadang / Sewaktu-waktu (Gold)
+    else if (currentStreak >= 3 || longestStreak >= 7 || thisYearContributions >= 20) {
       return const CommitTitleInfo(
-        title: 'Weekend Warrior',
+        title: 'Gold Adventurer',
         levelName: 'Commit Terkadang',
         badgeText: 'Tier: Gold',
         tier: 4,
-        description: 'Commit sewaktu-waktu di waktu senggang saat ada ide dan inspirasi.',
+        description: 'Menjelajah berbagai proyek kode di sela petualangan dan waktu senggang.',
       );
     }
-    // Tier 5: Jarang Commit (Low Activity)
+    // Tier 5: Jarang Commit (Silver)
     else if (thisYearContributions > 0 || totalContributions > 0) {
       return const CommitTitleInfo(
-        title: 'Dormant Explorer',
+        title: 'Silver Explorer',
         levelName: 'Jarang Commit',
         badgeText: 'Tier: Silver',
         tier: 5,
-        description: 'Jarang mendorong commit ke publik, menikmati ritme santai.',
+        description: 'Penjelajah santai yang mencatat commit saat menemukan inspirasi baru.',
       );
     }
-    // Tier 6: Belum Aktif / Newbie
+    // Tier 6: Belum Aktif (Bronze)
     else {
       return const CommitTitleInfo(
-        title: 'Fresh Sprout',
+        title: 'Bronze Novice',
         levelName: 'Belum Aktif',
         badgeText: 'Tier: Bronze',
         tier: 6,
-        description: 'Belum ada catatan commit tahun ini. Ayo mulai nyalakan streak pertamamu!',
+        description: 'Petualang baru di dunia open source. Nyalakan streak pertamamu!',
       );
     }
   }

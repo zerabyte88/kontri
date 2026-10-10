@@ -67,63 +67,63 @@ void main() {
     });
 
     test('ContributionStats determines commit titles correctly for different frequencies', () {
-      // 1. Sangat Rajin Ekstrem (Mythic)
+      // 1. Sangat Rajin Ekstrem (Mythic Archmage)
       final mythic = ContributionStats.determineTitle(
-        currentStreak: 15,
-        longestStreak: 35,
-        thisYearContributions: 400,
-        totalContributions: 600,
+        currentStreak: 32,
+        longestStreak: 65,
+        thisYearContributions: 520,
+        totalContributions: 800,
       );
-      expect(mythic.title, contains('Code Titan'));
+      expect(mythic.title, contains('Mythic Archmage'));
       expect(mythic.levelName, contains('Sangat Rajin'));
 
-      // 2. Sangat Rajin (Diamond)
+      // 2. Sangat Rajin (Diamond Vanguard)
       final diamond = ContributionStats.determineTitle(
-        currentStreak: 6,
-        longestStreak: 15,
-        thisYearContributions: 120,
-        totalContributions: 200,
+        currentStreak: 16,
+        longestStreak: 32,
+        thisYearContributions: 210,
+        totalContributions: 300,
       );
-      expect(diamond.title, contains('Relentless Committer'));
+      expect(diamond.title, contains('Diamond Vanguard'));
       expect(diamond.levelName, contains('Sangat Rajin'));
 
-      // 3. Rajin & Stabil (Platinum)
+      // 3. Rajin & Stabil (Platinum Artisan)
       final platinum = ContributionStats.determineTitle(
-        currentStreak: 3,
-        longestStreak: 8,
-        thisYearContributions: 45,
-        totalContributions: 60,
+        currentStreak: 8,
+        longestStreak: 15,
+        thisYearContributions: 75,
+        totalContributions: 100,
       );
-      expect(platinum.title, contains('Consistent Builder'));
+      expect(platinum.title, contains('Platinum Artisan'));
 
-      // 4. Terkadang Commit (Gold)
+      // 4. Terkadang Commit (Gold Adventurer)
       final gold = ContributionStats.determineTitle(
-        currentStreak: 1,
-        longestStreak: 3,
-        thisYearContributions: 15,
-        totalContributions: 30,
+        currentStreak: 4,
+        longestStreak: 8,
+        thisYearContributions: 25,
+        totalContributions: 40,
       );
-      expect(gold.title, contains('Weekend Warrior'));
+      expect(gold.title, contains('Gold Adventurer'));
       expect(gold.levelName, contains('Commit Terkadang'));
 
-      // 5. Jarang Commit (Silver)
+      // 5. Jarang Commit (Silver Explorer)
       final silver = ContributionStats.determineTitle(
         currentStreak: 0,
         longestStreak: 1,
         thisYearContributions: 3,
         totalContributions: 5,
       );
-      expect(silver.title, contains('Dormant Explorer'));
+      expect(silver.title, contains('Silver Explorer'));
       expect(silver.levelName, contains('Jarang Commit'));
 
-      // 6. Belum Aktif (Bronze)
+      // 6. Belum Aktif (Bronze Novice)
       final bronze = ContributionStats.determineTitle(
         currentStreak: 0,
         longestStreak: 0,
         thisYearContributions: 0,
         totalContributions: 0,
       );
-      expect(bronze.title, contains('Fresh Sprout'));
+      expect(bronze.title, contains('Bronze Novice'));
       expect(bronze.levelName, contains('Belum Aktif'));
     });
 
@@ -607,11 +607,11 @@ void main() {
       expect(koLoc.filterPopular, '인기순');
 
       // Commit tier clean titles
-      expect(idLoc.getCommitTierCleanTitle(1), 'Code Titan');
-      expect(jaLoc.getCommitTierCleanTitle(1), 'コードタイタン');
-      expect(zhHansLoc.getCommitTierCleanTitle(1), '代码泰坦');
-      expect(zhHantLoc.getCommitTierCleanTitle(1), '代碼泰坦');
-      expect(koLoc.getCommitTierCleanTitle(1), '코드 타이탄');
+      expect(idLoc.getCommitTierCleanTitle(1), 'Mythic Archmage');
+      expect(jaLoc.getCommitTierCleanTitle(1), 'ミシック・アークメイジ');
+      expect(zhHansLoc.getCommitTierCleanTitle(1), '秘法大法师');
+      expect(zhHantLoc.getCommitTierCleanTitle(1), '秘法大法師');
+      expect(koLoc.getCommitTierCleanTitle(1), '신화의 아크메이지');
 
       // Relative time formatting
       final tenMinutesAgo = DateTime.now().subtract(const Duration(minutes: 10));

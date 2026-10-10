@@ -1736,58 +1736,58 @@ class AppLocalizations {
     switch (tier) {
       case 1:
         return _str({
-          AppLanguage.indonesian: 'Code Titan',
-          AppLanguage.english: 'Code Titan',
-          AppLanguage.japanese: 'コードタイタン',
-          AppLanguage.chineseSimplified: '代码泰坦',
-          AppLanguage.chineseTraditional: '代碼泰坦',
-          AppLanguage.korean: '코드 타이탄',
+          AppLanguage.indonesian: 'Mythic Archmage',
+          AppLanguage.english: 'Mythic Archmage',
+          AppLanguage.japanese: 'ミシック・アークメイジ',
+          AppLanguage.chineseSimplified: '秘法大法师',
+          AppLanguage.chineseTraditional: '秘法大法師',
+          AppLanguage.korean: '신화의 아크메이지',
         });
       case 2:
         return _str({
-          AppLanguage.indonesian: 'Relentless Committer',
-          AppLanguage.english: 'Relentless Committer',
-          AppLanguage.japanese: '執念のコミッター',
-          AppLanguage.chineseSimplified: '不倦提交者',
-          AppLanguage.chineseTraditional: '不倦提交者',
-          AppLanguage.korean: '끈질긴 커미터',
+          AppLanguage.indonesian: 'Diamond Vanguard',
+          AppLanguage.english: 'Diamond Vanguard',
+          AppLanguage.japanese: 'ダイヤモンド・ヴァンガード',
+          AppLanguage.chineseSimplified: '钻石先锋',
+          AppLanguage.chineseTraditional: '鑽石先鋒',
+          AppLanguage.korean: '다이아몬드 뱅가드',
         });
       case 3:
         return _str({
-          AppLanguage.indonesian: 'Consistent Builder',
-          AppLanguage.english: 'Consistent Builder',
-          AppLanguage.japanese: '堅実なビルダー',
-          AppLanguage.chineseSimplified: '稳健构建者',
-          AppLanguage.chineseTraditional: '穩健構建者',
-          AppLanguage.korean: '꾸준한 빌더',
+          AppLanguage.indonesian: 'Platinum Artisan',
+          AppLanguage.english: 'Platinum Artisan',
+          AppLanguage.japanese: 'プラチナ・アーティザン',
+          AppLanguage.chineseSimplified: '白金匠人',
+          AppLanguage.chineseTraditional: '白金匠人',
+          AppLanguage.korean: '플래티넘 아티잔',
         });
       case 4:
         return _str({
-          AppLanguage.indonesian: 'Weekend Warrior',
-          AppLanguage.english: 'Weekend Warrior',
-          AppLanguage.japanese: '週末ウォリアー',
-          AppLanguage.chineseSimplified: '周末战士',
-          AppLanguage.chineseTraditional: '週末戰士',
-          AppLanguage.korean: '주말 전사',
+          AppLanguage.indonesian: 'Gold Adventurer',
+          AppLanguage.english: 'Gold Adventurer',
+          AppLanguage.japanese: 'ゴールド・アドベンチャラー',
+          AppLanguage.chineseSimplified: '黄金冒险家',
+          AppLanguage.chineseTraditional: '黃金冒險家',
+          AppLanguage.korean: '골드 모험가',
         });
       case 5:
         return _str({
-          AppLanguage.indonesian: 'Dormant Explorer',
-          AppLanguage.english: 'Dormant Explorer',
-          AppLanguage.japanese: '休眠中の探検家',
-          AppLanguage.chineseSimplified: '潜沉探索者',
-          AppLanguage.chineseTraditional: '潛沉探索者',
-          AppLanguage.korean: '휴면 탐험가',
+          AppLanguage.indonesian: 'Silver Explorer',
+          AppLanguage.english: 'Silver Explorer',
+          AppLanguage.japanese: 'シルバー・エクスプローラー',
+          AppLanguage.chineseSimplified: '白银探索者',
+          AppLanguage.chineseTraditional: '白銀探索者',
+          AppLanguage.korean: '실버 탐험가',
         });
       case 6:
       default:
         return _str({
-          AppLanguage.indonesian: 'Fresh Sprout',
-          AppLanguage.english: 'Fresh Sprout',
-          AppLanguage.japanese: 'フレッシュな若芽',
-          AppLanguage.chineseSimplified: '崭新萌芽',
-          AppLanguage.chineseTraditional: '嶄新萌芽',
-          AppLanguage.korean: '새싹 개발자',
+          AppLanguage.indonesian: 'Bronze Novice',
+          AppLanguage.english: 'Bronze Novice',
+          AppLanguage.japanese: 'ブロンズ・ノービス',
+          AppLanguage.chineseSimplified: '青铜见习者',
+          AppLanguage.chineseTraditional: '青銅見習者',
+          AppLanguage.korean: '브론즈 노비스',
         });
     }
   }
