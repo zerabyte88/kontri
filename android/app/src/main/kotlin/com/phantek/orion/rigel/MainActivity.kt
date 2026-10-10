@@ -1,4 +1,4 @@
-package com.gitpulse.gitpulse_mobile
+package com.phantek.orion.rigel
 
 import android.os.Build
 import android.os.Bundle

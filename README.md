@@ -7,14 +7,14 @@
 <div align="center">
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
-  <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.gitpulse.gitpulse_mobile&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v1.0.13&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.0.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
 <br/>
 
-**GitPulse Mobile** is an on-device developer telemetry, 24-hour activity rhythm, and GitHub productivity analytics application for Android (`com.gitpulse.gitpulse_mobile`). Built with Flutter and powered by hardware-accelerated charting via `fl_chart`, it transforms raw GitHub REST API v3 payloads into intuitive developer rhythms, cumulative portfolio impact telemetry, and habit-based commit tiers. Engineered for performance and privacy, all data processing, charting, and storage occur **100% on-device** with zero intermediary proxy servers.
+**GitPulse Mobile** is an on-device developer telemetry, 24-hour activity rhythm, and GitHub productivity analytics application for Android (`com.phantek.orion.rigel`). Built with Flutter and powered by hardware-accelerated charting via `fl_chart`, it transforms raw GitHub REST API v3 payloads into intuitive developer rhythms, cumulative portfolio impact telemetry, and habit-based commit tiers. Engineered for performance and privacy, all data processing, charting, and storage occur **100% on-device** with zero intermediary proxy servers.
 
 ---
 
@@ -87,7 +87,7 @@ Developers receive a continuous animated tier badge based on their commit streak
 
 | Component | Technology | Description |
 | :--- | :--- | :--- |
-| **Application ID** | `com.gitpulse.gitpulse_mobile` | Android package identifier |
+| **Application ID** | `com.phantek.orion.rigel` | Android package identifier |
 | **UI Framework** | Flutter 3.24+ (Dart 3.5+) | High-performance cross-platform declarative UI framework |
 | **Visual Charts** | `fl_chart` (v1.2.0) | Hardware-accelerated 24h activity histogram and language donut charts |
 | **Markdown Engine** | `flutter_markdown` (v0.7.7+1) | Native in-app GitHub README markdown parsing with CDN asset resolution |
@@ -116,6 +116,10 @@ The compiled release APK will be generated at:
 ---
 
 # Version History
+
+* ### v2.0.0 (Build 15)
+  - **BREAKING CHANGE - Application ID Migration:** Standardized Android namespace and application package identifier to `com.phantek.orion.rigel`.
+  - **Version 2.0.0 Milestone:** Upgraded application release versioning, system telemetry, and internal provider authorities for the v2 milestone.
 
 * ### v1.0.13 (Build 14)
   - **Settings Sheet Visual Polish:** Refined settings sheet layout and theme option cards with responsive layout geometry and smooth touch states.

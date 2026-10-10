@@ -126,7 +126,7 @@ class UpdateService {
         downloadUrl,
         destinationFilename: 'gitpulse-latest.apk',
         androidProviderAuthority:
-            'com.gitpulse.gitpulse_mobile.ota_update_provider',
+            'com.phantek.orion.rigel.ota_update_provider',
       );
     } catch (e) {
       return Stream.error(e);
@@ -160,6 +160,8 @@ class UpdateService {
       } catch (_) {}
 
       // Standard Android internal data directory paths
+      candidates.add('/data/user/0/com.phantek.orion.rigel/files/ota_update');
+      candidates.add('/data/data/com.phantek.orion.rigel/files/ota_update');
       candidates.add('/data/user/0/com.gitpulse.gitpulse_mobile/files/ota_update');
       candidates.add('/data/data/com.gitpulse.gitpulse_mobile/files/ota_update');
 
@@ -192,6 +194,8 @@ class UpdateService {
         sourceCandidates.add('$parentDir/files/ota_update/gitpulse-latest.apk');
       } catch (_) {}
       sourceCandidates.addAll([
+        '/data/user/0/com.phantek.orion.rigel/files/ota_update/gitpulse-latest.apk',
+        '/data/data/com.phantek.orion.rigel/files/ota_update/gitpulse-latest.apk',
         '/data/user/0/com.gitpulse.gitpulse_mobile/files/ota_update/gitpulse-latest.apk',
         '/data/data/com.gitpulse.gitpulse_mobile/files/ota_update/gitpulse-latest.apk',
       ]);

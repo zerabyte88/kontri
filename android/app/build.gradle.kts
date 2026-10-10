@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,8 +8,14 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
-    namespace = "com.gitpulse.gitpulse_mobile"
+    namespace = "com.phantek.orion.rigel"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -18,7 +27,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.gitpulse.gitpulse_mobile"
+        applicationId = "com.phantek.orion.rigel"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -37,21 +46,30 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("gitpulse-release.jks")
-            storePassword = "***REDACTED***"
-            keyAlias = "gitpulse"
-            keyPassword = "***REDACTED***"
-            enableV1Signing = true
-            enableV2Signing = true
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                val rawPath = keystoreProperties["storeFile"] as String
+                val candidate = file(rawPath)
+                storeFile = if (candidate.exists()) candidate else rootProject.file(rawPath)
+                storePassword = keystoreProperties["storePassword"] as String
+                enableV1Signing = true
+                enableV2Signing = true
+            }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            val releaseSigning = signingConfigs.getByName("release")
+            signingConfig = if (releaseSigning.storeFile != null && releaseSigning.storeFile!!.exists()) {
+                releaseSigning
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
         debug {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
