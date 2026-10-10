@@ -67,11 +67,9 @@ jobs:
           mkdir -p android/app
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > android/app/gitpulse-release.jks
-          fi
-          STORE_PASS="${KEYSTORE_PASSWORD:-***REDACTED***}"
-          KEY_PASS="${KEY_PASSWORD:-***REDACTED***}"
-          ALIAS="${KEY_ALIAS:-gitpulse}"
-          if [ -f "android/app/gitpulse-release.jks" ]; then
+            STORE_PASS="${KEYSTORE_PASSWORD:-***REDACTED***}"
+            KEY_PASS="${KEY_PASSWORD:-***REDACTED***}"
+            ALIAS="${KEY_ALIAS:-gitpulse}"
             printf "storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=gitpulse-release.jks\n" "$STORE_PASS" "$KEY_PASS" "$ALIAS" > android/key.properties
           fi
 

@@ -122,15 +122,10 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 The compiled release APK will be generated at:
 `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`
 
-### Keystore Configuration (Optional)
-To sign release builds locally or in custom pipelines, configure `android/key.properties` (refer to `android/key.properties.example`):
-```properties
-storePassword=yourStorePassword
-keyPassword=yourKeyPassword
-keyAlias=yourKeyAlias
-storeFile=path/to/keystore.jks
-```
-*Note: If `key.properties` is omitted, builds automatically fall back to standard debug signing for safe local execution.*
+### Keystore Configuration
+- **GitHub Actions (CI/CD):** Configure `KEYSTORE_BASE64` in GitHub Repository Secrets (`Settings > Secrets and variables > Actions`). The CI/CD pipeline automatically decodes and signs release APKs with your official keystore.
+- **Local Builds:** Configure `android/key.properties` (refer to `android/key.properties.example`). Keystore files and credentials are strictly ignored and never tracked in Git.
+*Note: If `KEYSTORE_BASE64` / `key.properties` is omitted, builds safely fall back to standard debug signing for local execution.*
 
 ---
 
