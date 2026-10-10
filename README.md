@@ -1,7 +1,7 @@
 # GitPulse Mobile
 
 <p align="center">
-  <img src="assets/icons/app_icon.png" alt="GitPulse Mobile Icon" width="120" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);" />
+  <img src="assets/icons/app_icon.jpg" alt="Phantek Icon" width="120" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);" />
 </p>
 
 <div align="center">
@@ -93,6 +93,8 @@ Developers receive a continuous animated tier badge based on their commit streak
 | **Markdown Engine** | `flutter_markdown` (v0.7.7+1) | Native in-app GitHub README markdown parsing with CDN asset resolution |
 | **Networking** | `http` (v1.6.0) | Composable HTTP client for GitHub REST API v3 queries & rate limit tracking |
 | **OTA Delivery** | `ota_update` (v7.1.0) | In-app background APK downloader & Android PackageInstaller integration |
+| **Release Signing** | `key.properties` Sandboxing | Decoupled credentials pipeline with safe fallback; zero committed secrets |
+| **CI/CD Automation** | GitHub Actions (`workflow_dispatch`) | Manual-only automated release compilation and SHA-256 verification |
 | **Typography** | `google_fonts` (Inter) | Professional typography and clean typeface rendering |
 | **Local Persistence** | `shared_preferences` (v2.5.5) | On-device sandboxed key-value store for bookmarks, themes, & tokens |
 | **Internationalization** | `intl` (v0.20.3) | Reactive 6-language localization & date/number formatting |
@@ -113,12 +115,23 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 The compiled release APK will be generated at:
 `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`
 
+### Keystore Configuration (Optional)
+To sign release builds locally or in custom pipelines, configure `android/key.properties` (refer to `android/key.properties.example`):
+```properties
+storePassword=yourStorePassword
+keyPassword=yourKeyPassword
+keyAlias=yourKeyAlias
+storeFile=path/to/keystore.jks
+```
+*Note: If `key.properties` is omitted, builds automatically fall back to standard debug signing for safe local execution.*
+
 ---
 
 # Version History
 
 * ### v2.0.0 (Build 15)
   - **BREAKING CHANGE - Application ID Migration:** Standardized Android namespace and application package identifier to `com.phantek.orion.rigel`.
+  - **New Phantek Visual Identity:** Replaced legacy launcher icon with official high-resolution Phantek icon across all mipmap density tiers (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`) and in-app asset catalogs.
   - **Version 2.0.0 Milestone:** Upgraded application release versioning, system telemetry, and internal provider authorities for the v2 milestone.
 
 * ### v1.0.13 (Build 14)

@@ -1,21 +1,16 @@
 name: GitPulse CI/CD Pipeline
 
 on:
-  push:
-    branches: [ main, master ]
-    tags: [ 'v*' ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Release Tag (e.g., v1.0.3)'
-        required: true
-        default: 'v1.0.3'
+        description: 'Release Tag (e.g., v2.0.0)'
+        required: false
+        default: ''
       release_name:
         description: 'Release Title'
-        required: true
-        default: 'GitPulse v1.0.3 (64-bit ARM)'
+        required: false
+        default: ''
       release_notes:
         description: 'Release Notes'
         required: false
@@ -78,7 +73,7 @@ jobs:
           elif [ -n "$PUBSPEC_VER" ]; then
             TAG="v$PUBSPEC_VER"
           else
-            TAG="v1.0.3"
+            TAG="v2.0.0"
           fi
           APK_NAME="GitPulse-${TAG}-arm64-v8a.apk"
           cp build/app/outputs/flutter-apk/app-release.apk "${APK_NAME}"
@@ -95,11 +90,11 @@ jobs:
             ${{ steps.prep.outputs.apk_name }}.sha256
 
       - name: Publish to GitHub Releases
-        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_to_release)
+        if: inputs.publish_to_release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.prep.outputs.tag_name }}
-          name: GitPulse ${{ steps.prep.outputs.tag_name }} (64-bit ARM)
+          name: ${{ inputs.release_name || format('GitPulse {0} (64-bit ARM)', steps.prep.outputs.tag_name) }}
           body: ${{ inputs.release_notes || 'Official GitPulse Mobile release bundle compiled exclusively for 64-bit ARM architecture (arm64-v8a).' }}
           generate_release_notes: true
           make_latest: true
