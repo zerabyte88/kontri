@@ -17,8 +17,6 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.phantek.orion.rigel"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
-
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
@@ -38,15 +36,10 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-
-        ndk {
-            abiFilters.add("arm64-v8a")
-        }
     }
 
     signingConfigs {
         create("release") {
-            val defaultJks = file("gitpulse-release.jks")
             if (keystorePropertiesFile.exists()) {
                 keyAlias = keystoreProperties["keyAlias"] as String
                 keyPassword = keystoreProperties["keyPassword"] as String
@@ -54,13 +47,6 @@ android {
                 val candidate = file(rawPath)
                 storeFile = if (candidate.exists()) candidate else rootProject.file(rawPath)
                 storePassword = keystoreProperties["storePassword"] as String
-                enableV1Signing = true
-                enableV2Signing = true
-            } else if (defaultJks.exists()) {
-                keyAlias = "gitpulse"
-                keyPassword = "***REDACTED***"
-                storeFile = defaultJks
-                storePassword = "***REDACTED***"
                 enableV1Signing = true
                 enableV2Signing = true
             }
