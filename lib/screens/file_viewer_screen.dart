@@ -6,6 +6,7 @@ import '../localization/app_localizations.dart';
 import '../models/github_content_item.dart';
 import '../services/github_api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/running_text.dart';
 
 class FileViewerScreen extends StatefulWidget {
   final GitHubContentItem item;
@@ -152,24 +153,22 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.item.name,
+            RunningText(
+              text: widget.item.name,
               style: TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 15.5,
                 fontWeight: FontWeight.w700,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              autoScroll: true,
             ),
-            Text(
-              widget.item.path,
+            RunningText(
+              text: widget.item.path,
               style: TextStyle(
                 color: AppTheme.textMuted,
                 fontSize: 11,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              autoScroll: true,
             ),
           ],
         ),

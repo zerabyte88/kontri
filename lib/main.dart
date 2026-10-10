@@ -9,6 +9,7 @@ import 'services/github_api_service.dart';
 import 'services/storage_service.dart';
 import 'services/update_service.dart';
 import 'theme/app_theme.dart';
+import 'widgets/animated_app_background.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,6 +63,9 @@ class GitPulseApp extends StatelessWidget {
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
+              builder: (context, child) {
+                return AnimatedAppBackground(child: child ?? const SizedBox());
+              },
               home: HomeScreen(
                 storageService: storageService,
                 apiService: apiService,

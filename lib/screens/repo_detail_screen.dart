@@ -8,6 +8,7 @@ import '../models/github_content_item.dart';
 import '../models/github_repo.dart';
 import '../services/github_api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/running_text.dart';
 import 'file_viewer_screen.dart';
 
 class RepoDetailScreen extends StatefulWidget {
@@ -43,12 +44,19 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
   final List<String> _pathStack = [];
   List<GitHubContentItem> _contents = [];
   String? _contentsError;
+  final ScrollController _breadcrumbsScrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _apiService = widget.apiService ?? GitHubApiService();
     _fetchReadme();
+  }
+
+  @override
+  void dispose() {
+    _breadcrumbsScrollController.dispose();
+    super.dispose();
   }
 
   String get _repoOwner {
@@ -122,6 +130,15 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
           _contents = items;
           _currentPath = path;
           _isLoadingContents = false;
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_breadcrumbsScrollController.hasClients) {
+            _breadcrumbsScrollController.animateTo(
+              _breadcrumbsScrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+            );
+          }
         });
       }
     } catch (e) {
@@ -330,15 +347,14 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.repo.name,
+            RunningText(
+              text: widget.repo.name,
               style: TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              autoScroll: true,
             ),
             if (_repoOwner.isNotEmpty)
               Text(
@@ -424,15 +440,14 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.repo.name,
+                    RunningText(
+                      text: widget.repo.name,
                       style: TextStyle(
                         color: AppTheme.textPrimary,
                         fontSize: 16.5,
                         fontWeight: FontWeight.w700,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      autoScroll: false,
                     ),
                     if (_repoOwner.isNotEmpty)
                       Text(
@@ -1250,11 +1265,11 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     final segments = _currentPath.isEmpty ? <String>[] : _currentPath.split('/');
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       color: AppTheme.surfaceElevated.withValues(alpha: 0.5),
       child: Row(
         children: [
-          if (_currentPath.isNotEmpty)
+          if (_currentPath.isNotEmpty) ...[
             InkWell(
               onTap: _navigateUp,
               borderRadius: BorderRadius.circular(6),
@@ -1267,63 +1282,80 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                 ),
               ),
             ),
-          InkWell(
-            onTap: _currentPath.isNotEmpty ? () => _fetchContents('') : null,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            const SizedBox(width: 4),
+          ],
+          Expanded(
+            child: SingleChildScrollView(
+              controller: _breadcrumbsScrollController,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.folder_copy_outlined,
-                    size: 14,
-                    color: _currentPath.isEmpty
-                        ? AppTheme.primaryCyan
-                        : AppTheme.textSecondary,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    widget.repo.name,
-                    style: TextStyle(
-                      color: _currentPath.isEmpty
-                          ? AppTheme.primaryCyan
-                          : AppTheme.textSecondary,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w600,
+                  InkWell(
+                    onTap: _currentPath.isNotEmpty ? () => _fetchContents('') : null,
+                    borderRadius: BorderRadius.circular(6),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.folder_copy_outlined,
+                            size: 14,
+                            color: _currentPath.isEmpty
+                                ? AppTheme.primaryCyan
+                                : AppTheme.textSecondary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            widget.repo.name,
+                            style: TextStyle(
+                              color: _currentPath.isEmpty
+                                  ? AppTheme.primaryCyan
+                                  : AppTheme.textSecondary,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                  for (int i = 0; i < segments.length; i++) ...[
+                    Text(
+                      ' / ',
+                      style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
+                    ),
+                    InkWell(
+                      onTap: i == segments.length - 1
+                          ? null
+                          : () {
+                              final path = segments.sublist(0, i + 1).join('/');
+                              _fetchContents(path);
+                            },
+                      borderRadius: BorderRadius.circular(6),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                        child: Text(
+                          segments[i],
+                          style: TextStyle(
+                            color: i == segments.length - 1
+                                ? AppTheme.primaryCyan
+                                : AppTheme.textSecondary,
+                            fontSize: 12.5,
+                            fontWeight: i == segments.length - 1
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
-          for (int i = 0; i < segments.length; i++) ...[
-            Text(
-              ' / ',
-              style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
-            ),
-            InkWell(
-              onTap: i == segments.length - 1
-                  ? null
-                  : () {
-                      final path = segments.sublist(0, i + 1).join('/');
-                      _fetchContents(path);
-                    },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-                child: Text(
-                  segments[i],
-                  style: TextStyle(
-                    color: i == segments.length - 1
-                        ? AppTheme.primaryCyan
-                        : AppTheme.textSecondary,
-                    fontSize: 12.5,
-                    fontWeight: i == segments.length - 1
-                        ? FontWeight.w600
-                        : FontWeight.w400,
-                  ),
-                ),
-              ),
-            ),
-          ],
         ],
       ),
     );

@@ -9,6 +9,7 @@ import '../theme/app_theme.dart';
 import '../widgets/animated_app_header.dart';
 import '../widgets/settings_sheet.dart';
 import '../widgets/tech_news_card.dart';
+import 'favorite_profiles_screen.dart';
 import 'stats_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,7 +29,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  final TechNewsService _newsService = TechNewsService();
+  late final TechNewsService _newsService;
+  final ScrollController _categoryScrollController = ScrollController();
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -36,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // News State
   String _selectedCategory = 'trending';
+  int _slideDirection = 1;
   List<TechNews> _newsList = [];
   bool _isNewsLoading = true;
 
@@ -60,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _newsService = TechNewsService(storageService: widget.storageService);
     _refreshLocalData();
     _searchFocusNode.addListener(_onSearchFocusChanged);
     _searchController.addListener(_onSearchTextChanged);
@@ -87,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _searchFocusNode.dispose();
     _searchController.removeListener(_onSearchTextChanged);
     _searchController.dispose();
+    _categoryScrollController.dispose();
     super.dispose();
   }
 
@@ -114,6 +119,61 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _isNewsLoading = false;
         });
+      }
+    }
+  }
+
+  void _changeCategoryByIndex(
+    int newIndex,
+    List<Map<String, String>> categories, {
+    bool isSwipeLeft = true,
+  }) {
+    if (newIndex < 0 || newIndex >= categories.length) return;
+    final targetCategory = categories[newIndex]['id']!;
+    if (targetCategory == _selectedCategory) return;
+
+    setState(() {
+      _slideDirection = isSwipeLeft ? 1 : -1;
+      _selectedCategory = targetCategory;
+    });
+
+    _animateCategoryChipToView(newIndex, categories.length);
+    _loadNews();
+  }
+
+  void _animateCategoryChipToView(int index, int totalCount) {
+    if (!_categoryScrollController.hasClients) return;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final estimatedCenter = (index * 96.0) + 48.0;
+    final targetOffset = (estimatedCenter - (screenWidth / 2)).clamp(
+      0.0,
+      _categoryScrollController.position.maxScrollExtent,
+    );
+    _categoryScrollController.animateTo(
+      targetOffset,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _handleHorizontalSwipe(
+    DragEndDetails details,
+    List<Map<String, String>> categories,
+  ) {
+    final velocity = details.primaryVelocity ?? 0;
+    if (velocity < -120) {
+      // Swiped Left -> Advance to next category
+      final currentIndex =
+          categories.indexWhere((c) => c['id'] == _selectedCategory);
+      if (currentIndex != -1 && currentIndex < categories.length - 1) {
+        _changeCategoryByIndex(currentIndex + 1, categories, isSwipeLeft: true);
+      }
+    } else if (velocity > 120) {
+      // Swiped Right -> Return to previous category
+      final currentIndex =
+          categories.indexWhere((c) => c['id'] == _selectedCategory);
+      if (currentIndex > 0) {
+        _changeCategoryByIndex(currentIndex - 1, categories, isSwipeLeft: false);
       }
     }
   }
@@ -202,6 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final categories = _getCategories(loc);
     final bookmarkedUsers = _bookmarkedUsers;
     final allRecents = _allRecents;
 
@@ -336,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 24),
 
                       // Latest Tech & AI News Header
-                      _buildTechNewsHeader(loc),
+                      _buildTechNewsHeader(loc, categories),
 
                       const SizedBox(height: 14),
                     ],
@@ -344,65 +405,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // News Content as virtualized sliver
-              if (_isNewsLoading)
-                SliverToBoxAdapter(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 36),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppTheme.primaryCyan,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            loc.loadingNews,
-                            style: TextStyle(
-                              color: AppTheme.textMuted.withValues(alpha: 0.8),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              else if (_newsList.isEmpty)
-                SliverToBoxAdapter(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 28),
-                      child: Text(
-                        loc.noNewsFound,
-                        style: TextStyle(
-                          color: AppTheme.textMuted.withValues(alpha: 0.8),
-                          fontSize: 12.5,
+              // News Content wrapped in horizontal swipe gesture detector with animated slide transition
+              SliverToBoxAdapter(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onHorizontalDragEnd: (details) =>
+                      _handleHorizontalSwipe(details, categories),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    transitionBuilder: (child, animation) {
+                      final offsetAnimation = Tween<Offset>(
+                        begin: Offset(_slideDirection * 0.25, 0),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutCubic,
+                      ));
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: FadeTransition(
+                          opacity: animation,
+                          child: child,
                         ),
-                      ),
-                    ),
-                  ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: TechNewsCard(news: _newsList[index]),
-                        );
-                      },
-                      childCount: _newsList.length,
+                      );
+                    },
+                    child: KeyedSubtree(
+                      key: ValueKey(_selectedCategory),
+                      child: _buildNewsContent(loc),
                     ),
                   ),
                 ),
+              ),
             ],
           ),
         ),
@@ -638,53 +671,74 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBookmarksSection(AppLocalizations loc, List<BookmarkedUser> bookmarks) {
     if (bookmarks.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.border, width: 1),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppTheme.border, width: 0.8),
+      return InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FavoriteProfilesScreen(
+                storageService: widget.storageService,
+                apiService: widget.apiService,
               ),
-              child: Icon(
-                Icons.star_outline_rounded,
-                color: AppTheme.accentAmber,
+            ),
+          );
+          _refreshLocalData();
+          if (mounted) setState(() {});
+        },
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.border, width: 1),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceElevated,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppTheme.border, width: 0.8),
+                ),
+                child: Icon(
+                  Icons.star_outline_rounded,
+                  color: AppTheme.accentAmber,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      loc.favoriteProfiles,
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      loc.emptyBookmarks,
+                      style: TextStyle(
+                        color: AppTheme.textMuted,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
                 size: 18,
+                color: AppTheme.textMuted,
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    loc.favoriteProfiles,
-                    style: TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    loc.emptyBookmarks,
-                    style: TextStyle(
-                      color: AppTheme.textMuted,
-                      fontSize: 11.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -692,40 +746,74 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Icon(
-              Icons.bookmark_outline_rounded,
-              size: 17,
-              color: AppTheme.accentAmber,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              loc.favoriteProfiles,
-              style: TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 14.5,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: AppTheme.border, width: 0.8),
-              ),
-              child: Text(
-                '${bookmarks.length}',
-                style: TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w600,
+        InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FavoriteProfilesScreen(
+                  storageService: widget.storageService,
+                  apiService: widget.apiService,
                 ),
               ),
+            );
+            _refreshLocalData();
+            if (mounted) setState(() {});
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.bookmark_outline_rounded,
+                  size: 17,
+                  color: AppTheme.accentAmber,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  loc.favoriteProfiles,
+                  style: TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: AppTheme.border, width: 0.8),
+                  ),
+                  child: Text(
+                    '${bookmarks.length}',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  loc.viewAllFavorites,
+                  style: TextStyle(
+                    color: AppTheme.primaryCyan,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 2),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 16,
+                  color: AppTheme.primaryCyan,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
         const SizedBox(height: 10),
         SizedBox(
@@ -854,41 +942,155 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTechNewsHeader(AppLocalizations loc) {
-    final categories = _getCategories(loc);
+  Widget _buildNewsContent(AppLocalizations loc) {
+    if (_isNewsLoading) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 36),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppTheme.primaryCyan,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                loc.loadingNews,
+                style: TextStyle(
+                  color: AppTheme.textMuted.withValues(alpha: 0.8),
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_newsList.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 28),
+          child: Text(
+            loc.noNewsFound,
+            style: TextStyle(
+              color: AppTheme.textMuted.withValues(alpha: 0.8),
+              fontSize: 12.5,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (int i = 0; i < _newsList.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: TechNewsCard(news: _newsList[i]),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTechNewsHeader(
+    AppLocalizations loc,
+    List<Map<String, String>> categories,
+  ) {
+    final isCachedOffline =
+        _newsService.isTagCachedOrOffline(_selectedCategory);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Header
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.feed_outlined,
+        GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onHorizontalDragEnd: (details) =>
+              _handleHorizontalSwipe(details, categories),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.feed_outlined,
+                      size: 18,
+                      color: AppTheme.primaryCyan,
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        loc.techNewsTitle,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    if (isCachedOffline) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.accentAmber.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: AppTheme.accentAmber.withValues(alpha: 0.3),
+                            width: 0.8,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.cloud_off_rounded,
+                              size: 11,
+                              color: AppTheme.accentAmber,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              loc.offlineCached,
+                              style: TextStyle(
+                                color: AppTheme.accentAmber,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.refresh_rounded,
                   size: 18,
-                  color: AppTheme.primaryCyan,
+                  color: AppTheme.textSecondary,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  loc.techNewsTitle,
-                  style: TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            IconButton(
-              icon: Icon(Icons.refresh_rounded, size: 18, color: AppTheme.textSecondary),
-              tooltip: loc.refresh,
-              onPressed: () => _loadNews(refresh: true),
-              visualDensity: VisualDensity.compact,
-            ),
-          ],
+                tooltip: loc.refresh,
+                onPressed: () => _loadNews(refresh: true),
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 10),
 
@@ -896,6 +1098,7 @@ class _HomeScreenState extends State<HomeScreen> {
         SizedBox(
           height: 34,
           child: ListView.separated(
+            controller: _categoryScrollController,
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             itemCount: categories.length,
@@ -907,7 +1110,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 label: Text(
                   cat['label']!,
                   style: TextStyle(
-                    color: isSelected ? AppTheme.primaryCyan : AppTheme.textSecondary,
+                    color: isSelected
+                        ? AppTheme.primaryCyan
+                        : AppTheme.textSecondary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                     fontSize: 12,
                   ),
@@ -925,10 +1130,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 showCheckmark: false,
                 onSelected: (selected) {
                   if (selected && _selectedCategory != cat['id']) {
-                    setState(() {
-                      _selectedCategory = cat['id']!;
-                    });
-                    _loadNews();
+                    final currentIndex =
+                        categories.indexWhere((c) => c['id'] == _selectedCategory);
+                    _changeCategoryByIndex(
+                      index,
+                      categories,
+                      isSwipeLeft: index > currentIndex,
+                    );
                   }
                 },
               );

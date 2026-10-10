@@ -4,12 +4,19 @@ import '../localization/app_localizations.dart';
 import 'storage_service.dart';
 
 class AppLanguageService {
-  static late final ValueNotifier<AppLanguage> currentLanguageNotifier;
+  static ValueNotifier<AppLanguage>? _currentLanguageNotifier;
+
+  static ValueNotifier<AppLanguage> get currentLanguageNotifier =>
+      _currentLanguageNotifier ??= ValueNotifier<AppLanguage>(AppLanguage.indonesian);
 
   static void init(StorageService storageService) {
     final code = storageService.getLanguageCode();
     final lang = AppLanguage.fromCode(code);
-    currentLanguageNotifier = ValueNotifier<AppLanguage>(lang);
+    if (_currentLanguageNotifier == null) {
+      _currentLanguageNotifier = ValueNotifier<AppLanguage>(lang);
+    } else {
+      _currentLanguageNotifier!.value = lang;
+    }
     AppLocalizations(lang);
   }
 

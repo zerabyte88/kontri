@@ -66,6 +66,13 @@
 - **Smart Rate-Limit Interceptor:** Strongly-typed handler for HTTP 403, 429, and exhausted rate limits with optional Personal Access Token (PAT) support stored in Android's private app sandbox.
 - **Zero Intermediary Servers & Total Privacy:** Direct device-to-GitHub TLS 1.3 queries with zero analytics SDKs, trackers, or telemetry scripts.
 
+### 8. Dedicated Favorite Profiles Grid & Adaptive Layout
+- **Configurable 1–4 Column Grid:** Interactive top toolbar toggle allowing users to dynamically switch between 1, 2 (default), 3, or 4 columns per row with seamless layout recalculation.
+- **Persistent Grid Layout Preferences:** User-selected column density is saved automatically to device storage via `SharedPreferences`.
+- **Rich Developer Profiles with Adaptive Cards:** Displays developer avatar, full name, GitHub handle, bio, and location with responsive typography and density scaling per column configuration.
+- **Direct Telemetry Inspection & Undo Action:** Tap any favorited card to instantly load full analytics in `StatsDetailScreen`, or remove with an undoable floating SnackBar action.
+- **Silent Background Enrichment:** Automatically fetches missing location and bio details from GitHub REST API in the background for older bookmarks.
+
 ---
 
 ## Commit Activity Tier Matrix
@@ -98,7 +105,7 @@ Developers receive a continuous animated tier badge based on their commit streak
 | **Typography** | `google_fonts` (Inter) | Professional typography and clean typeface rendering |
 | **Local Persistence** | `shared_preferences` (v2.5.5) | On-device sandboxed key-value store for bookmarks, themes, & tokens |
 | **Internationalization** | `intl` (v0.20.3) | Reactive 6-language localization & date/number formatting |
-| **Verification Suite** | `flutter_test` | Comprehensive test coverage (39/39 passing unit and widget tests) |
+| **Verification Suite** | `flutter_test` | Comprehensive test coverage (40/40 passing unit and widget tests) |
 
 ---
 
@@ -131,8 +138,22 @@ storeFile=path/to/keystore.jks
 
 * ### v2.0.0 (Build 15)
   - **BREAKING CHANGE - Application ID Migration:** Standardized Android namespace and application package identifier to `com.phantek.orion.rigel`.
+  - **Full-Screen Seamless Animated App Background:** Replaced isolated header animations with a continuous, looping ambient canvas across the entire application from top to bottom (status bar down to navigation bar), tailored per theme:
+    - *AMOLED Sakura:* Drifting cherry blossom petals with an elegant sakura tree trunk, branches, and blossom clusters on pure AMOLED black.
+    - *AMOLED Night:* Full-height starry cosmos with twinkling diamond stars, glowing crescent moon, and diagonal shooting stars / meteors crossing the screen.
+    - *Dark Mode (Thunderstorm):* Atmospheric dark rain with animated rain streaks, dark storm clouds, and periodic electric-blue jagged lightning strikes with ambient flash lighting.
+    - *Light Mode:* Gentle swirling green and autumn breeze leaves.
+  - **Glassmorphism Theme System:** Scaffold and AppBar backgrounds rendered transparent with subtly translucent card surfaces (`~92%` opacity) allowing the live animated background to shine through seamlessly.
+  - **Dedicated Favorite Profiles Grid:** Brand-new `FavoriteProfilesScreen` featuring dynamic 1 to 4 columns per row density slider, enriched developer cards (avatar, full name, GitHub handle, bio, location), unfavorite with floating SnackBar undo, and persistent on-device storage.
+  - **Plus Jakarta Sans Typography:** Upgraded core application font to Google Fonts' Plus Jakarta Sans for razor-sharp telemetry numbers, higher readability, and modern tech aesthetics, while preserving fixed monospace for code viewers and technical data.
+  - **Radiant Sakura Pink Palette Refinement:** Replaced coral/reddish tones in AMOLED Sakura mode with authentic radiant cherry blossom pink (`#FF65A3`), harmonizing card borders, dark wisteria surfaces, and ambient canvas petals.
+  - **Running Text (Marquee) for Repository Titles:** Added reusable `RunningText` widget supporting smooth ping-pong auto-scroll for long repository and file titles in AppBars, and interactive touch-scrollable text in overview cards to prevent text truncation.
+  - **Horizontally Scrollable Folder Breadcrumbs:** Replaced static breadcrumb bar in `RepoDetailScreen` with a smooth horizontally scrollable trail, featuring a pinned parent navigation button and auto-scroll to the active deep directory without clipping.
+  - **Dynamic GitHub Trending & Tech News:** Overhauled trending repository algorithm to query active projects created in the past 14 to 30 days sorted by stars, with 15-minute in-memory TTL caching, persistent offline storage fallback, and subtle offline mode indicator badge.
   - **New Phantek Visual Identity:** Replaced legacy launcher icon with official high-resolution Phantek icon across all mipmap density tiers (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`) and in-app asset catalogs.
-  - **Version 2.0.0 Milestone:** Upgraded application release versioning, system telemetry, and internal provider authorities for the v2 milestone.
+  - **Clean Header Identity:** Removed logo tap animation for a static, elegant header identity with synchronized animation lifecycle pause/resume during modal navigation to conserve battery and GPU.
+  - **Silent Profile Background Enrichment:** Automatically fetches missing location and bio details from GitHub REST API in the background for existing bookmarks.
+  - **Streamlined Search UX:** Simplified search placeholder hint across all 6 supported languages to clean action verbs (`Search...`, `Cari...`, `検索...`, etc.) removing verbose examples.
 
 * ### v1.0.13 (Build 14)
   - **Settings Sheet Visual Polish:** Refined settings sheet layout and theme option cards with responsive layout geometry and smooth touch states.

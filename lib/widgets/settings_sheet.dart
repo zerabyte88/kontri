@@ -16,12 +16,14 @@ class SettingsSheet extends StatefulWidget {
   final StorageService storageService;
   final GitHubApiService apiService;
   final VoidCallback? onSettingsChanged;
+  final ScrollController? scrollController;
 
   const SettingsSheet({
     super.key,
     required this.storageService,
     required this.apiService,
     this.onSettingsChanged,
+    this.scrollController,
   });
 
   static Future<void> show(
@@ -34,10 +36,18 @@ class SettingsSheet extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => SettingsSheet(
-        storageService: storageService,
-        apiService: apiService,
-        onSettingsChanged: onSettingsChanged,
+      enableDrag: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.88,
+        minChildSize: 0.25,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (context, scrollController) => SettingsSheet(
+          scrollController: scrollController,
+          storageService: storageService,
+          apiService: apiService,
+          onSettingsChanged: onSettingsChanged,
+        ),
       ),
     );
   }
@@ -49,6 +59,14 @@ class SettingsSheet extends StatefulWidget {
 class _SettingsSheetState extends State<SettingsSheet> {
   late final TextEditingController _tokenController;
   late final UpdateService _updateService;
+
+  bool _isDismissing = false;
+
+  void _dismissSheet() {
+    if (!mounted || _isDismissing) return;
+    _isDismissing = true;
+    Navigator.of(context).pop();
+  }
 
   bool _obscureToken = true;
   bool _isLoadingRateLimit = false;
@@ -371,79 +389,117 @@ class _SettingsSheetState extends State<SettingsSheet> {
       ),
       padding: EdgeInsets.only(bottom: bottomInset),
       child: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top drag indicator
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppTheme.border,
-                    borderRadius: BorderRadius.circular(2),
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            if (notification is ScrollUpdateNotification) {
+              if (notification.metrics.pixels <= 0 && (notification.scrollDelta ?? 0) < -8) {
+                _dismissSheet();
+                return true;
+              }
+            } else if (notification is OverscrollNotification) {
+              if (notification.overscroll < -6) {
+                _dismissSheet();
+                return true;
+              }
+            }
+            return false;
+          },
+          child: SingleChildScrollView(
+            controller: widget.scrollController,
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top drag indicator and header with swipe-to-dismiss gesture support
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onVerticalDragUpdate: (details) {
+                    if ((details.primaryDelta ?? 0) > 8) {
+                      _dismissSheet();
+                    }
+                  },
+                  onVerticalDragEnd: (details) {
+                    if ((details.primaryVelocity ?? 0) > 80) {
+                      _dismissSheet();
+                    }
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Top drag indicator
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Container(
+                            width: 36,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: AppTheme.border,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Sheet Header
+                      Row(
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 350),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.all(7),
+                            decoration: BoxDecoration(
+                              color: AppTheme.surfaceElevated,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppTheme.border, width: 0.8),
+                            ),
+                            child: Icon(
+                              Icons.tune_rounded,
+                              color: AppTheme.primaryCyan,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  loc.settingsTitle,
+                                  style: TextStyle(
+                                    color: AppTheme.textPrimary,
+                                    fontSize: 15.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 1),
+                                Text(
+                                  loc.settingsSubtitle,
+                                  style: TextStyle(
+                                    color: AppTheme.textMuted,
+                                    fontSize: 11.5,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close_rounded, size: 20, color: AppTheme.textSecondary),
+                            onPressed: _dismissSheet,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 14),
-
-              // Sheet Header
-              Row(
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeInOut,
-                    padding: const EdgeInsets.all(7),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceElevated,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppTheme.border, width: 0.8),
-                    ),
-                    child: Icon(
-                      Icons.tune_rounded,
-                      color: AppTheme.primaryCyan,
-                      size: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          loc.settingsTitle,
-                          style: TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 1),
-                        Text(
-                          loc.settingsSubtitle,
-                          style: TextStyle(
-                            color: AppTheme.textMuted,
-                            fontSize: 11.5,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.close_rounded, size: 20, color: AppTheme.textSecondary),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
               // CARD 1: Theme Selection (Dark, AMOLED, Japanese AMOLED Easter Egg, Light)
               AnimatedContainer(
@@ -1494,6 +1550,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
             ],
           ),
         ),
+      ),
       ),
       ),
     );

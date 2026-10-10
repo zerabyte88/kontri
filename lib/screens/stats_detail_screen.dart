@@ -132,6 +132,9 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
     await widget.storageService.toggleBookmark(
       username,
       avatarUrl: widget.stats.user.avatarUrl,
+      name: widget.stats.user.name,
+      bio: widget.stats.user.bio,
+      location: widget.stats.user.location,
     );
     if (!mounted) return;
     setState(() {

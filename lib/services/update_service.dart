@@ -27,7 +27,7 @@ class AppUpdateInfo {
 
 class UpdateService {
   static const String _releasesUrl =
-      'https://api.github.com/repos/zerabyte88/gitpulse_mobile/releases/latest';
+      'https://api.github.com/repos/zerabyte88/gitpulse-mobile/releases/latest';
 
   final http.Client _client;
 

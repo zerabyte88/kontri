@@ -183,12 +183,12 @@ class AppLocalizations {
 
   // Search & Home
   String get searchHint => _str({
-    AppLanguage.indonesian: 'Cari username GitHub... (contoh: torvalds)',
-    AppLanguage.english: 'Search GitHub username... (e.g. torvalds)',
-    AppLanguage.japanese: 'GitHubユーザー名を検索... (例: torvalds)',
-    AppLanguage.chineseSimplified: '搜索 GitHub 用户名... (例如: torvalds)',
-    AppLanguage.chineseTraditional: '搜尋 GitHub 使用者名稱... (例如: torvalds)',
-    AppLanguage.korean: 'GitHub 사용자 이름 검색... (예: torvalds)',
+    AppLanguage.indonesian: 'Cari...',
+    AppLanguage.english: 'Search...',
+    AppLanguage.japanese: '検索...',
+    AppLanguage.chineseSimplified: '搜索...',
+    AppLanguage.chineseTraditional: '搜尋...',
+    AppLanguage.korean: '검색...',
   });
 
   String get recentSearches => _str({
@@ -225,6 +225,43 @@ class AppLocalizations {
     AppLanguage.chineseSimplified: '收藏个人资料',
     AppLanguage.chineseTraditional: '收藏個人檔案',
     AppLanguage.korean: '즐겨찾는 프로필',
+  });
+
+  String get viewAllFavorites => _str({
+    AppLanguage.indonesian: 'Lihat Semua',
+    AppLanguage.english: 'View All',
+    AppLanguage.japanese: 'すべて表示',
+    AppLanguage.chineseSimplified: '查看全部',
+    AppLanguage.chineseTraditional: '查看全部',
+    AppLanguage.korean: '모두 보기',
+  });
+
+  String get gridColumnsLabel => _str({
+    AppLanguage.indonesian: 'Kolom Grid',
+    AppLanguage.english: 'Grid Columns',
+    AppLanguage.japanese: 'グリッド列',
+    AppLanguage.chineseSimplified: '网格列数',
+    AppLanguage.chineseTraditional: '網格列數',
+    AppLanguage.korean: '그리드 열',
+  });
+
+
+  String get undo => _str({
+    AppLanguage.indonesian: 'Urungkan',
+    AppLanguage.english: 'Undo',
+    AppLanguage.japanese: '元に戻す',
+    AppLanguage.chineseSimplified: '撤销',
+    AppLanguage.chineseTraditional: '復原',
+    AppLanguage.korean: '실행 취소',
+  });
+
+  String removedFromFavoritesWithUser(String username) => _str({
+    AppLanguage.indonesian: '$username dihapus dari favorit',
+    AppLanguage.english: '$username removed from favorites',
+    AppLanguage.japanese: '$username をお気に入りから削除しました',
+    AppLanguage.chineseSimplified: '$username 已从收藏夹中移除',
+    AppLanguage.chineseTraditional: '$username 已從收藏夾中移除',
+    AppLanguage.korean: '$username 즐겨찾기에서 삭제됨',
   });
 
   String get saved => _str({
@@ -361,6 +398,15 @@ class AppLocalizations {
     AppLanguage.chineseSimplified: '未找到相关资讯',
     AppLanguage.chineseTraditional: '未找到相關資訊',
     AppLanguage.korean: '뉴스를 찾을 수 없습니다',
+  });
+
+  String get offlineCached => _str({
+    AppLanguage.indonesian: 'Offline / Cache',
+    AppLanguage.english: 'Offline / Cached',
+    AppLanguage.japanese: 'オフライン / キャッシュ',
+    AppLanguage.chineseSimplified: '离线 / 缓存',
+    AppLanguage.chineseTraditional: '離線 / 快取',
+    AppLanguage.korean: '오프라인 / 캐시됨',
   });
 
   String get readMore => _str({

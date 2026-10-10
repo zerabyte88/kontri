@@ -262,6 +262,23 @@ class GitHubApiService {
     return null;
   }
 
+  Future<GitHubUser?> fetchUserProfile(String username) async {
+    final cleanUsername = username.trim();
+    if (cleanUsername.isEmpty) return null;
+    try {
+      final userUri = Uri.parse('$_baseUrl/users/$cleanUsername');
+      final res = await _client.get(userUri, headers: _headers).timeout(_timeoutDuration);
+      _updateRateLimitFromHeaders(res.headers);
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body) as Map<String, dynamic>;
+        return GitHubUser.fromJson(data);
+      }
+    } catch (_) {
+      return null;
+    }
+    return null;
+  }
+
   Future<UserStats> fetchUserStats(String username, {bool forceRefresh = false}) async {
     final cleanUsername = username.trim();
     if (cleanUsername.isEmpty) {

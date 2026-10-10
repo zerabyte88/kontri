@@ -16,21 +16,27 @@ import 'package:gitpulse_mobile/models/github_repo.dart';
 import 'package:gitpulse_mobile/models/github_user.dart';
 import 'package:gitpulse_mobile/models/tech_news.dart';
 import 'package:gitpulse_mobile/models/user_stats.dart';
+import 'package:gitpulse_mobile/screens/favorite_profiles_screen.dart';
+import 'package:gitpulse_mobile/screens/home_screen.dart';
 import 'package:gitpulse_mobile/screens/file_viewer_screen.dart';
 import 'package:gitpulse_mobile/screens/repo_detail_screen.dart';
 import 'package:gitpulse_mobile/screens/stats_detail_screen.dart';
 import 'package:gitpulse_mobile/services/github_api_service.dart';
 import 'package:gitpulse_mobile/services/storage_service.dart';
 import 'package:gitpulse_mobile/services/app_theme_service.dart';
+import 'package:gitpulse_mobile/services/app_language_service.dart';
 import 'package:gitpulse_mobile/services/tech_news_service.dart';
 import 'package:gitpulse_mobile/services/update_service.dart';
 import 'package:gitpulse_mobile/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
+import 'package:gitpulse_mobile/widgets/animated_app_background.dart';
 import 'package:gitpulse_mobile/widgets/animated_app_header.dart';
 import 'package:gitpulse_mobile/widgets/animated_tier_title.dart';
 import 'package:gitpulse_mobile/widgets/language_chart.dart';
 import 'package:gitpulse_mobile/widgets/repo_tile.dart';
 import 'package:gitpulse_mobile/widgets/stat_card.dart';
+import 'package:gitpulse_mobile/widgets/running_text.dart';
+import 'package:gitpulse_mobile/widgets/settings_sheet.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -345,33 +351,70 @@ void main() {
       expect(stats.languageCounts['CSS'], 18771);
     });
 
-    test('BookmarkedUser parses correctly and provides avatar fallback', () {
+    test('BookmarkedUser parses correctly and provides avatar fallback and profile details', () {
       final userWithAvatar = BookmarkedUser.fromJson({
         'username': 'octocat',
         'avatar_url': 'https://avatars.githubusercontent.com/u/583231',
+        'name': 'The Octocat',
+        'bio': 'GitHub mascot and feline developer',
+        'location': 'San Francisco, CA',
       });
       expect(userWithAvatar.username, 'octocat');
       expect(userWithAvatar.avatarUrl, 'https://avatars.githubusercontent.com/u/583231');
+      expect(userWithAvatar.name, 'The Octocat');
+      expect(userWithAvatar.bio, 'GitHub mascot and feline developer');
+      expect(userWithAvatar.location, 'San Francisco, CA');
 
       final userDefault = BookmarkedUser.fromJson({
         'username': 'torvalds',
       });
       expect(userDefault.username, 'torvalds');
       expect(userDefault.avatarUrl, 'https://github.com/torvalds.png');
+      expect(userDefault.name, isNull);
+      expect(userDefault.bio, isNull);
+      expect(userDefault.location, isNull);
+
+      final copied = userDefault.copyWith(
+        name: 'Linus Torvalds',
+        bio: 'Creator of Linux & Git',
+        location: 'Portland, Oregon',
+      );
+      expect(copied.name, 'Linus Torvalds');
+      expect(copied.bio, 'Creator of Linux & Git');
+      expect(copied.location, 'Portland, Oregon');
+      expect(copied.toJson()['name'], 'Linus Torvalds');
     });
 
     test('StorageService persists bookmarks with avatar and manages recent searches', () async {
       SharedPreferences.setMockInitialValues({});
       final storage = await StorageService.init();
 
-      // Add bookmark with custom avatar
-      await storage.toggleBookmark('linus', avatarUrl: 'https://avatars.githubusercontent.com/linus');
+      // Test default and setting grid columns
+      expect(storage.getFavoriteGridColumns(), 2);
+      await storage.setFavoriteGridColumns(4);
+      expect(storage.getFavoriteGridColumns(), 4);
+
+      // Add bookmark with full details
+      await storage.toggleBookmark(
+        'linus',
+        avatarUrl: 'https://avatars.githubusercontent.com/linus',
+        name: 'Linus Torvalds',
+        bio: 'Linux Kernel Developer',
+        location: 'Portland, OR',
+      );
       expect(storage.isBookmarked('linus'), true);
 
       final bookmarks = storage.getBookmarkedUsers();
       expect(bookmarks.length, 1);
       expect(bookmarks.first.username, 'linus');
       expect(bookmarks.first.avatarUrl, 'https://avatars.githubusercontent.com/linus');
+      expect(bookmarks.first.name, 'Linus Torvalds');
+      expect(bookmarks.first.bio, 'Linux Kernel Developer');
+      expect(bookmarks.first.location, 'Portland, OR');
+
+      // Update details
+      await storage.updateBookmarkDetails('linus', bio: 'Creator of Git');
+      expect(storage.getBookmarkedUsers().first.bio, 'Creator of Git');
 
       // Add recent searches and verify removal
       await storage.addRecentSearch('flutter');
@@ -536,6 +579,14 @@ void main() {
       expect(zhHansLoc.repositoriesTitle, '代码仓库');
       expect(zhHantLoc.repositoriesTitle, '代碼倉庫');
       expect(koLoc.repositoriesTitle, '리포지토리');
+
+      // Search hint
+      expect(idLoc.searchHint, 'Cari...');
+      expect(enLoc.searchHint, 'Search...');
+      expect(jaLoc.searchHint, '検索...');
+      expect(zhHansLoc.searchHint, '搜索...');
+      expect(zhHantLoc.searchHint, '搜尋...');
+      expect(koLoc.searchHint, '검색...');
 
       // Theme options (Gelap, AMOLED, Terang, AMOLED Sakura)
       expect(idLoc.themeDark, 'Gelap');
@@ -750,6 +801,100 @@ void main() {
       expect(thirdFetch.isNotEmpty, true);
     });
 
+    test('TechNews toJson and fromJson roundtrip serialization works correctly', () {
+      const original = TechNews(
+        id: 999,
+        title: '⭐ author/hot-repo (1200 stars)',
+        description: 'A newly created viral open source project',
+        url: 'https://github.com/author/hot-repo',
+        coverImage: 'https://images.unsplash.com/photo-1',
+        authorName: 'author',
+        authorAvatar: 'https://avatars.githubusercontent.com/u/999',
+        publishedDate: 'Trending Rust',
+        readingTimeMinutes: 4,
+        tags: ['trending', 'github', 'rust'],
+      );
+
+      final json = original.toJson();
+      final restored = TechNews.fromJson(json);
+
+      expect(restored.id, 999);
+      expect(restored.title, '⭐ author/hot-repo (1200 stars)');
+      expect(restored.description, 'A newly created viral open source project');
+      expect(restored.url, 'https://github.com/author/hot-repo');
+      expect(restored.authorName, 'author');
+      expect(restored.publishedDate, 'Trending Rust');
+      expect(restored.readingTimeMinutes, 4);
+      expect(restored.tags, ['trending', 'github', 'rust']);
+    });
+
+    test('StorageService persists and restores cached news per tag with timestamp', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+
+      expect(storage.getCachedNews('trending'), isNull);
+      expect(storage.getCachedNewsTimestamp('trending'), isNull);
+
+      final mockList = [
+        const TechNews(
+          id: 1,
+          title: 'Trending Repo A',
+          description: 'Desc A',
+          url: 'https://github.com/a/a',
+          authorName: 'a',
+          authorAvatar: null,
+          publishedDate: 'Trending Python',
+          readingTimeMinutes: 3,
+          tags: ['trending'],
+        ),
+      ];
+
+      await storage.saveCachedNews('trending', mockList);
+
+      final retrieved = storage.getCachedNews('trending');
+      final timestamp = storage.getCachedNewsTimestamp('trending');
+
+      expect(retrieved, isNotNull);
+      expect(retrieved!.length, 1);
+      expect(retrieved.first.title, 'Trending Repo A');
+      expect(timestamp, isNotNull);
+      expect(DateTime.now().difference(timestamp!).inSeconds < 5, true);
+    });
+
+    test('TechNewsService falls back to persisted storage news when offline and sets offline flag', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+
+      final offlineNews = [
+        const TechNews(
+          id: 88,
+          title: '⭐ persisted/project (500 stars)',
+          description: 'Previously cached repo',
+          url: 'https://github.com/persisted/project',
+          authorName: 'persisted',
+          authorAvatar: null,
+          publishedDate: 'Trending Go',
+          readingTimeMinutes: 3,
+          tags: ['trending'],
+        ),
+      ];
+      await storage.saveCachedNews('trending', offlineNews);
+
+      // Create service with a failing client
+      final client = MockClient((request) async {
+        return http.Response('Rate limit exceeded', 403);
+      });
+
+      final service = TechNewsService(client: client, storageService: storage);
+      final result = await service.fetchNews(tag: 'trending', forceRefresh: true);
+
+      expect(result.length, 1);
+      expect(result.first.title, '⭐ persisted/project (500 stars)');
+      expect(service.isTagCachedOrOffline('trending'), true);
+    });
+
     test('UpdateService backupApkToDownloads handles missing files safely without throwing', () async {
       final result = await UpdateService.backupApkToDownloads(versionTag: 'v1.0.3');
       // In unit test environment (not Android or source file not present), should safely return null
@@ -848,22 +993,36 @@ void main() {
       final sakuraTheme = AppTheme.getTheme(AppThemeMode.amoledJapanese);
       final lightTheme = AppTheme.getTheme(AppThemeMode.light);
 
-      // Verify scaffolds backgrounds
-      expect(darkTheme.scaffoldBackgroundColor, const Color(0xFF0D1117));
-      expect(amoledTheme.scaffoldBackgroundColor, const Color(0xFF000000));
-      expect(sakuraTheme.scaffoldBackgroundColor, const Color(0xFF000000));
-      expect(lightTheme.scaffoldBackgroundColor, const Color(0xFFF6F8FA));
+      // Verify scaffolds backgrounds are transparent for animated background canvas
+      expect(darkTheme.scaffoldBackgroundColor, Colors.transparent);
+      expect(amoledTheme.scaffoldBackgroundColor, Colors.transparent);
+      expect(sakuraTheme.scaffoldBackgroundColor, Colors.transparent);
+      expect(lightTheme.scaffoldBackgroundColor, Colors.transparent);
+
+      // Verify theme mode background palette
+      AppTheme.currentMode = AppThemeMode.dark;
+      expect(AppTheme.background, const Color(0xFF0D1117));
+      AppTheme.currentMode = AppThemeMode.amoled;
+      expect(AppTheme.background, const Color(0xFF000000));
+      AppTheme.currentMode = AppThemeMode.amoledJapanese;
+      expect(AppTheme.background, const Color(0xFF000000));
+      AppTheme.currentMode = AppThemeMode.light;
+      expect(AppTheme.background, const Color(0xFFF6F8FA));
+      AppTheme.currentMode = AppThemeMode.dark;
 
       // Verify distinct primary accents
       expect(darkTheme.primaryColor, const Color(0xFF58A6FF));
       expect(amoledTheme.primaryColor, const Color(0xFF00E5FF));
-      expect(sakuraTheme.primaryColor, const Color(0xFFFF5C8A));
+      expect(sakuraTheme.primaryColor, const Color(0xFFFF65A3));
       expect(lightTheme.primaryColor, const Color(0xFF0969DA));
 
-      // Verify card surfaces
-      expect(darkTheme.cardTheme.color, const Color(0xFF161B22));
-      expect(amoledTheme.cardTheme.color, const Color(0xFF101012));
-      expect(sakuraTheme.cardTheme.color, const Color(0xFF150C18));
+      // Verify card surfaces (translucent for glassmorphism)
+      expect(darkTheme.cardTheme.color, const Color(0xEB161B22));
+      expect(amoledTheme.cardTheme.color, const Color(0xEB101012));
+      expect(sakuraTheme.cardTheme.color, const Color(0xEB180C1A));
+
+      // Verify Plus Jakarta Sans typography is configured
+      expect(darkTheme.textTheme.bodyMedium?.fontFamily, contains('PlusJakartaSans'));
     });
 
     test('AppLocalizations renders beautiful copy profile and favorite toast messages', () {
@@ -924,9 +1083,17 @@ void main() {
 
       // Verify GitPulse logo, background, title, and version are rendered
       expect(find.byType(GitPulseLogo), findsOneWidget);
+      final imageFinder = find.descendant(
+        of: find.byType(GitPulseLogo),
+        matching: find.byType(Image),
+      );
+      expect(imageFinder, findsOneWidget);
+      final imageWidget = tester.widget<Image>(imageFinder);
+      expect((imageWidget.image as AssetImage).assetName, 'assets/icons/app_icon.png');
       expect(find.byType(AnimatedHeaderBackground), findsOneWidget);
       expect(find.text('GitPulse'), findsOneWidget);
       expect(find.text(AppConfig.appVersion), findsOneWidget);
+      expect(find.descendant(of: find.byType(AnimatedAppHeader), matching: find.byType(GestureDetector)), findsNothing);
 
       // Test theme mode toggling
       await AppThemeService.changeTheme(AppThemeMode.amoledJapanese, storage);
@@ -1348,6 +1515,399 @@ void main() {
       expect(find.text('lib'), findsOneWidget);
       expect(find.text('pubspec.yaml'), findsOneWidget);
     });
+
+    testWidgets('FavoriteProfilesScreen renders grid with 1 to 4 columns and displays user details', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.init();
+      await storage.toggleBookmark(
+        'zerabyte88',
+        name: 'Zerabyte Dev',
+        bio: 'Mobile & Cloud Engineer',
+        location: 'Jakarta, Indonesia',
+      );
+
+      final mockClient = MockClient((request) async {
+        return http.Response(jsonEncode({}), 200);
+      });
+      final apiService = GitHubApiService(client: mockClient);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('id'),
+          supportedLocales: AppLanguage.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: FavoriteProfilesScreen(
+            storageService: storage,
+            apiService: apiService,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Check header and user details
+      expect(find.text('Profil Favorit'), findsOneWidget);
+      expect(find.text('Zerabyte Dev'), findsOneWidget);
+      expect(find.text('Jakarta, Indonesia'), findsOneWidget);
+
+      // Check column control buttons 1, 2, 3, 4 via ValueKey
+      expect(find.byKey(const ValueKey('col_btn_1')), findsOneWidget);
+      expect(find.byKey(const ValueKey('col_btn_2')), findsOneWidget);
+      expect(find.byKey(const ValueKey('col_btn_3')), findsOneWidget);
+      expect(find.byKey(const ValueKey('col_btn_4')), findsOneWidget);
+
+      // Tap 1 column
+      await tester.tap(find.byKey(const ValueKey('col_btn_1')));
+      await tester.pumpAndSettle();
+      expect(storage.getFavoriteGridColumns(), 1);
+
+      // Tap 4 column
+      await tester.tap(find.byKey(const ValueKey('col_btn_4')));
+      await tester.pumpAndSettle();
+      expect(storage.getFavoriteGridColumns(), 4);
+    });
+
+    testWidgets('RunningText renders static text when content fits constraints', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 300,
+              child: RunningText(
+                text: 'Short Repo',
+                autoScroll: true,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      expect(find.text('Short Repo'), findsOneWidget);
+    });
+
+    testWidgets('RunningText renders scrollable text for long text in manual mode', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 100,
+              child: RunningText(
+                text: 'very_long_repository_name_that_exceeds_screen_width_significantly',
+                autoScroll: false,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      expect(find.byType(SingleChildScrollView), findsOneWidget);
+      expect(find.text('very_long_repository_name_that_exceeds_screen_width_significantly'), findsOneWidget);
+    });
+
+    testWidgets('SettingsSheet can be dismissed by swiping down from top to bottom', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.init();
+      AppLanguageService.init(storage);
+      AppThemeService.init(storage);
+      final client = MockClient((request) async => http.Response('{}', 200));
+      final api = GitHubApiService(client: client);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLanguage.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => SettingsSheet.show(
+                  context,
+                  storageService: storage,
+                  apiService: api,
+                ),
+                child: const Text('Open Settings'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsSheet), findsOneWidget);
+
+      // Drag down from top area
+      await tester.drag(find.byType(SettingsSheet), const Offset(0, 400));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsSheet), findsNothing);
+    });
+
+    testWidgets('SettingsSheet can be closed using the X button', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.init();
+      AppLanguageService.init(storage);
+      AppThemeService.init(storage);
+      final client = MockClient((request) async => http.Response('{}', 200));
+      final api = GitHubApiService(client: client);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLanguage.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => SettingsSheet.show(
+                  context,
+                  storageService: storage,
+                  apiService: api,
+                ),
+                child: const Text('Open Settings'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsSheet), findsOneWidget);
+
+      // Verify the close button exists and tap it
+      final closeButtonFinder = find.byIcon(Icons.close_rounded);
+      expect(closeButtonFinder, findsOneWidget);
+      await tester.tap(closeButtonFinder);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsSheet), findsNothing);
+    });
+
+    testWidgets('SettingsSheet dragging down from top drag indicator dismisses sheet', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.init();
+      AppLanguageService.init(storage);
+      AppThemeService.init(storage);
+      final client = MockClient((request) async => http.Response('{}', 200));
+      final api = GitHubApiService(client: client);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLanguage.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => SettingsSheet.show(
+                  context,
+                  storageService: storage,
+                  apiService: api,
+                ),
+                child: const Text('Open Settings'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open Settings'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsSheet), findsOneWidget);
+
+      // Find top of SettingsSheet and drag down from near the top
+      final sheetTopLeft = tester.getTopLeft(find.byType(SettingsSheet));
+      await tester.dragFrom(sheetTopLeft + const Offset(100, 20), const Offset(0, 350));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsSheet), findsNothing);
+    });
+
+    testWidgets('HomeScreen news section allows tapping category chips and switches category', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.init();
+      AppLanguageService.init(storage);
+      AppThemeService.init(storage);
+      final client = MockClient((request) async {
+        if (request.url.path.contains('rate_limit')) {
+          return http.Response(jsonEncode({
+            'resources': {
+              'core': {'limit': 60, 'remaining': 59, 'reset': 0, 'used': 1}
+            }
+          }), 200);
+        }
+        return http.Response('[]', 200);
+      });
+      final api = GitHubApiService(client: client);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLanguage.supportedLocales,
+          home: HomeScreen(
+            storageService: storage,
+            apiService: api,
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Initially trending category is active
+      expect(find.byKey(const ValueKey('trending')), findsOneWidget);
+
+      // Tap on GitHub category chip (label is 'GitHub Digest')
+      final githubChip = find.byWidgetPredicate(
+        (w) => w is ChoiceChip && w.label is Text && (w.label as Text).data == 'GitHub Digest',
+      );
+      expect(githubChip, findsOneWidget);
+      await tester.tap(githubChip);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Category switches to github
+      expect(find.byKey(const ValueKey('github')), findsOneWidget);
+    });
+
+    testWidgets('HomeScreen news section allows swiping left and right to switch categories', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.init();
+      AppLanguageService.init(storage);
+      AppThemeService.init(storage);
+      final client = MockClient((request) async {
+        if (request.url.path.contains('rate_limit')) {
+          return http.Response(jsonEncode({
+            'resources': {
+              'core': {'limit': 60, 'remaining': 59, 'reset': 0, 'used': 1}
+            }
+          }), 200);
+        }
+        return http.Response('[]', 200);
+      });
+      final api = GitHubApiService(client: client);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLanguage.supportedLocales,
+          home: HomeScreen(
+            storageService: storage,
+            apiService: api,
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Initially trending category is active
+      expect(find.byKey(const ValueKey('trending')), findsOneWidget);
+
+      // Swipe left on the news content area with velocity
+      await tester.fling(find.byKey(const ValueKey('trending')), const Offset(-400, 0), 1000);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Category should switch to github
+      expect(find.byKey(const ValueKey('github')), findsOneWidget);
+
+      // Swipe right on the news content area with velocity
+      await tester.fling(find.byKey(const ValueKey('github')), const Offset(400, 0), 1000);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Category should switch back to trending
+      expect(find.byKey(const ValueKey('trending')), findsOneWidget);
+    });
+  });
+
+  group('AnimatedAppBackground Tests', () {
+
+    Future<void> pumpBackground(WidgetTester tester, AppThemeMode mode) async {
+      AppTheme.currentMode = mode;
+      AppThemeService.currentThemeNotifier.value = mode;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AnimatedAppBackground(
+            child: Scaffold(body: Container()),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    testWidgets('renders without error in AMOLED Sakura mode', (tester) async {
+      await pumpBackground(tester, AppThemeMode.amoledJapanese);
+      expect(find.byType(AnimatedAppBackground), findsOneWidget);
+      expect(find.byType(CustomPaint), findsWidgets);
+    });
+
+    testWidgets('renders without error in AMOLED Night mode', (tester) async {
+      await pumpBackground(tester, AppThemeMode.amoled);
+      expect(find.byType(AnimatedAppBackground), findsOneWidget);
+      expect(find.byType(CustomPaint), findsWidgets);
+    });
+
+    testWidgets('renders without error in Dark Thunderstorm mode', (tester) async {
+      await pumpBackground(tester, AppThemeMode.dark);
+      expect(find.byType(AnimatedAppBackground), findsOneWidget);
+      expect(find.byType(CustomPaint), findsWidgets);
+    });
+
+    testWidgets('renders without error in Light mode', (tester) async {
+      await pumpBackground(tester, AppThemeMode.light);
+      expect(find.byType(AnimatedAppBackground), findsOneWidget);
+      expect(find.byType(CustomPaint), findsWidgets);
+    });
   });
 }
+
 

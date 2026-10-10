@@ -45,12 +45,34 @@ class TechNews {
       description: json['description'] as String? ?? '',
       url: json['url'] as String? ?? '',
       coverImage: sanitizeImageUrl(rawCover),
-      authorName: user?['name'] as String? ?? user?['username'] as String? ?? 'Tech Contributor',
-      authorAvatar: user?['profile_image_90'] as String? ?? user?['profile_image'] as String?,
-      publishedDate: json['readable_publish_date'] as String? ?? 'Terbaru',
+      authorName: user?['name'] as String? ??
+          user?['username'] as String? ??
+          json['author_name'] as String? ??
+          'Tech Contributor',
+      authorAvatar: user?['profile_image_90'] as String? ??
+          user?['profile_image'] as String? ??
+          json['author_avatar'] as String?,
+      publishedDate: json['readable_publish_date'] as String? ??
+          json['published_date'] as String? ??
+          'Terbaru',
       readingTimeMinutes: json['reading_time_minutes'] as int? ?? 3,
       tags: tags,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'url': url,
+      'cover_image': coverImage,
+      'author_name': authorName,
+      'author_avatar': authorAvatar,
+      'readable_publish_date': publishedDate,
+      'reading_time_minutes': readingTimeMinutes,
+      'tag_list': tags,
+    };
   }
 
   /// Extracts direct CDN / S3 URLs from dev.to dynamic proxy wrappers
