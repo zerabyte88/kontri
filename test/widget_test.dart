@@ -2388,6 +2388,55 @@ void main() {
       // Verify pull-to-refresh widget is mounted
       expect(find.byType(RefreshIndicator), findsOneWidget);
     });
+
+    testWidgets('GitPulsePageTransitionsBuilder executes smooth slide and fade transitions', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            pageTransitionsTheme: const PageTransitionsTheme(
+              builders: {
+                TargetPlatform.android: GitPulsePageTransitionsBuilder(),
+              },
+            ),
+          ),
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (ctx) => const Scaffold(
+                        body: Text('Destination Screen'),
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Go to Destination'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Go to Destination'), findsOneWidget);
+
+      await tester.tap(find.text('Go to Destination'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+      expect(find.byType(SlideTransition), findsWidgets);
+      expect(find.byType(FadeTransition), findsWidgets);
+
+      await tester.pumpAndSettle();
+      expect(find.text('Destination Screen'), findsOneWidget);
+
+      final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+      navigator.pop();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.pumpAndSettle();
+      expect(find.text('Go to Destination'), findsOneWidget);
+    });
   });
 }
 

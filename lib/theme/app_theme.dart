@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -278,9 +277,111 @@ class AppTheme {
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: GitPulsePageTransitionsBuilder(),
+          TargetPlatform.iOS: GitPulsePageTransitionsBuilder(),
+          TargetPlatform.fuchsia: GitPulsePageTransitionsBuilder(),
+          TargetPlatform.linux: GitPulsePageTransitionsBuilder(),
+          TargetPlatform.macOS: GitPulsePageTransitionsBuilder(),
+          TargetPlatform.windows: GitPulsePageTransitionsBuilder(),
         },
+      ),
+    );
+  }
+}
+
+/// Bespoke fluid page transitions builder for GitPulse.
+///
+/// Designed specifically for unified ambient background applications with
+/// translucent and transparent Scaffolds.
+///
+/// Eliminates rigid card collisions, visual tearing, and transparent ghosting:
+/// - Entering route: fades in smoothly (0.0 -> 1.0) with subtle forward glide (Offset(0.05, 0.0) -> Offset.zero)
+///   using [Curves.easeOutCubic].
+/// - Exiting route: fades out cleanly (1.0 -> 0.0) with subtle retreat (Offset.zero -> Offset(-0.03, 0.0))
+///   using [Curves.easeInCubic].
+///
+/// Prevents the jarring double-exposure when routes share an underlying canvas background.
+class GitPulsePageTransitionsBuilder extends PageTransitionsBuilder {
+  const GitPulsePageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return _GitPulsePageTransition(
+      primaryAnimation: animation,
+      secondaryAnimation: secondaryAnimation,
+      child: child,
+    );
+  }
+}
+
+class _GitPulsePageTransition extends StatelessWidget {
+  final Animation<double> primaryAnimation;
+  final Animation<double> secondaryAnimation;
+  final Widget child;
+
+  const _GitPulsePageTransition({
+    required this.primaryAnimation,
+    required this.secondaryAnimation,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // 1. Primary transition (this screen entering / leaving foreground)
+    final primarySlide = Tween<Offset>(
+      begin: const Offset(0.05, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: primaryAnimation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    ));
+
+    final primaryFade = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: primaryAnimation,
+      curve: const Interval(0.05, 0.90, curve: Curves.easeOutCubic),
+      reverseCurve: const Interval(0.10, 0.95, curve: Curves.easeInCubic),
+    ));
+
+    // 2. Secondary transition (another screen being pushed on top of this screen)
+    final secondarySlide = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(-0.03, 0.0),
+    ).animate(CurvedAnimation(
+      parent: secondaryAnimation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    ));
+
+    final secondaryFade = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(
+      parent: secondaryAnimation,
+      curve: const Interval(0.0, 0.65, curve: Curves.easeInCubic),
+      reverseCurve: const Interval(0.35, 1.0, curve: Curves.easeOutCubic),
+    ));
+
+    return SlideTransition(
+      position: primarySlide,
+      child: FadeTransition(
+        opacity: primaryFade,
+        child: SlideTransition(
+          position: secondarySlide,
+          child: FadeTransition(
+            opacity: secondaryFade,
+            child: child,
+          ),
+        ),
       ),
     );
   }

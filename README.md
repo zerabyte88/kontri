@@ -151,6 +151,10 @@ The compiled release APK will be generated at:
 # Version History
 
 * ### v2.3.2 (Build 20)
+  - **Bespoke Fluid Page Transitions Engine (`GitPulsePageTransitionsBuilder`):**
+    - *Eliminated Transparent Scaffold Ghosting & Text Collision:* Replaced rigid default page transitions with a tailored transition builder engineered specifically for persistent canvas backgrounds and transparent Scaffolds.
+    - *Synchronized Fade & Micro-Glide Choreography:* Entering routes fade in smoothly (`0.0 -> 1.0`) with an organic forward glide (`Offset(0.05, 0.0) -> Offset.zero`) using `Curves.easeOutCubic`, while exiting routes cleanly fade out (`1.0 -> 0.0`) with a subtle retreat (`Offset(-0.03, 0.0)`) using `Curves.easeInCubic`.
+    - *Seamless Route Switching Across Entire App:* Completely resolves card clashing, text double-exposure, and sudden pop-in glitches when transitioning between Home and Favorite Profiles, Profile Details and Repository Details, and Repository and File Viewer.
   - **High-Refresh-Rate Ambient Background Pacing & GPU Optimization:**
     - *Quantized Frame Pacing (`~30 FPS`):* Quantized `shouldRepaint` ticks in `AnimatedAppBackground` to ~30 FPS intervals over the 8-second animation loop. On 90Hz/120Hz displays, skips up to 75% of background canvas repaints, allowing Skia/Impeller to reuse cached Picture layers with zero trigonometrics and zero CPU overhead.
     - *Static Shader Caching:* Cached all dynamic gradient shaders (`_cachedCurtain1-3Shader`, `_cachedRibbon1-3Shader`, `_cachedMoonShader`) by display `Size`. Eliminates up to 360 native shader allocations per second, eliminating GC pauses and preventing thermal throttling.
