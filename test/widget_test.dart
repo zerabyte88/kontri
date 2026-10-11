@@ -739,12 +739,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v2.3.1', () {
+    test('AppConfig provides accurate release and version telemetry for v2.3.2', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v2.3.1');
-      expect(AppConfig.buildNumber, '19');
-      expect(AppConfig.fullVersion, 'v2.3.1 (Build 19)');
-      expect(AppConfig.releaseTag, 'v2.3.1');
+      expect(AppConfig.appVersion, 'v2.3.2');
+      expect(AppConfig.buildNumber, '20');
+      expect(AppConfig.fullVersion, 'v2.3.2 (Build 20)');
+      expect(AppConfig.releaseTag, 'v2.3.2');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -1992,6 +1992,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: GlassCard(
+              enableBlur: true,
               child: const Text('Glass Test Content'),
             ),
           ),

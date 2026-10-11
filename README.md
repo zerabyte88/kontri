@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.2&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -149,6 +149,15 @@ The compiled release APK will be generated at:
 ---
 
 # Version History
+
+* ### v2.3.2 (Build 20)
+  - **High-Refresh-Rate Ambient Background Pacing & GPU Optimization:**
+    - *Quantized Frame Pacing (`~30 FPS`):* Quantized `shouldRepaint` ticks in `AnimatedAppBackground` to ~30 FPS intervals over the 8-second animation loop. On 90Hz/120Hz displays, skips up to 75% of background canvas repaints, allowing Skia/Impeller to reuse cached Picture layers with zero trigonometrics and zero CPU overhead.
+    - *Static Shader Caching:* Cached all dynamic gradient shaders (`_cachedCurtain1-3Shader`, `_cachedRibbon1-3Shader`, `_cachedMoonShader`) by display `Size`. Eliminates up to 360 native shader allocations per second, eliminating GC pauses and preventing thermal throttling.
+    - *Trigonometric Path Optimization:* Precomputed top wave coordinates (`yTops`) in aurora curtains, eliminating redundant `math.sin` and `math.cos` calculations for the bottom wave pass.
+    - *Foreground RepaintBoundary Layer Isolation:* Wrapped foreground UI tree with `RepaintBoundary` inside `AnimatedAppBackground`, isolating interactive widget tree compositing from the ambient canvas background layer.
+    - *Scroll Idle Reset Fix:* Ensured scroll tracking count resets to zero on idle notifications, guaranteeing instant controller pause during active fling/drag gestures for 120 FPS buttery smooth scrolling.
+    - *Settings Sheet BackdropFilter Elimination:* Replaced heavyweight `BackdropFilter` on `SettingsSheet` with optimized `ClipRRect`, and updated switch thumb theming (`activeThumbColor`) to resolve deprecation warnings.
 
 * ### v2.3.1 (Build 19)
   - **Comprehensive GPU & Rendering Performance Patch:**

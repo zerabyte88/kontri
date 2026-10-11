@@ -56,6 +56,7 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
       }
     } else if (notification is UserScrollNotification &&
         notification.direction == ScrollDirection.idle) {
+      _activeScrollCount = 0;
       if (!HeaderAnimationState.isPausedNotifier.value && !_controller.isAnimating) {
         _controller.repeat();
       }
@@ -113,9 +114,11 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
                 ),
               ),
             ),
-            NotificationListener<ScrollNotification>(
-              onNotification: _onScrollNotification,
-              child: widget.child,
+            RepaintBoundary(
+              child: NotificationListener<ScrollNotification>(
+                onNotification: _onScrollNotification,
+                child: widget.child,
+              ),
             ),
           ],
         );
@@ -145,6 +148,16 @@ class _FullAppBgPainter extends CustomPainter {
   static Shader? _cachedMidnightBgShader;
   static Size? _cachedLightSize;
   static Shader? _cachedLightBgShader;
+  static Size? _cachedMoonSize;
+  static Shader? _cachedMoonShader;
+  static Size? _cachedCurtainSize;
+  static Shader? _cachedCurtain1Shader;
+  static Shader? _cachedCurtain2Shader;
+  static Shader? _cachedCurtain3Shader;
+  static Size? _cachedHorizonSize;
+  static Shader? _cachedRibbon1Shader;
+  static Shader? _cachedRibbon2Shader;
+  static Shader? _cachedRibbon3Shader;
 
   // 14 Sakura petals (AMOLED Sakura)
   static const List<_PC> _petals = [
@@ -306,16 +319,20 @@ class _FullAppBgPainter extends CustomPainter {
 
     // Moon Disc: Soft rose-pearl silver gradient so it does not clash with white text
     final moonBounds = Rect.fromCircle(center: moonCenter, radius: moonR);
-    _fill.shader = RadialGradient(
-      center: const Alignment(-0.25, -0.25),
-      radius: 0.9,
-      colors: [
-        const Color(0xFFFFF0F5).withValues(alpha: 0.92),
-        const Color(0xFFFFDEEB).withValues(alpha: 0.88),
-        const Color(0xFFF3C7DA).withValues(alpha: 0.82),
-      ],
-      stops: const [0.0, 0.65, 1.0],
-    ).createShader(moonBounds);
+    if (_cachedMoonSize != size || _cachedMoonShader == null) {
+      _cachedMoonSize = size;
+      _cachedMoonShader = RadialGradient(
+        center: const Alignment(-0.25, -0.25),
+        radius: 0.9,
+        colors: [
+          const Color(0xFFFFF0F5).withValues(alpha: 0.92),
+          const Color(0xFFFFDEEB).withValues(alpha: 0.88),
+          const Color(0xFFF3C7DA).withValues(alpha: 0.82),
+        ],
+        stops: const [0.0, 0.65, 1.0],
+      ).createShader(moonBounds);
+    }
+    _fill.shader = _cachedMoonShader;
     canvas.drawCircle(moonCenter, moonR, _fill);
     _fill.shader = null;
 
@@ -717,13 +734,13 @@ class _FullAppBgPainter extends CustomPainter {
 
     // 3 Undulating Aurora Curtains (Integer speeds for 100% loop continuity)
     // Curtain 1: Electric Cyan (Upper Horizon)
-    _drawAuroraCurtain(canvas, size, 0.07, 0.20, const Color(0xFF00E5FF), 1, 0.0);
+    _drawAuroraCurtain(canvas, size, 0.07, 0.20, const Color(0xFF00E5FF), 1, 0.0, 1);
 
     // Curtain 2: Emerald Green (Mid Horizon)
-    _drawAuroraCurtain(canvas, size, 0.13, 0.22, const Color(0xFF10B981), 1, 0.33);
+    _drawAuroraCurtain(canvas, size, 0.13, 0.22, const Color(0xFF10B981), 1, 0.33, 2);
 
     // Curtain 3: Nebula Violet (Lower Horizon Depth)
-    _drawAuroraCurtain(canvas, size, 0.19, 0.24, const Color(0xFF8B5CF6), 1, 0.66);
+    _drawAuroraCurtain(canvas, size, 0.19, 0.24, const Color(0xFF8B5CF6), 1, 0.66, 3);
   }
 
   void _drawAuroraCurtain(
@@ -734,6 +751,7 @@ class _FullAppBgPainter extends CustomPainter {
     Color peakColor,
     int speedMult,
     double phaseOffset,
+    int curtainIndex,
   ) {
     final w = size.width;
     final h = size.height;
@@ -746,6 +764,7 @@ class _FullAppBgPainter extends CustomPainter {
     final dx = w / segments;
 
     final curtainPath = Path();
+    final yTops = List<double>.filled(segments + 1, 0.0);
     for (int i = 0; i <= segments; i++) {
       final x = i * dx;
       final normX = i / segments;
@@ -753,6 +772,7 @@ class _FullAppBgPainter extends CustomPainter {
       final wave1 = math.sin(normX * 3.0 * math.pi + t) * (h * 0.035);
       final wave2 = math.cos(normX * 2.0 * math.pi - t) * (h * 0.020);
       final yTop = baseY + wave1 + wave2;
+      yTops[i] = yTop;
       if (i == 0) {
         curtainPath.moveTo(x, yTop);
       } else {
@@ -762,16 +782,31 @@ class _FullAppBgPainter extends CustomPainter {
     for (int i = segments; i >= 0; i--) {
       final x = i * dx;
       final normX = i / segments;
-      final wave1 = math.sin(normX * 3.0 * math.pi + t) * (h * 0.035);
-      final wave2 = math.cos(normX * 2.0 * math.pi - t) * (h * 0.020);
-      final yTop = baseY + wave1 + wave2;
-      final yBot = yTop + ribbonH + (math.sin(normX * 2.0 * math.pi + t) * (h * 0.015));
+      final yBot = yTops[i] + ribbonH + (math.sin(normX * 2.0 * math.pi + t) * (h * 0.015));
       curtainPath.lineTo(x, yBot);
     }
     curtainPath.close();
 
-    final bounds = Rect.fromLTWH(0, baseY - h * 0.06, w, ribbonH + h * 0.12);
-    _fill.shader = LinearGradient(
+    if (_cachedCurtainSize != size) {
+      _cachedCurtainSize = size;
+      _cachedCurtain1Shader = _createCurtainShader(size, 0.07, 0.20, const Color(0xFF00E5FF));
+      _cachedCurtain2Shader = _createCurtainShader(size, 0.13, 0.22, const Color(0xFF10B981));
+      _cachedCurtain3Shader = _createCurtainShader(size, 0.19, 0.24, const Color(0xFF8B5CF6));
+    }
+
+    _fill.shader = curtainIndex == 1
+        ? _cachedCurtain1Shader
+        : (curtainIndex == 2 ? _cachedCurtain2Shader : _cachedCurtain3Shader);
+
+    canvas.drawPath(curtainPath, _fill);
+    _fill.shader = null;
+  }
+
+  static Shader _createCurtainShader(Size size, double baseYRatio, double heightRatio, Color peakColor) {
+    final baseY = size.height * baseYRatio;
+    final ribbonH = size.height * heightRatio;
+    final bounds = Rect.fromLTWH(0, baseY - size.height * 0.06, size.width, ribbonH + size.height * 0.12);
+    return LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
@@ -782,9 +817,6 @@ class _FullAppBgPainter extends CustomPainter {
       ],
       stops: const [0.0, 0.35, 0.65, 1.0],
     ).createShader(bounds);
-
-    canvas.drawPath(curtainPath, _fill);
-    _fill.shader = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -819,11 +851,11 @@ class _FullAppBgPainter extends CustomPainter {
 
     // 3. Elegant Flowing Horizon Ribbons (Minimalist Topographic Wave Flow)
     // Ribbon 1: Sky Azure (Base wave)
-    _drawHorizonRibbon(canvas, size, 0.76, 0.14, const Color(0xFF0284C7), 0.0);
+    _drawHorizonRibbon(canvas, size, 0.76, 0.14, const Color(0xFF0284C7), 0.0, 1);
     // Ribbon 2: Mint Emerald (Mid harmonic wave)
-    _drawHorizonRibbon(canvas, size, 0.82, 0.12, const Color(0xFF059669), 0.33);
+    _drawHorizonRibbon(canvas, size, 0.82, 0.12, const Color(0xFF059669), 0.33, 2);
     // Ribbon 3: Warm Solar Iris (Deep depth wave)
-    _drawHorizonRibbon(canvas, size, 0.88, 0.10, const Color(0xFFD97706), 0.66);
+    _drawHorizonRibbon(canvas, size, 0.88, 0.10, const Color(0xFFD97706), 0.66, 3);
 
     // 4. Subtle Komorebi Sunlight Caustic Beams
     _drawKomorebiSunbeams(canvas, size);
@@ -867,11 +899,11 @@ class _FullAppBgPainter extends CustomPainter {
     double ribbonHRatio,
     Color ribbonColor,
     double phaseOffset,
+    int ribbonIndex,
   ) {
     final w = size.width;
     final h = size.height;
     final baseY = h * baseYRatio;
-    final ribbonH = h * ribbonHRatio;
     // Exactly 2*pi periodic over progress in [0, 1]
     final t = (progress + phaseOffset) * 2 * math.pi;
 
@@ -889,8 +921,26 @@ class _FullAppBgPainter extends CustomPainter {
     ribbonPath.lineTo(w, h);
     ribbonPath.close();
 
-    final bounds = Rect.fromLTWH(0, baseY - h * 0.04, w, ribbonH + h * 0.08);
-    _fill.shader = LinearGradient(
+    if (_cachedHorizonSize != size) {
+      _cachedHorizonSize = size;
+      _cachedRibbon1Shader = _createRibbonShader(size, 0.76, 0.14, const Color(0xFF0284C7));
+      _cachedRibbon2Shader = _createRibbonShader(size, 0.82, 0.12, const Color(0xFF059669));
+      _cachedRibbon3Shader = _createRibbonShader(size, 0.88, 0.10, const Color(0xFFD97706));
+    }
+
+    _fill.shader = ribbonIndex == 1
+        ? _cachedRibbon1Shader
+        : (ribbonIndex == 2 ? _cachedRibbon2Shader : _cachedRibbon3Shader);
+
+    canvas.drawPath(ribbonPath, _fill);
+    _fill.shader = null;
+  }
+
+  static Shader _createRibbonShader(Size size, double baseYRatio, double ribbonHRatio, Color ribbonColor) {
+    final baseY = size.height * baseYRatio;
+    final ribbonH = size.height * ribbonHRatio;
+    final bounds = Rect.fromLTWH(0, baseY - size.height * 0.04, size.width, ribbonH + size.height * 0.08);
+    return LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
@@ -900,9 +950,6 @@ class _FullAppBgPainter extends CustomPainter {
       ],
       stops: const [0.0, 0.60, 1.0],
     ).createShader(bounds);
-
-    canvas.drawPath(ribbonPath, _fill);
-    _fill.shader = null;
   }
 
   void _drawKomorebiSunbeams(Canvas canvas, Size size) {
@@ -954,8 +1001,14 @@ class _FullAppBgPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _FullAppBgPainter old) =>
-      old.progress != progress || old.themeMode != themeMode;
+  bool shouldRepaint(covariant _FullAppBgPainter old) {
+    if (old.themeMode != themeMode) return true;
+    // Quantize progress to ~30 FPS steps (240 steps over 8-second cycle).
+    // On 120Hz displays, skips 75% of frames; on 90Hz, skips 66%; on 60Hz, skips 50%.
+    final oldStep = (old.progress * 240).floor();
+    final newStep = (progress * 240).floor();
+    return oldStep != newStep;
+  }
 }
 
 // -----------------------------------------------------------------------------

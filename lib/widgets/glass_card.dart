@@ -27,7 +27,7 @@ class GlassCard extends StatelessWidget {
     this.border,
     this.color,
     this.blurAmount = 10.0,
-    this.enableBlur = true,
+    this.enableBlur = false,
   });
 
   @override

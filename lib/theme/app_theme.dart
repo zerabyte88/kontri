@@ -4,10 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppConfig {
   static const String appName = 'GitPulse';
-  static const String appVersion = 'v2.3.1';
-  static const String buildNumber = '19';
-  static const String fullVersion = 'v2.3.1 (Build 19)';
-  static const String releaseTag = 'v2.3.1';
+  static const String appVersion = 'v2.3.2';
+  static const String buildNumber = '20';
+  static const String fullVersion = 'v2.3.2 (Build 20)';
+  static const String releaseTag = 'v2.3.2';
   static const String githubRepoUrl = 'https://github.com/zerabyte88/gitpulse-mobile';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';

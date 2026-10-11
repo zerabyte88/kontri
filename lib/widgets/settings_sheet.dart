@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1768,17 +1767,10 @@ class _SettingsSheetState extends State<SettingsSheet> {
       ),
     );
 
-          if (isGlass) {
-            sheetContent = ClipRRect(
-              borderRadius: sheetRadius,
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: sheetContent,
-              ),
-            );
-          }
-
-          return sheetContent;
+          return ClipRRect(
+            borderRadius: sheetRadius,
+            child: sheetContent,
+          );
         },
       ),
     );
