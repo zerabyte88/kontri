@@ -26,6 +26,7 @@ class LanguageChart extends StatelessWidget {
 
     if (languageCounts.isEmpty) {
       return GlassCard(
+        enableBlur: false,
         padding: const EdgeInsets.all(20),
         child: Center(
           child: Text(
@@ -104,6 +105,7 @@ class LanguageChart extends StatelessWidget {
 
     return RepaintBoundary(
       child: GlassCard(
+        enableBlur: false,
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

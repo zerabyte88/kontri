@@ -22,9 +22,11 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassCard(
-      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
-      child: Column(
+    return RepaintBoundary(
+      child: GlassCard(
+        enableBlur: false,
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.min,
@@ -96,6 +98,7 @@ class StatCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

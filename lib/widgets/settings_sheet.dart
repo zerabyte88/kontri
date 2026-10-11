@@ -796,6 +796,66 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         );
                       },
                     ),
+                    const SizedBox(height: 12),
+                    Divider(color: AppTheme.border.withValues(alpha: 0.4), height: 1),
+                    const SizedBox(height: 12),
+
+                    // Background Animation Toggle
+                    ValueListenableBuilder<bool>(
+                      valueListenable: AppThemeService.bgAnimationEnabledNotifier,
+                      builder: (context, bgAnimEnabled, _) {
+                        return Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryCyan.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                Icons.auto_awesome_motion_rounded,
+                                size: 14,
+                                color: AppTheme.primaryCyan,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    loc.bgAnimationTitle,
+                                    style: TextStyle(
+                                      color: AppTheme.textPrimary,
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    loc.bgAnimationSubtitle,
+                                    style: TextStyle(
+                                      color: AppTheme.textMuted,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Switch.adaptive(
+                              value: bgAnimEnabled,
+                              activeColor: AppTheme.primaryCyan,
+                              onChanged: (val) {
+                                AppThemeService.setBackgroundAnimation(
+                                  val,
+                                  widget.storageService,
+                                );
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

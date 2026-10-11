@@ -255,6 +255,17 @@ class StorageService {
     await _prefs.setDouble(_keySurfaceOpacity, opacity.clamp(0.50, 1.00));
   }
 
+  // Background Animation Performance Setting
+  static const String _keyBgAnimationEnabled = 'gitpulse_bg_animation_enabled';
+
+  bool isBackgroundAnimationEnabled() {
+    return _prefs.getBool(_keyBgAnimationEnabled) ?? true;
+  }
+
+  Future<void> setBackgroundAnimationEnabled(bool enabled) async {
+    await _prefs.setBool(_keyBgAnimationEnabled, enabled);
+  }
+
   // Cached Tech News & Trending Repos
   static const String _keyCachedNewsPrefix = 'gitpulse_cached_news_';
   static const String _keyCachedNewsTimePrefix = 'gitpulse_cached_news_time_';

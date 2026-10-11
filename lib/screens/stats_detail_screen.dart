@@ -398,6 +398,7 @@ GitHub: https://github.com/${u.login}
                 children: [
             // User Header Card
             GlassCard(
+              enableBlur: false,
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [

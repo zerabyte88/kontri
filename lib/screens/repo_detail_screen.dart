@@ -414,6 +414,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     final langColor = _getLanguageColor(widget.repo.language);
 
     return GlassCard(
+      enableBlur: false,
       padding: const EdgeInsets.all(16),
       borderRadius: BorderRadius.circular(14),
       child: Column(
@@ -840,6 +841,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
 
     if (_readmeError != null) {
       return GlassCard(
+        enableBlur: false,
         padding: const EdgeInsets.all(24),
         borderRadius: BorderRadius.circular(14),
         child: Column(
@@ -878,6 +880,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
 
     if (_readmeContent == null || _readmeContent!.trim().isEmpty) {
       return GlassCard(
+        enableBlur: false,
         padding: const EdgeInsets.all(28),
         borderRadius: BorderRadius.circular(14),
         child: Column(
@@ -920,6 +923,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
         : null;
 
     return GlassCard(
+      enableBlur: false,
       padding: const EdgeInsets.all(16),
       borderRadius: BorderRadius.circular(14),
       child: MarkdownBody(

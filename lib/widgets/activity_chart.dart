@@ -73,6 +73,7 @@ class ActivityChart extends StatelessWidget {
 
     return RepaintBoundary(
       child: GlassCard(
+        enableBlur: false,
         padding: const EdgeInsets.all(16),
         child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

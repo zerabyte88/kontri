@@ -739,12 +739,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v2.3.0', () {
+    test('AppConfig provides accurate release and version telemetry for v2.3.1', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v2.3.0');
-      expect(AppConfig.buildNumber, '18');
-      expect(AppConfig.fullVersion, 'v2.3.0 (Build 18)');
-      expect(AppConfig.releaseTag, 'v2.3.0');
+      expect(AppConfig.appVersion, 'v2.3.1');
+      expect(AppConfig.buildNumber, '19');
+      expect(AppConfig.fullVersion, 'v2.3.1 (Build 19)');
+      expect(AppConfig.releaseTag, 'v2.3.1');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -2098,6 +2098,84 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.byType(AnimatedAppBackground), findsOneWidget);
+    });
+
+    test('StorageService persists and retrieves background animation enabled state', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+
+      // Default is true
+      expect(storage.isBackgroundAnimationEnabled(), isTrue);
+
+      // Save false
+      await storage.setBackgroundAnimationEnabled(false);
+      expect(storage.isBackgroundAnimationEnabled(), isFalse);
+
+      // Save true again
+      await storage.setBackgroundAnimationEnabled(true);
+      expect(storage.isBackgroundAnimationEnabled(), isTrue);
+    });
+
+    test('AppThemeService toggles background animation and pauses HeaderAnimationState', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+
+      AppThemeService.init(storage);
+      expect(AppThemeService.bgAnimationEnabledNotifier.value, isTrue);
+      expect(HeaderAnimationState.isPausedNotifier.value, isFalse);
+
+      // Disable background animation
+      AppThemeService.setBackgroundAnimation(false, storage);
+      expect(AppThemeService.bgAnimationEnabledNotifier.value, isFalse);
+      expect(HeaderAnimationState.isPausedNotifier.value, isTrue);
+      expect(storage.isBackgroundAnimationEnabled(), isFalse);
+
+      // Re-enable
+      AppThemeService.setBackgroundAnimation(true, storage);
+      expect(AppThemeService.bgAnimationEnabledNotifier.value, isTrue);
+      expect(HeaderAnimationState.isPausedNotifier.value, isFalse);
+      expect(storage.isBackgroundAnimationEnabled(), isTrue);
+    });
+
+    testWidgets('SettingsSheet renders background animation switch and responds to toggle', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      AppThemeService.init(storage);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLanguage.supportedLocales,
+          home: Scaffold(
+            body: SettingsSheet(
+              storageService: storage,
+              apiService: GitHubApiService(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Find switch
+      final switchFinder = find.byType(Switch);
+      expect(switchFinder, findsOneWidget);
+
+      // Toggle switch off
+      await tester.tap(switchFinder);
+      await tester.pumpAndSettle();
+
+      expect(AppThemeService.bgAnimationEnabledNotifier.value, isFalse);
+      expect(HeaderAnimationState.isPausedNotifier.value, isTrue);
+      expect(storage.isBackgroundAnimationEnabled(), isFalse);
     });
   });
 

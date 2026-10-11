@@ -69,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _newsService = TechNewsService(storageService: widget.storageService);
     _refreshLocalData();
     _searchFocusNode.addListener(_onSearchFocusChanged);
-    _searchController.addListener(_onSearchTextChanged);
     _loadCategoryNews(_selectedCategory);
     widget.apiService.fetchRateLimit().then((_) {
       if (mounted) setState(() {});
@@ -82,18 +81,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _onSearchTextChanged() {
-    if (_isSearchFocused) {
-      setState(() {});
-    }
-  }
-
   @override
   void dispose() {
     _newsPageController.dispose();
     _searchFocusNode.removeListener(_onSearchFocusChanged);
     _searchFocusNode.dispose();
-    _searchController.removeListener(_onSearchTextChanged);
     _searchController.dispose();
     _categoryScrollController.dispose();
     super.dispose();
@@ -353,12 +345,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final bookmarkedUsers = _bookmarkedUsers;
     final allRecents = _allRecents;
 
-    // Filter recents based on input query when user is typing
-    final query = _searchController.text.trim().toLowerCase();
-    final recents = query.isEmpty
-        ? allRecents
-        : allRecents.where((u) => u.toLowerCase().contains(query)).toList();
-
     final rateLimit = widget.apiService.lastRateLimit;
 
     return GestureDetector(
@@ -437,13 +423,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Search Input with integrated dropdown
-                      _buildSearchBar(loc),
+                      ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _searchController,
+                        builder: (context, searchValue, _) {
+                          final query = searchValue.text.trim().toLowerCase();
+                          final recents = query.isEmpty
+                              ? allRecents
+                              : allRecents.where((u) => u.toLowerCase().contains(query)).toList();
 
-                      // Search History Dropdown (only visible when search field is focused/clicked)
-                      if (_isSearchFocused) ...[
-                        const SizedBox(height: 8),
-                        _buildSearchHistoryPanel(loc, recents, allRecents),
-                      ],
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSearchBar(loc),
+                              if (_isSearchFocused) ...[
+                                const SizedBox(height: 8),
+                                _buildSearchHistoryPanel(loc, recents, allRecents),
+                              ],
+                            ],
+                          );
+                        },
+                      ),
 
                       if (_errorMessage != null) ...[
                         const SizedBox(height: 12),

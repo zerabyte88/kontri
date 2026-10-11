@@ -234,6 +234,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
 
   Widget _buildToolbar(AppLocalizations loc) {
     return GlassCard(
+      enableBlur: false,
       margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: Row(

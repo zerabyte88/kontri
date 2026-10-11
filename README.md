@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -149,6 +149,15 @@ The compiled release APK will be generated at:
 ---
 
 # Version History
+
+* ### v2.3.1 (Build 19)
+  - **Comprehensive GPU & Rendering Performance Patch:**
+    - *Eliminated BackdropFilter Bottlenecks on Content Cards:* Disabled expensive GPU blur passes (`enableBlur: false`) across `StatCard`, `LanguageChart`, `ActivityChart`, repository Markdown containers, image preview, and detail toolbars while maintaining sleek, translucent glassmorphism aesthetics.
+    - *RepaintBoundary Layer Isolation:* Wrapped stat cards and blur-enabled glass surfaces with `RepaintBoundary` to prevent unnecessary canvas repainting during page scroll.
+    - *User-Facing Background Animation Toggle:* Added persistent settings toggle in `SettingsSheet` to enable or disable ambient background animations, reducing battery consumption and frame latency on lower-end devices. Fully localized in Indonesian, English, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
+    - *Canvas Shader Caching & Trigonometric Loop Reduction:* Cached static linear gradients (`_cachedMidnightBgShader`, `_cachedLightBgShader`) and reduced aurora curtain segment density from 28 to 16 and horizon ribbons from 24 to 14, decreasing trigonometric calculations by ~45% per frame.
+    - *Real-Time Scroll Pause Logic:* Enhanced scroll notification listeners to pause background animations immediately on touch scroll updates.
+    - *Search Keystroke Rebuild Scoping:* Isolated search field typing via `ValueListenableBuilder<TextEditingValue>`, completely eliminating full-screen re-renders of the home feed, app bar, and news carousel during keyboard typing.
 
 * ### v2.3.0 (Build 18)
   - **Zero-Quota Caching & HTTP Conditional Requests Engine:**

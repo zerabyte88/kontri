@@ -512,6 +512,24 @@ class AppLocalizations {
     AppLanguage.korean: '카드 글래스모피즘 및 배경 투명도를 조절하세요',
   });
 
+  String get bgAnimationTitle => _str({
+    AppLanguage.indonesian: 'Animasi Latar Belakang',
+    AppLanguage.english: 'Background Animation',
+    AppLanguage.japanese: '背景アニメーション',
+    AppLanguage.chineseSimplified: '背景动画效果',
+    AppLanguage.chineseTraditional: '背景動畫效果',
+    AppLanguage.korean: '배경 애니메이션',
+  });
+
+  String get bgAnimationSubtitle => _str({
+    AppLanguage.indonesian: 'Aktifkan kanvas dinamis atau matikan untuk performa maksimal & hemat baterai',
+    AppLanguage.english: 'Enable dynamic ambient canvas or turn off for maximum performance & battery saving',
+    AppLanguage.japanese: '動的背景を有効化、またはオフにして最高パフォーマンスと省電力を実現',
+    AppLanguage.chineseSimplified: '开启流动动态背景，或关闭以获得极致流畅与省电表现',
+    AppLanguage.chineseTraditional: '開啟流動動態背景，或關閉以獲得極致流暢與省電表現',
+    AppLanguage.korean: '동적 배경 캔버스를 켜거나 꺼서 최대 성능과 배터리 절약을 확보하세요',
+  });
+
   String get themeDark => _str({
     AppLanguage.indonesian: 'Gelap',
     AppLanguage.english: 'Dark',

@@ -61,11 +61,13 @@ class GlassCard extends StatelessWidget {
         );
 
         if (isGlass && enableBlur) {
-          box = ClipRRect(
-            borderRadius: effectiveRadius,
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
-              child: box,
+          box = RepaintBoundary(
+            child: ClipRRect(
+              borderRadius: effectiveRadius,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
+                child: box,
+              ),
             ),
           );
         }

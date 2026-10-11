@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import '../services/app_theme_service.dart';
 import '../theme/app_theme.dart';
 import 'animated_app_header.dart';
@@ -24,7 +25,10 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
-    )..repeat();
+    );
+    if (!HeaderAnimationState.isPausedNotifier.value) {
+      _controller.repeat();
+    }
 
     HeaderAnimationState.isPausedNotifier.addListener(_onPauseStateChanged);
   }
@@ -37,11 +41,22 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
       if (_controller.isAnimating) {
         _controller.stop();
       }
+    } else if (notification is ScrollUpdateNotification) {
+      if (notification.scrollDelta != null && notification.scrollDelta! != 0) {
+        if (_controller.isAnimating) {
+          _controller.stop();
+        }
+      }
     } else if (notification is ScrollEndNotification) {
       if (_activeScrollCount > 0) _activeScrollCount--;
       if (_activeScrollCount == 0 &&
           !HeaderAnimationState.isPausedNotifier.value &&
           !_controller.isAnimating) {
+        _controller.repeat();
+      }
+    } else if (notification is UserScrollNotification &&
+        notification.direction == ScrollDirection.idle) {
+      if (!HeaderAnimationState.isPausedNotifier.value && !_controller.isAnimating) {
         _controller.repeat();
       }
     }
@@ -124,6 +139,12 @@ class _FullAppBgPainter extends CustomPainter {
     ..strokeWidth = 1.0
     ..strokeCap = StrokeCap.round;
   static final Paint _glow = Paint();
+
+  // Cached static background shaders
+  static Size? _cachedMidnightSize;
+  static Shader? _cachedMidnightBgShader;
+  static Size? _cachedLightSize;
+  static Shader? _cachedLightBgShader;
 
   // 14 Sakura petals (AMOLED Sakura)
   static const List<_PC> _petals = [
@@ -645,11 +666,15 @@ class _FullAppBgPainter extends CustomPainter {
 
     // Deep Midnight Slate Canvas
     final bgRect = Offset.zero & size;
-    _fill.shader = const LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [Color(0xFF0B0E14), Color(0xFF111622)],
-    ).createShader(bgRect);
+    if (_cachedMidnightSize != size || _cachedMidnightBgShader == null) {
+      _cachedMidnightSize = size;
+      _cachedMidnightBgShader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFF0B0E14), Color(0xFF111622)],
+      ).createShader(bgRect);
+    }
+    _fill.shader = _cachedMidnightBgShader;
     canvas.drawRect(bgRect, _fill);
     _fill.shader = null;
 
@@ -717,7 +742,7 @@ class _FullAppBgPainter extends CustomPainter {
     // Exactly 2*pi periodic over progress in [0, 1]
     final t = (progress * speedMult + phaseOffset) * 2 * math.pi;
 
-    const segments = 28;
+    const segments = 16;
     final dx = w / segments;
 
     final curtainPath = Path();
@@ -771,12 +796,16 @@ class _FullAppBgPainter extends CustomPainter {
 
     // 1. Pristine Dawn Ceramic Sky Canvas
     final bgRect = Offset.zero & size;
-    _fill.shader = const LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [Color(0xFFFBFDFF), Color(0xFFF3F7FA), Color(0xFFE5EDF4)],
-      stops: [0.0, 0.45, 1.0],
-    ).createShader(bgRect);
+    if (_cachedLightSize != size || _cachedLightBgShader == null) {
+      _cachedLightSize = size;
+      _cachedLightBgShader = const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFFFBFDFF), Color(0xFFF3F7FA), Color(0xFFE5EDF4)],
+        stops: [0.0, 0.45, 1.0],
+      ).createShader(bgRect);
+    }
+    _fill.shader = _cachedLightBgShader;
     canvas.drawRect(bgRect, _fill);
     _fill.shader = null;
 
@@ -846,7 +875,7 @@ class _FullAppBgPainter extends CustomPainter {
     // Exactly 2*pi periodic over progress in [0, 1]
     final t = (progress + phaseOffset) * 2 * math.pi;
 
-    const segments = 24;
+    const segments = 14;
     final dx = w / segments;
 
     final ribbonPath = Path()..moveTo(0, h);

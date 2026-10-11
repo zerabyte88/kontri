@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../widgets/animated_app_header.dart';
 import 'storage_service.dart';
 
 class AppThemeService {
@@ -7,9 +8,12 @@ class AppThemeService {
       ValueNotifier<AppThemeMode>(AppThemeMode.dark);
   static final ValueNotifier<double> surfaceOpacityNotifier =
       ValueNotifier<double>(0.85);
+  static final ValueNotifier<bool> bgAnimationEnabledNotifier =
+      ValueNotifier<bool>(true);
 
   static AppThemeMode get currentTheme => currentThemeNotifier.value;
   static double get surfaceOpacity => surfaceOpacityNotifier.value;
+  static bool get isBgAnimationEnabled => bgAnimationEnabledNotifier.value;
 
   static void init(StorageService storageService) {
     final savedKey = storageService.getThemeMode();
@@ -19,6 +23,10 @@ class AppThemeService {
 
     final savedOpacity = storageService.getSurfaceOpacity();
     surfaceOpacityNotifier.value = savedOpacity;
+
+    final savedBgAnim = storageService.isBackgroundAnimationEnabled();
+    bgAnimationEnabledNotifier.value = savedBgAnim;
+    HeaderAnimationState.isPausedNotifier.value = !savedBgAnim;
   }
 
   static Future<void> changeTheme(
@@ -37,6 +45,15 @@ class AppThemeService {
     final clamped = opacity.clamp(0.50, 1.00);
     surfaceOpacityNotifier.value = clamped;
     await storageService.setSurfaceOpacity(clamped);
+  }
+
+  static Future<void> setBackgroundAnimation(
+    bool enabled,
+    StorageService storageService,
+  ) async {
+    bgAnimationEnabledNotifier.value = enabled;
+    HeaderAnimationState.isPausedNotifier.value = !enabled;
+    await storageService.setBackgroundAnimationEnabled(enabled);
   }
 
   static bool isJapaneseUnlocked(StorageService storageService) {

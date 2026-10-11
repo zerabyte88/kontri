@@ -257,6 +257,7 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               GlassCard(
+                enableBlur: false,
                 padding: const EdgeInsets.all(12),
                 child: _isSvg
                     ? SvgPicture.network(
