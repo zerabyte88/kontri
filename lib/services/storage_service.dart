@@ -286,4 +286,67 @@ class StorageService {
     if (epoch == null) return null;
     return DateTime.fromMillisecondsSinceEpoch(epoch);
   }
+
+  // HTTP & ETag Response Cache
+  static const String _keyHttpCachePrefix = 'gitpulse_http_cache_';
+  static const String _keyHttpEtagPrefix = 'gitpulse_http_etag_';
+  static const String _keyHttpTimePrefix = 'gitpulse_http_time_';
+
+  Future<void> saveHttpCache({
+    required String key,
+    required String body,
+    String? etag,
+    DateTime? timestamp,
+  }) async {
+    final cleanKey = key.trim().toLowerCase();
+    await _prefs.setString('$_keyHttpCachePrefix$cleanKey', body);
+    if (etag != null && etag.trim().isNotEmpty) {
+      await _prefs.setString('$_keyHttpEtagPrefix$cleanKey', etag.trim());
+    }
+    await _prefs.setInt(
+      '$_keyHttpTimePrefix$cleanKey',
+      (timestamp ?? DateTime.now()).millisecondsSinceEpoch,
+    );
+  }
+
+  String? getHttpCacheBody(String key) {
+    final cleanKey = key.trim().toLowerCase();
+    return _prefs.getString('$_keyHttpCachePrefix$cleanKey');
+  }
+
+  String? getHttpCacheEtag(String key) {
+    final cleanKey = key.trim().toLowerCase();
+    return _prefs.getString('$_keyHttpEtagPrefix$cleanKey');
+  }
+
+  DateTime? getHttpCacheTimestamp(String key) {
+    final cleanKey = key.trim().toLowerCase();
+    final epoch = _prefs.getInt('$_keyHttpTimePrefix$cleanKey');
+    if (epoch == null) return null;
+    return DateTime.fromMillisecondsSinceEpoch(epoch);
+  }
+
+  bool isHttpCacheValid(String key, {Duration ttl = const Duration(minutes: 10)}) {
+    final cleanKey = key.trim().toLowerCase();
+    final hasBody = _prefs.containsKey('$_keyHttpCachePrefix$cleanKey');
+    if (!hasBody) return false;
+    final timestamp = getHttpCacheTimestamp(cleanKey);
+    if (timestamp == null) return false;
+    return DateTime.now().difference(timestamp) < ttl;
+  }
+
+  Future<void> updateHttpCacheTimestamp(String key, [DateTime? timestamp]) async {
+    final cleanKey = key.trim().toLowerCase();
+    await _prefs.setInt(
+      '$_keyHttpTimePrefix$cleanKey',
+      (timestamp ?? DateTime.now()).millisecondsSinceEpoch,
+    );
+  }
+
+  Future<void> clearHttpCache(String key) async {
+    final cleanKey = key.trim().toLowerCase();
+    await _prefs.remove('$_keyHttpCachePrefix$cleanKey');
+    await _prefs.remove('$_keyHttpEtagPrefix$cleanKey');
+    await _prefs.remove('$_keyHttpTimePrefix$cleanKey');
+  }
 }

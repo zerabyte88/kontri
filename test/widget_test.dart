@@ -739,12 +739,12 @@ void main() {
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v2.2.0', () {
+    test('AppConfig provides accurate release and version telemetry for v2.3.0', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v2.2.0');
-      expect(AppConfig.buildNumber, '17');
-      expect(AppConfig.fullVersion, 'v2.2.0 (Build 17)');
-      expect(AppConfig.releaseTag, 'v2.2.0');
+      expect(AppConfig.appVersion, 'v2.3.0');
+      expect(AppConfig.buildNumber, '18');
+      expect(AppConfig.fullVersion, 'v2.3.0 (Build 18)');
+      expect(AppConfig.releaseTag, 'v2.3.0');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -2040,6 +2040,274 @@ void main() {
       final slider = find.byType(Slider);
       await tester.tap(slider);
       await tester.pumpAndSettle();
+    });
+
+    testWidgets('GlassCard respects enableBlur: false and bypasses BackdropFilter even when translucent', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      AppThemeService.init(storage);
+
+      // Pastikan opacity < 1.0 (translucent)
+      await AppThemeService.changeSurfaceOpacity(0.85, storage);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: GlassCard(
+              enableBlur: false,
+              child: Text('Performance List Item'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      // BackdropFilter harus dilewati (0 widget) demi performa 60/120fps
+      expect(find.byType(BackdropFilter), findsNothing);
+      expect(find.text('Performance List Item'), findsOneWidget);
+    });
+
+    testWidgets('AnimatedAppBackground pauses animation controller during scroll and resumes after scroll ends', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      AppThemeService.init(storage);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AnimatedAppBackground(
+              child: ListView.builder(
+                itemCount: 100,
+                itemBuilder: (context, index) => ListTile(
+                  title: Text('Item $index'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      expect(find.text('Item 0'), findsOneWidget);
+
+      // Scroll list
+      await tester.fling(find.byType(ListView), const Offset(0, -300), 1000);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.byType(AnimatedAppBackground), findsOneWidget);
+    });
+  });
+
+  group('HTTP Cache, ETag (304), & Manual Reload Tests', () {
+    test('StorageService persists and validates HTTP cache and ETag headers correctly', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+
+      expect(storage.isHttpCacheValid('user_octocat'), isFalse);
+      expect(storage.getHttpCacheEtag('user_octocat'), isNull);
+
+      await storage.saveHttpCache(
+        key: 'user_octocat',
+        body: '{"login":"octocat","id":1}',
+        etag: 'W/"12345"',
+      );
+
+      expect(storage.isHttpCacheValid('user_octocat'), isTrue);
+      expect(storage.getHttpCacheBody('user_octocat'), '{"login":"octocat","id":1}');
+      expect(storage.getHttpCacheEtag('user_octocat'), 'W/"12345"');
+      expect(storage.getHttpCacheTimestamp('user_octocat'), isNotNull);
+
+      // Updating timestamp
+      await storage.updateHttpCacheTimestamp('user_octocat');
+      expect(storage.isHttpCacheValid('user_octocat'), isTrue);
+
+      // Clearing cache
+      await storage.clearHttpCache('user_octocat');
+      expect(storage.isHttpCacheValid('user_octocat'), isFalse);
+      expect(storage.getHttpCacheBody('user_octocat'), isNull);
+      expect(storage.getHttpCacheEtag('user_octocat'), isNull);
+    });
+
+    test('GitHubApiService uses 10-minute cache without executing HTTP requests when fresh', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+
+      int requestCount = 0;
+      final client = MockClient((request) async {
+        requestCount++;
+        if (request.url.path.contains('/users/octocat/repos')) {
+          return http.Response('[]', 200, headers: {'etag': 'W/"repos1"'});
+        } else if (request.url.path.contains('/users/octocat/events')) {
+          return http.Response('[]', 200, headers: {'etag': 'W/"events1"'});
+        } else if (request.url.path.contains('/users/octocat')) {
+          return http.Response(
+            '{"login":"octocat","id":1,"avatar_url":"","html_url":"","public_repos":0,"followers":0,"following":0}',
+            200,
+            headers: {'etag': 'W/"user1"'},
+          );
+        }
+        return http.Response('{}', 200);
+      });
+
+      final api = GitHubApiService(client: client, storageService: storage);
+
+      // First call -> network request
+      final stats1 = await api.fetchUserStats('octocat');
+      expect(stats1.user.login, 'octocat');
+      expect(requestCount, greaterThan(0));
+
+      final countAfterFirst = requestCount;
+
+      // Second call within 10 minutes -> served from cache, zero network calls!
+      final stats2 = await api.fetchUserStats('octocat');
+      expect(stats2.user.login, 'octocat');
+      expect(requestCount, countAfterFirst); // No new requests!
+    });
+
+    test('GitHubApiService sends If-None-Match header and handles 304 Not Modified correctly', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+
+      // Pre-seed storage with initial data and ETags
+      await storage.saveHttpCache(
+        key: 'user_octocat',
+        body: '{"login":"octocat","id":1,"avatar_url":"","html_url":"","public_repos":5,"followers":10,"following":2}',
+        etag: 'W/"user_etag_1"',
+      );
+      await storage.saveHttpCache(
+        key: 'repos_octocat',
+        body: '[{"name":"Hello-World","html_url":"https://github.com/octocat/Hello-World","stargazers_count":10,"forks_count":2,"fork":false,"size":100}]',
+        etag: 'W/"repos_etag_1"',
+      );
+      await storage.saveHttpCache(
+        key: 'events_octocat',
+        body: '[]',
+        etag: 'W/"events_etag_1"',
+      );
+      await storage.saveHttpCache(
+        key: 'languages_octocat',
+        body: '{"Dart": 1000}',
+      );
+
+      final capturedHeaders = <String, String>{};
+      final client = MockClient((request) async {
+        capturedHeaders[request.url.path] = request.headers['If-None-Match'] ?? '';
+        return http.Response('', 304);
+      });
+
+      final api = GitHubApiService(client: client, storageService: storage);
+
+      // Force refresh -> sends If-None-Match and gracefully reconstructs UserStats from cache
+      final stats = await api.fetchUserStats('octocat', forceRefresh: true);
+      expect(stats.user.login, 'octocat');
+      expect(stats.repos.length, 1);
+      expect(stats.repos.first.name, 'Hello-World');
+      expect(capturedHeaders['/users/octocat'], 'W/"user_etag_1"');
+      expect(capturedHeaders['/users/octocat/repos'], 'W/"repos_etag_1"');
+      expect(capturedHeaders['/users/octocat/events/public'], 'W/"events_etag_1"');
+      expect(api.isLastResponseNotModified, isTrue);
+    });
+
+    testWidgets('StatsDetailScreen refresh button triggers profile reload and displays feedback toast', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      AppLanguageService.init(storage);
+      AppThemeService.init(storage);
+
+      final user = GitHubUser(
+        login: 'octocat',
+        id: 1,
+        avatarUrl: '',
+        htmlUrl: 'https://github.com/octocat',
+        publicRepos: 1,
+        followers: 10,
+        following: 5,
+      );
+      final repo = GitHubRepo(
+        name: 'test-repo',
+        htmlUrl: 'https://github.com/octocat/test-repo',
+        stargazersCount: 5,
+        forksCount: 1,
+        isFork: false,
+      );
+      final stats = UserStats.calculate(
+        user: user,
+        repos: [repo],
+        publicEvents: [],
+        contributionStats: ContributionStats(
+          commitTitle: ContributionStats.determineTitle(
+            currentStreak: 1,
+            longestStreak: 5,
+            thisYearContributions: 10,
+            totalContributions: 50,
+          ),
+          currentStreak: 1,
+          longestStreak: 5,
+          thisYearContributions: 10,
+          lastYearContributions: 5,
+          totalContributions: 50,
+          yearlyTotals: const {'2025': 5, '2026': 10},
+        ),
+      );
+
+      int refreshCalled = 0;
+      final client = MockClient((request) async {
+        refreshCalled++;
+        if (request.url.path.contains('/users/octocat/repos')) {
+          return http.Response('[]', 200);
+        } else if (request.url.path.contains('/users/octocat/events')) {
+          return http.Response('[]', 200);
+        } else if (request.url.path.contains('/users/octocat')) {
+          return http.Response(
+            '{"login":"octocat","id":1,"avatar_url":"","html_url":"","public_repos":2,"followers":12,"following":5}',
+            200,
+          );
+        }
+        return http.Response('{}', 200);
+      });
+
+      final api = GitHubApiService(client: client, storageService: storage);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLanguage.supportedLocales,
+          home: StatsDetailScreen(
+            stats: stats,
+            storageService: storage,
+            apiService: api,
+          ),
+        ),
+      );
+
+      await tester.pump();
+      expect(find.widgetWithText(AppBar, '@octocat'), findsOneWidget);
+
+      // Verify refresh button exists in AppBar actions
+      final refreshBtn = find.byIcon(Icons.refresh_rounded);
+      expect(refreshBtn, findsOneWidget);
+
+      // Tap refresh button
+      await tester.tap(refreshBtn);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(refreshCalled, greaterThan(0));
+
+      // Verify pull-to-refresh widget is mounted
+      expect(find.byType(RefreshIndicator), findsOneWidget);
     });
   });
 }

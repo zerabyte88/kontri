@@ -8,6 +8,7 @@ import '../models/github_rate_limit.dart';
 import '../models/github_repo.dart';
 import '../models/github_user.dart';
 import '../models/user_stats.dart';
+import 'storage_service.dart';
 
 class GitHubApiException implements Exception {
   final String message;
@@ -31,13 +32,19 @@ class GitHubApiService {
   static const Duration _timeoutDuration = Duration(seconds: 15);
   final http.Client _client;
   String? personalAccessToken;
+  final StorageService? storageService;
   GitHubRateLimit? _lastRateLimit;
   final Map<String, UserStats> _statsCache = {};
+  bool _isLastResponseNotModified = false;
 
-  GitHubApiService({http.Client? client, this.personalAccessToken})
-      : _client = client ?? http.Client();
+  GitHubApiService({
+    http.Client? client,
+    this.personalAccessToken,
+    this.storageService,
+  }) : _client = client ?? http.Client();
 
   GitHubRateLimit? get lastRateLimit => _lastRateLimit;
+  bool get isLastResponseNotModified => _isLastResponseNotModified;
 
   void clearCache() => _statsCache.clear();
 
@@ -248,16 +255,25 @@ class GitHubApiService {
     return null;
   }
 
-  Future<ContributionStats?> _fetchContributions(String username) async {
+
+  Future<ContributionStats?> _fetchContributionsWithCache(String username, String cacheKey) async {
     try {
       final uri = Uri.parse('https://github-contributions-api.jogruber.de/v4/$username');
       final res = await _client.get(uri).timeout(const Duration(seconds: 8));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
+        storageService?.saveHttpCache(key: 'contrib_$cacheKey', body: res.body);
         return ContributionStats.fromContributionsApi(data);
       }
     } catch (_) {
-      // Ignored: will fallback to event-based calculation
+      // Ignored: will fallback to cached or event-based calculation
+    }
+
+    final cached = storageService?.getHttpCacheBody('contrib_$cacheKey');
+    if (cached != null) {
+      try {
+        return ContributionStats.fromContributionsApi(jsonDecode(cached) as Map<String, dynamic>);
+      } catch (_) {}
     }
     return null;
   }
@@ -265,18 +281,76 @@ class GitHubApiService {
   Future<GitHubUser?> fetchUserProfile(String username) async {
     final cleanUsername = username.trim();
     if (cleanUsername.isEmpty) return null;
+    final cacheKey = cleanUsername.toLowerCase();
     try {
       final userUri = Uri.parse('$_baseUrl/users/$cleanUsername');
-      final res = await _client.get(userUri, headers: _headers).timeout(_timeoutDuration);
+      final headers = Map<String, String>.from(_headers);
+      final etag = storageService?.getHttpCacheEtag('user_$cacheKey');
+      if (etag != null && etag.isNotEmpty) {
+        headers['If-None-Match'] = etag;
+      }
+
+      final res = await _client.get(userUri, headers: headers).timeout(_timeoutDuration);
       _updateRateLimitFromHeaders(res.headers);
-      if (res.statusCode == 200) {
+
+      if (res.statusCode == 304) {
+        final cached = storageService?.getHttpCacheBody('user_$cacheKey');
+        if (cached != null && cached.isNotEmpty) {
+          return GitHubUser.fromJson(jsonDecode(cached) as Map<String, dynamic>);
+        }
+      } else if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
+        storageService?.saveHttpCache(
+          key: 'user_$cacheKey',
+          body: res.body,
+          etag: res.headers['etag'],
+        );
         return GitHubUser.fromJson(data);
       }
     } catch (_) {
-      return null;
+      final cached = storageService?.getHttpCacheBody('user_$cacheKey');
+      if (cached != null && cached.isNotEmpty) {
+        return GitHubUser.fromJson(jsonDecode(cached) as Map<String, dynamic>);
+      }
     }
     return null;
+  }
+
+  UserStats? _tryLoadOfflineStats(String cacheKey) {
+    if (storageService == null) return null;
+    final userBody = storageService!.getHttpCacheBody('user_$cacheKey');
+    final reposBody = storageService!.getHttpCacheBody('repos_$cacheKey');
+    final eventsBody = storageService!.getHttpCacheBody('events_$cacheKey');
+    if (userBody == null || reposBody == null || eventsBody == null) return null;
+
+    try {
+      final user = GitHubUser.fromJson(jsonDecode(userBody) as Map<String, dynamic>);
+      final List<GitHubRepo> repos = (jsonDecode(reposBody) as List)
+          .map((e) => GitHubRepo.fromJson(e as Map<String, dynamic>))
+          .toList();
+      final List<Map<String, dynamic>> events = (jsonDecode(eventsBody) as List)
+          .map((e) => e as Map<String, dynamic>)
+          .toList();
+      final langBody = storageService!.getHttpCacheBody('languages_$cacheKey');
+      final Map<String, int> languages = langBody != null
+          ? (jsonDecode(langBody) as Map<String, dynamic>)
+              .map((k, v) => MapEntry(k, (v as num).toInt()))
+          : {};
+      final contribBody = storageService!.getHttpCacheBody('contrib_$cacheKey');
+      final contrib = contribBody != null
+          ? ContributionStats.fromContributionsApi(jsonDecode(contribBody) as Map<String, dynamic>)
+          : ContributionStats.fromEvents(events);
+
+      return UserStats.calculate(
+        user: user,
+        repos: repos,
+        publicEvents: events,
+        contributionStats: contrib,
+        aggregatedLanguages: languages,
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<UserStats> fetchUserStats(String username, {bool forceRefresh = false}) async {
@@ -286,25 +360,53 @@ class GitHubApiService {
     }
 
     final cacheKey = cleanUsername.toLowerCase();
+    _isLastResponseNotModified = false;
+
+    // 1. Cek in-memory cache jika masih dalam batas TTL 10 menit
     if (!forceRefresh && _statsCache.containsKey(cacheKey)) {
-      return _statsCache[cacheKey]!;
+      final cachedTime = storageService?.getHttpCacheTimestamp('user_stats_$cacheKey');
+      if (cachedTime == null || DateTime.now().difference(cachedTime) < const Duration(minutes: 10)) {
+        return _statsCache[cacheKey]!;
+      }
+    }
+
+    // 2. Cek disk storage cache jika masih dalam batas TTL 10 menit
+    if (!forceRefresh &&
+        storageService != null &&
+        storageService!.isHttpCacheValid('user_stats_$cacheKey', ttl: const Duration(minutes: 10))) {
+      final cachedStats = _tryLoadOfflineStats(cacheKey);
+      if (cachedStats != null) {
+        _statsCache[cacheKey] = cachedStats;
+        return cachedStats;
+      }
     }
 
     try {
-      // Kick off contributions fetch in background early
-      final contribFuture = _fetchContributions(cleanUsername);
+      // Kick off contributions fetch in background with local caching
+      final contribFuture = _fetchContributionsWithCache(cleanUsername, cacheKey);
 
-      // Fetch User Profile, Repositories, and Public Events concurrently for maximum responsiveness
       final userUri = Uri.parse('$_baseUrl/users/$cleanUsername');
-      final reposUri = Uri.parse(
-          '$_baseUrl/users/$cleanUsername/repos?per_page=100&sort=updated');
-      final eventsUri =
-          Uri.parse('$_baseUrl/users/$cleanUsername/events/public?per_page=100');
+      final reposUri = Uri.parse('$_baseUrl/users/$cleanUsername/repos?per_page=100&sort=updated');
+      final eventsUri = Uri.parse('$_baseUrl/users/$cleanUsername/events/public?per_page=100');
+
+      // Ambil ETag sebelumnya untuk conditional requests (304 Not Modified)
+      final userEtag = storageService?.getHttpCacheEtag('user_$cacheKey');
+      final reposEtag = storageService?.getHttpCacheEtag('repos_$cacheKey');
+      final eventsEtag = storageService?.getHttpCacheEtag('events_$cacheKey');
+
+      final userHeaders = Map<String, String>.from(_headers);
+      if (userEtag != null && userEtag.isNotEmpty) userHeaders['If-None-Match'] = userEtag;
+
+      final reposHeaders = Map<String, String>.from(_headers);
+      if (reposEtag != null && reposEtag.isNotEmpty) reposHeaders['If-None-Match'] = reposEtag;
+
+      final eventsHeaders = Map<String, String>.from(_headers);
+      if (eventsEtag != null && eventsEtag.isNotEmpty) eventsHeaders['If-None-Match'] = eventsEtag;
 
       final responses = await Future.wait([
-        _client.get(userUri, headers: _headers).timeout(_timeoutDuration),
-        _client.get(reposUri, headers: _headers).timeout(_timeoutDuration),
-        _client.get(eventsUri, headers: _headers).timeout(_timeoutDuration),
+        _client.get(userUri, headers: userHeaders).timeout(_timeoutDuration),
+        _client.get(reposUri, headers: reposHeaders).timeout(_timeoutDuration),
+        _client.get(eventsUri, headers: eventsHeaders).timeout(_timeoutDuration),
       ]);
 
       final userRes = responses[0];
@@ -338,51 +440,104 @@ class GitHubApiService {
               : 403,
           isRateLimit: true,
         );
-      } else if (userRes.statusCode != 200) {
+      }
+
+      // Tandai jika seluruh respon adalah 304 Not Modified (0 kuota terpakai)
+      _isLastResponseNotModified = (userRes.statusCode == 304 &&
+          reposRes.statusCode == 304 &&
+          eventsRes.statusCode == 304);
+
+      // 1. Ekstrak Data User (200 OK atau 304 Not Modified)
+      Map<String, dynamic> userData;
+      if (userRes.statusCode == 304) {
+        final cached = storageService?.getHttpCacheBody('user_$cacheKey');
+        if (cached == null) {
+          throw GitHubApiException('Gagal memuat profil: cache lokal tidak ditemukan.');
+        }
+        userData = jsonDecode(cached) as Map<String, dynamic>;
+      } else if (userRes.statusCode == 200) {
+        userData = jsonDecode(userRes.body) as Map<String, dynamic>;
+        storageService?.saveHttpCache(
+          key: 'user_$cacheKey',
+          body: userRes.body,
+          etag: userRes.headers['etag'],
+        );
+      } else {
         throw GitHubApiException(
           'Gagal memuat profil (${userRes.statusCode}): ${userRes.reasonPhrase}',
           statusCode: userRes.statusCode,
         );
       }
-
-      final userData = jsonDecode(userRes.body) as Map<String, dynamic>;
       final user = GitHubUser.fromJson(userData);
 
-      // Process Repositories
+      // 2. Ekstrak Data Repositories (200 OK atau 304 Not Modified)
       final List<GitHubRepo> repos = [];
-      if (reposRes.statusCode == 200) {
+      bool reposUpdated = false;
+      if (reposRes.statusCode == 304) {
+        final cached = storageService?.getHttpCacheBody('repos_$cacheKey');
+        if (cached != null) {
+          final List<dynamic> list = jsonDecode(cached) as List<dynamic>;
+          for (final item in list) {
+            if (item is Map<String, dynamic>) {
+              repos.add(GitHubRepo.fromJson(item));
+            }
+          }
+        }
+      } else if (reposRes.statusCode == 200) {
+        reposUpdated = true;
         final List<dynamic> reposData = jsonDecode(reposRes.body) as List<dynamic>;
         for (final item in reposData) {
           if (item is Map<String, dynamic>) {
             repos.add(GitHubRepo.fromJson(item));
           }
         }
+        storageService?.saveHttpCache(
+          key: 'repos_$cacheKey',
+          body: reposRes.body,
+          etag: reposRes.headers['etag'],
+        );
       }
-
-      // Sort repos by stars descending
       repos.sort((a, b) => b.stargazersCount.compareTo(a.stargazersCount));
 
-      // Process Public Events for activity analysis
+      // 3. Ekstrak Data Public Events (200 OK atau 304 Not Modified)
       final List<Map<String, dynamic>> events = [];
-      if (eventsRes.statusCode == 200) {
+      if (eventsRes.statusCode == 304) {
+        final cached = storageService?.getHttpCacheBody('events_$cacheKey');
+        if (cached != null) {
+          final List<dynamic> list = jsonDecode(cached) as List<dynamic>;
+          for (final item in list) {
+            if (item is Map<String, dynamic>) {
+              events.add(item);
+            }
+          }
+        }
+      } else if (eventsRes.statusCode == 200) {
         final List<dynamic> eventsData = jsonDecode(eventsRes.body) as List<dynamic>;
         for (final item in eventsData) {
           if (item is Map<String, dynamic>) {
             events.add(item);
           }
         }
+        storageService?.saveHttpCache(
+          key: 'events_$cacheKey',
+          body: eventsRes.body,
+          etag: eventsRes.headers['etag'],
+        );
       }
 
-      // 4. Fetch Language breakdown from active repositories
+      // 4. Bahasa Pemrograman (Hemat 8 - 25 request jika repos 304 & cache bahasa tersedia)
       final nonForkRepos = repos.where((r) => !r.isFork).toList();
-      final Map<String, int> aggregatedLanguages = {};
+      Map<String, int> aggregatedLanguages = {};
+      final cachedLang = storageService?.getHttpCacheBody('languages_$cacheKey');
 
-      if (nonForkRepos.isNotEmpty) {
-        // Prioritize repositories by size so the most significant codebases are captured
+      if (!reposUpdated && cachedLang != null) {
+        try {
+          final Map<String, dynamic> langData = jsonDecode(cachedLang) as Map<String, dynamic>;
+          aggregatedLanguages = langData.map((k, v) => MapEntry(k, (v as num).toInt()));
+        } catch (_) {}
+      } else if (nonForkRepos.isNotEmpty) {
         final prioritizedRepos = List<GitHubRepo>.from(nonForkRepos)
           ..sort((a, b) => b.size.compareTo(a.size));
-
-        // Limit queries to avoid exhausting unauthenticated rate limits (max 8 unauthenticated, 25 authenticated)
         final maxRepoQueries = personalAccessToken != null ? 25 : 8;
         final targetRepos = prioritizedRepos.take(maxRepoQueries).toList();
 
@@ -395,9 +550,7 @@ class GitHubApiService {
               final Map<String, dynamic> data = jsonDecode(langRes.body) as Map<String, dynamic>;
               return data.map((k, v) => MapEntry(k, (v as num).toInt()));
             }
-          } catch (_) {
-            // Silently ignore individual repo language fetch issues
-          }
+          } catch (_) {}
           return <String, int>{};
         });
 
@@ -407,9 +560,14 @@ class GitHubApiService {
             aggregatedLanguages[lang] = (aggregatedLanguages[lang] ?? 0) + bytes;
           });
         }
+
+        storageService?.saveHttpCache(
+          key: 'languages_$cacheKey',
+          body: jsonEncode(aggregatedLanguages),
+        );
       }
 
-      // Await contribution stats or fallback to public events
+      // Ambil data kontribusi
       final fetchedContributions = await contribFuture;
       final contributionStats = fetchedContributions ?? ContributionStats.fromEvents(events);
 
@@ -420,19 +578,47 @@ class GitHubApiService {
         contributionStats: contributionStats,
         aggregatedLanguages: aggregatedLanguages,
       );
+
+      // Simpan timestamp cache validitas 10 menit
+      await storageService?.saveHttpCache(
+        key: 'user_stats_$cacheKey',
+        body: 'valid',
+        timestamp: DateTime.now(),
+      );
+
       _statsCache[cacheKey] = calculated;
       return calculated;
     } on SocketException catch (e) {
+      final offlineCached = _tryLoadOfflineStats(cacheKey);
+      if (offlineCached != null) {
+        _statsCache[cacheKey] = offlineCached;
+        return offlineCached;
+      }
       if (e.osError?.errorCode == 13 || e.message.toLowerCase().contains('permission')) {
         throw GitHubApiException('Izin akses internet belum diaktifkan pada sistem aplikasi.');
       }
       throw GitHubApiException('Tidak ada koneksi internet. Periksa jaringan kamu.');
     } on TimeoutException {
+      final offlineCached = _tryLoadOfflineStats(cacheKey);
+      if (offlineCached != null) {
+        _statsCache[cacheKey] = offlineCached;
+        return offlineCached;
+      }
       throw GitHubApiException('Koneksi timeout. Server GitHub tidak merespons tepat waktu.');
     } on http.ClientException {
+      final offlineCached = _tryLoadOfflineStats(cacheKey);
+      if (offlineCached != null) {
+        _statsCache[cacheKey] = offlineCached;
+        return offlineCached;
+      }
       throw GitHubApiException('Gagal berkomunikasi dengan server GitHub.');
     } catch (e) {
       if (e is GitHubApiException) rethrow;
+      final offlineCached = _tryLoadOfflineStats(cacheKey);
+      if (offlineCached != null) {
+        _statsCache[cacheKey] = offlineCached;
+        return offlineCached;
+      }
       throw GitHubApiException('Terjadi kesalahan tak terduga: $e');
     }
   }

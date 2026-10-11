@@ -394,41 +394,44 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
   Widget _buildProfileCard(AppLocalizations loc, BookmarkedUser user) {
     final isLoading = _loadingUsername == user.username;
 
-    return GlassCard(
-      padding: EdgeInsets.zero,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          splashColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
-          highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
-          onTap: () => _openUser(user.username),
-          child: Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.all(_columns == 1 ? 12 : 8),
-                child: _buildAdaptiveCardBody(loc, user),
-              ),
-              if (isLoading)
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppTheme.background.withValues(alpha: 0.72),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppTheme.primaryCyan,
+    return RepaintBoundary(
+      child: GlassCard(
+        enableBlur: false,
+        padding: EdgeInsets.zero,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            splashColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
+            highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
+            onTap: () => _openUser(user.username),
+            child: Stack(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(_columns == 1 ? 12 : 8),
+                  child: _buildAdaptiveCardBody(loc, user),
+                ),
+                if (isLoading)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.background.withValues(alpha: 0.72),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppTheme.primaryCyan,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

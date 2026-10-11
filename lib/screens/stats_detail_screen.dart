@@ -38,20 +38,23 @@ class StatsDetailScreen extends StatefulWidget {
 }
 
 class _StatsDetailScreenState extends State<StatsDetailScreen> {
+  late UserStats _stats;
   late bool _isBookmarked;
   RepoSortFilter _currentFilter = RepoSortFilter.popular;
   bool _showAllRepos = false;
+  bool _isRefreshing = false;
   late List<GitHubRepo> _sortedRepos;
 
   @override
   void initState() {
     super.initState();
-    _isBookmarked = widget.storageService.isBookmarked(widget.stats.user.login);
+    _stats = widget.stats;
+    _isBookmarked = widget.storageService.isBookmarked(_stats.user.login);
     _sortRepos();
   }
 
   void _sortRepos() {
-    final list = List<GitHubRepo>.from(widget.stats.repos);
+    final list = List<GitHubRepo>.from(_stats.repos);
     switch (_currentFilter) {
       case RepoSortFilter.popular:
         list.sort((a, b) {
@@ -128,15 +131,50 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
     );
   }
 
+  Future<void> _refreshProfile() async {
+    if (_isRefreshing) return;
+    final api = widget.apiService ?? GitHubApiService(storageService: widget.storageService);
+    setState(() => _isRefreshing = true);
+    final loc = AppLocalizations.of(context);
+
+    try {
+      final updated = await api.fetchUserStats(_stats.user.login, forceRefresh: true);
+      if (mounted) {
+        setState(() {
+          _stats = updated;
+          _isBookmarked = widget.storageService.isBookmarked(_stats.user.login);
+          _sortRepos();
+          _isRefreshing = false;
+        });
+
+        final is304 = api.isLastResponseNotModified;
+        _showThemedSnackBar(
+          icon: is304 ? Icons.bolt_rounded : Icons.check_circle_rounded,
+          iconColor: is304 ? AppTheme.accentAmber : AppTheme.primaryCyan,
+          message: is304 ? loc.profileUpToDate : loc.profileRefreshed,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isRefreshing = false);
+        _showThemedSnackBar(
+          icon: Icons.error_outline_rounded,
+          iconColor: AppTheme.accentRed,
+          message: e.toString(),
+        );
+      }
+    }
+  }
+
   void _toggleBookmark() async {
     final loc = AppLocalizations.of(context);
-    final username = widget.stats.user.login;
+    final username = _stats.user.login;
     await widget.storageService.toggleBookmark(
       username,
-      avatarUrl: widget.stats.user.avatarUrl,
-      name: widget.stats.user.name,
-      bio: widget.stats.user.bio,
-      location: widget.stats.user.location,
+      avatarUrl: _stats.user.avatarUrl,
+      name: _stats.user.name,
+      bio: _stats.user.bio,
+      location: _stats.user.location,
     );
     if (!mounted) return;
     setState(() {
@@ -154,10 +192,10 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
 
   void _shareSummary() {
     final loc = AppLocalizations.of(context);
-    final u = widget.stats.user;
-    final cStats = widget.stats.contributionStats;
-    final topLang = widget.stats.languageCounts.entries.isNotEmpty
-        ? (widget.stats.languageCounts.entries.toList()
+    final u = _stats.user;
+    final cStats = _stats.contributionStats;
+    final topLang = _stats.languageCounts.entries.isNotEmpty
+        ? (_stats.languageCounts.entries.toList()
               ..sort((a, b) => b.value.compareTo(a.value)))
             .first
             .key
@@ -170,8 +208,8 @@ Title: ${cStats.commitTitle.cleanTitle} (${loc.getCommitTierLevelName(cStats.com
 Streak: ${cStats.currentStreak} ${loc.daysUnit} (Max: ${cStats.longestStreak} ${loc.daysUnit})
 ${loc.thisYearContributions}: ${cStats.thisYearContributions}
 ${loc.allYearsContributions}: ${cStats.totalContributions}
-Persona: ${widget.stats.developerPersona}
-${loc.totalStars}: ${widget.stats.totalStars}
+Persona: ${_stats.developerPersona}
+${loc.totalStars}: ${_stats.totalStars}
 ${loc.repositoriesTitle}: ${u.publicRepos} | ${loc.followers}: ${u.followers}
 ${loc.topLanguagesTitle}: $topLang
 GitHub: https://github.com/${u.login}
@@ -211,17 +249,17 @@ GitHub: https://github.com/${u.login}
   }
 
   void _openUserRepositories() {
-    final login = widget.stats.user.login;
-    final url = widget.stats.user.htmlUrl.isNotEmpty
-        ? '${widget.stats.user.htmlUrl}?tab=repositories'
+    final login = _stats.user.login;
+    final url = _stats.user.htmlUrl.isNotEmpty
+        ? '${_stats.user.htmlUrl}?tab=repositories'
         : 'https://github.com/$login?tab=repositories';
     _openUrl(url);
   }
 
   void _openUserProfile() {
-    final login = widget.stats.user.login;
-    final url = widget.stats.user.htmlUrl.isNotEmpty
-        ? widget.stats.user.htmlUrl
+    final login = _stats.user.login;
+    final url = _stats.user.htmlUrl.isNotEmpty
+        ? _stats.user.htmlUrl
         : 'https://github.com/$login';
     _openUrl(url);
   }
@@ -283,15 +321,11 @@ GitHub: https://github.com/${u.login}
     );
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final user = widget.stats.user;
-    final cStats = widget.stats.contributionStats;
+    final user = _stats.user;
+    final cStats = _stats.contributionStats;
     final titleInfo = cStats.commitTitle;
     final currentYear = DateTime.now().year;
     final repos = _sortedRepos;
@@ -310,6 +344,25 @@ GitHub: https://github.com/${u.login}
           ),
         ),
         actions: [
+          _isRefreshing
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Center(
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppTheme.primaryCyan,
+                      ),
+                    ),
+                  ),
+                )
+              : IconButton(
+                  tooltip: loc.refreshProfile,
+                  icon: Icon(Icons.refresh_rounded, size: 21, color: AppTheme.textSecondary),
+                  onPressed: _refreshProfile,
+                ),
           IconButton(
             tooltip: _isBookmarked ? loc.removeFavorite : loc.saveFavorite,
             icon: Icon(
@@ -326,10 +379,16 @@ GitHub: https://github.com/${u.login}
           ),
         ],
       ),
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        // ignore: deprecated_member_use
-        cacheExtent: 600.0,
+      body: RefreshIndicator(
+        onRefresh: _refreshProfile,
+        color: AppTheme.primaryCyan,
+        backgroundColor: AppTheme.surfaceElevated,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          // ignore: deprecated_member_use
+          cacheExtent: 600.0,
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -965,8 +1024,9 @@ GitHub: https://github.com/${u.login}
               ),
             ),
           ),
+        ],
       ],
-    ],
+    ),
   ),
 );
   }

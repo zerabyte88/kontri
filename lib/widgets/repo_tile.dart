@@ -120,6 +120,7 @@ class RepoTile extends StatelessWidget {
 
     return RepaintBoundary(
       child: GlassCard(
+        enableBlur: false,
         margin: const EdgeInsets.only(bottom: 10),
         padding: EdgeInsets.zero,
         child: Material(

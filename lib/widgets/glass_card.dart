@@ -16,6 +16,7 @@ class GlassCard extends StatelessWidget {
   final Border? border;
   final Color? color;
   final double blurAmount;
+  final bool enableBlur;
 
   const GlassCard({
     super.key,
@@ -26,6 +27,7 @@ class GlassCard extends StatelessWidget {
     this.border,
     this.color,
     this.blurAmount = 10.0,
+    this.enableBlur = true,
   });
 
   @override
@@ -58,7 +60,7 @@ class GlassCard extends StatelessWidget {
           ),
         );
 
-        if (isGlass) {
+        if (isGlass && enableBlur) {
           box = ClipRRect(
             borderRadius: effectiveRadius,
             child: BackdropFilter(

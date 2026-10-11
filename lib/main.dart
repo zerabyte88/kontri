@@ -18,6 +18,7 @@ void main() async {
   AppThemeService.init(storageService);
   final apiService = GitHubApiService(
     personalAccessToken: storageService.getToken(),
+    storageService: storageService,
   );
 
   // Auto-clean any leftover APK update file to free internal storage

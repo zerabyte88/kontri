@@ -8,13 +8,13 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.2.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
 <br/>
 
-**GitPulse Mobile** is an on-device developer telemetry, 24-hour activity rhythm, and GitHub productivity analytics application for Android (`com.phantek.orion.rigel`). Built with Flutter and powered by hardware-accelerated charting via `fl_chart`, it transforms raw GitHub REST API v3 payloads into intuitive developer rhythms, cumulative portfolio impact telemetry, and habit-based commit tiers. Engineered for performance and privacy, all data processing, charting, and storage occur **100% on-device** with zero intermediary proxy servers.
+**GitPulse Mobile** is an on-device developer telemetry, 24-hour activity rhythm, and GitHub productivity analytics application for Android. Built with Flutter and powered by hardware-accelerated charting via `fl_chart`, it transforms raw GitHub REST API v3 payloads into intuitive developer rhythms, cumulative portfolio impact telemetry, and habit-based commit tiers. Engineered for performance and privacy, all data processing, charting, and storage occur **100% on-device** with zero intermediary proxy servers.
 
 ---
 
@@ -44,10 +44,10 @@
 ### 5. Commit Activity Tier Engine & Dynamic Visuals
 - **6-Level Animated Tier Badges:** Continuous streak and annual contribution volume ranking with custom canvas shaders (`Mythic Archmage`, `Diamond Vanguard`, `Platinum Artisan`, `Gold Adventurer`, `Silver Explorer`, `Bronze Novice`).
 - **Full-Screen Dynamic Ambient Background:** GPU-accelerated continuous looping canvas across the entire application viewport tailored to each active theme:
-  - **Dark Mode (Thunderstorm ⛈️):** Atmospheric rain streaks with impact ripples, multi-tiered drifting storm clouds, and periodic dual-stage electric-blue lightning strikes with ambient flash lighting.
+  - **Dark Mode (Midnight Cyber Aurora 🌌):** Undulating multi-layered aurora curtains, micro cosmic stars, and continuous upward-streaming stardust embers with 100% seamless mathematical loop continuity.
   - **AMOLED (Pure Black Cosmos 🌌):** Starry cosmos with twinkling diamond stars, glowing crescent moon, and continuous full-screen staggered meteor shower (6 meteors crossing edge-to-edge).
-  - **AMOLED Sakura (Radiant Pink 🌸):** Majestic sakura tree with organic bark grain, volumetric cherry blossom canopy clouds, layered spring green leaves, and drifting petals with swaying wind physics.
-  - **Light Mode (Sunny Grove 🍃):** Fruit tree with lush canopy foliage and glossy ripe red apples/cherries, rolling green grass foothills with wind-swayed tufts, drifting cumulus clouds, and gentle falling leaves.
+  - **AMOLED Sakura (Radiant Pink 🌸):** Artistic sumi-e sakura boughs, drifting cherry blossom petals, and an ethereal full moon repositioned below the header to guarantee crystal-clear title readability.
+  - **Light Mode (Solar Horizon & Prismatic Breeze ☀️):** Luminous ceramic dawn sky with flowing topographic horizon ribbons, drifting prismatic daylight motes, and soft breathing komorebi sunbeams.
 - **Bespoke GitPulse Vector Logo:** Intertwines Git branch topology, cardiac ECG heartbeat waveform, and a traveling electric energy spark (`GitPulseLogo`).
 - **Developer Easter Egg:** Tap the AMOLED card **10 times in rapid succession** in Settings to unlock the hidden AMOLED Sakura mode.
 
@@ -57,8 +57,8 @@
 
 ### 7. Multi-Language Internationalization & Privacy
 - **6 Supported Languages:** Complete translation coverage switchable on-the-fly without app restarts:
-  - 🇮🇩 Indonesian (Bahasa Indonesia)
   - 🇺🇸 English (Default on first install)
+  - 🇮🇩 Indonesian (Bahasa Indonesia)
   - 🇯🇵 Japanese (日本語)
   - 🇨🇳 Simplified Chinese (简体中文)
   - 🇹🇼 Traditional Chinese (繁體中文)
@@ -85,6 +85,13 @@
 - **Stats Detail Screen (`StatsDetailScreen`):** Overhauled with avatar halo glow ring, sleek metadata chips (company, location, blog), minimalist quote bio typography, and custom themed filter dropdown.
 - **Favorite Profiles Screen (`FavoriteProfilesScreen`):** Clean segmented pill controls, uncluttered card architecture, and polished developer badges.
 - **Settings Sheet (`SettingsSheet`):** Re-engineered cards 1 through 5 with modern minimalist glassmorphism, accent borders, and clean typography, while preserving the foundational Card 6 About APK card untouched.
+
+### 11. Smart Zero-Quota Caching & Conditional Requests Engine
+- **Persistent 10-Minute Smart Cache:** Eliminates redundant GitHub API round-trips by caching user profiles, repositories, activity events, and language aggregates in local storage (`StorageService`). Returning to a profile within 10 minutes loads instantaneously with 0 API calls.
+- **Conditional HTTP Requests (`ETag` & `304 Not Modified`):** Attaches `If-None-Match: <etag>` headers upon cache expiration. If profile telemetry is unchanged, GitHub responds with `304 Not Modified` without debiting API rate limits (`x-ratelimit-remaining` remains completely untouched).
+- **Intelligent Language Query Bypass:** Skips 8–25 repetitive language breakdown calls whenever repositories return 304, protecting the 60 req/hr unauthenticated rate limit.
+- **Manual Profile Reload & Pull-to-Refresh:** Includes an AppBar refresh button with loading spinner and full-screen `RefreshIndicator` pull-to-refresh gesture, accompanied by status SnackBars indicating whether updates were pulled or verified up-to-date with zero quota cost.
+- **Graceful Offline Fallback:** When network connectivity is lost, cached profiles load immediately with full analytics.
 
 ---
 
@@ -118,7 +125,7 @@ Developers receive a continuous animated tier badge based on their commit streak
 | **Typography** | `google_fonts` (Poppins) | Modern, geometric typography and typeface rendering |
 | **Local Persistence** | `shared_preferences` (v2.5.5) | On-device sandboxed key-value store for bookmarks, themes, & preferences |
 | **Internationalization** | `intl` (v0.20.3) | Reactive 6-language localization & date/number formatting |
-| **Verification Suite** | `flutter_test` | Comprehensive test coverage (59/59 passing unit and widget tests) |
+| **Verification Suite** | `flutter_test` | Comprehensive test coverage (65/65 passing unit and widget tests) |
 
 ---
 
@@ -143,6 +150,17 @@ The compiled release APK will be generated at:
 
 # Version History
 
+* ### v2.3.0 (Build 18)
+  - **Zero-Quota Caching & HTTP Conditional Requests Engine:**
+    - *10-Minute Persistent Smart Cache:* Implemented intelligent local caching with a 10-minute TTL for GitHub user profiles (`/users/:username`), repositories (`/users/:username/repos`), public events (`/users/:username/events/public`), and aggregated language footprints via `StorageService`. Repeated profile visits within 10 minutes load instantly with zero API calls.
+    - *ETag Conditional Requests (`304 Not Modified`):* Persists HTTP `ETag` headers for every queried endpoint. On cache expiration, requests are dispatched with `If-None-Match: <etag>`. When GitHub responds with `304 Not Modified`, local cached data is reused seamlessly and cache TTL is refreshed without reducing the user's GitHub API quota (`x-ratelimit-remaining` remains completely untouched).
+    - *Language Aggregation API Bypass:* Skips 8–25 repetitive repository language API requests completely whenever repository endpoints return `304 Not Modified`, drastically preserving rate limits.
+    - *Graceful Offline Resilience:* Seamlessly falls back to cached profile telemetry when the device loses network connectivity, preventing error screens and ensuring uninterrupted analytics.
+  - **Manual Profile Refresh & Native Pull-to-Refresh:**
+    - Added an AppBar reload action button (`Icons.refresh_rounded`) with an active loading spinner in `StatsDetailScreen`.
+    - Integrated native full-screen `RefreshIndicator` pull-to-refresh swipe gesture on profile detail views.
+    - Added feedback SnackBars across all 6 supported languages notifying users whether profile telemetry was updated (`profileRefreshed`) or verified already up-to-date with zero quota consumption (`profileUpToDate`).
+
 * ### v2.2.0 (Build 17)
   - **Complete Modern & Minimalist UI Redesign:**
     - *Stats Detail & Profile Screen (`StatsDetailScreen`):* Overhauled header profile layout with avatar halo glow ring, sleek metadata chips (company, location, blog), minimalist quote bio typography, and custom themed filter dropdown.
@@ -160,8 +178,6 @@ The compiled release APK will be generated at:
   - **Fluid News Tab Auto-Centering & Transitions:**
     - Tech news category tab bar dynamically auto-centers the active chip to the exact middle (50%) of the screen upon tapping or swiping with `Scrollable.ensureVisible` and smooth easing curves.
     - Replaced jumpy tab switching with a fluid, synchronized `PageView` experience.
-  - **Verification Suite & Quality Assurance:**
-    - Comprehensive automated test suite expanded to 59/59 passing unit and widget tests with 0 static analysis issues.
 
 * ### v2.1.0 (Build 16)
   - **Overhauled Ambient Canvas Background Animations Across All 4 Themes:**
@@ -208,7 +224,6 @@ The compiled release APK will be generated at:
 * ### v1.0.13 (Build 14)
   - **Settings Sheet Visual Polish:** Refined settings sheet layout and theme option cards with responsive layout geometry and smooth touch states.
   - **Header Canvas Fine-Tuning:** Polished particle physics parameters and alpha blending across all 4 theme modes.
-  - **Test Suite Verification:** Updated widget tests to ensure 100% passing test matrix (39/39 tests).
 
 * ### v1.0.12 (Build 13)
   - **Native In-App Repository Explorer:** Added dual-tab repository screen toggling between README documentation and interactive file tree without external browser redirects.

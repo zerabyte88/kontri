@@ -29,6 +29,25 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
     HeaderAnimationState.isPausedNotifier.addListener(_onPauseStateChanged);
   }
 
+  int _activeScrollCount = 0;
+
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is ScrollStartNotification) {
+      _activeScrollCount++;
+      if (_controller.isAnimating) {
+        _controller.stop();
+      }
+    } else if (notification is ScrollEndNotification) {
+      if (_activeScrollCount > 0) _activeScrollCount--;
+      if (_activeScrollCount == 0 &&
+          !HeaderAnimationState.isPausedNotifier.value &&
+          !_controller.isAnimating) {
+        _controller.repeat();
+      }
+    }
+    return false;
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!mounted) return;
@@ -79,7 +98,10 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
                 ),
               ),
             ),
-            widget.child,
+            NotificationListener<ScrollNotification>(
+              onNotification: _onScrollNotification,
+              child: widget.child,
+            ),
           ],
         );
       },
@@ -189,20 +211,40 @@ class _FullAppBgPainter extends CustomPainter {
     _Meteor(startXRatio: 1.26, startYRatio: 0.20, speed: 1.12, phase: 0.88, length: 195, headSize: 2.7),
   ];
 
-  // 12 Drifting fresh spring leaves (Light theme)
+  // 16 Continuous Floating Stardust & Cyber Embers (Dark Theme)
+  static const List<_DarkParticle> _darkParticles = [
+    _DarkParticle(bx: 0.07, sp: 1, sw: 12.0, sz: 1.8, ph: 0.05, cl: Color(0xFF00E5FF)),
+    _DarkParticle(bx: 0.15, sp: 2, sw: 16.0, sz: 2.2, ph: 0.18, cl: Color(0xFF8B5CF6)),
+    _DarkParticle(bx: 0.23, sp: 1, sw: 10.0, sz: 1.5, ph: 0.32, cl: Color(0xFF10B981)),
+    _DarkParticle(bx: 0.31, sp: 2, sw: 18.0, sz: 2.4, ph: 0.48, cl: Color(0xFF00E5FF)),
+    _DarkParticle(bx: 0.40, sp: 1, sw: 14.0, sz: 1.6, ph: 0.62, cl: Color(0xFFE0F7FA)),
+    _DarkParticle(bx: 0.48, sp: 2, sw: 15.0, sz: 2.0, ph: 0.75, cl: Color(0xFF8B5CF6)),
+    _DarkParticle(bx: 0.57, sp: 1, sw: 11.0, sz: 1.4, ph: 0.88, cl: Color(0xFF10B981)),
+    _DarkParticle(bx: 0.65, sp: 2, sw: 17.0, sz: 2.5, ph: 0.12, cl: Color(0xFF00E5FF)),
+    _DarkParticle(bx: 0.73, sp: 1, sw: 13.0, sz: 1.7, ph: 0.28, cl: Color(0xFF8B5CF6)),
+    _DarkParticle(bx: 0.81, sp: 2, sw: 16.0, sz: 2.1, ph: 0.42, cl: Color(0xFF10B981)),
+    _DarkParticle(bx: 0.89, sp: 1, sw: 12.0, sz: 1.5, ph: 0.58, cl: Color(0xFF00E5FF)),
+    _DarkParticle(bx: 0.95, sp: 2, sw: 15.0, sz: 2.3, ph: 0.72, cl: Color(0xFFE0F7FA)),
+    _DarkParticle(bx: 0.12, sp: 1, sw: 14.0, sz: 1.6, ph: 0.85, cl: Color(0xFF8B5CF6)),
+    _DarkParticle(bx: 0.35, sp: 2, sw: 19.0, sz: 2.6, ph: 0.02, cl: Color(0xFF00E5FF)),
+    _DarkParticle(bx: 0.61, sp: 1, sw: 13.0, sz: 1.8, ph: 0.38, cl: Color(0xFF10B981)),
+    _DarkParticle(bx: 0.84, sp: 2, sw: 17.0, sz: 2.2, ph: 0.68, cl: Color(0xFF8B5CF6)),
+  ];
+
+  // 12 Drifting Prismatic Daylight Motes (Light theme)
   static const List<_LC> _leaves = [
-    _LC(bx: 0.06, sp: 1, sw: 14.0, sz: 6.8, ph: 0.05, cl: Color(0xFF10B981)),
-    _LC(bx: 0.15, sp: 2, sw: 16.0, sz: 8.0, ph: 0.22, cl: Color(0xFF34D399)),
-    _LC(bx: 0.25, sp: 1, sw: 12.0, sz: 6.5, ph: 0.40, cl: Color(0xFF059669)),
-    _LC(bx: 0.35, sp: 2, sw: 18.0, sz: 7.8, ph: 0.58, cl: Color(0xFF10B981)),
-    _LC(bx: 0.45, sp: 1, sw: 13.0, sz: 7.0, ph: 0.76, cl: Color(0xFF34D399)),
-    _LC(bx: 0.54, sp: 2, sw: 15.0, sz: 7.5, ph: 0.94, cl: Color(0xFF059669)),
-    _LC(bx: 0.63, sp: 1, sw: 11.0, sz: 6.2, ph: 0.12, cl: Color(0xFF10B981)),
-    _LC(bx: 0.72, sp: 2, sw: 17.0, sz: 7.8, ph: 0.30, cl: Color(0xFF34D399)),
-    _LC(bx: 0.81, sp: 1, sw: 14.0, sz: 6.8, ph: 0.48, cl: Color(0xFF059669)),
-    _LC(bx: 0.89, sp: 2, sw: 16.0, sz: 7.6, ph: 0.66, cl: Color(0xFF10B981)),
-    _LC(bx: 0.95, sp: 1, sw: 13.0, sz: 6.4, ph: 0.84, cl: Color(0xFF34D399)),
-    _LC(bx: 0.20, sp: 2, sw: 19.0, sz: 8.2, ph: 0.02, cl: Color(0xFF059669)),
+    _LC(bx: 0.08, sp: 1, sw: 14.0, sz: 5.5, ph: 0.05, cl: Color(0xFF38BDF8)),
+    _LC(bx: 0.18, sp: 2, sw: 16.0, sz: 6.8, ph: 0.22, cl: Color(0xFF34D399)),
+    _LC(bx: 0.28, sp: 1, sw: 12.0, sz: 5.0, ph: 0.40, cl: Color(0xFFFBBF24)),
+    _LC(bx: 0.38, sp: 2, sw: 18.0, sz: 6.5, ph: 0.58, cl: Color(0xFF38BDF8)),
+    _LC(bx: 0.48, sp: 1, sw: 13.0, sz: 5.8, ph: 0.76, cl: Color(0xFF34D399)),
+    _LC(bx: 0.57, sp: 2, sw: 15.0, sz: 6.2, ph: 0.94, cl: Color(0xFF818CF8)),
+    _LC(bx: 0.66, sp: 1, sw: 11.0, sz: 5.2, ph: 0.12, cl: Color(0xFF38BDF8)),
+    _LC(bx: 0.75, sp: 2, sw: 17.0, sz: 6.6, ph: 0.30, cl: Color(0xFF34D399)),
+    _LC(bx: 0.83, sp: 1, sw: 14.0, sz: 5.6, ph: 0.48, cl: Color(0xFFFBBF24)),
+    _LC(bx: 0.90, sp: 2, sw: 16.0, sz: 6.4, ph: 0.66, cl: Color(0xFF38BDF8)),
+    _LC(bx: 0.96, sp: 1, sw: 13.0, sz: 5.4, ph: 0.84, cl: Color(0xFF34D399)),
+    _LC(bx: 0.22, sp: 2, sw: 19.0, sz: 7.0, ph: 0.02, cl: Color(0xFF818CF8)),
   ];
 
   @override
@@ -230,26 +272,37 @@ class _FullAppBgPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // 1. Ethereal Full Moon (Top-Left)
-    final moonCenter = Offset(w * 0.18, h * 0.10);
-    const moonR = 22.0;
+    // 1. Ethereal Full Moon (Repositioned down & right to clear GitPulse header text)
+    final moonCenter = Offset(w * 0.36, h * 0.21);
+    const moonR = 21.0;
     final moonGlow = 0.85 + 0.15 * math.sin(progress * 2 * math.pi);
 
     // Outer Rose-Gold Halo
     _glow.color = const Color(0xFFFF7AA5).withValues(alpha: 0.08 * moonGlow);
     canvas.drawCircle(moonCenter, moonR + 18.0, _glow);
-    _glow.color = const Color(0xFFFFD4E8).withValues(alpha: 0.15 * moonGlow);
+    _glow.color = const Color(0xFFFFD4E8).withValues(alpha: 0.14 * moonGlow);
     canvas.drawCircle(moonCenter, moonR + 9.0, _glow);
 
-    // Moon Disc
-    _fill.color = const Color(0xFFFFF1F6).withValues(alpha: 0.95);
+    // Moon Disc: Soft rose-pearl silver gradient so it does not clash with white text
+    final moonBounds = Rect.fromCircle(center: moonCenter, radius: moonR);
+    _fill.shader = RadialGradient(
+      center: const Alignment(-0.25, -0.25),
+      radius: 0.9,
+      colors: [
+        const Color(0xFFFFF0F5).withValues(alpha: 0.92),
+        const Color(0xFFFFDEEB).withValues(alpha: 0.88),
+        const Color(0xFFF3C7DA).withValues(alpha: 0.82),
+      ],
+      stops: const [0.0, 0.65, 1.0],
+    ).createShader(moonBounds);
     canvas.drawCircle(moonCenter, moonR, _fill);
+    _fill.shader = null;
 
     // Subtle Soft Lunar Craters / Shading
-    _fill.color = const Color(0xFFF3D2DF).withValues(alpha: 0.28);
-    canvas.drawCircle(moonCenter.translate(-5, -4), 5.5, _fill);
-    canvas.drawCircle(moonCenter.translate(6, 3), 4.2, _fill);
-    canvas.drawCircle(moonCenter.translate(1, 7), 3.0, _fill);
+    _fill.color = const Color(0xFFE2B4C8).withValues(alpha: 0.32);
+    canvas.drawCircle(moonCenter.translate(-5, -4), 5.0, _fill);
+    canvas.drawCircle(moonCenter.translate(6, 3), 4.0, _fill);
+    canvas.drawCircle(moonCenter.translate(1, 6), 2.8, _fill);
 
     // 2. Artistic Sumi-e Sakura Bough (Hanging from top-right with micro-sway)
     _drawSumiESakuraBough(canvas, size);
@@ -279,11 +332,11 @@ class _FullAppBgPainter extends CustomPainter {
     }
 
     // 4. Stardust / Sparkle Puffs
-    _drawSparkle(canvas, Offset(w * 0.28, h * 0.16), progress, const Color(0xFFFFD4E8));
-    _drawSparkle(canvas, Offset(w * 0.42, h * 0.08), progress + 0.35, const Color(0xFFFF7AA5));
-    _drawSparkle(canvas, Offset(w * 0.55, h * 0.22), progress + 0.70, const Color(0xFFFFD1E3));
-    _drawSparkle(canvas, Offset(w * 0.75, h * 0.12), progress + 0.20, const Color(0xFFFFE485));
-    _drawSparkle(canvas, Offset(w * 0.12, h * 0.24), progress + 0.50, const Color(0xFFFFB3D1));
+    _drawSparkle(canvas, Offset(w * 0.14, h * 0.12), progress, const Color(0xFFFFD4E8));
+    _drawSparkle(canvas, Offset(w * 0.52, h * 0.10), progress + 0.35, const Color(0xFFFF7AA5));
+    _drawSparkle(canvas, Offset(w * 0.66, h * 0.22), progress + 0.70, const Color(0xFFFFD1E3));
+    _drawSparkle(canvas, Offset(w * 0.82, h * 0.14), progress + 0.20, const Color(0xFFFFE485));
+    _drawSparkle(canvas, Offset(w * 0.20, h * 0.28), progress + 0.50, const Color(0xFFFFB3D1));
   }
 
   void _drawSumiESakuraBough(Canvas canvas, Size size) {
@@ -584,7 +637,7 @@ class _FullAppBgPainter extends CustomPainter {
   }
 
   // ---------------------------------------------------------------------------
-  // 3. DARK THEME (Midnight Cyber Aurora)
+  // 3. DARK THEME (Midnight Cyber Aurora - Continuous & Seamless Looping)
   // ---------------------------------------------------------------------------
   void _drawMidnightAurora(Canvas canvas, Size size) {
     final w = size.width;
@@ -611,22 +664,41 @@ class _FullAppBgPainter extends CustomPainter {
       canvas.drawCircle(pos, s.sz * (0.75 + 0.25 * twinkle), _fill);
     }
 
-    // Ethereal Horizon Nebula Glow
-    _glow.color = const Color(0xFF00E5FF).withValues(alpha: 0.05);
+    // Continuous Flowing Ambient Cyber Stardust Stream (Seamless loop)
+    for (final p in _darkParticles) {
+      final t = (progress * p.sp + p.ph) % 1.0;
+      final x = (p.bx * w) + math.sin(t * 2 * math.pi + p.ph) * p.sw;
+      // Drifts upward smoothly across full height
+      final y = (1.0 - t) * (h + 30) - 15;
+      final alpha = (math.sin(t * math.pi) * 0.85).clamp(0.0, 1.0);
+      final pColor = p.cl.withValues(alpha: alpha);
+
+      // Core particle
+      _fill.color = pColor;
+      canvas.drawCircle(Offset(x, y), p.sz, _fill);
+
+      // Soft aura glow
+      _glow.color = p.cl.withValues(alpha: alpha * 0.25);
+      canvas.drawCircle(Offset(x, y), p.sz * 2.4, _glow);
+    }
+
+    // Ethereal Horizon Nebula Glow (Smooth continuous integer sine breathing)
+    final nebulaPulse = 0.85 + 0.15 * math.sin(progress * 2 * math.pi);
+    _glow.color = const Color(0xFF00E5FF).withValues(alpha: 0.05 * nebulaPulse);
     canvas.drawOval(
       Rect.fromCenter(center: Offset(w * 0.5, h * 0.22), width: w * 1.2, height: h * 0.35),
       _glow,
     );
 
-    // 3 Undulating Aurora Borealis Curtains
+    // 3 Undulating Aurora Curtains (Integer speeds for 100% loop continuity)
     // Curtain 1: Electric Cyan (Upper Horizon)
-    _drawAuroraCurtain(canvas, size, 0.07, 0.20, const Color(0xFF00E5FF), 0.7, 0.0);
+    _drawAuroraCurtain(canvas, size, 0.07, 0.20, const Color(0xFF00E5FF), 1, 0.0);
 
     // Curtain 2: Emerald Green (Mid Horizon)
-    _drawAuroraCurtain(canvas, size, 0.13, 0.22, const Color(0xFF10B981), 0.9, 0.33);
+    _drawAuroraCurtain(canvas, size, 0.13, 0.22, const Color(0xFF10B981), 1, 0.33);
 
     // Curtain 3: Nebula Violet (Lower Horizon Depth)
-    _drawAuroraCurtain(canvas, size, 0.19, 0.24, const Color(0xFF8B5CF6), 0.6, 0.66);
+    _drawAuroraCurtain(canvas, size, 0.19, 0.24, const Color(0xFF8B5CF6), 1, 0.66);
   }
 
   void _drawAuroraCurtain(
@@ -635,39 +707,41 @@ class _FullAppBgPainter extends CustomPainter {
     double baseYRatio,
     double heightRatio,
     Color peakColor,
-    double speedMult,
+    int speedMult,
     double phaseOffset,
   ) {
     final w = size.width;
     final h = size.height;
     final baseY = h * baseYRatio;
     final ribbonH = h * heightRatio;
+    // Exactly 2*pi periodic over progress in [0, 1]
     final t = (progress * speedMult + phaseOffset) * 2 * math.pi;
 
-    const segments = 24;
+    const segments = 28;
     final dx = w / segments;
 
-    final topPoints = <Offset>[];
-    final bottomPoints = <Offset>[];
-
+    final curtainPath = Path();
     for (int i = 0; i <= segments; i++) {
       final x = i * dx;
       final normX = i / segments;
-      final wave1 = math.sin(normX * 3.2 * math.pi + t) * (h * 0.035);
-      final wave2 = math.cos(normX * 2.1 * math.pi - t * 0.8) * (h * 0.02);
+      // All harmonics use exact integer multiples of t so f(0) == f(1) exactly
+      final wave1 = math.sin(normX * 3.0 * math.pi + t) * (h * 0.035);
+      final wave2 = math.cos(normX * 2.0 * math.pi - t) * (h * 0.020);
       final yTop = baseY + wave1 + wave2;
-      final yBot = yTop + ribbonH + (math.sin(normX * 2.5 * math.pi + t * 0.5) * (h * 0.015));
-
-      topPoints.add(Offset(x, yTop));
-      bottomPoints.add(Offset(x, yBot));
+      if (i == 0) {
+        curtainPath.moveTo(x, yTop);
+      } else {
+        curtainPath.lineTo(x, yTop);
+      }
     }
-
-    final curtainPath = Path()..moveTo(topPoints.first.dx, topPoints.first.dy);
-    for (int i = 1; i < topPoints.length; i++) {
-      curtainPath.lineTo(topPoints[i].dx, topPoints[i].dy);
-    }
-    for (int i = bottomPoints.length - 1; i >= 0; i--) {
-      curtainPath.lineTo(bottomPoints[i].dx, bottomPoints[i].dy);
+    for (int i = segments; i >= 0; i--) {
+      final x = i * dx;
+      final normX = i / segments;
+      final wave1 = math.sin(normX * 3.0 * math.pi + t) * (h * 0.035);
+      final wave2 = math.cos(normX * 2.0 * math.pi - t) * (h * 0.020);
+      final yTop = baseY + wave1 + wave2;
+      final yBot = yTop + ribbonH + (math.sin(normX * 2.0 * math.pi + t) * (h * 0.015));
+      curtainPath.lineTo(x, yBot);
     }
     curtainPath.close();
 
@@ -689,94 +763,158 @@ class _FullAppBgPainter extends CustomPainter {
   }
 
   // ---------------------------------------------------------------------------
-  // 4. LIGHT THEME (Morning Breeze & Komorebi)
+  // 4. LIGHT THEME (Solar Horizon & Minimalist Prismatic Breeze)
   // ---------------------------------------------------------------------------
   void _drawLightTheme(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
 
-    // Clean Dawn Sky Gradient Canvas
+    // 1. Pristine Dawn Ceramic Sky Canvas
     final bgRect = Offset.zero & size;
     _fill.shader = const LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [Color(0xFFF8FAFC), Color(0xFFEFF6FF)],
+      colors: [Color(0xFFFBFDFF), Color(0xFFF3F7FA), Color(0xFFE5EDF4)],
+      stops: [0.0, 0.45, 1.0],
     ).createShader(bgRect);
     canvas.drawRect(bgRect, _fill);
     _fill.shader = null;
 
-    // Soft Komorebi Sunbeams
+    // 2. Soft Morning Sun Radial Ambient Bloom (Top-Left)
+    final sunCenter = Offset(w * 0.22, h * 0.12);
+    final sunBreathe = 0.85 + 0.15 * math.sin(progress * 2 * math.pi);
+    _glow.color = const Color(0xFFFEF08A).withValues(alpha: 0.09 * sunBreathe);
+    canvas.drawCircle(sunCenter, w * 0.40, _glow);
+    _glow.color = const Color(0xFFBAE6FD).withValues(alpha: 0.06 * sunBreathe);
+    canvas.drawCircle(sunCenter, w * 0.25, _glow);
+
+    // 3. Elegant Flowing Horizon Ribbons (Minimalist Topographic Wave Flow)
+    // Ribbon 1: Sky Azure (Base wave)
+    _drawHorizonRibbon(canvas, size, 0.76, 0.14, const Color(0xFF0284C7), 0.0);
+    // Ribbon 2: Mint Emerald (Mid harmonic wave)
+    _drawHorizonRibbon(canvas, size, 0.82, 0.12, const Color(0xFF059669), 0.33);
+    // Ribbon 3: Warm Solar Iris (Deep depth wave)
+    _drawHorizonRibbon(canvas, size, 0.88, 0.10, const Color(0xFFD97706), 0.66);
+
+    // 4. Subtle Komorebi Sunlight Caustic Beams
     _drawKomorebiSunbeams(canvas, size);
 
-    // 12 Fresh Spring Leaves with White Central Vein
+    // 5. 12 Drifting Prismatic Daylight Motes (Smooth sinusoidal sway & wrap)
     for (final l in _leaves) {
       final t = (progress * l.sp + l.ph) % 1.0;
       final x = (l.bx * w) + math.sin(t * 2 * math.pi + l.ph) * l.sw;
       final y = -l.sz + t * (h + l.sz * 2);
       final alpha = (math.sin(t * math.pi) * 0.75).clamp(0.0, 1.0);
 
-      _fill.color = l.cl.withValues(alpha: alpha);
-      _stroke
-        ..strokeWidth = 0.8
-        ..color = Colors.white.withValues(alpha: alpha * 0.65);
-
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate((t * 2 * math.pi) + l.ph);
+
+      // Translucent droplet mote
+      _fill.color = l.cl.withValues(alpha: alpha * 0.65);
       canvas.drawOval(
-        Rect.fromCenter(center: Offset.zero, width: l.sz * 1.8, height: l.sz * 0.72),
+        Rect.fromCenter(center: Offset.zero, width: l.sz * 1.6, height: l.sz * 0.75),
         _fill,
       );
-      canvas.drawLine(Offset(-l.sz * 0.7, 0), Offset(l.sz * 0.7, 0), _stroke);
+
+      // Delicate pristine core glint
+      _fill.color = Colors.white.withValues(alpha: alpha * 0.90);
+      canvas.drawCircle(Offset(-l.sz * 0.2, -l.sz * 0.1), l.sz * 0.22, _fill);
+
       canvas.restore();
     }
 
-    // Gentle Morning Dew Sparkles
-    _drawSparkle(canvas, Offset(w * 0.25, h * 0.12), progress, const Color(0xFF38BDF8));
-    _drawSparkle(canvas, Offset(w * 0.70, h * 0.18), progress + 0.4, const Color(0xFF34D399));
-    _drawSparkle(canvas, Offset(w * 0.45, h * 0.08), progress + 0.7, const Color(0xFFFBBF24));
+    // 6. Crisp Solar Sparkles
+    _drawSparkle(canvas, Offset(w * 0.18, h * 0.16), progress, const Color(0xFF0284C7));
+    _drawSparkle(canvas, Offset(w * 0.68, h * 0.14), progress + 0.33, const Color(0xFF059669));
+    _drawSparkle(canvas, Offset(w * 0.44, h * 0.24), progress + 0.66, const Color(0xFFD97706));
+    _drawSparkle(canvas, Offset(w * 0.82, h * 0.32), progress + 0.50, const Color(0xFF38BDF8));
+  }
+
+  void _drawHorizonRibbon(
+    Canvas canvas,
+    Size size,
+    double baseYRatio,
+    double ribbonHRatio,
+    Color ribbonColor,
+    double phaseOffset,
+  ) {
+    final w = size.width;
+    final h = size.height;
+    final baseY = h * baseYRatio;
+    final ribbonH = h * ribbonHRatio;
+    // Exactly 2*pi periodic over progress in [0, 1]
+    final t = (progress + phaseOffset) * 2 * math.pi;
+
+    const segments = 24;
+    final dx = w / segments;
+
+    final ribbonPath = Path()..moveTo(0, h);
+    for (int i = 0; i <= segments; i++) {
+      final x = i * dx;
+      final normX = i / segments;
+      final wave1 = math.sin(normX * 2.0 * math.pi + t) * (h * 0.022);
+      final wave2 = math.cos(normX * 1.0 * math.pi - t) * (h * 0.012);
+      ribbonPath.lineTo(x, baseY + wave1 + wave2);
+    }
+    ribbonPath.lineTo(w, h);
+    ribbonPath.close();
+
+    final bounds = Rect.fromLTWH(0, baseY - h * 0.04, w, ribbonH + h * 0.08);
+    _fill.shader = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        ribbonColor.withValues(alpha: 0.07),
+        ribbonColor.withValues(alpha: 0.03),
+        ribbonColor.withValues(alpha: 0.0),
+      ],
+      stops: const [0.0, 0.60, 1.0],
+    ).createShader(bounds);
+
+    canvas.drawPath(ribbonPath, _fill);
+    _fill.shader = null;
   }
 
   void _drawKomorebiSunbeams(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final breathe = 0.04 + 0.02 * math.sin(progress * 2 * math.pi);
+    final breathe = 0.03 + 0.015 * math.sin(progress * 2 * math.pi);
 
     void drawBeam(double startX, double startW, double endX, double endW, double alphaMult) {
       final beamPath = Path()
         ..moveTo(startX, 0)
         ..lineTo(startX + startW, 0)
-        ..lineTo(endX + endW, h * 0.85)
-        ..lineTo(endX, h * 0.85)
+        ..lineTo(endX + endW, h * 0.75)
+        ..lineTo(endX, h * 0.75)
         ..close();
 
       final bounds = Rect.fromLTWH(
         math.min(startX, endX),
         0,
         math.max(startX + startW, endX + endW) - math.min(startX, endX),
-        h * 0.85,
+        h * 0.75,
       );
 
       _fill.shader = LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          const Color(0xFFFFFBEB).withValues(alpha: breathe * alphaMult * 1.4),
-          const Color(0xFFE0F2FE).withValues(alpha: breathe * alphaMult * 0.7),
-          const Color(0xFFF0FDF4).withValues(alpha: 0.0),
+          const Color(0xFFFFFBEB).withValues(alpha: breathe * alphaMult * 1.2),
+          const Color(0xFFE0F2FE).withValues(alpha: breathe * alphaMult * 0.6),
+          Colors.transparent,
         ],
-        stops: const [0.0, 0.45, 1.0],
+        stops: const [0.0, 0.40, 1.0],
       ).createShader(bounds);
 
       canvas.drawPath(beamPath, _fill);
       _fill.shader = null;
     }
 
-    // 4 Distinct Komorebi Light Shafts
-    drawBeam(-w * 0.08, w * 0.22, w * 0.25, w * 0.48, 1.0);
-    drawBeam(w * 0.12, w * 0.18, w * 0.55, w * 0.42, 0.85);
-    drawBeam(w * 0.32, w * 0.16, w * 0.82, w * 0.38, 0.75);
-    drawBeam(-w * 0.02, w * 0.14, w * 0.10, w * 0.35, 0.90);
+    // 3 Distinct Komorebi Light Shafts
+    drawBeam(-w * 0.05, w * 0.18, w * 0.22, w * 0.42, 1.0);
+    drawBeam(w * 0.15, w * 0.16, w * 0.50, w * 0.38, 0.80);
+    drawBeam(w * 0.35, w * 0.14, w * 0.76, w * 0.32, 0.65);
   }
 
   void _drawSparkle(Canvas canvas, Offset center, double phase, Color color) {
@@ -840,4 +978,21 @@ class _LC {
   final double ph;
   final Color cl;
   const _LC({required this.bx, required this.sp, required this.sw, required this.sz, required this.ph, required this.cl});
+}
+
+class _DarkParticle {
+  final double bx;
+  final int sp;
+  final double sw;
+  final double sz;
+  final double ph;
+  final Color cl;
+  const _DarkParticle({
+    required this.bx,
+    required this.sp,
+    required this.sw,
+    required this.sz,
+    required this.ph,
+    required this.cl,
+  });
 }

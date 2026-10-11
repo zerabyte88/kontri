@@ -1518,6 +1518,33 @@ class AppLocalizations {
     AppLanguage.korean: '즐겨찾기에서 제거되었습니다.',
   });
 
+  String get refreshProfile => _str({
+    AppLanguage.indonesian: 'Segarkan Profil',
+    AppLanguage.english: 'Refresh Profile',
+    AppLanguage.japanese: 'プロフィールを更新',
+    AppLanguage.chineseSimplified: '刷新个人资料',
+    AppLanguage.chineseTraditional: '重新整理個人檔案',
+    AppLanguage.korean: '프로필 새로고침',
+  });
+
+  String get profileRefreshed => _str({
+    AppLanguage.indonesian: 'Data profil berhasil diperbarui dari GitHub! 🔄✨',
+    AppLanguage.english: 'Profile data updated from GitHub! 🔄✨',
+    AppLanguage.japanese: 'GitHubからプロフィールを更新しました！ 🔄✨',
+    AppLanguage.chineseSimplified: '已从 GitHub 更新个人资料！ 🔄✨',
+    AppLanguage.chineseTraditional: '已從 GitHub 更新個人檔案！ 🔄✨',
+    AppLanguage.korean: 'GitHub에서 프로필 데이터를 업데이트했습니다! 🔄✨',
+  });
+
+  String get profileUpToDate => _str({
+    AppLanguage.indonesian: 'Data profil sudah yang terbaru (304 Not Modified) ⚡',
+    AppLanguage.english: 'Profile data is already up to date (304 Not Modified) ⚡',
+    AppLanguage.japanese: 'プロフィールは既に最新です (304 Not Modified) ⚡',
+    AppLanguage.chineseSimplified: '个人资料已是最新 (304 Not Modified) ⚡',
+    AppLanguage.chineseTraditional: '個人檔案已是最新 (304 Not Modified) ⚡',
+    AppLanguage.korean: '프로필 데이터가 이미 최신 상태입니다 (304 Not Modified) ⚡',
+  });
+
   String get summaryCopiedToast => _str({
     AppLanguage.indonesian: 'Profil berhasil disalin ke clipboard! 📋✨',
     AppLanguage.english: 'Profile copied to clipboard! 📋✨',
