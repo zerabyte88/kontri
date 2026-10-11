@@ -844,7 +844,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             ),
                             Switch.adaptive(
                               value: bgAnimEnabled,
-                              activeColor: AppTheme.primaryCyan,
+                              activeThumbColor: AppTheme.primaryCyan,
                               onChanged: (val) {
                                 AppThemeService.setBackgroundAnimation(
                                   val,
