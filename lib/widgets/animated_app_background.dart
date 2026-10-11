@@ -14,18 +14,31 @@ class AnimatedAppBackground extends StatefulWidget {
 }
 
 class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
     )..repeat();
 
     HeaderAnimationState.isPausedNotifier.addListener(_onPauseStateChanged);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted) return;
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      if (_controller.isAnimating) _controller.stop();
+    } else if (state == AppLifecycleState.resumed) {
+      if (!HeaderAnimationState.isPausedNotifier.value && !_controller.isAnimating) {
+        _controller.repeat();
+      }
+    }
   }
 
   void _onPauseStateChanged() {
@@ -39,6 +52,7 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     HeaderAnimationState.isPausedNotifier.removeListener(_onPauseStateChanged);
     _controller.dispose();
     super.dispose();
@@ -89,28 +103,22 @@ class _FullAppBgPainter extends CustomPainter {
     ..strokeCap = StrokeCap.round;
   static final Paint _glow = Paint();
 
-  // Sakura petals (AMOLED Sakura)
+  // 14 Sakura petals (AMOLED Sakura)
   static const List<_PC> _petals = [
-    _PC(bx: 0.04, sp: 1, sw: 14.0, sz: 6.2, ph: 0.05),
-    _PC(bx: 0.12, sp: 2, sw: 16.0, sz: 7.5, ph: 0.15),
-    _PC(bx: 0.20, sp: 1, sw: 13.0, sz: 6.5, ph: 0.28),
-    _PC(bx: 0.29, sp: 2, sw: 18.0, sz: 8.0, ph: 0.42),
-    _PC(bx: 0.37, sp: 1, sw: 12.0, sz: 5.8, ph: 0.57),
-    _PC(bx: 0.45, sp: 2, sw: 17.0, sz: 7.8, ph: 0.70),
-    _PC(bx: 0.53, sp: 1, sw: 15.0, sz: 6.8, ph: 0.82),
-    _PC(bx: 0.60, sp: 2, sw: 19.0, sz: 8.2, ph: 0.10),
-    _PC(bx: 0.67, sp: 1, sw: 13.0, sz: 6.2, ph: 0.22),
-    _PC(bx: 0.74, sp: 2, sw: 16.0, sz: 7.4, ph: 0.35),
-    _PC(bx: 0.80, sp: 1, sw: 14.0, sz: 5.5, ph: 0.48),
-    _PC(bx: 0.86, sp: 2, sw: 17.0, sz: 7.0, ph: 0.62),
-    _PC(bx: 0.91, sp: 1, sw: 12.0, sz: 6.0, ph: 0.75),
-    _PC(bx: 0.95, sp: 2, sw: 15.0, sz: 7.6, ph: 0.88),
-    _PC(bx: 0.02, sp: 1, sw: 11.0, sz: 5.2, ph: 0.32),
-    _PC(bx: 0.16, sp: 2, sw: 20.0, sz: 8.4, ph: 0.55),
-    _PC(bx: 0.33, sp: 1, sw: 13.5, sz: 6.6, ph: 0.68),
-    _PC(bx: 0.57, sp: 2, sw: 18.5, sz: 7.9, ph: 0.90),
-    _PC(bx: 0.77, sp: 1, sw: 14.5, sz: 6.3, ph: 0.18),
-    _PC(bx: 0.98, sp: 2, sw: 15.5, sz: 7.2, ph: 0.44),
+    _PC(bx: 0.05, sp: 1, sw: 14.0, sz: 6.2, ph: 0.05),
+    _PC(bx: 0.14, sp: 2, sw: 16.0, sz: 7.5, ph: 0.15),
+    _PC(bx: 0.22, sp: 1, sw: 13.0, sz: 6.5, ph: 0.28),
+    _PC(bx: 0.31, sp: 2, sw: 18.0, sz: 7.8, ph: 0.42),
+    _PC(bx: 0.39, sp: 1, sw: 12.0, sz: 5.8, ph: 0.57),
+    _PC(bx: 0.47, sp: 2, sw: 17.0, sz: 7.6, ph: 0.70),
+    _PC(bx: 0.55, sp: 1, sw: 15.0, sz: 6.8, ph: 0.82),
+    _PC(bx: 0.63, sp: 2, sw: 19.0, sz: 8.0, ph: 0.10),
+    _PC(bx: 0.70, sp: 1, sw: 13.0, sz: 6.2, ph: 0.25),
+    _PC(bx: 0.78, sp: 2, sw: 16.0, sz: 7.4, ph: 0.38),
+    _PC(bx: 0.85, sp: 1, sw: 14.0, sz: 5.6, ph: 0.52),
+    _PC(bx: 0.91, sp: 2, sw: 17.0, sz: 7.0, ph: 0.66),
+    _PC(bx: 0.96, sp: 1, sw: 12.0, sz: 6.0, ph: 0.80),
+    _PC(bx: 0.18, sp: 2, sw: 20.0, sz: 8.2, ph: 0.92),
   ];
 
   // Stars (AMOLED Night)
@@ -149,6 +157,28 @@ class _FullAppBgPainter extends CustomPainter {
     _SC(x: 0.97, y: 0.78, sz: 1.9, ph: 0.18, sp: true),
   ];
 
+  // Micro-stars & Cosmic Stardust (Midnight Aurora)
+  static const List<_SC> _auroraStars = [
+    _SC(x: 0.05, y: 0.05, sz: 1.4, ph: 0.10, cl: Color(0xFF00E5FF)),
+    _SC(x: 0.12, y: 0.15, sz: 1.0, ph: 0.45, cl: Color(0xFFE0F7FA)),
+    _SC(x: 0.20, y: 0.08, sz: 1.6, ph: 0.25, sp: true, cl: Color(0xFF8B5CF6)),
+    _SC(x: 0.28, y: 0.22, sz: 0.9, ph: 0.80, cl: Color(0xFF10B981)),
+    _SC(x: 0.36, y: 0.12, sz: 1.2, ph: 0.35, cl: Color(0xFF00E5FF)),
+    _SC(x: 0.44, y: 0.28, sz: 1.5, ph: 0.65, sp: true, cl: Color(0xFFE0F7FA)),
+    _SC(x: 0.52, y: 0.06, sz: 1.1, ph: 0.15, cl: Color(0xFF10B981)),
+    _SC(x: 0.60, y: 0.18, sz: 1.4, ph: 0.90, cl: Color(0xFF8B5CF6)),
+    _SC(x: 0.68, y: 0.09, sz: 1.8, ph: 0.40, sp: true, cl: Color(0xFF00E5FF)),
+    _SC(x: 0.76, y: 0.24, sz: 1.0, ph: 0.70, cl: Color(0xFFE0F7FA)),
+    _SC(x: 0.84, y: 0.14, sz: 1.3, ph: 0.30, cl: Color(0xFF10B981)),
+    _SC(x: 0.92, y: 0.07, sz: 1.6, ph: 0.85, sp: true, cl: Color(0xFF8B5CF6)),
+    _SC(x: 0.16, y: 0.38, sz: 0.8, ph: 0.55, cl: Color(0xFF00E5FF)),
+    _SC(x: 0.38, y: 0.42, sz: 1.0, ph: 0.20, cl: Color(0xFFE0F7FA)),
+    _SC(x: 0.58, y: 0.36, sz: 0.9, ph: 0.75, cl: Color(0xFF10B981)),
+    _SC(x: 0.72, y: 0.45, sz: 1.2, ph: 0.12, cl: Color(0xFF8B5CF6)),
+    _SC(x: 0.86, y: 0.34, sz: 1.0, ph: 0.62, cl: Color(0xFF00E5FF)),
+    _SC(x: 0.95, y: 0.25, sz: 1.3, ph: 0.48, cl: Color(0xFFE0F7FA)),
+  ];
+
   // 6 Meteors traversing full screen (AMOLED Night)
   static const List<_Meteor> _meteors = [
     _Meteor(startXRatio: 0.88, startYRatio: -0.06, speed: 0.85, phase: 0.02, length: 190, headSize: 2.6),
@@ -159,54 +189,20 @@ class _FullAppBgPainter extends CustomPainter {
     _Meteor(startXRatio: 1.26, startYRatio: 0.20, speed: 1.12, phase: 0.88, length: 195, headSize: 2.7),
   ];
 
-  // Wind-swept rain (Dark Thunderstorm)
-  static const List<_RainDrop> _rainDrops = [
-    _RainDrop(x: 0.02, speed: 3.2, len: 26, ph: 0.02, width: 1.3, alpha: 0.45),
-    _RainDrop(x: 0.06, speed: 2.4, len: 18, ph: 0.12, width: 1.0, alpha: 0.28),
-    _RainDrop(x: 0.09, speed: 3.6, len: 30, ph: 0.24, width: 1.4, alpha: 0.50),
-    _RainDrop(x: 0.13, speed: 2.8, len: 22, ph: 0.35, width: 1.1, alpha: 0.35),
-    _RainDrop(x: 0.17, speed: 3.3, len: 28, ph: 0.46, width: 1.3, alpha: 0.46),
-    _RainDrop(x: 0.21, speed: 2.5, len: 19, ph: 0.58, width: 1.0, alpha: 0.30),
-    _RainDrop(x: 0.25, speed: 3.5, len: 29, ph: 0.69, width: 1.4, alpha: 0.52),
-    _RainDrop(x: 0.29, speed: 2.9, len: 23, ph: 0.80, width: 1.2, alpha: 0.38),
-    _RainDrop(x: 0.33, speed: 3.1, len: 25, ph: 0.91, width: 1.2, alpha: 0.44),
-    _RainDrop(x: 0.37, speed: 2.6, len: 20, ph: 0.05, width: 1.1, alpha: 0.32),
-    _RainDrop(x: 0.41, speed: 3.7, len: 31, ph: 0.16, width: 1.5, alpha: 0.54),
-    _RainDrop(x: 0.45, speed: 2.8, len: 21, ph: 0.28, width: 1.1, alpha: 0.36),
-    _RainDrop(x: 0.49, speed: 3.4, len: 27, ph: 0.39, width: 1.3, alpha: 0.48),
-    _RainDrop(x: 0.53, speed: 2.5, len: 18, ph: 0.50, width: 1.0, alpha: 0.29),
-    _RainDrop(x: 0.57, speed: 3.6, len: 30, ph: 0.62, width: 1.4, alpha: 0.50),
-    _RainDrop(x: 0.61, speed: 2.7, len: 22, ph: 0.73, width: 1.1, alpha: 0.34),
-    _RainDrop(x: 0.65, speed: 3.2, len: 26, ph: 0.84, width: 1.3, alpha: 0.45),
-    _RainDrop(x: 0.69, speed: 2.4, len: 17, ph: 0.95, width: 1.0, alpha: 0.27),
-    _RainDrop(x: 0.73, speed: 3.8, len: 32, ph: 0.08, width: 1.5, alpha: 0.55),
-    _RainDrop(x: 0.77, speed: 2.9, len: 23, ph: 0.20, width: 1.2, alpha: 0.37),
-    _RainDrop(x: 0.81, speed: 3.3, len: 27, ph: 0.31, width: 1.3, alpha: 0.47),
-    _RainDrop(x: 0.85, speed: 2.6, len: 19, ph: 0.43, width: 1.0, alpha: 0.31),
-    _RainDrop(x: 0.89, speed: 3.5, len: 29, ph: 0.54, width: 1.4, alpha: 0.51),
-    _RainDrop(x: 0.93, speed: 2.8, len: 21, ph: 0.66, width: 1.1, alpha: 0.35),
-    _RainDrop(x: 0.97, speed: 3.4, len: 28, ph: 0.77, width: 1.3, alpha: 0.48),
-    _RainDrop(x: 0.04, speed: 3.0, len: 24, ph: 0.88, width: 1.2, alpha: 0.40),
-    _RainDrop(x: 0.15, speed: 3.5, len: 29, ph: 0.98, width: 1.4, alpha: 0.50),
-    _RainDrop(x: 0.28, speed: 2.7, len: 20, ph: 0.14, width: 1.1, alpha: 0.33),
-    _RainDrop(x: 0.46, speed: 3.3, len: 27, ph: 0.26, width: 1.3, alpha: 0.46),
-    _RainDrop(x: 0.63, speed: 2.5, len: 19, ph: 0.38, width: 1.0, alpha: 0.30),
-    _RainDrop(x: 0.79, speed: 3.6, len: 30, ph: 0.51, width: 1.4, alpha: 0.52),
-    _RainDrop(x: 0.91, speed: 2.9, len: 22, ph: 0.63, width: 1.1, alpha: 0.36),
-  ];
-
-  // Drifting leaves (Light theme)
+  // 12 Drifting fresh spring leaves (Light theme)
   static const List<_LC> _leaves = [
-    _LC(bx: 0.06, sp: 1, sw: 14.0, sz: 6.8, ph: 0.05, cl: Color(0xFF2E7D32)),
-    _LC(bx: 0.16, sp: 2, sw: 16.0, sz: 8.0, ph: 0.25, cl: Color(0xFFD97706)),
-    _LC(bx: 0.27, sp: 1, sw: 12.0, sz: 6.5, ph: 0.45, cl: Color(0xFF388E3C)),
-    _LC(bx: 0.38, sp: 2, sw: 18.0, sz: 8.2, ph: 0.65, cl: Color(0xFFE28743)),
-    _LC(bx: 0.48, sp: 1, sw: 13.0, sz: 7.0, ph: 0.85, cl: Color(0xFF4CAF50)),
-    _LC(bx: 0.58, sp: 2, sw: 15.0, sz: 7.8, ph: 0.10, cl: Color(0xFFD97706)),
-    _LC(bx: 0.68, sp: 1, sw: 11.0, sz: 6.2, ph: 0.30, cl: Color(0xFF2E7D32)),
-    _LC(bx: 0.78, sp: 2, sw: 17.0, sz: 7.8, ph: 0.50, cl: Color(0xFFE28743)),
-    _LC(bx: 0.88, sp: 1, sw: 14.0, sz: 6.8, ph: 0.70, cl: Color(0xFF388E3C)),
-    _LC(bx: 0.95, sp: 2, sw: 16.0, sz: 7.6, ph: 0.90, cl: Color(0xFFD97706)),
+    _LC(bx: 0.06, sp: 1, sw: 14.0, sz: 6.8, ph: 0.05, cl: Color(0xFF10B981)),
+    _LC(bx: 0.15, sp: 2, sw: 16.0, sz: 8.0, ph: 0.22, cl: Color(0xFF34D399)),
+    _LC(bx: 0.25, sp: 1, sw: 12.0, sz: 6.5, ph: 0.40, cl: Color(0xFF059669)),
+    _LC(bx: 0.35, sp: 2, sw: 18.0, sz: 7.8, ph: 0.58, cl: Color(0xFF10B981)),
+    _LC(bx: 0.45, sp: 1, sw: 13.0, sz: 7.0, ph: 0.76, cl: Color(0xFF34D399)),
+    _LC(bx: 0.54, sp: 2, sw: 15.0, sz: 7.5, ph: 0.94, cl: Color(0xFF059669)),
+    _LC(bx: 0.63, sp: 1, sw: 11.0, sz: 6.2, ph: 0.12, cl: Color(0xFF10B981)),
+    _LC(bx: 0.72, sp: 2, sw: 17.0, sz: 7.8, ph: 0.30, cl: Color(0xFF34D399)),
+    _LC(bx: 0.81, sp: 1, sw: 14.0, sz: 6.8, ph: 0.48, cl: Color(0xFF059669)),
+    _LC(bx: 0.89, sp: 2, sw: 16.0, sz: 7.6, ph: 0.66, cl: Color(0xFF10B981)),
+    _LC(bx: 0.95, sp: 1, sw: 13.0, sz: 6.4, ph: 0.84, cl: Color(0xFF34D399)),
+    _LC(bx: 0.20, sp: 2, sw: 19.0, sz: 8.2, ph: 0.02, cl: Color(0xFF059669)),
   ];
 
   @override
@@ -218,159 +214,281 @@ class _FullAppBgPainter extends CustomPainter {
       case AppThemeMode.amoled:
         _drawAmoledNight(canvas, size);
       case AppThemeMode.dark:
-        _drawThunderstorm(canvas, size);
+        _drawMidnightAurora(canvas, size);
       case AppThemeMode.light:
         _drawLightTheme(canvas, size);
     }
   }
 
   // ---------------------------------------------------------------------------
-  // 1. AMOLED SAKURA THEME
+  // 1. AMOLED SAKURA THEME (Zen Ethereal Moonlit Sakura)
   // ---------------------------------------------------------------------------
   void _drawSakura(Canvas canvas, Size size) {
     _fill.color = const Color(0xFF000000);
     canvas.drawRect(Offset.zero & size, _fill);
 
-    // Lush Sakura Tree with Volumetric Canopy & Foliage
-    _drawLushSakuraTree(canvas, size);
+    final w = size.width;
+    final h = size.height;
 
-    // Drifting Sakura Petals
+    // 1. Ethereal Full Moon (Top-Left)
+    final moonCenter = Offset(w * 0.18, h * 0.10);
+    const moonR = 22.0;
+    final moonGlow = 0.85 + 0.15 * math.sin(progress * 2 * math.pi);
+
+    // Outer Rose-Gold Halo
+    _glow.color = const Color(0xFFFF7AA5).withValues(alpha: 0.08 * moonGlow);
+    canvas.drawCircle(moonCenter, moonR + 18.0, _glow);
+    _glow.color = const Color(0xFFFFD4E8).withValues(alpha: 0.15 * moonGlow);
+    canvas.drawCircle(moonCenter, moonR + 9.0, _glow);
+
+    // Moon Disc
+    _fill.color = const Color(0xFFFFF1F6).withValues(alpha: 0.95);
+    canvas.drawCircle(moonCenter, moonR, _fill);
+
+    // Subtle Soft Lunar Craters / Shading
+    _fill.color = const Color(0xFFF3D2DF).withValues(alpha: 0.28);
+    canvas.drawCircle(moonCenter.translate(-5, -4), 5.5, _fill);
+    canvas.drawCircle(moonCenter.translate(6, 3), 4.2, _fill);
+    canvas.drawCircle(moonCenter.translate(1, 7), 3.0, _fill);
+
+    // 2. Artistic Sumi-e Sakura Bough (Hanging from top-right with micro-sway)
+    _drawSumiESakuraBough(canvas, size);
+
+    // 3. 14 Drifting Sakura Petals
     for (final p in _petals) {
       final t = (progress * p.sp + p.ph) % 1.0;
-      final x = (p.bx * size.width) + math.sin(t * 2 * math.pi + p.ph) * p.sw;
-      final y = -p.sz + t * (size.height + p.sz * 2);
+      final x = (p.bx * w) + math.sin(t * 2 * math.pi + p.ph) * p.sw;
+      final y = -p.sz + t * (h + p.sz * 2);
       final opacity = (math.sin(t * math.pi) * 0.85).clamp(0.0, 1.0);
-      _fill.color = const Color(0xFFFF7AA5).withValues(alpha: opacity);
+      _fill.color = const Color(0xFFFF85BF).withValues(alpha: opacity * 0.90);
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate((t * 2 * math.pi) + p.ph);
+      // Oval petal with cleft hint
       canvas.drawOval(
-        Rect.fromCenter(center: Offset.zero, width: p.sz * 1.5, height: p.sz * 0.8),
+        Rect.fromCenter(center: Offset.zero, width: p.sz * 1.5, height: p.sz * 0.85),
+        _fill,
+      );
+      // Delicate inner highlight
+      _fill.color = const Color(0xFFFFD4E8).withValues(alpha: opacity * 0.50);
+      canvas.drawOval(
+        Rect.fromCenter(center: const Offset(-1, 0), width: p.sz * 0.9, height: p.sz * 0.45),
         _fill,
       );
       canvas.restore();
     }
 
-    _drawSparkle(canvas, Offset(size.width * 0.30, size.height * 0.15), progress, const Color(0xFFFFD1E3));
-    _drawSparkle(canvas, Offset(size.width * 0.65, size.height * 0.08), progress + 0.3, const Color(0xFFFFD1E3));
-    _drawSparkle(canvas, Offset(size.width * 0.48, size.height * 0.45), progress + 0.6, const Color(0xFFFF85BF));
+    // 4. Stardust / Sparkle Puffs
+    _drawSparkle(canvas, Offset(w * 0.28, h * 0.16), progress, const Color(0xFFFFD4E8));
+    _drawSparkle(canvas, Offset(w * 0.42, h * 0.08), progress + 0.35, const Color(0xFFFF7AA5));
+    _drawSparkle(canvas, Offset(w * 0.55, h * 0.22), progress + 0.70, const Color(0xFFFFD1E3));
+    _drawSparkle(canvas, Offset(w * 0.75, h * 0.12), progress + 0.20, const Color(0xFFFFE485));
+    _drawSparkle(canvas, Offset(w * 0.12, h * 0.24), progress + 0.50, const Color(0xFFFFB3D1));
   }
 
-  void _drawLushSakuraTree(Canvas canvas, Size size) {
+  void _drawSumiESakuraBough(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
+    final sway = math.sin(progress * 2 * math.pi) * 2.5;
 
-    // 1. Organic Tapered Trunk
-    final trunkPath = Path()
-      ..moveTo(w * 0.88, h * 1.02)
-      ..cubicTo(w * 0.89, h * 0.88, w * 0.87, h * 0.74, w * 0.84, h * 0.62)
-      ..cubicTo(w * 0.81, h * 0.52, w * 0.77, h * 0.44, w * 0.72, h * 0.36)
-      ..lineTo(w * 0.76, h * 0.35)
-      ..cubicTo(w * 0.82, h * 0.45, w * 0.87, h * 0.54, w * 0.91, h * 0.65)
-      ..cubicTo(w * 0.94, h * 0.76, w * 0.97, h * 0.88, w * 1.02, h * 1.02)
-      ..close();
-
-    _fill.color = const Color(0xFF2E1020).withValues(alpha: 0.80);
-    canvas.drawPath(trunkPath, _fill);
-
-    // Inner Bark Grain Lines
+    // 1. Sumi-e Main Trunk & Curved Boughs
     _stroke
-      ..color = const Color(0xFF451832).withValues(alpha: 0.65)
-      ..strokeWidth = 3.5;
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.94, h * 1.01)
-        ..cubicTo(w * 0.92, h * 0.85, w * 0.89, h * 0.70, w * 0.84, h * 0.58),
-      _stroke,
-    );
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
-    // 2. Main Boughs & Reaching Branches
+    // Main bough from top-right corner sweeping downward
     _stroke
-      ..color = const Color(0xFF351225).withValues(alpha: 0.75)
-      ..strokeWidth = 10;
-    // Bough reaching toward center-left
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.84, h * 0.62)
-        ..cubicTo(w * 0.78, h * 0.52, w * 0.70, h * 0.44, w * 0.60, h * 0.34),
-      _stroke,
-    );
-    // Bough reaching upward
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.86, h * 0.60)
-        ..cubicTo(w * 0.86, h * 0.48, w * 0.84, h * 0.38, w * 0.80, h * 0.24),
-      _stroke,
-    );
-    // Bough reaching rightward
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.89, h * 0.63)
-        ..cubicTo(w * 0.92, h * 0.52, w * 0.96, h * 0.42, w * 0.99, h * 0.28),
-      _stroke,
-    );
+      ..color = const Color(0xFF260D1B).withValues(alpha: 0.90)
+      ..strokeWidth = 9.0;
+    final mainBranch = Path()
+      ..moveTo(w * 1.05, -h * 0.02)
+      ..cubicTo(
+        w * 0.90,
+        h * 0.08 + sway * 0.3,
+        w * 0.75,
+        h * 0.16 + sway * 0.7,
+        w * 0.58,
+        h * 0.24 + sway,
+      );
+    canvas.drawPath(mainBranch, _stroke);
 
-    // Sub-branches
+    // Inner bark highlight
     _stroke
-      ..strokeWidth = 5.0
-      ..color = const Color(0xFF3D152B).withValues(alpha: 0.65);
+      ..color = const Color(0xFF451832).withValues(alpha: 0.55)
+      ..strokeWidth = 3.0;
+    final barkDetail = Path()
+      ..moveTo(w * 1.02, -h * 0.01)
+      ..cubicTo(
+        w * 0.88,
+        h * 0.08 + sway * 0.3,
+        w * 0.74,
+        h * 0.16 + sway * 0.7,
+        w * 0.60,
+        h * 0.23 + sway,
+      );
+    canvas.drawPath(barkDetail, _stroke);
+
+    // Sub-branch A: Reaching upward toward top
+    _stroke
+      ..color = const Color(0xFF2E1020).withValues(alpha: 0.85)
+      ..strokeWidth = 4.5;
     canvas.drawPath(
-      Path()..moveTo(w * 0.70, h * 0.44)..cubicTo(w * 0.65, h * 0.38, w * 0.54, h * 0.32, w * 0.48, h * 0.28),
+      Path()
+        ..moveTo(w * 0.86, h * 0.09 + sway * 0.3)
+        ..cubicTo(
+          w * 0.82,
+          h * 0.04 + sway * 0.2,
+          w * 0.76,
+          h * 0.02 + sway * 0.1,
+          w * 0.70,
+          h * 0.01 + sway * 0.1,
+        ),
       _stroke,
     );
+
+    // Sub-branch B: Arching downward
+    _stroke.strokeWidth = 4.0;
     canvas.drawPath(
-      Path()..moveTo(w * 0.73, h * 0.46)..cubicTo(w * 0.74, h * 0.36, w * 0.70, h * 0.28, w * 0.68, h * 0.20),
+      Path()
+        ..moveTo(w * 0.74, h * 0.16 + sway * 0.7)
+        ..cubicTo(
+          w * 0.72,
+          h * 0.24 + sway * 0.9,
+          w * 0.66,
+          h * 0.29 + sway * 1.1,
+          w * 0.62,
+          h * 0.32 + sway * 1.2,
+        ),
       _stroke,
     );
+
+    // Sub-branch C: Reaching center-left tip
+    _stroke.strokeWidth = 3.2;
     canvas.drawPath(
-      Path()..moveTo(w * 0.83, h * 0.42)..cubicTo(w * 0.88, h * 0.32, w * 0.90, h * 0.24, w * 0.89, h * 0.16),
+      Path()
+        ..moveTo(w * 0.60, h * 0.23 + sway)
+        ..cubicTo(
+          w * 0.52,
+          h * 0.24 + sway * 1.1,
+          w * 0.46,
+          h * 0.27 + sway * 1.2,
+          w * 0.42,
+          h * 0.30 + sway * 1.3,
+        ),
       _stroke,
     );
+
+    // Sub-branch D: Minor twig
+    _stroke.strokeWidth = 2.4;
     canvas.drawPath(
-      Path()..moveTo(w * 0.94, h * 0.46)..cubicTo(w * 0.97, h * 0.38, w * 1.01, h * 0.30, w * 1.02, h * 0.22),
+      Path()
+        ..moveTo(w * 0.80, h * 0.13 + sway * 0.5)
+        ..cubicTo(
+          w * 0.78,
+          h * 0.10 + sway * 0.4,
+          w * 0.75,
+          h * 0.08 + sway * 0.3,
+          w * 0.73,
+          h * 0.07 + sway * 0.3,
+        ),
       _stroke,
     );
 
-    // 3. Volumetric Cherry Blossom Canopy Clouds with Foliage Underlay
-    void drawCanopyCluster(Offset c, double radius) {
-      // Layer A: Under-canopy Depth Shadow
-      _fill.color = const Color(0xFF561533).withValues(alpha: 0.50);
-      canvas.drawCircle(c.translate(0, radius * 0.25), radius * 0.95, _fill);
+    // 2. Sakura Blooming Flowers (5 petals with golden stamen)
+    void drawFlower(Offset center, double radius, double rot) {
+      canvas.save();
+      canvas.translate(center.dx, center.dy);
+      canvas.rotate(rot);
 
-      // Layer B: Spring Green Leaves nestled in the blooms
-      _fill.color = const Color(0xFF2E6832).withValues(alpha: 0.42);
-      canvas.drawCircle(c.translate(-radius * 0.35, radius * 0.20), radius * 0.55, _fill);
-      _fill.color = const Color(0xFF4C8C50).withValues(alpha: 0.38);
-      canvas.drawCircle(c.translate(radius * 0.30, radius * 0.15), radius * 0.50, _fill);
+      // Draw 5 petals
+      for (int i = 0; i < 5; i++) {
+        final angle = i * (2 * math.pi / 5);
+        final petalDist = radius * 0.60;
+        final petalCenter = Offset(math.cos(angle) * petalDist, math.sin(angle) * petalDist);
 
-      // Layer C: Rich Magenta / Deep Rose Blossom Base
-      _fill.color = const Color(0xFFFF528F).withValues(alpha: 0.55);
-      canvas.drawCircle(c.translate(-radius * 0.25, 0), radius * 0.75, _fill);
-      canvas.drawCircle(c.translate(radius * 0.25, -radius * 0.10), radius * 0.70, _fill);
-      canvas.drawCircle(c.translate(0, -radius * 0.30), radius * 0.65, _fill);
+        canvas.save();
+        canvas.translate(petalCenter.dx, petalCenter.dy);
+        canvas.rotate(angle);
 
-      // Layer D: Soft Sakura Blossom Clouds
-      _fill.color = const Color(0xFFFF85BF).withValues(alpha: 0.60);
-      canvas.drawCircle(c, radius * 0.60, _fill);
-      canvas.drawCircle(c.translate(-radius * 0.20, -radius * 0.20), radius * 0.48, _fill);
-      canvas.drawCircle(c.translate(radius * 0.20, -radius * 0.15), radius * 0.45, _fill);
+        // Petal base
+        _fill.color = const Color(0xFFFF6097).withValues(alpha: 0.85);
+        canvas.drawOval(
+          Rect.fromCenter(center: Offset.zero, width: radius * 0.75, height: radius * 0.50),
+          _fill,
+        );
 
-      // Layer E: Sunlit Petal Highlight Puffs
-      _fill.color = const Color(0xFFFFD4E8).withValues(alpha: 0.68);
-      canvas.drawCircle(c.translate(-radius * 0.10, -radius * 0.35), radius * 0.38, _fill);
-      canvas.drawCircle(c.translate(radius * 0.15, -radius * 0.30), radius * 0.32, _fill);
+        // Petal tip highlight
+        _fill.color = const Color(0xFFFFD4E8).withValues(alpha: 0.90);
+        canvas.drawOval(
+          Rect.fromCenter(center: Offset(radius * 0.15, 0), width: radius * 0.60, height: radius * 0.38),
+          _fill,
+        );
+
+        canvas.restore();
+      }
+
+      // Center disc
+      _fill.color = const Color(0xFFFF4081).withValues(alpha: 0.90);
+      canvas.drawCircle(Offset.zero, radius * 0.28, _fill);
+
+      // Golden Stamen & Pistil
+      _fill.color = const Color(0xFFFFE485);
+      canvas.drawCircle(Offset.zero, radius * 0.18, _fill);
+
+      // 5 Tiny Golden Pollen Dots
+      for (int i = 0; i < 5; i++) {
+        final a = i * (2 * math.pi / 5) + 0.3;
+        final px = math.cos(a) * (radius * 0.26);
+        final py = math.sin(a) * (radius * 0.26);
+        _fill.color = const Color(0xFFFFF9C4);
+        canvas.drawCircle(Offset(px, py), 1.0, _fill);
+      }
+
+      canvas.restore();
     }
 
-    // Lush Canopy Lobes spanning across the upper and mid boughs
-    drawCanopyCluster(Offset(w * 0.48, h * 0.27), 38);
-    drawCanopyCluster(Offset(w * 0.59, h * 0.22), 44);
-    drawCanopyCluster(Offset(w * 0.69, h * 0.17), 46);
-    drawCanopyCluster(Offset(w * 0.80, h * 0.14), 45);
-    drawCanopyCluster(Offset(w * 0.89, h * 0.16), 40);
-    drawCanopyCluster(Offset(w * 0.99, h * 0.22), 38);
-    drawCanopyCluster(Offset(w * 0.72, h * 0.33), 36);
-    drawCanopyCluster(Offset(w * 0.86, h * 0.30), 34);
-    drawCanopyCluster(Offset(w * 0.95, h * 0.36), 30);
+    // 3. Cherry Buds
+    void drawBud(Offset center, double radius, double rot) {
+      canvas.save();
+      canvas.translate(center.dx, center.dy);
+      canvas.rotate(rot);
+
+      // Sepal green/wine
+      _fill.color = const Color(0xFF381024).withValues(alpha: 0.85);
+      canvas.drawOval(
+        Rect.fromCenter(center: const Offset(-2, 0), width: radius * 0.9, height: radius * 0.5),
+        _fill,
+      );
+
+      // Rosy bud petal
+      _fill.color = const Color(0xFFFF528F).withValues(alpha: 0.95);
+      canvas.drawOval(
+        Rect.fromCenter(center: const Offset(2, 0), width: radius * 0.85, height: radius * 0.55),
+        _fill,
+      );
+
+      _fill.color = const Color(0xFFFFB3D1);
+      canvas.drawCircle(const Offset(3, -1), radius * 0.22, _fill);
+
+      canvas.restore();
+    }
+
+    // Place Flowers at branch nodes and clusters
+    drawFlower(Offset(w * 0.86, h * 0.09 + sway * 0.3), 13.0, 0.2);
+    drawFlower(Offset(w * 0.78, h * 0.14 + sway * 0.6), 14.5, 0.8);
+    drawFlower(Offset(w * 0.69, h * 0.19 + sway * 0.8), 15.0, 0.4);
+    drawFlower(Offset(w * 0.58, h * 0.24 + sway), 13.5, 1.2);
+    drawFlower(Offset(w * 0.42, h * 0.30 + sway * 1.3), 12.0, 0.6);
+    drawFlower(Offset(w * 0.70, h * 0.02 + sway * 0.1), 11.5, 1.5);
+    drawFlower(Offset(w * 0.62, h * 0.32 + sway * 1.2), 12.5, 0.9);
+    drawFlower(Offset(w * 0.94, h * 0.05 + sway * 0.2), 11.0, 0.1);
+
+    // Place Buds
+    drawBud(Offset(w * 0.65, h * 0.04 + sway * 0.15), 7.0, -0.4);
+    drawBud(Offset(w * 0.55, h * 0.35 + sway * 1.25), 6.5, 0.8);
+    drawBud(Offset(w * 0.38, h * 0.32 + sway * 1.35), 6.0, 0.3);
+    drawBud(Offset(w * 0.74, h * 0.06 + sway * 0.25), 6.5, -0.2);
+    drawBud(Offset(w * 0.83, h * 0.18 + sway * 0.7), 7.0, 1.1);
   }
 
   // ---------------------------------------------------------------------------
@@ -426,28 +544,23 @@ class _FullAppBgPainter extends CustomPainter {
 
   void _drawContinuousMeteor(Canvas canvas, Size size, _Meteor m) {
     final tCycle = (progress * m.speed + m.phase) % 1.0;
-    // Each meteor transits the canvas for 42% of its cycle, then waits in cooldown
     const transitFraction = 0.42;
     if (tCycle > transitFraction) return;
 
-    final p = tCycle / transitFraction; // 0.0 (entering) to 1.0 (exited)
+    final p = tCycle / transitFraction;
     const angle = 36.0 * math.pi / 180.0;
     final cosA = math.cos(angle);
     final sinA = math.sin(angle);
 
-    // Full traversal length across the diagonal
     final totalDistance = (size.width + size.height) * 1.35;
     final startX = size.width * m.startXRatio;
     final startY = size.height * m.startYRatio;
 
-    // Head moves from start towards bottom-left
     final headX = startX - cosA * totalDistance * p;
     final headY = startY + sinA * totalDistance * p;
 
-    // Smooth entry and exit envelope (no abrupt disappearance)
     final envelope = (math.sin(p * math.pi)).clamp(0.0, 1.0);
 
-    // Draw glowing gradient trail
     const steps = 7;
     for (int i = 0; i < steps; i++) {
       final f1 = i / steps;
@@ -464,7 +577,6 @@ class _FullAppBgPainter extends CustomPainter {
       canvas.drawLine(Offset(x1, y1), Offset(x2, y2), _stroke);
     }
 
-    // Radiant Glowing Head
     _fill.color = m.color.withValues(alpha: envelope * 0.45);
     canvas.drawCircle(Offset(headX, headY), m.headSize * 2.2, _fill);
     _fill.color = Colors.white.withValues(alpha: envelope * 0.95);
@@ -472,400 +584,199 @@ class _FullAppBgPainter extends CustomPainter {
   }
 
   // ---------------------------------------------------------------------------
-  // 3. DARK THUNDERSTORM THEME (Drifting Clouds, Forked Lightning, Angled Rain)
+  // 3. DARK THEME (Midnight Cyber Aurora)
   // ---------------------------------------------------------------------------
-  void _drawThunderstorm(Canvas canvas, Size size) {
-    _fill.color = const Color(0xFF0D1117);
-    canvas.drawRect(Offset.zero & size, _fill);
-
-    // Lightning Flash Check (two strike cycles in the animation)
-    final lProgress1 = (progress * 1.5) % 1.0;
-    final lProgress2 = (progress * 1.5 + 0.55) % 1.0;
-    final bool isStrike1 = lProgress1 < 0.08;
-    final bool isStrike2 = lProgress2 < 0.06;
-
-    double flashAlpha = 0.0;
-    if (isStrike1) {
-      flashAlpha = (math.sin(lProgress1 / 0.08 * math.pi) * 0.07).clamp(0.0, 0.08);
-    } else if (isStrike2) {
-      flashAlpha = (math.sin(lProgress2 / 0.06 * math.pi) * 0.06).clamp(0.0, 0.07);
-    }
-
-    if (flashAlpha > 0.0) {
-      _fill.color = const Color(0xFF388BFD).withValues(alpha: flashAlpha);
-      canvas.drawRect(Offset.zero & size, _fill);
-    }
-
-    // Wind-swept rain (~15 degree tilt to right)
-    final rainTiltX = 7.0;
-    final rainTiltY = 26.0;
-
-    for (final r in _rainDrops) {
-      final t = (progress * r.speed + r.ph) % 1.0;
-      final x = r.x * size.width + (t * 40.0) % size.width;
-      final y = -40.0 + (size.height + 60.0) * t;
-      final alpha = (r.alpha * (0.6 + 0.4 * math.sin(t * math.pi))).clamp(0.0, 1.0);
-
-      _stroke
-        ..strokeWidth = r.width
-        ..color = const Color(0xFF8B949E).withValues(alpha: alpha);
-      canvas.drawLine(
-        Offset(x, y),
-        Offset(x + rainTiltX * (r.len / 26.0), y + rainTiltY * (r.len / 26.0)),
-        _stroke,
-      );
-
-      // Splash ripple when drop hits the bottom
-      if (y > size.height - 18) {
-        final spT = (y - (size.height - 18)) / 18;
-        _stroke
-          ..strokeWidth = 0.8
-          ..color = const Color(0xFF8B949E).withValues(alpha: (1.0 - spT) * 0.25);
-        canvas.drawOval(
-          Rect.fromCenter(
-            center: Offset(x + rainTiltX, size.height - 2),
-            width: 8 * spT,
-            height: 2.5 * spT,
-          ),
-          _stroke,
-        );
-      }
-    }
-
-    // Dynamic Multi-Tier Storm Clouds
-    _drawStormClouds(canvas, size, flashAlpha);
-
-    // Forked Branching Lightning Bolt
-    if (isStrike1) {
-      _drawForkedLightning(canvas, size, lProgress1 / 0.08, Offset(size.width * 0.58, size.height * 0.06));
-    } else if (isStrike2) {
-      _drawForkedLightning(canvas, size, lProgress2 / 0.06, Offset(size.width * 0.32, size.height * 0.05));
-    }
-  }
-
-  void _drawStormClouds(Canvas canvas, Size size, double flashAlpha) {
+  void _drawMidnightAurora(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final drift = math.sin(progress * 2 * math.pi) * 8.0;
 
-    void drawCloudPuff(Offset c, double radius, Color color) {
-      _fill.color = color;
-      canvas.drawCircle(c, radius, _fill);
+    // Deep Midnight Slate Canvas
+    final bgRect = Offset.zero & size;
+    _fill.shader = const LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0xFF0B0E14), Color(0xFF111622)],
+    ).createShader(bgRect);
+    canvas.drawRect(bgRect, _fill);
+    _fill.shader = null;
+
+    // Micro Cosmic Stars
+    for (final s in _auroraStars) {
+      final pos = Offset(s.x * w, s.y * h);
+      final twinkle = 0.30 + 0.70 * (0.5 + 0.5 * math.sin((progress + s.ph) * 2 * math.pi));
+      final alpha = (twinkle * 0.85).clamp(0.0, 1.0);
+      final starColor = s.cl.withValues(alpha: alpha);
+      if (s.sp) _drawSparkle(canvas, pos, (progress + s.ph) % 1.0, starColor);
+      _fill.color = starColor;
+      canvas.drawCircle(pos, s.sz * (0.75 + 0.25 * twinkle), _fill);
     }
 
-    // Back Dark Storm Tier
-    final backColor = const Color(0xFF131924).withValues(alpha: 0.90);
-    drawCloudPuff(Offset(w * 0.08 + drift * 0.5, h * 0.04), 48, backColor);
-    drawCloudPuff(Offset(w * 0.35 + drift * 0.5, h * 0.06), 56, backColor);
-    drawCloudPuff(Offset(w * 0.68 + drift * 0.5, h * 0.05), 52, backColor);
-    drawCloudPuff(Offset(w * 0.95 + drift * 0.5, h * 0.03), 46, backColor);
+    // Ethereal Horizon Nebula Glow
+    _glow.color = const Color(0xFF00E5FF).withValues(alpha: 0.05);
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(w * 0.5, h * 0.22), width: w * 1.2, height: h * 0.35),
+      _glow,
+    );
 
-    // Front Textured Thundercloud Tier
-    final frontColor = Color.lerp(
-      const Color(0xFF1C2331).withValues(alpha: 0.88),
-      const Color(0xFF324560).withValues(alpha: 0.95),
-      (flashAlpha * 12.0).clamp(0.0, 1.0),
-    )!;
+    // 3 Undulating Aurora Borealis Curtains
+    // Curtain 1: Electric Cyan (Upper Horizon)
+    _drawAuroraCurtain(canvas, size, 0.07, 0.20, const Color(0xFF00E5FF), 0.7, 0.0);
 
-    drawCloudPuff(Offset(w * 0.18 + drift, h * 0.07), 42, frontColor);
-    drawCloudPuff(Offset(w * 0.50 + drift, h * 0.08), 50, frontColor);
-    drawCloudPuff(Offset(w * 0.82 + drift, h * 0.06), 46, frontColor);
-    drawCloudPuff(Offset(w * 0.34 + drift, h * 0.11), 36, frontColor);
-    drawCloudPuff(Offset(w * 0.64 + drift, h * 0.10), 38, frontColor);
+    // Curtain 2: Emerald Green (Mid Horizon)
+    _drawAuroraCurtain(canvas, size, 0.13, 0.22, const Color(0xFF10B981), 0.9, 0.33);
+
+    // Curtain 3: Nebula Violet (Lower Horizon Depth)
+    _drawAuroraCurtain(canvas, size, 0.19, 0.24, const Color(0xFF8B5CF6), 0.6, 0.66);
   }
 
-  void _drawForkedLightning(Canvas canvas, Size size, double p01, Offset origin) {
-    final alpha = (math.sin(p01 * math.pi) * 0.95).clamp(0.0, 1.0);
+  void _drawAuroraCurtain(
+    Canvas canvas,
+    Size size,
+    double baseYRatio,
+    double heightRatio,
+    Color peakColor,
+    double speedMult,
+    double phaseOffset,
+  ) {
+    final w = size.width;
     final h = size.height;
+    final baseY = h * baseYRatio;
+    final ribbonH = h * heightRatio;
+    final t = (progress * speedMult + phaseOffset) * 2 * math.pi;
 
-    // Main jagged trunk
-    final pts = [
-      origin,
-      Offset(origin.dx - 8, origin.dy + h * 0.07),
-      Offset(origin.dx + 14, origin.dy + h * 0.15),
-      Offset(origin.dx - 6, origin.dy + h * 0.23),
-      Offset(origin.dx + 10, origin.dy + h * 0.32),
-      Offset(origin.dx - 2, origin.dy + h * 0.40),
-    ];
+    const segments = 24;
+    final dx = w / segments;
 
-    final mainBolt = Path()..moveTo(pts[0].dx, pts[0].dy);
-    for (int i = 1; i < pts.length; i++) {
-      mainBolt.lineTo(pts[i].dx, pts[i].dy);
+    final topPoints = <Offset>[];
+    final bottomPoints = <Offset>[];
+
+    for (int i = 0; i <= segments; i++) {
+      final x = i * dx;
+      final normX = i / segments;
+      final wave1 = math.sin(normX * 3.2 * math.pi + t) * (h * 0.035);
+      final wave2 = math.cos(normX * 2.1 * math.pi - t * 0.8) * (h * 0.02);
+      final yTop = baseY + wave1 + wave2;
+      final yBot = yTop + ribbonH + (math.sin(normX * 2.5 * math.pi + t * 0.5) * (h * 0.015));
+
+      topPoints.add(Offset(x, yTop));
+      bottomPoints.add(Offset(x, yBot));
     }
 
-    // Branch 1 (splitting to the left at step 2)
-    final branch1 = Path()
-      ..moveTo(pts[2].dx, pts[2].dy)
-      ..lineTo(pts[2].dx - 18, pts[2].dy + h * 0.06)
-      ..lineTo(pts[2].dx - 26, pts[2].dy + h * 0.12);
-
-    // Branch 2 (splitting to the right at step 4)
-    final branch2 = Path()
-      ..moveTo(pts[4].dx, pts[4].dy)
-      ..lineTo(pts[4].dx + 16, pts[4].dy + h * 0.05)
-      ..lineTo(pts[4].dx + 22, pts[4].dy + h * 0.09);
-
-    void renderBolt(Path path, double glowW, double coreW) {
-      _stroke
-        ..strokeWidth = glowW
-        ..color = const Color(0xFF388BFD).withValues(alpha: alpha * 0.30);
-      canvas.drawPath(path, _stroke);
-
-      _stroke
-        ..strokeWidth = coreW * 1.8
-        ..color = const Color(0xFF79C0FF).withValues(alpha: alpha * 0.85);
-      canvas.drawPath(path, _stroke);
-
-      _stroke
-        ..strokeWidth = coreW * 0.8
-        ..color = Colors.white.withValues(alpha: alpha * 0.95);
-      canvas.drawPath(path, _stroke);
+    final curtainPath = Path()..moveTo(topPoints.first.dx, topPoints.first.dy);
+    for (int i = 1; i < topPoints.length; i++) {
+      curtainPath.lineTo(topPoints[i].dx, topPoints[i].dy);
     }
+    for (int i = bottomPoints.length - 1; i >= 0; i--) {
+      curtainPath.lineTo(bottomPoints[i].dx, bottomPoints[i].dy);
+    }
+    curtainPath.close();
 
-    renderBolt(mainBolt, 9.0, 2.0);
-    renderBolt(branch1, 5.0, 1.2);
-    renderBolt(branch2, 5.0, 1.2);
+    final bounds = Rect.fromLTWH(0, baseY - h * 0.06, w, ribbonH + h * 0.12);
+    _fill.shader = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        peakColor.withValues(alpha: 0.0),
+        peakColor.withValues(alpha: 0.22),
+        peakColor.withValues(alpha: 0.28),
+        peakColor.withValues(alpha: 0.0),
+      ],
+      stops: const [0.0, 0.35, 0.65, 1.0],
+    ).createShader(bounds);
+
+    canvas.drawPath(curtainPath, _fill);
+    _fill.shader = null;
   }
 
   // ---------------------------------------------------------------------------
-  // 4. LIGHT THEME (Left Fruit Tree, Rolling Grass Hills, Drifting Clouds)
+  // 4. LIGHT THEME (Morning Breeze & Komorebi)
   // ---------------------------------------------------------------------------
   void _drawLightTheme(Canvas canvas, Size size) {
-    _fill.color = const Color(0xFFF6F8FA);
-    canvas.drawRect(Offset.zero & size, _fill);
+    final w = size.width;
+    final h = size.height;
 
-    // Awan Putih di Langit Atas
-    _drawSkyClouds(canvas, size);
+    // Clean Dawn Sky Gradient Canvas
+    final bgRect = Offset.zero & size;
+    _fill.shader = const LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0xFFF8FAFC), Color(0xFFEFF6FF)],
+    ).createShader(bgRect);
+    canvas.drawRect(bgRect, _fill);
+    _fill.shader = null;
 
-    // Pohon Buah di Sisi Kiri Layar
-    _drawLeftFruitTree(canvas, size);
+    // Soft Komorebi Sunbeams
+    _drawKomorebiSunbeams(canvas, size);
 
-    // Rerumputan di Bagian Footer
-    _drawFooterGrassHills(canvas, size);
-
-    // Daun-daun lembut melayang tertiup angin
+    // 12 Fresh Spring Leaves with White Central Vein
     for (final l in _leaves) {
       final t = (progress * l.sp + l.ph) % 1.0;
-      final x = (l.bx * size.width) + math.sin(t * 2 * math.pi + l.ph) * l.sw;
-      final y = -l.sz + t * (size.height + l.sz * 2);
-      final alpha = (math.sin(t * math.pi) * 0.70).clamp(0.0, 1.0);
-      _fill.color = l.cl.withValues(alpha: alpha);
+      final x = (l.bx * w) + math.sin(t * 2 * math.pi + l.ph) * l.sw;
+      final y = -l.sz + t * (h + l.sz * 2);
+      final alpha = (math.sin(t * math.pi) * 0.75).clamp(0.0, 1.0);
 
+      _fill.color = l.cl.withValues(alpha: alpha);
       _stroke
         ..strokeWidth = 0.8
-        ..color = Colors.white.withValues(alpha: alpha * 0.55);
+        ..color = Colors.white.withValues(alpha: alpha * 0.65);
 
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate((t * 2 * math.pi) + l.ph);
       canvas.drawOval(
-        Rect.fromCenter(center: Offset.zero, width: l.sz * 1.8, height: l.sz * 0.7),
+        Rect.fromCenter(center: Offset.zero, width: l.sz * 1.8, height: l.sz * 0.72),
         _fill,
       );
       canvas.drawLine(Offset(-l.sz * 0.7, 0), Offset(l.sz * 0.7, 0), _stroke);
       canvas.restore();
     }
+
+    // Gentle Morning Dew Sparkles
+    _drawSparkle(canvas, Offset(w * 0.25, h * 0.12), progress, const Color(0xFF38BDF8));
+    _drawSparkle(canvas, Offset(w * 0.70, h * 0.18), progress + 0.4, const Color(0xFF34D399));
+    _drawSparkle(canvas, Offset(w * 0.45, h * 0.08), progress + 0.7, const Color(0xFFFBBF24));
   }
 
-  void _drawSkyClouds(Canvas canvas, Size size) {
+  void _drawKomorebiSunbeams(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
+    final breathe = 0.04 + 0.02 * math.sin(progress * 2 * math.pi);
 
-    void drawPuffyCloud(double baseXRatio, double y, double scale) {
-      final x = ((baseXRatio + progress * 0.08) % 1.3 - 0.15) * w;
+    void drawBeam(double startX, double startW, double endX, double endW, double alphaMult) {
+      final beamPath = Path()
+        ..moveTo(startX, 0)
+        ..lineTo(startX + startW, 0)
+        ..lineTo(endX + endW, h * 0.85)
+        ..lineTo(endX, h * 0.85)
+        ..close();
 
-      // Soft underside shadow
-      _fill.color = const Color(0xFFE2EBF5).withValues(alpha: 0.45);
-      canvas.drawCircle(Offset(x, y + 4 * scale), 20 * scale, _fill);
-      canvas.drawCircle(Offset(x - 18 * scale, y + 6 * scale), 15 * scale, _fill);
-      canvas.drawCircle(Offset(x + 18 * scale, y + 5 * scale), 16 * scale, _fill);
-
-      // Pure white cloud puffs
-      _fill.color = const Color(0xFFFFFFFF).withValues(alpha: 0.68);
-      canvas.drawCircle(Offset(x, y), 20 * scale, _fill);
-      canvas.drawCircle(Offset(x - 18 * scale, y + 2 * scale), 15 * scale, _fill);
-      canvas.drawCircle(Offset(x + 18 * scale, y + 1 * scale), 16 * scale, _fill);
-      canvas.drawCircle(Offset(x - 8 * scale, y - 8 * scale), 14 * scale, _fill);
-      canvas.drawCircle(Offset(x + 8 * scale, y - 6 * scale), 13 * scale, _fill);
-    }
-
-    drawPuffyCloud(0.15, h * 0.05, 1.15);
-    drawPuffyCloud(0.58, h * 0.08, 0.95);
-    drawPuffyCloud(0.92, h * 0.04, 1.05);
-  }
-
-  void _drawLeftFruitTree(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-
-    // 1. Organic Tapered Tree Trunk on the Left
-    final trunkPath = Path()
-      ..moveTo(-w * 0.02, h * 1.02)
-      ..cubicTo(w * 0.02, h * 0.88, w * 0.06, h * 0.75, w * 0.10, h * 0.62)
-      ..cubicTo(w * 0.12, h * 0.52, w * 0.15, h * 0.44, w * 0.20, h * 0.35)
-      ..lineTo(w * 0.16, h * 0.34)
-      ..cubicTo(w * 0.11, h * 0.45, w * 0.07, h * 0.55, w * 0.04, h * 0.68)
-      ..cubicTo(w * 0.02, h * 0.80, -w * 0.01, h * 0.90, w * 0.12, h * 1.02)
-      ..close();
-
-    _fill.color = const Color(0xFF5D4037).withValues(alpha: 0.75);
-    canvas.drawPath(trunkPath, _fill);
-
-    // Trunk Grain
-    _stroke
-      ..color = const Color(0xFF795548).withValues(alpha: 0.60)
-      ..strokeWidth = 3.0;
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.03, h * 1.01)
-        ..cubicTo(w * 0.05, h * 0.84, w * 0.08, h * 0.70, w * 0.13, h * 0.56),
-      _stroke,
-    );
-
-    // 2. Reaching Branches
-    _stroke
-      ..color = const Color(0xFF5D4037).withValues(alpha: 0.75)
-      ..strokeWidth = 9.0;
-    // Main right bough
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.10, h * 0.62)
-        ..cubicTo(w * 0.16, h * 0.52, w * 0.24, h * 0.44, w * 0.32, h * 0.34),
-      _stroke,
-    );
-    // Center-top bough
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.11, h * 0.58)
-        ..cubicTo(w * 0.13, h * 0.46, w * 0.15, h * 0.36, w * 0.18, h * 0.22),
-      _stroke,
-    );
-    // Outer-left bough
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.07, h * 0.60)
-        ..cubicTo(w * 0.05, h * 0.50, w * 0.03, h * 0.40, w * 0.02, h * 0.28),
-      _stroke,
-    );
-
-    // Sub-branches
-    _stroke
-      ..strokeWidth = 4.5
-      ..color = const Color(0xFF6D4C41).withValues(alpha: 0.68);
-    canvas.drawPath(
-      Path()..moveTo(w * 0.22, h * 0.45)..cubicTo(w * 0.28, h * 0.38, w * 0.34, h * 0.32, w * 0.38, h * 0.28),
-      _stroke,
-    );
-    canvas.drawPath(
-      Path()..moveTo(w * 0.20, h * 0.48)..cubicTo(w * 0.22, h * 0.36, w * 0.25, h * 0.28, w * 0.28, h * 0.20),
-      _stroke,
-    );
-    canvas.drawPath(
-      Path()..moveTo(w * 0.14, h * 0.38)..cubicTo(w * 0.10, h * 0.30, w * 0.08, h * 0.22, w * 0.06, h * 0.16),
-      _stroke,
-    );
-
-    // 3. Volumetric Lush Green Canopy Clouds
-    void drawFoliageCluster(Offset c, double radius) {
-      // Under-canopy shadow
-      _fill.color = const Color(0xFF1B5E20).withValues(alpha: 0.45);
-      canvas.drawCircle(c.translate(0, radius * 0.25), radius * 0.95, _fill);
-
-      // Deep forest mid-tier
-      _fill.color = const Color(0xFF2E7D32).withValues(alpha: 0.60);
-      canvas.drawCircle(c.translate(-radius * 0.25, 0), radius * 0.75, _fill);
-      canvas.drawCircle(c.translate(radius * 0.25, -radius * 0.10), radius * 0.70, _fill);
-
-      // Fresh leafy green
-      _fill.color = const Color(0xFF43A047).withValues(alpha: 0.65);
-      canvas.drawCircle(c, radius * 0.60, _fill);
-      canvas.drawCircle(c.translate(0, -radius * 0.25), radius * 0.55, _fill);
-
-      // Sunlit bright highlights
-      _fill.color = const Color(0xFF81C784).withValues(alpha: 0.70);
-      canvas.drawCircle(c.translate(-radius * 0.10, -radius * 0.35), radius * 0.38, _fill);
-      canvas.drawCircle(c.translate(radius * 0.15, -radius * 0.30), radius * 0.34, _fill);
-    }
-
-    drawFoliageCluster(Offset(w * 0.03, h * 0.26), 36);
-    drawFoliageCluster(Offset(w * 0.12, h * 0.18), 42);
-    drawFoliageCluster(Offset(w * 0.22, h * 0.22), 44);
-    drawFoliageCluster(Offset(w * 0.32, h * 0.28), 40);
-    drawFoliageCluster(Offset(w * 0.38, h * 0.34), 32);
-    drawFoliageCluster(Offset(w * 0.20, h * 0.36), 38);
-    drawFoliageCluster(Offset(w * 0.11, h * 0.44), 34);
-
-    // 4. Shiny Ripe Red Fruits (Apples/Cherries) with Stems and Highlights
-    void drawFruit(Offset center, double radius) {
-      // Little brown stem
-      _stroke
-        ..strokeWidth = 1.2
-        ..color = const Color(0xFF4E342E).withValues(alpha: 0.85);
-      canvas.drawLine(
-        Offset(center.dx, center.dy - radius * 0.8),
-        Offset(center.dx + 2.0, center.dy - radius * 1.6),
-        _stroke,
+      final bounds = Rect.fromLTWH(
+        math.min(startX, endX),
+        0,
+        math.max(startX + startW, endX + endW) - math.min(startX, endX),
+        h * 0.85,
       );
 
-      // Fruit body
-      _fill.color = const Color(0xFFE53935).withValues(alpha: 0.88);
-      canvas.drawCircle(center, radius, _fill);
+      _fill.shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFFFFFBEB).withValues(alpha: breathe * alphaMult * 1.4),
+          const Color(0xFFE0F2FE).withValues(alpha: breathe * alphaMult * 0.7),
+          const Color(0xFFF0FDF4).withValues(alpha: 0.0),
+        ],
+        stops: const [0.0, 0.45, 1.0],
+      ).createShader(bounds);
 
-      // Subtle depth shade
-      _fill.color = const Color(0xFFB71C1C).withValues(alpha: 0.50);
-      canvas.drawCircle(center.translate(radius * 0.25, radius * 0.25), radius * 0.55, _fill);
-
-      // Specular white shine dot
-      _fill.color = Colors.white.withValues(alpha: 0.90);
-      canvas.drawCircle(center.translate(-radius * 0.35, -radius * 0.35), radius * 0.28, _fill);
+      canvas.drawPath(beamPath, _fill);
+      _fill.shader = null;
     }
 
-    drawFruit(Offset(w * 0.33, h * 0.32), 4.5);
-    drawFruit(Offset(w * 0.26, h * 0.26), 4.2);
-    drawFruit(Offset(w * 0.36, h * 0.38), 4.0);
-    drawFruit(Offset(w * 0.18, h * 0.22), 4.5);
-    drawFruit(Offset(w * 0.12, h * 0.26), 4.0);
-    drawFruit(Offset(w * 0.06, h * 0.32), 4.2);
-    drawFruit(Offset(w * 0.24, h * 0.40), 4.5);
-    drawFruit(Offset(w * 0.14, h * 0.36), 4.2);
-  }
-
-  void _drawFooterGrassHills(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-
-    // Back Rolling Grass Hill
-    final backHillPath = Path()
-      ..moveTo(0, h * 0.94)
-      ..cubicTo(w * 0.30, h * 0.92, w * 0.65, h * 0.96, w, h * 0.93)
-      ..lineTo(w, h * 1.02)
-      ..lineTo(0, h * 1.02)
-      ..close();
-    _fill.color = const Color(0xFF81C784).withValues(alpha: 0.40);
-    canvas.drawPath(backHillPath, _fill);
-
-    // Front Lush Grass Hill
-    final frontHillPath = Path()
-      ..moveTo(0, h * 0.96)
-      ..cubicTo(w * 0.38, h * 0.93, w * 0.72, h * 0.97, w, h * 0.95)
-      ..lineTo(w, h * 1.02)
-      ..lineTo(0, h * 1.02)
-      ..close();
-    _fill.color = const Color(0xFF4CAF50).withValues(alpha: 0.50);
-    canvas.drawPath(frontHillPath, _fill);
-
-    // Tufts of Grass Blades Swaying with Wind
-    final sway = math.sin(progress * 2 * math.pi) * 2.5;
-    _stroke
-      ..color = const Color(0xFF2E7D32).withValues(alpha: 0.60)
-      ..strokeWidth = 1.4;
-
-    for (int i = 0; i <= 14; i++) {
-      final x = (i / 14.0) * w;
-      final y = h * 0.95 + math.sin(i * 1.2) * 5.0;
-      canvas.drawLine(Offset(x, y), Offset(x - 3 + sway, y - 9), _stroke);
-      canvas.drawLine(Offset(x, y), Offset(x + 3 + sway, y - 8), _stroke);
-    }
+    // 4 Distinct Komorebi Light Shafts
+    drawBeam(-w * 0.08, w * 0.22, w * 0.25, w * 0.48, 1.0);
+    drawBeam(w * 0.12, w * 0.18, w * 0.55, w * 0.42, 0.85);
+    drawBeam(w * 0.32, w * 0.16, w * 0.82, w * 0.38, 0.75);
+    drawBeam(-w * 0.02, w * 0.14, w * 0.10, w * 0.35, 0.90);
   }
 
   void _drawSparkle(Canvas canvas, Offset center, double phase, Color color) {
@@ -918,23 +829,6 @@ class _Meteor {
     required this.length,
     required this.headSize,
     this.color = const Color(0xFF00E5FF),
-  });
-}
-
-class _RainDrop {
-  final double x;
-  final double speed;
-  final double len;
-  final double ph;
-  final double width;
-  final double alpha;
-  const _RainDrop({
-    required this.x,
-    required this.speed,
-    required this.len,
-    required this.ph,
-    required this.width,
-    required this.alpha,
   });
 }
 

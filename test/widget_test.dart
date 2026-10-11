@@ -36,6 +36,7 @@ import 'package:gitpulse_mobile/widgets/language_chart.dart';
 import 'package:gitpulse_mobile/widgets/repo_tile.dart';
 import 'package:gitpulse_mobile/widgets/stat_card.dart';
 import 'package:gitpulse_mobile/widgets/running_text.dart';
+import 'package:gitpulse_mobile/widgets/glass_card.dart';
 import 'package:gitpulse_mobile/widgets/settings_sheet.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -555,7 +556,7 @@ void main() {
       expect(AppLanguage.fromCode('zh_Hant'), AppLanguage.chineseTraditional);
       expect(AppLanguage.fromCode('zh_TW'), AppLanguage.chineseTraditional);
       expect(AppLanguage.fromCode('ko'), AppLanguage.korean);
-      expect(AppLanguage.fromCode('unknown'), AppLanguage.indonesian);
+      expect(AppLanguage.fromCode('unknown'), AppLanguage.english);
 
       expect(AppLanguage.values.length, 6);
       for (final lang in AppLanguage.values) {
@@ -637,6 +638,14 @@ void main() {
       expect(idLoc.activityRhythmTitle, 'Ritme Jam Produktif');
       expect(enLoc.activityRhythmTitle, 'Productive Hours Rhythm');
       expect(jaLoc.activityRhythmTitle, '生産的時間のリズム');
+
+      // Favorite profile labels
+      expect(idLoc.favoriteProfiles, 'Profil Favorit');
+      expect(enLoc.favoriteProfiles, 'Favorite Profile');
+      expect(jaLoc.favoriteProfiles, 'お気に入りプロフィール');
+      expect(zhHansLoc.favoriteProfiles, '收藏个人资料');
+      expect(zhHantLoc.favoriteProfiles, '收藏個人檔案');
+      expect(koLoc.favoriteProfiles, '즐겨찾는 프로필');
     });
 
     test('StorageService persists and retrieves language preference correctly', () async {
@@ -644,8 +653,8 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       final storage = StorageService(prefs);
 
-      // Default is Indonesian (id)
-      expect(storage.getLanguageCode(), 'id');
+      // Default is English (en)
+      expect(storage.getLanguageCode(), 'en');
 
       // Update to Japanese
       await storage.setLanguageCode('ja');
@@ -724,18 +733,18 @@ void main() {
       // Verify that AnimatedTierTitle exists in the commit habit banner
       expect(find.byType(AnimatedTierTitle), findsOneWidget);
 
-      // Verify all years total contributions card is rendered
-      expect(find.text('Total Kontribusi (Semua Tahun)'), findsOneWidget);
-      expect(find.text('Sepanjang waktu'), findsOneWidget);
+      // Verify all years total contributions card is rendered (in default English)
+      expect(find.text('Total Contributions (All Years)'), findsOneWidget);
+      expect(find.text('All time'), findsOneWidget);
       expect(find.text('150'), findsOneWidget);
     });
 
-    test('AppConfig provides accurate release and version telemetry for v2.1.0', () {
+    test('AppConfig provides accurate release and version telemetry for v2.2.0', () {
       expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v2.1.0');
-      expect(AppConfig.buildNumber, '16');
-      expect(AppConfig.fullVersion, 'v2.1.0 (Build 16)');
-      expect(AppConfig.releaseTag, 'v2.1.0');
+      expect(AppConfig.appVersion, 'v2.2.0');
+      expect(AppConfig.buildNumber, '17');
+      expect(AppConfig.fullVersion, 'v2.2.0 (Build 17)');
+      expect(AppConfig.releaseTag, 'v2.2.0');
       expect(AppConfig.license, 'MIT License');
       expect(AppConfig.githubRepoUrl, contains('github.com'));
     });
@@ -1574,6 +1583,33 @@ void main() {
       expect(storage.getFavoriteGridColumns(), 2);
     });
 
+    testWidgets('FavoriteProfilesScreen renders Favorite Profile in English without truncation', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.init();
+      final mockClient = MockClient((request) async => http.Response('{}', 200));
+      final apiService = GitHubApiService(client: mockClient);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          supportedLocales: AppLanguage.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: FavoriteProfilesScreen(
+            storageService: storage,
+            apiService: apiService,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.text('Favorite Profile'), findsWidgets);
+    });
+
     testWidgets('RunningText renders static text when content fits constraints', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
@@ -1910,6 +1946,103 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
   });
+
+  group('Surface Opacity & Glassmorphism Tests', () {
+    test('StorageService persists and clamps surface opacity correctly', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+
+      // Default is 0.85
+      expect(storage.getSurfaceOpacity(), 0.85);
+
+      // Set valid opacity
+      await storage.setSurfaceOpacity(0.65);
+      expect(storage.getSurfaceOpacity(), 0.65);
+
+      // Clamp low (min 0.50)
+      await storage.setSurfaceOpacity(0.30);
+      expect(storage.getSurfaceOpacity(), 0.50);
+
+      // Clamp high (max 1.00)
+      await storage.setSurfaceOpacity(1.20);
+      expect(storage.getSurfaceOpacity(), 1.00);
+    });
+
+    test('AppThemeService updates surface opacity notifier and saves to storage', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      AppThemeService.init(storage);
+
+      expect(AppThemeService.surfaceOpacity, 0.85);
+
+      await AppThemeService.changeSurfaceOpacity(0.70, storage);
+      expect(AppThemeService.surfaceOpacity, 0.70);
+      expect(storage.getSurfaceOpacity(), 0.70);
+    });
+
+    testWidgets('GlassCard adapts between BackdropFilter when translucent and solid when opaque', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      AppThemeService.init(storage);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: GlassCard(
+              child: const Text('Glass Test Content'),
+            ),
+          ),
+        ),
+      );
+
+      // Default opacity is 0.85 -> BackdropFilter active
+      expect(find.byType(BackdropFilter), findsOneWidget);
+      expect(find.text('Glass Test Content'), findsOneWidget);
+
+      // Change opacity to 1.00 -> BackdropFilter bypassed for GPU performance
+      await AppThemeService.changeSurfaceOpacity(1.00, storage);
+      await tester.pump();
+      expect(find.byType(BackdropFilter), findsNothing);
+      expect(find.text('Glass Test Content'), findsOneWidget);
+    });
+
+    testWidgets('SettingsSheet displays surface opacity slider and percentage badge', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      AppThemeService.init(storage);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: Scaffold(
+            body: SettingsSheet(
+              storageService: storage,
+              apiService: GitHubApiService(),
+            ),
+          ),
+        ),
+      );
+
+      // Verify opacity slider and badge render
+      expect(find.byType(Slider), findsOneWidget);
+      expect(find.text('85%'), findsOneWidget);
+
+      // Drag/change slider
+      final slider = find.byType(Slider);
+      await tester.tap(slider);
+      await tester.pumpAndSettle();
+    });
+  });
 }
+
 
 

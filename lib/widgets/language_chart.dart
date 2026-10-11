@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
+import 'glass_card.dart';
 
 class LanguageChart extends StatelessWidget {
   final Map<String, int> languageCounts;
@@ -24,13 +25,8 @@ class LanguageChart extends StatelessWidget {
     final loc = AppLocalizations.of(context);
 
     if (languageCounts.isEmpty) {
-      return Container(
+      return GlassCard(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.border, width: 1),
-        ),
         child: Center(
           child: Text(
             loc.noLanguageData,
@@ -107,13 +103,8 @@ class LanguageChart extends StatelessWidget {
     }
 
     return RepaintBoundary(
-      child: Container(
+      child: GlassCard(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.border, width: 1),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

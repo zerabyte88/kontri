@@ -217,7 +217,7 @@ class StorageService {
   static const String _keyLanguage = 'gitpulse_app_language';
 
   String getLanguageCode() {
-    return _prefs.getString(_keyLanguage) ?? 'id';
+    return _prefs.getString(_keyLanguage) ?? 'en';
   }
 
   Future<void> setLanguageCode(String code) async {
@@ -242,6 +242,17 @@ class StorageService {
 
   Future<void> setJapaneseThemeUnlocked(bool unlocked) async {
     await _prefs.setBool(_keyJapaneseEasterEgg, unlocked);
+  }
+
+  // Surface Opacity & Glassmorphism Setting
+  static const String _keySurfaceOpacity = 'gitpulse_surface_opacity';
+
+  double getSurfaceOpacity() {
+    return _prefs.getDouble(_keySurfaceOpacity) ?? 0.85;
+  }
+
+  Future<void> setSurfaceOpacity(double opacity) async {
+    await _prefs.setDouble(_keySurfaceOpacity, opacity.clamp(0.50, 1.00));
   }
 
   // Cached Tech News & Trending Repos

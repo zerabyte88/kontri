@@ -8,6 +8,8 @@ import '../models/github_content_item.dart';
 import '../models/github_repo.dart';
 import '../services/github_api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/animated_app_header.dart';
+import '../widgets/glass_card.dart';
 import '../widgets/running_text.dart';
 import 'file_viewer_screen.dart';
 
@@ -338,9 +340,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
         : 'https://github.com/$_repoOwner/${widget.repo.name}';
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppTheme.surface,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: const AnimatedHeaderBackground(),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         titleSpacing: 0,
@@ -410,14 +413,9 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
   Widget _buildOverviewCard(AppLocalizations loc, String repoUrl) {
     final langColor = _getLanguageColor(widget.repo.language);
 
-    return Container(
-      width: double.infinity,
+    return GlassCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.border, width: 1),
-      ),
+      borderRadius: BorderRadius.circular(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -841,14 +839,9 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     }
 
     if (_readmeError != null) {
-      return Container(
-        width: double.infinity,
+      return GlassCard(
         padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.border, width: 1),
-        ),
+        borderRadius: BorderRadius.circular(14),
         child: Column(
           children: [
             Icon(
@@ -884,14 +877,9 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     }
 
     if (_readmeContent == null || _readmeContent!.trim().isEmpty) {
-      return Container(
-        width: double.infinity,
+      return GlassCard(
         padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.border, width: 1),
-        ),
+        borderRadius: BorderRadius.circular(14),
         child: Column(
           children: [
             Icon(
@@ -931,14 +919,9 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
         ? 'https://raw.githubusercontent.com/$owner/${widget.repo.name}/$branch/'
         : null;
 
-    return Container(
-      width: double.infinity,
+    return GlassCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.border, width: 1),
-      ),
+      borderRadius: BorderRadius.circular(14),
       child: MarkdownBody(
         data: processedMarkdown,
         selectable: true,
@@ -1172,17 +1155,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
       );
     }
 
-    return Material(
-      color: AppTheme.surface,
+    return GlassCard(
+      padding: EdgeInsets.zero,
       borderRadius: BorderRadius.circular(14),
-      clipBehavior: Clip.antiAlias,
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.border, width: 1),
-        ),
-        child: Column(
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Breadcrumb header
@@ -1257,8 +1233,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
               ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildBreadcrumbsBar() {

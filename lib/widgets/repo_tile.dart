@@ -5,6 +5,7 @@ import '../models/github_repo.dart';
 import '../screens/repo_detail_screen.dart';
 import '../services/github_api_service.dart';
 import '../theme/app_theme.dart';
+import 'glass_card.dart';
 
 class RepoTile extends StatelessWidget {
   final GitHubRepo repo;
@@ -118,14 +119,9 @@ class RepoTile extends StatelessWidget {
     final langColor = _getLanguageColor(repo.language);
 
     return RepaintBoundary(
-      child: Container(
+      child: GlassCard(
         margin: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.border, width: 1),
-        ),
-        clipBehavior: Clip.antiAlias,
+        padding: EdgeInsets.zero,
         child: Material(
           color: Colors.transparent,
           child: InkWell(

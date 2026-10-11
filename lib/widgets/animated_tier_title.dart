@@ -30,7 +30,7 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     super.initState();
     final tier = widget.titleInfo.tier;
     final durationMs = switch (tier) {
-      1 => 2200,
+      1 => 1600, // fast energetic burning dragonflame
       2 => 1800, // fast energetic electric crackle
       3 => 2400, // digital matrix rhythm
       4 => 2600, // golden sunlight sweep
@@ -82,26 +82,32 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
 
   /// Tier 1 (Mythic Archmage): Arcane Dragonflame with floating magical rune embers
   Widget _buildTier1ArcaneDragonEffect(String title, double t) {
-    // Multi-harmonic arcane pulse physics
+    // Multi-harmonic burning flame physics (vertical ascending lick & micro-flicker)
     final auraPulse = (math.sin(t * 2 * math.pi) + 1) / 2;
-    final flameFlutter = (math.sin(t * 4 * math.pi) + 1) / 2;
-    final auraIntensity = (auraPulse * 0.70 + flameFlutter * 0.30).clamp(0.0, 1.0);
-    final wave = math.sin(t * 2 * math.pi) * 0.22;
-    final heatRise = math.sin(t * 2 * math.pi) * 0.08;
+    final microFlutter =
+        math.sin(t * 8 * math.pi) * 0.07 + math.sin(t * 16 * math.pi) * 0.03;
+    final flameSurge = (math.sin(t * 2 * math.pi) + 1) / 2;
+    final flameIntensity =
+        (auraPulse * 0.65 + microFlutter.abs() * 0.35).clamp(0.0, 1.0);
+    final auraIntensity = flameIntensity;
 
-    // Prismatic Arcane-Dragon gradient: Crimson Ruby, Royal Violet, Dragon Gold & Starfire
+    // Dynamic heat haze shadow flicker
+    final shadowAlpha = (0.70 + 0.30 * flameIntensity).clamp(0.0, 1.0);
+    final shadowBlur = 4.5 + 5.5 * flameIntensity;
+
+    // Vertical ascending flame: strictly zero horizontal tilt/sway
     final textWidget = ShaderMask(
       blendMode: BlendMode.srcIn,
       shaderCallback: (bounds) {
         return LinearGradient(
-          begin: Alignment(wave, 1.1 + heatRise),
-          end: Alignment(-wave, -1.1 + heatRise),
+          begin: Alignment(0.0, 1.15 + microFlutter * 0.4),
+          end: Alignment(0.0, -0.95 - flameSurge * 0.55 + microFlutter),
           colors: const [
-            Color(0xFFE11D48), // Deep ruby dragon ember
+            Color(0xFFE11D48), // Deep ruby dragon ember (anchored base)
             Color(0xFF9333EA), // Arcane royal violet
-            Color(0xFFF97316), // Dragon flame orange
+            Color(0xFFF97316), // Dragon flame orange (rising flame)
             Color(0xFFFBBF24), // Celestial solar gold
-            Color(0xFFFFFBEB), // White-hot arcane starfire
+            Color(0xFFFFFBEB), // White-hot arcane starfire (tongue tip)
           ],
           stops: const [0.0, 0.25, 0.55, 0.82, 1.0],
         ).createShader(bounds);
@@ -116,15 +122,15 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           letterSpacing: -0.2,
           shadows: [
             Shadow(
-              color: const Color(0xFFC026D3)
-                  .withValues(alpha: 0.75 + 0.25 * auraIntensity),
-              blurRadius: 5.0,
+              color: const Color(0xFFC026D3).withValues(alpha: shadowAlpha),
+              blurRadius: shadowBlur * 0.65,
               offset: const Offset(0, -1),
             ),
             Shadow(
               color: const Color(0xFFF59E0B)
-                  .withValues(alpha: 0.50 + 0.30 * auraIntensity),
-              blurRadius: 8.0,
+                  .withValues(alpha: (0.45 + 0.45 * flameIntensity).clamp(0.0, 1.0)),
+              blurRadius: shadowBlur,
+              offset: Offset(0, -1.0 - 1.2 * flameIntensity),
             ),
           ],
         ),

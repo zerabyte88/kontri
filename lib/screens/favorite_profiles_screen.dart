@@ -4,6 +4,8 @@ import '../models/bookmarked_user.dart';
 import '../theme/app_theme.dart';
 import '../services/github_api_service.dart';
 import '../services/storage_service.dart';
+import '../widgets/animated_app_header.dart';
+import '../widgets/glass_card.dart';
 import 'stats_detail_screen.dart';
 
 class FavoriteProfilesScreen extends StatefulWidget {
@@ -167,15 +169,17 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
     final loc = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppTheme.background,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: const AnimatedHeaderBackground(),
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.bookmark_rounded,
@@ -183,16 +187,13 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
               size: 20,
             ),
             const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                loc.favoriteProfiles,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AppTheme.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                ),
+            Text(
+              loc.favoriteProfiles,
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.3,
               ),
             ),
             const SizedBox(width: 8),
@@ -232,14 +233,9 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
   }
 
   Widget _buildToolbar(AppLocalizations loc) {
-    return Container(
+    return GlassCard(
       margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.border, width: 1),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: Row(
         children: [
           Icon(
@@ -257,50 +253,64 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
             ),
           ),
           const Spacer(),
-          // 1 to 2 Segmented Control Buttons
-          Row(
-            children: [1, 2].map((col) {
-              final isSelected = _columns == col;
-              return Padding(
-                padding: const EdgeInsets.only(left: 6),
-                child: InkWell(
-                  key: ValueKey('col_btn_$col'),
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => _setColumns(col),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeOutCubic,
-                    width: 36,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppTheme.primaryCyan
-                          : AppTheme.surfaceElevated,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
+          // 1 to 2 Modern Segmented Control Pill
+          Container(
+            padding: const EdgeInsets.all(2.5),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceElevated.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: AppTheme.border.withValues(alpha: 0.7),
+                width: 0.8,
+              ),
+            ),
+            child: Row(
+              children: [1, 2].map((col) {
+                final isSelected = _columns == col;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1.5),
+                  child: InkWell(
+                    key: ValueKey('col_btn_$col'),
+                    borderRadius: BorderRadius.circular(7),
+                    onTap: () => _setColumns(col),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutCubic,
+                      width: 32,
+                      height: 25,
+                      decoration: BoxDecoration(
                         color: isSelected
                             ? AppTheme.primaryCyan
-                            : AppTheme.border,
-                        width: 1,
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(7),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: AppTheme.primaryCyan.withValues(alpha: 0.25),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ]
+                            : null,
                       ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '$col',
-                        style: TextStyle(
-                          color: isSelected
-                              ? Colors.black
-                              : AppTheme.textPrimary,
-                          fontSize: 12,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                      child: Center(
+                        child: Text(
+                          '$col',
+                          style: TextStyle(
+                            color: isSelected
+                                ? const Color(0xFF0D1117)
+                                : AppTheme.textSecondary,
+                            fontSize: 12,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),
@@ -310,21 +320,29 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
   Widget _buildEmptyState(AppLocalizations loc) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(22),
               decoration: BoxDecoration(
-                color: AppTheme.surface,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppTheme.border, width: 1),
+                gradient: RadialGradient(
+                  colors: [
+                    AppTheme.accentAmber.withValues(alpha: 0.14),
+                    AppTheme.surfaceElevated.withValues(alpha: 0.4),
+                  ],
+                ),
+                border: Border.all(
+                  color: AppTheme.accentAmber.withValues(alpha: 0.25),
+                  width: 1.2,
+                ),
               ),
               child: Icon(
                 Icons.bookmark_outline_rounded,
-                size: 48,
-                color: AppTheme.accentAmber.withValues(alpha: 0.8),
+                size: 42,
+                color: AppTheme.accentAmber,
               ),
             ),
             const SizedBox(height: 18),
@@ -333,16 +351,17 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
               style: TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               loc.emptyBookmarks,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppTheme.textMuted,
-                fontSize: 13,
+                fontSize: 12.5,
                 height: 1.4,
               ),
             ),
@@ -375,19 +394,15 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
   Widget _buildProfileCard(AppLocalizations loc, BookmarkedUser user) {
     final isLoading = _loadingUsername == user.username;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        splashColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
-        highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
-        onTap: () => _openUser(user.username),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppTheme.border, width: 1),
-          ),
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          splashColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
+          highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
+          onTap: () => _openUser(user.username),
           child: Stack(
             children: [
               Padding(
@@ -431,7 +446,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildAvatar(user.avatarUrl, size: 52),
+        _buildAvatar(user.avatarUrl, size: 50),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -451,21 +466,30 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                         color: AppTheme.textPrimary,
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
                       ),
                     ),
                   ),
-                  Text(
-                    '@${user.username}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryCyan.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '@${user.username}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppTheme.primaryCyan,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 6),
-                  _buildRemoveButton(user, size: 16),
+                  _buildRemoveButton(user, size: 17),
                 ],
               ),
               const SizedBox(height: 3),
@@ -476,16 +500,16 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: AppTheme.textMuted,
+                  color: AppTheme.textSecondary,
                   fontSize: 11.5,
-                  height: 1.3,
+                  height: 1.35,
                 ),
               ),
               const SizedBox(height: 5),
               Row(
                 children: [
                   Icon(
-                    Icons.location_on_rounded,
+                    Icons.location_on_outlined,
                     size: 13,
                     color: user.location != null && user.location!.trim().isNotEmpty
                         ? AppTheme.accentAmber
@@ -500,7 +524,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textMuted,
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
@@ -521,9 +545,10 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildAvatar(user.avatarUrl, size: 44),
-            _buildRemoveButton(user, size: 15),
+            _buildAvatar(user.avatarUrl, size: 40),
+            _buildRemoveButton(user, size: 16),
           ],
         ),
         const SizedBox(height: 8),
@@ -537,6 +562,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
             color: AppTheme.textPrimary,
             fontSize: 13,
             fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
           ),
         ),
         const SizedBox(height: 1),
@@ -545,9 +571,9 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            color: AppTheme.textSecondary,
+            color: AppTheme.primaryCyan,
             fontSize: 11,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 4),
@@ -559,7 +585,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: AppTheme.textMuted,
+              color: AppTheme.textSecondary,
               fontSize: 10.5,
               height: 1.25,
             ),
@@ -569,7 +595,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
         Row(
           children: [
             Icon(
-              Icons.location_on_rounded,
+              Icons.location_on_outlined,
               size: 12,
               color: user.location != null && user.location!.trim().isNotEmpty
                   ? AppTheme.accentAmber
@@ -584,7 +610,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textMuted,
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                 ),
@@ -600,15 +626,29 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
     return Container(
       width: size,
       height: size,
+      padding: const EdgeInsets.all(1.5),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: AppTheme.border, width: 1),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.primaryCyan.withValues(alpha: 0.7),
+            AppTheme.primaryViolet.withValues(alpha: 0.7),
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryCyan.withValues(alpha: 0.12),
+            blurRadius: 6,
+          ),
+        ],
       ),
       child: ClipOval(
         child: Image.network(
           avatarUrl,
-          width: size,
-          height: size,
+          width: size - 3,
+          height: size - 3,
           cacheWidth: 100,
           cacheHeight: 100,
           fit: BoxFit.cover,
@@ -646,7 +686,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
       borderRadius: BorderRadius.circular(12),
       onTap: () => _removeBookmark(user),
       child: Padding(
-        padding: const EdgeInsets.all(2),
+        padding: const EdgeInsets.all(3),
         child: Icon(
           Icons.bookmark_rounded,
           size: size,

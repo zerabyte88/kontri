@@ -10,7 +10,7 @@ class AppLocalizations {
   static AppLocalizations? _current;
 
   static AppLocalizations get current {
-    _current ??= AppLocalizations(AppLanguage.indonesian);
+    _current ??= AppLocalizations(AppLanguage.english);
     return _current!;
   }
 
@@ -23,7 +23,7 @@ class AppLocalizations {
       _AppLocalizationsDelegate();
 
   // Helper string map lookup
-  String _str(Map<AppLanguage, String> map) => map[language] ?? map[AppLanguage.indonesian] ?? '';
+  String _str(Map<AppLanguage, String> map) => map[language] ?? map[AppLanguage.english] ?? map[AppLanguage.indonesian] ?? '';
 
   // App & General
   String get appTitle => 'GitPulse';
@@ -220,12 +220,14 @@ class AppLocalizations {
 
   String get favoriteProfiles => _str({
     AppLanguage.indonesian: 'Profil Favorit',
-    AppLanguage.english: 'Favorite Profiles',
+    AppLanguage.english: 'Favorite Profile',
     AppLanguage.japanese: 'お気に入りプロフィール',
     AppLanguage.chineseSimplified: '收藏个人资料',
     AppLanguage.chineseTraditional: '收藏個人檔案',
     AppLanguage.korean: '즐겨찾는 프로필',
   });
+
+  String get favoriteProfile => favoriteProfiles;
 
   String get viewAllFavorites => _str({
     AppLanguage.indonesian: 'Lihat Semua',
@@ -490,6 +492,24 @@ class AppLocalizations {
     AppLanguage.chineseSimplified: '选择界面显示主题模式',
     AppLanguage.chineseTraditional: '選擇介面顯示主題模式',
     AppLanguage.korean: '앱의 시각적 테마 모드를 선택하세요',
+  });
+
+  String get themeOpacityTitle => _str({
+    AppLanguage.indonesian: 'Transparansi Tampilan',
+    AppLanguage.english: 'Surface Opacity',
+    AppLanguage.japanese: 'UIの透明度',
+    AppLanguage.chineseSimplified: '界面不透明度',
+    AppLanguage.chineseTraditional: '介面不透明度',
+    AppLanguage.korean: 'UI 불투명도',
+  });
+
+  String get themeOpacitySubtitle => _str({
+    AppLanguage.indonesian: 'Sesuaikan efek kaca transparan (glassmorphism) kartu',
+    AppLanguage.english: 'Adjust card glassmorphism and background transparency',
+    AppLanguage.japanese: 'カードのすりガラス効果と背景の透過度を調整',
+    AppLanguage.chineseSimplified: '调整卡片磨砂玻璃效果与背景透明度',
+    AppLanguage.chineseTraditional: '調整卡片磨砂玻璃效果與背景透明度',
+    AppLanguage.korean: '카드 글래스모피즘 및 배경 투명도를 조절하세요',
   });
 
   String get themeDark => _str({

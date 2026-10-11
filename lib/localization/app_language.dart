@@ -59,7 +59,7 @@ enum AppLanguage {
   });
 
   static AppLanguage fromCode(String? code) {
-    if (code == null || code.isEmpty) return AppLanguage.indonesian;
+    if (code == null || code.isEmpty) return AppLanguage.english;
 
     for (final lang in AppLanguage.values) {
       if (lang.code.toLowerCase() == code.toLowerCase()) {
@@ -76,9 +76,10 @@ enum AppLanguage {
     }
     if (lower.startsWith('ja')) return AppLanguage.japanese;
     if (lower.startsWith('ko')) return AppLanguage.korean;
+    if (lower.startsWith('id')) return AppLanguage.indonesian;
     if (lower.startsWith('en')) return AppLanguage.english;
 
-    return AppLanguage.indonesian;
+    return AppLanguage.english;
   }
 
   static List<Locale> get supportedLocales =>

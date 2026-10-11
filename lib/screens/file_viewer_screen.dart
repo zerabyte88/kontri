@@ -6,6 +6,8 @@ import '../localization/app_localizations.dart';
 import '../models/github_content_item.dart';
 import '../services/github_api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/animated_app_header.dart';
+import '../widgets/glass_card.dart';
 import '../widgets/running_text.dart';
 
 class FileViewerScreen extends StatefulWidget {
@@ -144,9 +146,10 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
         'https://github.com/${widget.owner}/${widget.repo}/blob/${widget.ref ?? 'main'}/${widget.item.path}';
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        backgroundColor: AppTheme.surface,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: const AnimatedHeaderBackground(),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         titleSpacing: 0,
@@ -253,12 +256,7 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.border),
-                ),
+              GlassCard(
                 padding: const EdgeInsets.all(12),
                 child: _isSvg
                     ? SvgPicture.network(

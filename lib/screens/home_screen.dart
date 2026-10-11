@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final FocusNode _searchFocusNode = FocusNode();
   late final TechNewsService _newsService;
   final ScrollController _categoryScrollController = ScrollController();
+  final Map<String, GlobalKey> _categoryKeys = {};
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -137,16 +138,23 @@ class _HomeScreenState extends State<HomeScreen> {
     final targetCategory = categories[index]['id']!;
     if (targetCategory == _selectedCategory) return;
 
+    final currentIndex =
+        categories.indexWhere((c) => c['id'] == _selectedCategory);
+
     setState(() {
       _selectedCategory = targetCategory;
     });
 
-    _animateCategoryChipToView(index, categories.length);
+    _animateCategoryChipToView(index, categories);
     if (_newsPageController.hasClients) {
+      if (currentIndex != -1 && (index - currentIndex).abs() > 1) {
+        final intermediate = index > currentIndex ? index - 1 : index + 1;
+        _newsPageController.jumpToPage(intermediate);
+      }
       _newsPageController.animateToPage(
         index,
-        duration: const Duration(milliseconds: 320),
-        curve: Curves.easeOutCubic,
+        duration: const Duration(milliseconds: 380),
+        curve: Curves.fastOutSlowIn,
       );
     }
     _loadCategoryNews(targetCategory);
@@ -159,24 +167,43 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _selectedCategory = targetCategory;
       });
-      _animateCategoryChipToView(index, categories.length);
+      _animateCategoryChipToView(index, categories);
       _loadCategoryNews(targetCategory);
     }
   }
 
-  void _animateCategoryChipToView(int index, int totalCount) {
-    if (!_categoryScrollController.hasClients) return;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final estimatedCenter = (index * 96.0) + 48.0;
-    final targetOffset = (estimatedCenter - (screenWidth / 2)).clamp(
-      0.0,
-      _categoryScrollController.position.maxScrollExtent,
-    );
-    _categoryScrollController.animateTo(
-      targetOffset,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutCubic,
-    );
+  void _animateCategoryChipToView(
+    int index,
+    List<Map<String, String>> categories,
+  ) {
+    if (index < 0 || index >= categories.length) return;
+    final catId = categories[index]['id']!;
+    final key = _categoryKeys[catId];
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final keyContext = key?.currentContext;
+      if (keyContext != null) {
+        Scrollable.ensureVisible(
+          keyContext,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.fastOutSlowIn,
+        );
+      } else if (_categoryScrollController.hasClients) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final estimatedCenter = (index * 105.0) + 52.0;
+        final targetOffset = (estimatedCenter - (screenWidth / 2)).clamp(
+          0.0,
+          _categoryScrollController.position.maxScrollExtent,
+        );
+        _categoryScrollController.animateTo(
+          targetOffset,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.fastOutSlowIn,
+        );
+      }
+    });
   }
 
   void _searchUser(String username) async {
@@ -200,7 +227,6 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
 
-      HeaderAnimationState.pauseAnimation();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -211,7 +237,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ).then((_) {
-        HeaderAnimationState.resumeAnimation();
         _refreshLocalData();
         setState(() {});
       });
@@ -262,7 +287,6 @@ class _HomeScreenState extends State<HomeScreen> {
         _loadingFavoriteUsername = null;
       });
 
-      HeaderAnimationState.pauseAnimation();
       if (!mounted) return;
       await Navigator.push(
         context,
@@ -274,7 +298,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       );
-      HeaderAnimationState.resumeAnimation();
       _refreshLocalData();
       if (mounted) setState(() {});
     } catch (e) {
@@ -312,20 +335,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openSettingsSheet() async {
-    HeaderAnimationState.pauseAnimation();
-    try {
-      await SettingsSheet.show(
-        context,
-        storageService: widget.storageService,
-        apiService: widget.apiService,
-        onSettingsChanged: () {
-          _refreshLocalData();
-          setState(() {});
-        },
-      );
-    } finally {
-      HeaderAnimationState.resumeAnimation();
-    }
+    await SettingsSheet.show(
+      context,
+      storageService: widget.storageService,
+      apiService: widget.apiService,
+      onSettingsChanged: () {
+        _refreshLocalData();
+        setState(() {});
+      },
+    );
   }
 
   @override
@@ -824,15 +842,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppTheme.accentAmber,
                 ),
                 const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    loc.favoriteProfiles,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w600,
-                    ),
+                Text(
+                  loc.favoriteProfiles,
+                  style: TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1178,43 +1193,74 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // Category Filter Chips
         SizedBox(
-          height: 34,
+          height: 38,
           child: ListView.separated(
             controller: _categoryScrollController,
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
+            clipBehavior: Clip.none,
             itemCount: categories.length,
             separatorBuilder: (context, index) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final cat = categories[index];
               final isSelected = cat['id'] == _selectedCategory;
-              return ChoiceChip(
-                label: Text(
-                  cat['label']!,
-                  style: TextStyle(
-                    color: isSelected
-                        ? AppTheme.primaryCyan
-                        : AppTheme.textSecondary,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                    fontSize: 12,
+              final catKey =
+                  _categoryKeys.putIfAbsent(cat['id']!, () => GlobalKey());
+              return KeyedSubtree(
+                key: catKey,
+                child: AnimatedScale(
+                  scale: isSelected ? 1.04 : 1.0,
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOutCubic,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeOutCubic,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(9),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: AppTheme.primaryCyan
+                                    .withValues(alpha: 0.22),
+                                blurRadius: 8.0,
+                                spreadRadius: 0.5,
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: ChoiceChip(
+                      label: Text(
+                        cat['label']!,
+                        style: TextStyle(
+                          color: isSelected
+                              ? AppTheme.primaryCyan
+                              : AppTheme.textSecondary,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400,
+                          fontSize: 12,
+                        ),
+                      ),
+                      selected: isSelected,
+                      selectedColor:
+                          AppTheme.primaryCyan.withValues(alpha: 0.12),
+                      backgroundColor: AppTheme.surface,
+                      side: BorderSide(
+                        color:
+                            isSelected ? AppTheme.primaryCyan : AppTheme.border,
+                        width: isSelected ? 1.1 : 0.8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      showCheckmark: false,
+                      onSelected: (selected) {
+                        if (selected && _selectedCategory != cat['id']) {
+                          _onCategoryChipTapped(index, categories);
+                        }
+                      },
+                    ),
                   ),
                 ),
-                selected: isSelected,
-                selectedColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
-                backgroundColor: AppTheme.surface,
-                side: BorderSide(
-                  color: isSelected ? AppTheme.primaryCyan : AppTheme.border,
-                  width: 0.8,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                showCheckmark: false,
-                onSelected: (selected) {
-                  if (selected && _selectedCategory != cat['id']) {
-                    _onCategoryChipTapped(index, categories);
-                  }
-                },
               );
             },
           ),

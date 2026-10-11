@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.1.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.2.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -44,10 +44,10 @@
 ### 5. Commit Activity Tier Engine & Dynamic Visuals
 - **6-Level Animated Tier Badges:** Continuous streak and annual contribution volume ranking with custom canvas shaders (`Mythic Archmage`, `Diamond Vanguard`, `Platinum Artisan`, `Gold Adventurer`, `Silver Explorer`, `Bronze Novice`).
 - **Full-Screen Dynamic Ambient Background:** GPU-accelerated continuous looping canvas across the entire application viewport tailored to each active theme:
-  - **Dark Mode (Thunderstorm ⛈️):** Atmospheric rain streaks, brooding storm clouds, and periodic electric-blue lightning flashes.
-  - **AMOLED (Pure Black Cosmos 🌌):** Starry cosmos with twinkling diamond stars, crescent moon, and diagonal shooting stars / meteors.
-  - **AMOLED Sakura (Radiant Pink 🌸):** Elegant sakura tree trunk, branches, and drifting cherry blossom petals with swaying wind physics.
-  - **Light Mode (Autumn Leaves 🍃):** Crisp autumn breeze with swirling green and golden leaves.
+  - **Dark Mode (Thunderstorm ⛈️):** Atmospheric rain streaks with impact ripples, multi-tiered drifting storm clouds, and periodic dual-stage electric-blue lightning strikes with ambient flash lighting.
+  - **AMOLED (Pure Black Cosmos 🌌):** Starry cosmos with twinkling diamond stars, glowing crescent moon, and continuous full-screen staggered meteor shower (6 meteors crossing edge-to-edge).
+  - **AMOLED Sakura (Radiant Pink 🌸):** Majestic sakura tree with organic bark grain, volumetric cherry blossom canopy clouds, layered spring green leaves, and drifting petals with swaying wind physics.
+  - **Light Mode (Sunny Grove 🍃):** Fruit tree with lush canopy foliage and glossy ripe red apples/cherries, rolling green grass foothills with wind-swayed tufts, drifting cumulus clouds, and gentle falling leaves.
 - **Bespoke GitPulse Vector Logo:** Intertwines Git branch topology, cardiac ECG heartbeat waveform, and a traveling electric energy spark (`GitPulseLogo`).
 - **Developer Easter Egg:** Tap the AMOLED card **10 times in rapid succession** in Settings to unlock the hidden AMOLED Sakura mode.
 
@@ -58,20 +58,33 @@
 ### 7. Multi-Language Internationalization & Privacy
 - **6 Supported Languages:** Complete translation coverage switchable on-the-fly without app restarts:
   - 🇮🇩 Indonesian (Bahasa Indonesia)
-  - 🇺🇸 English
+  - 🇺🇸 English (Default on first install)
   - 🇯🇵 Japanese (日本語)
   - 🇨🇳 Simplified Chinese (简体中文)
   - 🇹🇼 Traditional Chinese (繁體中文)
   - 🇰🇷 Korean (한국어)
+- **Default English Language:** Initializes with English (`en`) on fresh installation for international accessibility, while respecting user manual language selection across sessions.
+- **Anti-Truncation & Localization Integrity:** Complete dictionary audits across all supported locales ensuring UI labels, buttons, headers, and "Favorite Profile" strings render cleanly without clipping or ellipsis cutoff across all screen densities.
 - **Smart Rate-Limit Interceptor:** Strongly-typed handler for HTTP 403, 429, and exhausted rate limits with optional Personal Access Token (PAT) support stored in Android's private app sandbox.
 - **Zero Intermediary Servers & Total Privacy:** Direct device-to-GitHub TLS 1.3 queries with zero analytics SDKs, trackers, or telemetry scripts.
 
 ### 8. Dedicated Favorite Profiles Grid & Adaptive Layout
-- **Configurable 1–4 Column Grid:** Interactive top toolbar toggle allowing users to dynamically switch between 1, 2 (default), 3, or 4 columns per row with seamless layout recalculation.
+- **Streamlined 1–2 Column Density:** Modern interactive segmented control pill enabling instant switching between 1 column (wide developer ID banner) and 2 columns (balanced dual-card grid) with optimized aspect ratios (`2.9` and `0.88`).
 - **Persistent Grid Layout Preferences:** User-selected column density is saved automatically to device storage via `SharedPreferences`.
-- **Rich Developer Profiles with Adaptive Cards:** Displays developer avatar, full name, GitHub handle, bio, and location with responsive typography and density scaling per column configuration.
+- **Modern Developer ID Cards & Visual States:** Displays developer avatar, full name, GitHub handle, bio, location, and follower counts with clean minimalist styling, ripple touch feedback, and inline mini loading spinners.
 - **Direct Telemetry Inspection & Undo Action:** Tap any favorited card to instantly load full analytics in `StatsDetailScreen`, or remove with an undoable floating SnackBar action.
 - **Silent Background Enrichment:** Automatically fetches missing location and bio details from GitHub REST API in the background for older bookmarks.
+- **Radial Empty State Illustration:** Polished centered illustration and welcoming prompt when no profiles are currently favorited.
+
+### 9. Customizable Surface Opacity & Adaptive Glassmorphism
+- **Real-Time Surface Opacity Slider:** Interactive slider (50% – 100%, default 85%) in Settings with a live percentage badge, giving users full control over background bleed-through.
+- **Hardware-Accelerated Frosted Glass (`GlassCard`):** Custom reusable glassmorphism component featuring GPU-accelerated `BackdropFilter` (`10px` gaussian blur) when opacity is below 1.0, and automatically bypassing blur filtering at 1.0 for zero battery and GPU overhead.
+- **App-Wide Ambient Persistence:** Background particle loops persist continuously across all screens (Settings, User Profile, Favorite Profiles, Repository Detail, Code Viewer) with lifecycle-aware pausing when minimized to the OS background.
+
+### 10. Modern & Minimalist UI Redesign
+- **Stats Detail Screen (`StatsDetailScreen`):** Overhauled with avatar halo glow ring, sleek metadata chips (company, location, blog), minimalist quote bio typography, and custom themed filter dropdown.
+- **Favorite Profiles Screen (`FavoriteProfilesScreen`):** Clean segmented pill controls, uncluttered card architecture, and polished developer badges.
+- **Settings Sheet (`SettingsSheet`):** Re-engineered cards 1 through 5 with modern minimalist glassmorphism, accent borders, and clean typography, while preserving the foundational Card 6 About APK card untouched.
 
 ---
 
@@ -102,10 +115,10 @@ Developers receive a continuous animated tier badge based on their commit streak
 | **OTA Delivery** | `ota_update` (v7.1.0) | In-app background APK downloader & Android PackageInstaller integration |
 | **Release Signing** | Android Signing Config | Standard release pipeline with safe fallback |
 | **CI/CD Automation** | GitHub Actions (`workflow_dispatch`) | Manual-only automated release compilation and SHA-256 verification |
-| **Typography** | `google_fonts` (Plus Jakarta Sans) | Modern, clean typography and typeface rendering |
+| **Typography** | `google_fonts` (Poppins) | Modern, geometric typography and typeface rendering |
 | **Local Persistence** | `shared_preferences` (v2.5.5) | On-device sandboxed key-value store for bookmarks, themes, & preferences |
 | **Internationalization** | `intl` (v0.20.3) | Reactive 6-language localization & date/number formatting |
-| **Verification Suite** | `flutter_test` | Comprehensive test coverage (54/54 passing unit and widget tests) |
+| **Verification Suite** | `flutter_test` | Comprehensive test coverage (59/59 passing unit and widget tests) |
 
 ---
 
@@ -129,6 +142,26 @@ The compiled release APK will be generated at:
 ---
 
 # Version History
+
+* ### v2.2.0 (Build 17)
+  - **Complete Modern & Minimalist UI Redesign:**
+    - *Stats Detail & Profile Screen (`StatsDetailScreen`):* Overhauled header profile layout with avatar halo glow ring, sleek metadata chips (company, location, blog), minimalist quote bio typography, and custom themed filter dropdown.
+    - *Favorite Profiles Screen (`FavoriteProfilesScreen`):* Clean segmented pill control for 1-2 column switching, refined developer ID card layout with ripple touch feedback and anti-truncation, and centered radial empty state illustration.
+    - *Settings Sheet (`SettingsSheet`):* Re-engineered Cards 1 through 5 with modern minimalist glassmorphism, accent borders, and clean typography, while preserving the foundational Card 6 About APK card untouched.
+  - **Language & Localization Integrity:**
+    - Configured English (`en`) as the default language for new app installations.
+    - Full localization dictionary audit across all 6 supported languages, ensuring UI headers, buttons, and "Favorite Profile" strings render cleanly without clipping or text truncation across all screen densities.
+  - **Customizable Surface Opacity & Adaptive Glassmorphism:**
+    - Added a surface opacity slider (50% – 100%, default 85%) with a live percentage badge in the Theme settings card, persisted to device storage.
+    - Built reusable `GlassCard` with dynamic `BackdropFilter` (frosted blur `10px`), providing transparent glassmorphism for modal sheets, profile metric cards, charts, and repository file explorer when opacity < 1.0, and automatically bypassing blur filtering at 1.0 for GPU and battery efficiency.
+  - **Persistent App-Wide Ambient Canvas Animations:**
+    - Background animations (Sakura petals, meteors, rain/lightning, sunny grove) now persist continuously across all screens (Settings, User Profile, Favorite Profiles, Repository Detail, Code Viewer) instead of freezing during in-app navigation.
+    - Lifecycle-aware pause via `WidgetsBindingObserver`: canvas animations pause only when the app is placed in the background OS (`AppLifecycleState.paused` / `hidden`), instantly resuming on foreground return.
+  - **Fluid News Tab Auto-Centering & Transitions:**
+    - Tech news category tab bar dynamically auto-centers the active chip to the exact middle (50%) of the screen upon tapping or swiping with `Scrollable.ensureVisible` and smooth easing curves.
+    - Replaced jumpy tab switching with a fluid, synchronized `PageView` experience.
+  - **Verification Suite & Quality Assurance:**
+    - Comprehensive automated test suite expanded to 59/59 passing unit and widget tests with 0 static analysis issues.
 
 * ### v2.1.0 (Build 16)
   - **Overhauled Ambient Canvas Background Animations Across All 4 Themes:**

@@ -8,7 +8,9 @@ import '../services/github_api_service.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/activity_chart.dart';
+import '../widgets/animated_app_header.dart';
 import '../widgets/animated_tier_title.dart';
+import '../widgets/glass_card.dart';
 import '../widgets/language_chart.dart';
 import '../widgets/repo_tile.dart';
 import '../widgets/stat_card.dart';
@@ -296,7 +298,10 @@ GitHub: https://github.com/${u.login}
     final displayedRepos = _showAllRepos ? repos : repos.take(10).toList();
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        flexibleSpace: const AnimatedHeaderBackground(),
         title: Text(
           '@${user.login}',
           style: const TextStyle(
@@ -333,29 +338,35 @@ GitHub: https://github.com/${u.login}
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
             // User Header Card
-            Container(
+            GlassCard(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.border, width: 1),
-              ),
               child: Column(
                 children: [
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(2),
+                        padding: const EdgeInsets.all(2.5),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppTheme.border,
-                            width: 1.5,
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppTheme.primaryCyan.withValues(alpha: 0.8),
+                              AppTheme.primaryViolet.withValues(alpha: 0.8),
+                            ],
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.primaryCyan.withValues(alpha: 0.18),
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                            ),
+                          ],
                         ),
                         child: CircleAvatar(
-                          radius: 30,
+                          radius: 32,
                           backgroundColor: AppTheme.surfaceElevated,
                           backgroundImage: user.avatarUrl.isNotEmpty
                               ? ResizeImage(
@@ -395,9 +406,9 @@ GitHub: https://github.com/${u.login}
                                       : user.login,
                                   style: TextStyle(
                                     color: AppTheme.textPrimary,
-                                    fontSize: 17,
+                                    fontSize: 17.5,
                                     fontWeight: FontWeight.w700,
-                                    letterSpacing: -0.2,
+                                    letterSpacing: -0.3,
                                   ),
                                 ),
                                 AnimatedTierTitle(
@@ -407,75 +418,114 @@ GitHub: https://github.com/${u.login}
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 3),
+                            const SizedBox(height: 4),
                             InkWell(
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(20),
                               onTap: _openUserProfile,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    '@${user.login}',
-                                    style: TextStyle(
-                                      color: AppTheme.primaryCyan,
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w500,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryCyan.withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: AppTheme.primaryCyan.withValues(alpha: 0.25),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '@${user.login}',
+                                      style: TextStyle(
+                                        color: AppTheme.primaryCyan,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Icon(
-                                    Icons.open_in_new_rounded,
-                                    size: 11,
-                                    color: AppTheme.primaryCyan.withValues(alpha: 0.7),
-                                  ),
-                                ],
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.open_in_new_rounded,
+                                      size: 11,
+                                      color: AppTheme.primaryCyan,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            if (user.location != null && user.location!.trim().isNotEmpty) ...[
-                              const SizedBox(height: 5),
-                              Row(
+                            if ((user.location != null && user.location!.trim().isNotEmpty) ||
+                                (user.company != null && user.company!.trim().isNotEmpty)) ...[
+                              const SizedBox(height: 6),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 4,
                                 children: [
-                                  Icon(
-                                    Icons.location_on_outlined,
-                                    size: 13,
-                                    color: AppTheme.textMuted,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      user.location!.trim(),
-                                      style: TextStyle(
-                                        color: AppTheme.textMuted,
-                                        fontSize: 11.5,
+                                  if (user.location != null && user.location!.trim().isNotEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.surfaceElevated.withValues(alpha: 0.6),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: AppTheme.border.withValues(alpha: 0.6), width: 0.7),
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                            if (user.company != null && user.company!.trim().isNotEmpty) ...[
-                              const SizedBox(height: 3),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.business_outlined,
-                                    size: 13,
-                                    color: AppTheme.textMuted,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      user.company!.trim(),
-                                      style: TextStyle(
-                                        color: AppTheme.textMuted,
-                                        fontSize: 11.5,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.location_on_outlined,
+                                            size: 12,
+                                            color: AppTheme.accentAmber,
+                                          ),
+                                          const SizedBox(width: 3.5),
+                                          ConstrainedBox(
+                                            constraints: const BoxConstraints(maxWidth: 180),
+                                            child: Text(
+                                              user.location!.trim(),
+                                              style: TextStyle(
+                                                color: AppTheme.textSecondary,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
+                                  if (user.company != null && user.company!.trim().isNotEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.surfaceElevated.withValues(alpha: 0.6),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: AppTheme.border.withValues(alpha: 0.6), width: 0.7),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.business_outlined,
+                                            size: 12,
+                                            color: AppTheme.primaryViolet,
+                                          ),
+                                          const SizedBox(width: 3.5),
+                                          ConstrainedBox(
+                                            constraints: const BoxConstraints(maxWidth: 180),
+                                            child: Text(
+                                              user.company!.trim(),
+                                              style: TextStyle(
+                                                color: AppTheme.textSecondary,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                 ],
                               ),
                             ],
@@ -488,18 +538,27 @@ GitHub: https://github.com/${u.login}
                     const SizedBox(height: 12),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceElevated,
+                        color: AppTheme.primaryCyan.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppTheme.border, width: 0.8),
+                        border: Border(
+                          left: BorderSide(
+                            color: AppTheme.primaryCyan.withValues(alpha: 0.6),
+                            width: 2.5,
+                          ),
+                          top: BorderSide(color: AppTheme.border.withValues(alpha: 0.4), width: 0.6),
+                          right: BorderSide(color: AppTheme.border.withValues(alpha: 0.4), width: 0.6),
+                          bottom: BorderSide(color: AppTheme.border.withValues(alpha: 0.4), width: 0.6),
+                        ),
                       ),
                       child: Text(
                         user.bio!,
                         style: TextStyle(
                           color: AppTheme.textSecondary,
                           fontSize: 12.5,
-                          height: 1.4,
+                          height: 1.45,
+                          fontStyle: FontStyle.italic,
                         ),
                       ),
                     ),
@@ -736,11 +795,14 @@ GitHub: https://github.com/${u.login}
                     side: BorderSide(color: AppTheme.border, width: 1),
                   ),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.5),
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceElevated,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppTheme.border, width: 0.8),
+                      color: AppTheme.primaryCyan.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: AppTheme.primaryCyan.withValues(alpha: 0.22),
+                        width: 0.8,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -754,16 +816,16 @@ GitHub: https://github.com/${u.login}
                         Text(
                           _getFilterLabel(_currentFilter, loc),
                           style: TextStyle(
-                            color: AppTheme.textPrimary,
+                            color: AppTheme.primaryCyan,
                             fontSize: 11.5,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(width: 3),
                         Icon(
-                          Icons.arrow_drop_down_rounded,
-                          size: 16,
-                          color: AppTheme.textSecondary,
+                          Icons.keyboard_arrow_down_rounded,
+                          size: 15,
+                          color: AppTheme.primaryCyan,
                         ),
                       ],
                     ),

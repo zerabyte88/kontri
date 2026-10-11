@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -375,20 +376,37 @@ class _SettingsSheetState extends State<SettingsSheet> {
     final isJapaneseUnlocked = AppThemeService.isJapaneseUnlocked(widget.storageService);
 
     return RepaintBoundary(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-        color: AppTheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        border: Border(
-          top: BorderSide(color: AppTheme.border, width: 1.2),
-          left: BorderSide(color: AppTheme.border, width: 1),
-          right: BorderSide(color: AppTheme.border, width: 1),
-        ),
-      ),
-      padding: EdgeInsets.only(bottom: bottomInset),
-      child: SafeArea(
+      child: ValueListenableBuilder<double>(
+        valueListenable: AppThemeService.surfaceOpacityNotifier,
+        builder: (context, surfaceOpacity, _) {
+          final isGlass = surfaceOpacity < 0.999;
+          const sheetRadius = BorderRadius.vertical(top: Radius.circular(20));
+
+          Widget sheetContent = AnimatedContainer(
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeInOut,
+            decoration: BoxDecoration(
+              color: isGlass
+                  ? AppTheme.surface.withValues(alpha: surfaceOpacity)
+                  : AppTheme.surface,
+              borderRadius: sheetRadius,
+              border: Border(
+                top: BorderSide(
+                  color: AppTheme.border.withValues(alpha: isGlass ? 0.7 : 1.0),
+                  width: 1.2,
+                ),
+                left: BorderSide(
+                  color: AppTheme.border.withValues(alpha: isGlass ? 0.7 : 1.0),
+                  width: 1,
+                ),
+                right: BorderSide(
+                  color: AppTheme.border.withValues(alpha: isGlass ? 0.7 : 1.0),
+                  width: 1,
+                ),
+              ),
+            ),
+            padding: EdgeInsets.only(bottom: bottomInset),
+            child: SafeArea(
         child: NotificationListener<ScrollNotification>(
           onNotification: (notification) {
             if (notification is ScrollUpdateNotification) {
@@ -505,41 +523,52 @@ class _SettingsSheetState extends State<SettingsSheet> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeInOut,
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceElevated,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.border, width: 1),
+                  color: AppTheme.surfaceElevated.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.7), width: 1),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.palette_outlined,
-                          color: AppTheme.primaryCyan,
-                          size: 16,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryCyan.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.palette_outlined,
+                            color: AppTheme.primaryCyan,
+                            size: 16,
+                          ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             loc.themeSectionTitle,
                             style: TextStyle(
                               color: AppTheme.textPrimary,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
                             ),
                           ),
                         ),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 350),
                           curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppTheme.surface,
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: AppTheme.border, width: 0.8),
+                            color: AppTheme.primaryCyan.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppTheme.primaryCyan.withValues(alpha: 0.25),
+                              width: 0.8,
+                            ),
                           ),
                           child: Text(
                             switch (currentTheme) {
@@ -551,7 +580,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             style: TextStyle(
                               color: AppTheme.primaryCyan,
                               fontSize: 11,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
@@ -561,7 +590,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     Text(
                       loc.themeSectionSubtitle,
                       style: TextStyle(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textMuted,
                         fontSize: 11.5,
                       ),
                     ),
@@ -575,43 +604,43 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             // 1. Gelap
                             Expanded(
                               child: _buildOptionCard(
-                              title: loc.themeDark,
-                              subtitle: loc.themeDarkSubtitle,
-                              leading: Icon(
-                                Icons.dark_mode_outlined,
-                                size: 17,
-                                color: currentTheme == AppThemeMode.dark
-                                    ? AppTheme.primaryCyan
-                                    : AppTheme.textMuted,
+                                title: loc.themeDark,
+                                subtitle: loc.themeDarkSubtitle,
+                                leading: Icon(
+                                  Icons.dark_mode_outlined,
+                                  size: 17,
+                                  color: currentTheme == AppThemeMode.dark
+                                      ? AppTheme.primaryCyan
+                                      : AppTheme.textMuted,
+                                ),
+                                isSelected: currentTheme == AppThemeMode.dark,
+                                onTap: () async {
+                                  await AppThemeService.changeTheme(
+                                    AppThemeMode.dark,
+                                    widget.storageService,
+                                  );
+                                  widget.onSettingsChanged?.call();
+                                  if (mounted) setState(() {});
+                                },
                               ),
-                              isSelected: currentTheme == AppThemeMode.dark,
-                              onTap: () async {
-                                await AppThemeService.changeTheme(
-                                  AppThemeMode.dark,
-                                  widget.storageService,
-                                );
-                                widget.onSettingsChanged?.call();
-                                if (mounted) setState(() {});
-                              },
-                            ),
                             ),
                             const SizedBox(width: 8),
 
                             // 2. AMOLED (With Easter Egg tap listener)
                             Expanded(
                               child: _buildOptionCard(
-                              title: loc.themeAmoled,
-                              subtitle: loc.themeAmoledSubtitle,
-                              leading: Icon(
-                                Icons.brightness_2_rounded,
-                                size: 17,
-                                color: currentTheme == AppThemeMode.amoled
-                                    ? AppTheme.primaryCyan
-                                    : AppTheme.textMuted,
+                                title: loc.themeAmoled,
+                                subtitle: loc.themeAmoledSubtitle,
+                                leading: Icon(
+                                  Icons.brightness_2_rounded,
+                                  size: 17,
+                                  color: currentTheme == AppThemeMode.amoled
+                                      ? AppTheme.primaryCyan
+                                      : AppTheme.textMuted,
+                                ),
+                                isSelected: currentTheme == AppThemeMode.amoled,
+                                onTap: () => _onAmoledTapped(loc),
                               ),
-                              isSelected: currentTheme == AppThemeMode.amoled,
-                              onTap: () => _onAmoledTapped(loc),
-                            ),
                             ),
                           ],
                         ),
@@ -621,25 +650,25 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             // 3. Terang
                             Expanded(
                               child: _buildOptionCard(
-                              title: loc.themeLight,
-                              subtitle: loc.themeLightSubtitle,
-                              leading: Icon(
-                                Icons.light_mode_outlined,
-                                size: 17,
-                                color: currentTheme == AppThemeMode.light
-                                    ? AppTheme.primaryCyan
-                                    : AppTheme.textMuted,
+                                title: loc.themeLight,
+                                subtitle: loc.themeLightSubtitle,
+                                leading: Icon(
+                                  Icons.light_mode_outlined,
+                                  size: 17,
+                                  color: currentTheme == AppThemeMode.light
+                                      ? AppTheme.primaryCyan
+                                      : AppTheme.textMuted,
+                                ),
+                                isSelected: currentTheme == AppThemeMode.light,
+                                onTap: () async {
+                                  await AppThemeService.changeTheme(
+                                    AppThemeMode.light,
+                                    widget.storageService,
+                                  );
+                                  widget.onSettingsChanged?.call();
+                                  if (mounted) setState(() {});
+                                },
                               ),
-                              isSelected: currentTheme == AppThemeMode.light,
-                              onTap: () async {
-                                await AppThemeService.changeTheme(
-                                  AppThemeMode.light,
-                                  widget.storageService,
-                                );
-                                widget.onSettingsChanged?.call();
-                                if (mounted) setState(() {});
-                              },
-                            ),
                             ),
                             const SizedBox(width: 8),
 
@@ -674,6 +703,99 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    Divider(color: AppTheme.border.withValues(alpha: 0.4), height: 1),
+                    const SizedBox(height: 14),
+
+                    // Surface Opacity Slider
+                    ValueListenableBuilder<double>(
+                      valueListenable: AppThemeService.surfaceOpacityNotifier,
+                      builder: (context, opacity, _) {
+                        final percent = (opacity * 100).round();
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryCyan.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Icon(
+                                    Icons.opacity_rounded,
+                                    size: 14,
+                                    color: AppTheme.primaryCyan,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    loc.themeOpacityTitle,
+                                    style: TextStyle(
+                                      color: AppTheme.textPrimary,
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryCyan.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: AppTheme.primaryCyan.withValues(alpha: 0.25),
+                                      width: 0.8,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '$percent%',
+                                    style: TextStyle(
+                                      color: AppTheme.primaryCyan,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              loc.themeOpacitySubtitle,
+                              style: TextStyle(
+                                color: AppTheme.textMuted,
+                                fontSize: 11,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SliderTheme(
+                              data: SliderTheme.of(context).copyWith(
+                                activeTrackColor: AppTheme.primaryCyan,
+                                inactiveTrackColor: AppTheme.border.withValues(alpha: 0.5),
+                                thumbColor: AppTheme.primaryCyan,
+                                overlayColor: AppTheme.primaryCyan.withValues(alpha: 0.15),
+                                trackHeight: 3.5,
+                                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+                              ),
+                              child: Slider(
+                                value: opacity,
+                                min: 0.50,
+                                max: 1.00,
+                                divisions: 50,
+                                onChanged: (val) {
+                                  AppThemeService.changeSurfaceOpacity(
+                                    val,
+                                    widget.storageService,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -683,48 +805,59 @@ class _SettingsSheetState extends State<SettingsSheet> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeInOut,
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceElevated,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.border, width: 1),
+                  color: AppTheme.surfaceElevated.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.7), width: 1),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.translate_rounded,
-                          color: AppTheme.primaryCyan,
-                          size: 16,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryCyan.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.translate_rounded,
+                            color: AppTheme.primaryCyan,
+                            size: 16,
+                          ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             loc.languageSectionTitle,
                             style: TextStyle(
                               color: AppTheme.textPrimary,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
                             ),
                           ),
                         ),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 350),
                           curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppTheme.surface,
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: AppTheme.border, width: 0.8),
+                            color: AppTheme.primaryCyan.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppTheme.primaryCyan.withValues(alpha: 0.25),
+                              width: 0.8,
+                            ),
                           ),
                           child: Text(
                             '${currentLang.flag} ${currentLang.nativeName}',
                             style: TextStyle(
                               color: AppTheme.primaryCyan,
                               fontSize: 11,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
@@ -734,7 +867,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     Text(
                       loc.languageSectionSubtitle,
                       style: TextStyle(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textMuted,
                         fontSize: 11.5,
                       ),
                     ),
@@ -779,30 +912,38 @@ class _SettingsSheetState extends State<SettingsSheet> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeInOut,
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceElevated,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.border, width: 1),
+                  color: AppTheme.surfaceElevated.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.7), width: 1),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.speed_rounded,
-                          color: AppTheme.primaryCyan,
-                          size: 16,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryCyan.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.speed_rounded,
+                            color: AppTheme.primaryCyan,
+                            size: 16,
+                          ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             loc.rateLimitStatus,
                             style: TextStyle(
                               color: AppTheme.textPrimary,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
                             ),
                           ),
                         ),
@@ -867,7 +1008,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         ),
                       ],
                     ),
-                    ...[
                     const SizedBox(height: 4),
                     Text(
                       '${loc.resetIn}: ${loc.formatCountdown(rateLimit.resetTime.difference(DateTime.now()))}',
@@ -877,7 +1017,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
                       ),
                     ),
                   ],
-                  ],
                 ),
               ),
               const SizedBox(height: 14),
@@ -886,44 +1025,54 @@ class _SettingsSheetState extends State<SettingsSheet> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeInOut,
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceElevated,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.border, width: 1),
+                  color: AppTheme.surfaceElevated.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.7), width: 1),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.vpn_key_outlined,
-                          color: AppTheme.primaryCyan,
-                          size: 16,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryCyan.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.vpn_key_outlined,
+                            color: AppTheme.primaryCyan,
+                            size: 16,
+                          ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             loc.githubTokenTitle,
                             style: TextStyle(
                               color: AppTheme.textPrimary,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
                             ),
                           ),
                         ),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 350),
                           curve: Curves.easeInOut,
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: hasToken
                                 ? AppTheme.accentGreen.withValues(alpha: 0.12)
                                 : AppTheme.surface,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: hasToken ? AppTheme.accentGreen.withValues(alpha: 0.3) : AppTheme.border,
+                              color: hasToken
+                                  ? AppTheme.accentGreen.withValues(alpha: 0.35)
+                                  : AppTheme.border,
                               width: 0.8,
                             ),
                           ),
@@ -942,7 +1091,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     Text(
                       loc.tokenSubtitle,
                       style: TextStyle(
-                        color: AppTheme.textSecondary,
+                        color: AppTheme.textMuted,
                         fontSize: 11.5,
                       ),
                     ),
@@ -957,7 +1106,22 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         fontFamily: 'monospace',
                       ),
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: AppTheme.surface,
                         hintText: loc.tokenHint,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: AppTheme.border, width: 0.8),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: AppTheme.border, width: 0.8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: AppTheme.primaryCyan, width: 1.2),
+                        ),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscureToken
@@ -977,6 +1141,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                     const SizedBox(height: 8),
 
                     InkWell(
+                      borderRadius: BorderRadius.circular(6),
                       onTap: () {
                         setState(() {
                           _showTokenGuide = !_showTokenGuide;
@@ -999,7 +1164,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                               style: TextStyle(
                                 color: AppTheme.primaryCyan,
                                 fontSize: 11.5,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -1050,9 +1215,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryCyan,
                             foregroundColor: const Color(0xFF0D1117),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                           child: Text(
@@ -1074,30 +1239,38 @@ class _SettingsSheetState extends State<SettingsSheet> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeInOut,
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceElevated,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.border, width: 1),
+                  color: AppTheme.surfaceElevated.withValues(alpha: 0.85),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.7), width: 1),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.system_update_alt_rounded,
-                          color: AppTheme.primaryCyan,
-                          size: 16,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryCyan.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.system_update_alt_rounded,
+                            color: AppTheme.primaryCyan,
+                            size: 16,
+                          ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             loc.updateSectionTitle,
                             style: TextStyle(
                               color: AppTheme.textPrimary,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
                             ),
                           ),
                         ),
@@ -1112,12 +1285,12 @@ class _SettingsSheetState extends State<SettingsSheet> {
                           )
                         else if (_updateInfo?.hasUpdate == true)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
                               color: AppTheme.accentGreen.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(5),
+                              borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: AppTheme.accentGreen.withValues(alpha: 0.3),
+                                color: AppTheme.accentGreen.withValues(alpha: 0.35),
                                 width: 0.8,
                               ),
                             ),
@@ -1225,7 +1398,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                     elevation: 0,
                                     padding: EdgeInsets.zero,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
                                   onPressed: () => _runOtaUpdate(
@@ -1249,7 +1422,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                   side: BorderSide(color: AppTheme.border, width: 1.0),
                                   padding: EdgeInsets.zero,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
                                 onPressed: () => UpdateService.openReleaseInBrowser(
@@ -1285,7 +1458,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                 foregroundColor: AppTheme.primaryCyan,
                                 side: BorderSide(color: AppTheme.border, width: 1.0),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
                               ),
@@ -1533,6 +1706,20 @@ class _SettingsSheetState extends State<SettingsSheet> {
         ),
       ),
       ),
+    );
+
+          if (isGlass) {
+            sheetContent = ClipRRect(
+              borderRadius: sheetRadius,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: sheetContent,
+              ),
+            );
+          }
+
+          return sheetContent;
+        },
       ),
     );
   }
@@ -1593,7 +1780,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           onTap: onTap,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 250),
@@ -1601,10 +1788,10 @@ class _SettingsSheetState extends State<SettingsSheet> {
             decoration: BoxDecoration(
               color: isSelected
                   ? accent.withValues(alpha: 0.12)
-                  : AppTheme.surface,
-              borderRadius: BorderRadius.circular(10),
+                  : AppTheme.surface.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected ? accent : AppTheme.border,
+                color: isSelected ? accent : AppTheme.border.withValues(alpha: 0.7),
                 width: isSelected ? 1.4 : 0.8,
               ),
             ),
@@ -1634,7 +1821,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                           style: TextStyle(
                             color: isSelected ? accent : AppTheme.textPrimary,
                             fontSize: 12.0,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                             height: 1.15,
                           ),
                         ),
@@ -1647,7 +1834,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: isSelected
-                                  ? accent.withValues(alpha: 0.8)
+                                  ? accent.withValues(alpha: 0.85)
                                   : AppTheme.textMuted,
                               fontSize: 9.8,
                               letterSpacing: -0.2,

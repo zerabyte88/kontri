@@ -7,7 +7,7 @@ class AppLanguageService {
   static ValueNotifier<AppLanguage>? _currentLanguageNotifier;
 
   static ValueNotifier<AppLanguage> get currentLanguageNotifier =>
-      _currentLanguageNotifier ??= ValueNotifier<AppLanguage>(AppLanguage.indonesian);
+      _currentLanguageNotifier ??= ValueNotifier<AppLanguage>(AppLanguage.english);
 
   static void init(StorageService storageService) {
     final code = storageService.getLanguageCode();
