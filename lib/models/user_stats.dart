@@ -36,7 +36,8 @@ class UserStats {
     int totalForks = 0;
     final Map<String, int> langCounts = {};
 
-    final hasAggregated = aggregatedLanguages != null && aggregatedLanguages.isNotEmpty;
+    final hasAggregated =
+        aggregatedLanguages != null && aggregatedLanguages.isNotEmpty;
     if (hasAggregated) {
       langCounts.addAll(aggregatedLanguages);
     }
@@ -45,7 +46,10 @@ class UserStats {
       totalStars += repo.stargazersCount;
       totalForks += repo.forksCount;
 
-      if (!hasAggregated && !repo.isFork && repo.language != null && repo.language!.isNotEmpty) {
+      if (!hasAggregated &&
+          !repo.isFork &&
+          repo.language != null &&
+          repo.language!.isNotEmpty) {
         final weight = repo.size > 0 ? repo.size : 1;
         langCounts[repo.language!] = (langCounts[repo.language!] ?? 0) + weight;
       }
@@ -78,22 +82,28 @@ class UserStats {
 
     if (totalStars >= 100) {
       persona = 'Star Magnet';
-      description = 'Koleksi bintang repositorimu sangat memukau komunitas GitHub!';
+      description =
+          'Koleksi bintang repositorimu sangat memukau komunitas GitHub!';
     } else if (langCounts.length >= 4) {
       persona = 'Polyglot Architect';
-      description = 'Menguasai dan aktif menggunakan beragam bahasa pemrograman.';
+      description =
+          'Menguasai dan aktif menggunakan beragam bahasa pemrograman.';
     } else if (nightEvents > morningEvents && nightEvents > afternoonEvents) {
       persona = 'Midnight Owl Coder';
-      description = 'Fokus dan produktivitas tertinggi terpancar di keheningan malam.';
+      description =
+          'Fokus dan produktivitas tertinggi terpancar di keheningan malam.';
     } else if (morningEvents > afternoonEvents && morningEvents > nightEvents) {
       persona = 'Early Bird Developer';
-      description = 'Memulai hari dengan commit segar dan pikiran jernih di pagi hari.';
+      description =
+          'Memulai hari dengan commit segar dan pikiran jernih di pagi hari.';
     } else if (repos.length > 20) {
       persona = 'Prolific Builder';
-      description = 'Sangat produktif dalam mengeksekusi dan merilis ide ke publik.';
+      description =
+          'Sangat produktif dalam mengeksekusi dan merilis ide ke publik.';
     } else {
       persona = 'Dedicated Craftsman';
-      description = 'Terus konsisten mengasah kode dan membangun karya bermutu.';
+      description =
+          'Terus konsisten mengasah kode dan membangun karya bermutu.';
     }
 
     return UserStats(

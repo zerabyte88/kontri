@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../localization/app_localizations.dart';
 import '../models/github_content_item.dart';
 import '../services/github_api_service.dart';
@@ -45,11 +46,31 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
         ? widget.item.name.split('.').last.toLowerCase()
         : '';
     return [
-      'zip', 'tar', 'gz', '7z', 'rar',
-      'pdf', 'exe', 'dll', 'so', 'dylib',
-      'bin', 'apk', 'aab', 'jar', 'class',
-      'mp3', 'mp4', 'wav', 'mov', 'avi',
-      'woff', 'woff2', 'ttf', 'otf', 'eot',
+      'zip',
+      'tar',
+      'gz',
+      '7z',
+      'rar',
+      'pdf',
+      'exe',
+      'dll',
+      'so',
+      'dylib',
+      'bin',
+      'apk',
+      'aab',
+      'jar',
+      'class',
+      'mp3',
+      'mp4',
+      'wav',
+      'mov',
+      'avi',
+      'woff',
+      'woff2',
+      'ttf',
+      'otf',
+      'eot',
     ].contains(ext);
   }
 
@@ -113,7 +134,10 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
     if (uri != null) {
       final loc = AppLocalizations.of(context);
       try {
-        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
         if (!launched && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -140,9 +164,11 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final rawUrl = widget.item.downloadUrl ??
+    final rawUrl =
+        widget.item.downloadUrl ??
         'https://raw.githubusercontent.com/${widget.owner}/${widget.repo}/${widget.ref ?? 'main'}/${widget.item.path}';
-    final githubWebUrl = widget.item.htmlUrl ??
+    final githubWebUrl =
+        widget.item.htmlUrl ??
         'https://github.com/${widget.owner}/${widget.repo}/blob/${widget.ref ?? 'main'}/${widget.item.path}';
 
     return Scaffold(
@@ -167,10 +193,7 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
             ),
             RunningText(
               text: widget.item.path,
-              style: TextStyle(
-                color: AppTheme.textMuted,
-                fontSize: 11,
-              ),
+              style: TextStyle(color: AppTheme.textMuted, fontSize: 11),
               autoScroll: true,
             ),
           ],
@@ -226,7 +249,11 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline_rounded, size: 36, color: AppTheme.accentRed),
+              Icon(
+                Icons.error_outline_rounded,
+                size: 36,
+                color: AppTheme.accentRed,
+              ),
               const SizedBox(height: 12),
               Text(
                 _errorMessage!,
@@ -277,8 +304,11 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => Column(
                           children: [
-                            Icon(Icons.broken_image_outlined,
-                                size: 48, color: AppTheme.textMuted),
+                            Icon(
+                              Icons.broken_image_outlined,
+                              size: 48,
+                              color: AppTheme.textMuted,
+                            ),
                             const SizedBox(height: 8),
                             Text(
                               loc.failedToOpenLink(''),
@@ -306,7 +336,11 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.inventory_2_outlined, size: 48, color: AppTheme.textMuted),
+              Icon(
+                Icons.inventory_2_outlined,
+                size: 48,
+                color: AppTheme.textMuted,
+              ),
               const SizedBox(height: 16),
               Text(
                 widget.item.name,
@@ -350,11 +384,17 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: AppTheme.surface,
-            border: Border(bottom: BorderSide(color: AppTheme.border, width: 0.8)),
+            border: Border(
+              bottom: BorderSide(color: AppTheme.border, width: 0.8),
+            ),
           ),
           child: Row(
             children: [
-              Icon(widget.item.iconData, size: 15, color: widget.item.iconColor),
+              Icon(
+                widget.item.iconData,
+                size: 15,
+                color: widget.item.iconColor,
+              ),
               const SizedBox(width: 8),
               Text(
                 '$totalLines lines • ${widget.item.formattedSize}',

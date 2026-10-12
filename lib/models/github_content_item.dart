@@ -36,7 +36,16 @@ class GitHubContentItem {
 
   bool get isImage {
     final ext = name.contains('.') ? name.split('.').last.toLowerCase() : '';
-    return const {'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'ico', 'bmp'}.contains(ext);
+    return const {
+      'png',
+      'jpg',
+      'jpeg',
+      'gif',
+      'svg',
+      'webp',
+      'ico',
+      'bmp',
+    }.contains(ext);
   }
 
   bool get isSvg => name.toLowerCase().endsWith('.svg');

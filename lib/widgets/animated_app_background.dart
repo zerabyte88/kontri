@@ -1,6 +1,8 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import '../services/app_theme_service.dart';
 import '../theme/app_theme.dart';
 import 'animated_app_header.dart';
@@ -57,7 +59,8 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
     } else if (notification is UserScrollNotification &&
         notification.direction == ScrollDirection.idle) {
       _activeScrollCount = 0;
-      if (!HeaderAnimationState.isPausedNotifier.value && !_controller.isAnimating) {
+      if (!HeaderAnimationState.isPausedNotifier.value &&
+          !_controller.isAnimating) {
         _controller.repeat();
       }
     }
@@ -67,10 +70,12 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!mounted) return;
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
       if (_controller.isAnimating) _controller.stop();
     } else if (state == AppLifecycleState.resumed) {
-      if (!HeaderAnimationState.isPausedNotifier.value && !_controller.isAnimating) {
+      if (!HeaderAnimationState.isPausedNotifier.value &&
+          !_controller.isAnimating) {
         _controller.repeat();
       }
     }
@@ -237,32 +242,188 @@ class _FullAppBgPainter extends CustomPainter {
 
   // 6 Meteors traversing full screen (AMOLED Night)
   static const List<_Meteor> _meteors = [
-    _Meteor(startXRatio: 0.88, startYRatio: -0.06, speed: 0.85, phase: 0.02, length: 190, headSize: 2.6),
-    _Meteor(startXRatio: 1.18, startYRatio: 0.08, speed: 1.05, phase: 0.18, length: 160, headSize: 2.1, color: Color(0xFF80DEEA)),
-    _Meteor(startXRatio: 0.62, startYRatio: -0.08, speed: 0.78, phase: 0.36, length: 210, headSize: 2.8),
-    _Meteor(startXRatio: 1.02, startYRatio: 0.14, speed: 0.95, phase: 0.54, length: 175, headSize: 2.3),
-    _Meteor(startXRatio: 0.48, startYRatio: -0.05, speed: 0.82, phase: 0.72, length: 180, headSize: 2.5, color: Color(0xFFE0F7FA)),
-    _Meteor(startXRatio: 1.26, startYRatio: 0.20, speed: 1.12, phase: 0.88, length: 195, headSize: 2.7),
+    _Meteor(
+      startXRatio: 0.88,
+      startYRatio: -0.06,
+      speed: 0.85,
+      phase: 0.02,
+      length: 190,
+      headSize: 2.6,
+    ),
+    _Meteor(
+      startXRatio: 1.18,
+      startYRatio: 0.08,
+      speed: 1.05,
+      phase: 0.18,
+      length: 160,
+      headSize: 2.1,
+      color: Color(0xFF80DEEA),
+    ),
+    _Meteor(
+      startXRatio: 0.62,
+      startYRatio: -0.08,
+      speed: 0.78,
+      phase: 0.36,
+      length: 210,
+      headSize: 2.8,
+    ),
+    _Meteor(
+      startXRatio: 1.02,
+      startYRatio: 0.14,
+      speed: 0.95,
+      phase: 0.54,
+      length: 175,
+      headSize: 2.3,
+    ),
+    _Meteor(
+      startXRatio: 0.48,
+      startYRatio: -0.05,
+      speed: 0.82,
+      phase: 0.72,
+      length: 180,
+      headSize: 2.5,
+      color: Color(0xFFE0F7FA),
+    ),
+    _Meteor(
+      startXRatio: 1.26,
+      startYRatio: 0.20,
+      speed: 1.12,
+      phase: 0.88,
+      length: 195,
+      headSize: 2.7,
+    ),
   ];
 
   // 16 Continuous Floating Stardust & Cyber Embers (Dark Theme)
   static const List<_DarkParticle> _darkParticles = [
-    _DarkParticle(bx: 0.07, sp: 1, sw: 12.0, sz: 1.8, ph: 0.05, cl: Color(0xFF00E5FF)),
-    _DarkParticle(bx: 0.15, sp: 2, sw: 16.0, sz: 2.2, ph: 0.18, cl: Color(0xFF8B5CF6)),
-    _DarkParticle(bx: 0.23, sp: 1, sw: 10.0, sz: 1.5, ph: 0.32, cl: Color(0xFF10B981)),
-    _DarkParticle(bx: 0.31, sp: 2, sw: 18.0, sz: 2.4, ph: 0.48, cl: Color(0xFF00E5FF)),
-    _DarkParticle(bx: 0.40, sp: 1, sw: 14.0, sz: 1.6, ph: 0.62, cl: Color(0xFFE0F7FA)),
-    _DarkParticle(bx: 0.48, sp: 2, sw: 15.0, sz: 2.0, ph: 0.75, cl: Color(0xFF8B5CF6)),
-    _DarkParticle(bx: 0.57, sp: 1, sw: 11.0, sz: 1.4, ph: 0.88, cl: Color(0xFF10B981)),
-    _DarkParticle(bx: 0.65, sp: 2, sw: 17.0, sz: 2.5, ph: 0.12, cl: Color(0xFF00E5FF)),
-    _DarkParticle(bx: 0.73, sp: 1, sw: 13.0, sz: 1.7, ph: 0.28, cl: Color(0xFF8B5CF6)),
-    _DarkParticle(bx: 0.81, sp: 2, sw: 16.0, sz: 2.1, ph: 0.42, cl: Color(0xFF10B981)),
-    _DarkParticle(bx: 0.89, sp: 1, sw: 12.0, sz: 1.5, ph: 0.58, cl: Color(0xFF00E5FF)),
-    _DarkParticle(bx: 0.95, sp: 2, sw: 15.0, sz: 2.3, ph: 0.72, cl: Color(0xFFE0F7FA)),
-    _DarkParticle(bx: 0.12, sp: 1, sw: 14.0, sz: 1.6, ph: 0.85, cl: Color(0xFF8B5CF6)),
-    _DarkParticle(bx: 0.35, sp: 2, sw: 19.0, sz: 2.6, ph: 0.02, cl: Color(0xFF00E5FF)),
-    _DarkParticle(bx: 0.61, sp: 1, sw: 13.0, sz: 1.8, ph: 0.38, cl: Color(0xFF10B981)),
-    _DarkParticle(bx: 0.84, sp: 2, sw: 17.0, sz: 2.2, ph: 0.68, cl: Color(0xFF8B5CF6)),
+    _DarkParticle(
+      bx: 0.07,
+      sp: 1,
+      sw: 12.0,
+      sz: 1.8,
+      ph: 0.05,
+      cl: Color(0xFF00E5FF),
+    ),
+    _DarkParticle(
+      bx: 0.15,
+      sp: 2,
+      sw: 16.0,
+      sz: 2.2,
+      ph: 0.18,
+      cl: Color(0xFF8B5CF6),
+    ),
+    _DarkParticle(
+      bx: 0.23,
+      sp: 1,
+      sw: 10.0,
+      sz: 1.5,
+      ph: 0.32,
+      cl: Color(0xFF10B981),
+    ),
+    _DarkParticle(
+      bx: 0.31,
+      sp: 2,
+      sw: 18.0,
+      sz: 2.4,
+      ph: 0.48,
+      cl: Color(0xFF00E5FF),
+    ),
+    _DarkParticle(
+      bx: 0.40,
+      sp: 1,
+      sw: 14.0,
+      sz: 1.6,
+      ph: 0.62,
+      cl: Color(0xFFE0F7FA),
+    ),
+    _DarkParticle(
+      bx: 0.48,
+      sp: 2,
+      sw: 15.0,
+      sz: 2.0,
+      ph: 0.75,
+      cl: Color(0xFF8B5CF6),
+    ),
+    _DarkParticle(
+      bx: 0.57,
+      sp: 1,
+      sw: 11.0,
+      sz: 1.4,
+      ph: 0.88,
+      cl: Color(0xFF10B981),
+    ),
+    _DarkParticle(
+      bx: 0.65,
+      sp: 2,
+      sw: 17.0,
+      sz: 2.5,
+      ph: 0.12,
+      cl: Color(0xFF00E5FF),
+    ),
+    _DarkParticle(
+      bx: 0.73,
+      sp: 1,
+      sw: 13.0,
+      sz: 1.7,
+      ph: 0.28,
+      cl: Color(0xFF8B5CF6),
+    ),
+    _DarkParticle(
+      bx: 0.81,
+      sp: 2,
+      sw: 16.0,
+      sz: 2.1,
+      ph: 0.42,
+      cl: Color(0xFF10B981),
+    ),
+    _DarkParticle(
+      bx: 0.89,
+      sp: 1,
+      sw: 12.0,
+      sz: 1.5,
+      ph: 0.58,
+      cl: Color(0xFF00E5FF),
+    ),
+    _DarkParticle(
+      bx: 0.95,
+      sp: 2,
+      sw: 15.0,
+      sz: 2.3,
+      ph: 0.72,
+      cl: Color(0xFFE0F7FA),
+    ),
+    _DarkParticle(
+      bx: 0.12,
+      sp: 1,
+      sw: 14.0,
+      sz: 1.6,
+      ph: 0.85,
+      cl: Color(0xFF8B5CF6),
+    ),
+    _DarkParticle(
+      bx: 0.35,
+      sp: 2,
+      sw: 19.0,
+      sz: 2.6,
+      ph: 0.02,
+      cl: Color(0xFF00E5FF),
+    ),
+    _DarkParticle(
+      bx: 0.61,
+      sp: 1,
+      sw: 13.0,
+      sz: 1.8,
+      ph: 0.38,
+      cl: Color(0xFF10B981),
+    ),
+    _DarkParticle(
+      bx: 0.84,
+      sp: 2,
+      sw: 17.0,
+      sz: 2.2,
+      ph: 0.68,
+      cl: Color(0xFF8B5CF6),
+    ),
   ];
 
   // 12 Drifting Prismatic Daylight Motes (Light theme)
@@ -357,24 +518,57 @@ class _FullAppBgPainter extends CustomPainter {
       canvas.rotate((t * 2 * math.pi) + p.ph);
       // Oval petal with cleft hint
       canvas.drawOval(
-        Rect.fromCenter(center: Offset.zero, width: p.sz * 1.5, height: p.sz * 0.85),
+        Rect.fromCenter(
+          center: Offset.zero,
+          width: p.sz * 1.5,
+          height: p.sz * 0.85,
+        ),
         _fill,
       );
       // Delicate inner highlight
       _fill.color = const Color(0xFFFFD4E8).withValues(alpha: opacity * 0.50);
       canvas.drawOval(
-        Rect.fromCenter(center: const Offset(-1, 0), width: p.sz * 0.9, height: p.sz * 0.45),
+        Rect.fromCenter(
+          center: const Offset(-1, 0),
+          width: p.sz * 0.9,
+          height: p.sz * 0.45,
+        ),
         _fill,
       );
       canvas.restore();
     }
 
     // 4. Stardust / Sparkle Puffs
-    _drawSparkle(canvas, Offset(w * 0.14, h * 0.12), progress, const Color(0xFFFFD4E8));
-    _drawSparkle(canvas, Offset(w * 0.52, h * 0.10), progress + 0.35, const Color(0xFFFF7AA5));
-    _drawSparkle(canvas, Offset(w * 0.66, h * 0.22), progress + 0.70, const Color(0xFFFFD1E3));
-    _drawSparkle(canvas, Offset(w * 0.82, h * 0.14), progress + 0.20, const Color(0xFFFFE485));
-    _drawSparkle(canvas, Offset(w * 0.20, h * 0.28), progress + 0.50, const Color(0xFFFFB3D1));
+    _drawSparkle(
+      canvas,
+      Offset(w * 0.14, h * 0.12),
+      progress,
+      const Color(0xFFFFD4E8),
+    );
+    _drawSparkle(
+      canvas,
+      Offset(w * 0.52, h * 0.10),
+      progress + 0.35,
+      const Color(0xFFFF7AA5),
+    );
+    _drawSparkle(
+      canvas,
+      Offset(w * 0.66, h * 0.22),
+      progress + 0.70,
+      const Color(0xFFFFD1E3),
+    );
+    _drawSparkle(
+      canvas,
+      Offset(w * 0.82, h * 0.14),
+      progress + 0.20,
+      const Color(0xFFFFE485),
+    );
+    _drawSparkle(
+      canvas,
+      Offset(w * 0.20, h * 0.28),
+      progress + 0.50,
+      const Color(0xFFFFB3D1),
+    );
   }
 
   void _drawSumiESakuraBough(Canvas canvas, Size size) {
@@ -495,7 +689,10 @@ class _FullAppBgPainter extends CustomPainter {
       for (int i = 0; i < 5; i++) {
         final angle = i * (2 * math.pi / 5);
         final petalDist = radius * 0.60;
-        final petalCenter = Offset(math.cos(angle) * petalDist, math.sin(angle) * petalDist);
+        final petalCenter = Offset(
+          math.cos(angle) * petalDist,
+          math.sin(angle) * petalDist,
+        );
 
         canvas.save();
         canvas.translate(petalCenter.dx, petalCenter.dy);
@@ -504,14 +701,22 @@ class _FullAppBgPainter extends CustomPainter {
         // Petal base
         _fill.color = const Color(0xFFFF6097).withValues(alpha: 0.85);
         canvas.drawOval(
-          Rect.fromCenter(center: Offset.zero, width: radius * 0.75, height: radius * 0.50),
+          Rect.fromCenter(
+            center: Offset.zero,
+            width: radius * 0.75,
+            height: radius * 0.50,
+          ),
           _fill,
         );
 
         // Petal tip highlight
         _fill.color = const Color(0xFFFFD4E8).withValues(alpha: 0.90);
         canvas.drawOval(
-          Rect.fromCenter(center: Offset(radius * 0.15, 0), width: radius * 0.60, height: radius * 0.38),
+          Rect.fromCenter(
+            center: Offset(radius * 0.15, 0),
+            width: radius * 0.60,
+            height: radius * 0.38,
+          ),
           _fill,
         );
 
@@ -547,14 +752,22 @@ class _FullAppBgPainter extends CustomPainter {
       // Sepal green/wine
       _fill.color = const Color(0xFF381024).withValues(alpha: 0.85);
       canvas.drawOval(
-        Rect.fromCenter(center: const Offset(-2, 0), width: radius * 0.9, height: radius * 0.5),
+        Rect.fromCenter(
+          center: const Offset(-2, 0),
+          width: radius * 0.9,
+          height: radius * 0.5,
+        ),
         _fill,
       );
 
       // Rosy bud petal
       _fill.color = const Color(0xFFFF528F).withValues(alpha: 0.95);
       canvas.drawOval(
-        Rect.fromCenter(center: const Offset(2, 0), width: radius * 0.85, height: radius * 0.55),
+        Rect.fromCenter(
+          center: const Offset(2, 0),
+          width: radius * 0.85,
+          height: radius * 0.55,
+        ),
         _fill,
       );
 
@@ -592,7 +805,8 @@ class _FullAppBgPainter extends CustomPainter {
     // Stars
     for (final s in _stars) {
       final pos = Offset(s.x * size.width, s.y * size.height);
-      final twinkle = 0.25 + 0.75 * (0.5 + 0.5 * math.sin((progress + s.ph) * 2 * math.pi));
+      final twinkle =
+          0.25 + 0.75 * (0.5 + 0.5 * math.sin((progress + s.ph) * 2 * math.pi));
       final alpha = (twinkle * 0.9).clamp(0.0, 1.0);
       final starColor = s.cl.withValues(alpha: alpha);
       if (s.sp) _drawSparkle(canvas, pos, (progress + s.ph) % 1.0, starColor);
@@ -698,7 +912,8 @@ class _FullAppBgPainter extends CustomPainter {
     // Micro Cosmic Stars
     for (final s in _auroraStars) {
       final pos = Offset(s.x * w, s.y * h);
-      final twinkle = 0.30 + 0.70 * (0.5 + 0.5 * math.sin((progress + s.ph) * 2 * math.pi));
+      final twinkle =
+          0.30 + 0.70 * (0.5 + 0.5 * math.sin((progress + s.ph) * 2 * math.pi));
       final alpha = (twinkle * 0.85).clamp(0.0, 1.0);
       final starColor = s.cl.withValues(alpha: alpha);
       if (s.sp) _drawSparkle(canvas, pos, (progress + s.ph) % 1.0, starColor);
@@ -728,19 +943,50 @@ class _FullAppBgPainter extends CustomPainter {
     final nebulaPulse = 0.85 + 0.15 * math.sin(progress * 2 * math.pi);
     _glow.color = const Color(0xFF00E5FF).withValues(alpha: 0.05 * nebulaPulse);
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(w * 0.5, h * 0.22), width: w * 1.2, height: h * 0.35),
+      Rect.fromCenter(
+        center: Offset(w * 0.5, h * 0.22),
+        width: w * 1.2,
+        height: h * 0.35,
+      ),
       _glow,
     );
 
     // 3 Undulating Aurora Curtains (Integer speeds for 100% loop continuity)
     // Curtain 1: Electric Cyan (Upper Horizon)
-    _drawAuroraCurtain(canvas, size, 0.07, 0.20, const Color(0xFF00E5FF), 1, 0.0, 1);
+    _drawAuroraCurtain(
+      canvas,
+      size,
+      0.07,
+      0.20,
+      const Color(0xFF00E5FF),
+      1,
+      0.0,
+      1,
+    );
 
     // Curtain 2: Emerald Green (Mid Horizon)
-    _drawAuroraCurtain(canvas, size, 0.13, 0.22, const Color(0xFF10B981), 1, 0.33, 2);
+    _drawAuroraCurtain(
+      canvas,
+      size,
+      0.13,
+      0.22,
+      const Color(0xFF10B981),
+      1,
+      0.33,
+      2,
+    );
 
     // Curtain 3: Nebula Violet (Lower Horizon Depth)
-    _drawAuroraCurtain(canvas, size, 0.19, 0.24, const Color(0xFF8B5CF6), 1, 0.66, 3);
+    _drawAuroraCurtain(
+      canvas,
+      size,
+      0.19,
+      0.24,
+      const Color(0xFF8B5CF6),
+      1,
+      0.66,
+      3,
+    );
   }
 
   void _drawAuroraCurtain(
@@ -782,16 +1028,34 @@ class _FullAppBgPainter extends CustomPainter {
     for (int i = segments; i >= 0; i--) {
       final x = i * dx;
       final normX = i / segments;
-      final yBot = yTops[i] + ribbonH + (math.sin(normX * 2.0 * math.pi + t) * (h * 0.015));
+      final yBot =
+          yTops[i] +
+          ribbonH +
+          (math.sin(normX * 2.0 * math.pi + t) * (h * 0.015));
       curtainPath.lineTo(x, yBot);
     }
     curtainPath.close();
 
     if (_cachedCurtainSize != size) {
       _cachedCurtainSize = size;
-      _cachedCurtain1Shader = _createCurtainShader(size, 0.07, 0.20, const Color(0xFF00E5FF));
-      _cachedCurtain2Shader = _createCurtainShader(size, 0.13, 0.22, const Color(0xFF10B981));
-      _cachedCurtain3Shader = _createCurtainShader(size, 0.19, 0.24, const Color(0xFF8B5CF6));
+      _cachedCurtain1Shader = _createCurtainShader(
+        size,
+        0.07,
+        0.20,
+        const Color(0xFF00E5FF),
+      );
+      _cachedCurtain2Shader = _createCurtainShader(
+        size,
+        0.13,
+        0.22,
+        const Color(0xFF10B981),
+      );
+      _cachedCurtain3Shader = _createCurtainShader(
+        size,
+        0.19,
+        0.24,
+        const Color(0xFF8B5CF6),
+      );
     }
 
     _fill.shader = curtainIndex == 1
@@ -802,10 +1066,20 @@ class _FullAppBgPainter extends CustomPainter {
     _fill.shader = null;
   }
 
-  static Shader _createCurtainShader(Size size, double baseYRatio, double heightRatio, Color peakColor) {
+  static Shader _createCurtainShader(
+    Size size,
+    double baseYRatio,
+    double heightRatio,
+    Color peakColor,
+  ) {
     final baseY = size.height * baseYRatio;
     final ribbonH = size.height * heightRatio;
-    final bounds = Rect.fromLTWH(0, baseY - size.height * 0.06, size.width, ribbonH + size.height * 0.12);
+    final bounds = Rect.fromLTWH(
+      0,
+      baseY - size.height * 0.06,
+      size.width,
+      ribbonH + size.height * 0.12,
+    );
     return LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
@@ -851,11 +1125,35 @@ class _FullAppBgPainter extends CustomPainter {
 
     // 3. Elegant Flowing Horizon Ribbons (Minimalist Topographic Wave Flow)
     // Ribbon 1: Sky Azure (Base wave)
-    _drawHorizonRibbon(canvas, size, 0.76, 0.14, const Color(0xFF0284C7), 0.0, 1);
+    _drawHorizonRibbon(
+      canvas,
+      size,
+      0.76,
+      0.14,
+      const Color(0xFF0284C7),
+      0.0,
+      1,
+    );
     // Ribbon 2: Mint Emerald (Mid harmonic wave)
-    _drawHorizonRibbon(canvas, size, 0.82, 0.12, const Color(0xFF059669), 0.33, 2);
+    _drawHorizonRibbon(
+      canvas,
+      size,
+      0.82,
+      0.12,
+      const Color(0xFF059669),
+      0.33,
+      2,
+    );
     // Ribbon 3: Warm Solar Iris (Deep depth wave)
-    _drawHorizonRibbon(canvas, size, 0.88, 0.10, const Color(0xFFD97706), 0.66, 3);
+    _drawHorizonRibbon(
+      canvas,
+      size,
+      0.88,
+      0.10,
+      const Color(0xFFD97706),
+      0.66,
+      3,
+    );
 
     // 4. Subtle Komorebi Sunlight Caustic Beams
     _drawKomorebiSunbeams(canvas, size);
@@ -874,7 +1172,11 @@ class _FullAppBgPainter extends CustomPainter {
       // Translucent droplet mote
       _fill.color = l.cl.withValues(alpha: alpha * 0.65);
       canvas.drawOval(
-        Rect.fromCenter(center: Offset.zero, width: l.sz * 1.6, height: l.sz * 0.75),
+        Rect.fromCenter(
+          center: Offset.zero,
+          width: l.sz * 1.6,
+          height: l.sz * 0.75,
+        ),
         _fill,
       );
 
@@ -886,10 +1188,30 @@ class _FullAppBgPainter extends CustomPainter {
     }
 
     // 6. Crisp Solar Sparkles
-    _drawSparkle(canvas, Offset(w * 0.18, h * 0.16), progress, const Color(0xFF0284C7));
-    _drawSparkle(canvas, Offset(w * 0.68, h * 0.14), progress + 0.33, const Color(0xFF059669));
-    _drawSparkle(canvas, Offset(w * 0.44, h * 0.24), progress + 0.66, const Color(0xFFD97706));
-    _drawSparkle(canvas, Offset(w * 0.82, h * 0.32), progress + 0.50, const Color(0xFF38BDF8));
+    _drawSparkle(
+      canvas,
+      Offset(w * 0.18, h * 0.16),
+      progress,
+      const Color(0xFF0284C7),
+    );
+    _drawSparkle(
+      canvas,
+      Offset(w * 0.68, h * 0.14),
+      progress + 0.33,
+      const Color(0xFF059669),
+    );
+    _drawSparkle(
+      canvas,
+      Offset(w * 0.44, h * 0.24),
+      progress + 0.66,
+      const Color(0xFFD97706),
+    );
+    _drawSparkle(
+      canvas,
+      Offset(w * 0.82, h * 0.32),
+      progress + 0.50,
+      const Color(0xFF38BDF8),
+    );
   }
 
   void _drawHorizonRibbon(
@@ -923,9 +1245,24 @@ class _FullAppBgPainter extends CustomPainter {
 
     if (_cachedHorizonSize != size) {
       _cachedHorizonSize = size;
-      _cachedRibbon1Shader = _createRibbonShader(size, 0.76, 0.14, const Color(0xFF0284C7));
-      _cachedRibbon2Shader = _createRibbonShader(size, 0.82, 0.12, const Color(0xFF059669));
-      _cachedRibbon3Shader = _createRibbonShader(size, 0.88, 0.10, const Color(0xFFD97706));
+      _cachedRibbon1Shader = _createRibbonShader(
+        size,
+        0.76,
+        0.14,
+        const Color(0xFF0284C7),
+      );
+      _cachedRibbon2Shader = _createRibbonShader(
+        size,
+        0.82,
+        0.12,
+        const Color(0xFF059669),
+      );
+      _cachedRibbon3Shader = _createRibbonShader(
+        size,
+        0.88,
+        0.10,
+        const Color(0xFFD97706),
+      );
     }
 
     _fill.shader = ribbonIndex == 1
@@ -936,10 +1273,20 @@ class _FullAppBgPainter extends CustomPainter {
     _fill.shader = null;
   }
 
-  static Shader _createRibbonShader(Size size, double baseYRatio, double ribbonHRatio, Color ribbonColor) {
+  static Shader _createRibbonShader(
+    Size size,
+    double baseYRatio,
+    double ribbonHRatio,
+    Color ribbonColor,
+  ) {
     final baseY = size.height * baseYRatio;
     final ribbonH = size.height * ribbonHRatio;
-    final bounds = Rect.fromLTWH(0, baseY - size.height * 0.04, size.width, ribbonH + size.height * 0.08);
+    final bounds = Rect.fromLTWH(
+      0,
+      baseY - size.height * 0.04,
+      size.width,
+      ribbonH + size.height * 0.08,
+    );
     return LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
@@ -957,7 +1304,13 @@ class _FullAppBgPainter extends CustomPainter {
     final h = size.height;
     final breathe = 0.03 + 0.015 * math.sin(progress * 2 * math.pi);
 
-    void drawBeam(double startX, double startW, double endX, double endW, double alphaMult) {
+    void drawBeam(
+      double startX,
+      double startW,
+      double endX,
+      double endW,
+      double alphaMult,
+    ) {
       final beamPath = Path()
         ..moveTo(startX, 0)
         ..lineTo(startX + startW, 0)
@@ -996,8 +1349,16 @@ class _FullAppBgPainter extends CustomPainter {
   void _drawSparkle(Canvas canvas, Offset center, double phase, Color color) {
     final arm = 2.0 + 1.5 * (0.5 + 0.5 * math.sin(phase * 2 * math.pi));
     _sparkle.color = color;
-    canvas.drawLine(Offset(center.dx - arm, center.dy), Offset(center.dx + arm, center.dy), _sparkle);
-    canvas.drawLine(Offset(center.dx, center.dy - arm), Offset(center.dx, center.dy + arm), _sparkle);
+    canvas.drawLine(
+      Offset(center.dx - arm, center.dy),
+      Offset(center.dx + arm, center.dy),
+      _sparkle,
+    );
+    canvas.drawLine(
+      Offset(center.dx, center.dy - arm),
+      Offset(center.dx, center.dy + arm),
+      _sparkle,
+    );
   }
 
   @override
@@ -1020,7 +1381,13 @@ class _PC {
   final double sw;
   final double sz;
   final double ph;
-  const _PC({required this.bx, required this.sp, required this.sw, required this.sz, required this.ph});
+  const _PC({
+    required this.bx,
+    required this.sp,
+    required this.sw,
+    required this.sz,
+    required this.ph,
+  });
 }
 
 class _SC {
@@ -1030,7 +1397,14 @@ class _SC {
   final double ph;
   final bool sp;
   final Color cl;
-  const _SC({required this.x, required this.y, required this.sz, required this.ph, this.sp = false, this.cl = const Color(0xFF00E5FF)});
+  const _SC({
+    required this.x,
+    required this.y,
+    required this.sz,
+    required this.ph,
+    this.sp = false,
+    this.cl = const Color(0xFF00E5FF),
+  });
 }
 
 class _Meteor {
@@ -1059,7 +1433,14 @@ class _LC {
   final double sz;
   final double ph;
   final Color cl;
-  const _LC({required this.bx, required this.sp, required this.sw, required this.sz, required this.ph, required this.cl});
+  const _LC({
+    required this.bx,
+    required this.sp,
+    required this.sw,
+    required this.sz,
+    required this.ph,
+    required this.cl,
+  });
 }
 
 class _DarkParticle {

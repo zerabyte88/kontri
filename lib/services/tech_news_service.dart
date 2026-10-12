@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../models/tech_news.dart';
 import 'storage_service.dart';
 
@@ -37,7 +39,10 @@ class TechNewsService {
     final isExpired =
         cachedTime == null || now.difference(cachedTime) >= cacheTtl;
 
-    if (!forceRefresh && !isExpired && _cache.containsKey(tag) && _cache[tag]!.isNotEmpty) {
+    if (!forceRefresh &&
+        !isExpired &&
+        _cache.containsKey(tag) &&
+        _cache[tag]!.isNotEmpty) {
       return _cache[tag]!;
     }
 
@@ -52,13 +57,15 @@ class TechNewsService {
       final url = Uri.parse(
         'https://dev.to/api/articles?tag=${Uri.encodeComponent(tag)}&per_page=12',
       );
-      final response = await _client.get(
-        url,
-        headers: {
-          'User-Agent': 'GitPulseMobile/1.0',
-          'Accept': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 8));
+      final response = await _client
+          .get(
+            url,
+            headers: {
+              'User-Agent': 'GitPulseMobile/1.0',
+              'Accept': 'application/json',
+            },
+          )
+          .timeout(const Duration(seconds: 8));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -98,7 +105,8 @@ class TechNewsService {
   /// sorted by stars descending, giving a true live picture of recent viral repositories.
   Future<List<TechNews>> fetchTrendingRepos({bool forceRefresh = false}) async {
     try {
-      final items = await _queryGithubTrendingWindow(14) ??
+      final items =
+          await _queryGithubTrendingWindow(14) ??
           await _queryGithubTrendingWindow(30);
 
       if (items != null && items.isNotEmpty) {
@@ -111,8 +119,7 @@ class TechNewsService {
           return TechNews(
             id: (repo['id'] as num?)?.toInt() ?? 0,
             title: '⭐ $fullName ($stars stars)',
-            description: repo['description']?.toString() ??
-                'Open-source repository trending on GitHub with active development.',
+            description: repo['description']?.toString() ?? 'Open-source repository trending on GitHub with active development.',
             url: repo['html_url']?.toString() ?? 'https://github.com',
             coverImage: null,
             authorName: owner?['login']?.toString() ?? 'github',
@@ -178,8 +185,7 @@ class TechNewsService {
         const TechNews(
           id: 501,
           title: '⭐ flutter/flutter (165,000+ stars)',
-          description:
-              'Framework open source revolusioner Google untuk membangun aplikasi multiplatform dari satu basis kode.',
+          description: 'Framework open source revolusioner Google untuk membangun aplikasi multiplatform dari satu basis kode.',
           url: 'https://github.com/flutter/flutter',
           coverImage: null,
           authorName: 'flutter',
@@ -191,8 +197,7 @@ class TechNewsService {
         const TechNews(
           id: 502,
           title: '⭐ torvalds/linux (185,000+ stars)',
-          description:
-              'Kernel sistem operasi Linux yang mendasari komputasi modern, cloud, dan mobile di seluruh dunia.',
+          description: 'Kernel sistem operasi Linux yang mendasari komputasi modern, cloud, dan mobile di seluruh dunia.',
           url: 'https://github.com/torvalds/linux',
           coverImage: null,
           authorName: 'torvalds',
@@ -204,8 +209,7 @@ class TechNewsService {
         const TechNews(
           id: 503,
           title: '⭐ vllm-project/vllm (32,000+ stars)',
-          description:
-              'Pustaka inferensi dan penyajian model LLM berkecepatan tinggi dengan alokasi memori PagedAttention.',
+          description: 'Pustaka inferensi dan penyajian model LLM berkecepatan tinggi dengan alokasi memori PagedAttention.',
           url: 'https://github.com/vllm-project/vllm',
           coverImage: null,
           authorName: 'vllm-project',
@@ -220,8 +224,7 @@ class TechNewsService {
         const TechNews(
           id: 401,
           title: 'Fitur Baru GitHub Copilot Workspace & AI Agents untuk Otomasi PR',
-          description:
-              'Lingkungan kerja berbasis AI terintegrasi untuk merencanakan perbaikan bug hingga implementasi kode otomatis.',
+          description: 'Lingkungan kerja berbasis AI terintegrasi untuk merencanakan perbaikan bug hingga implementasi kode otomatis.',
           url: 'https://github.blog',
           coverImage: null,
           authorName: 'GitHub Engineering',
@@ -233,8 +236,7 @@ class TechNewsService {
         const TechNews(
           id: 402,
           title: 'Panduan Praktis Optimasi CI/CD dengan GitHub Actions Matrix',
-          description:
-              'Trik mempercepat build pipeline dan menghemat runner minutes pada repositori skala besar.',
+          description: 'Trik mempercepat build pipeline dan menghemat runner minutes pada repositori skala besar.',
           url: 'https://github.blog',
           authorName: 'DevOps Pulse',
           coverImage: null,
@@ -248,9 +250,9 @@ class TechNewsService {
       return [
         const TechNews(
           id: 601,
-          title: 'Arsitektur Mobile Modern: Flutter 3 & Performa Rendah Latensi',
-          description:
-              'Bagaimana engine Impeller membawa rendering grafis 60/120 FPS bebas jank ke miliaran perangkat.',
+          title:
+              'Arsitektur Mobile Modern: Flutter 3 & Performa Rendah Latensi',
+          description: 'Bagaimana engine Impeller membawa rendering grafis 60/120 FPS bebas jank ke miliaran perangkat.',
           url: 'https://flutter.dev',
           coverImage: null,
           authorName: 'Mobile Architect',
@@ -262,8 +264,7 @@ class TechNewsService {
         const TechNews(
           id: 602,
           title: 'Tren Frontend 2026: Kompilator Reaktif Tanpa Virtual DOM',
-          description:
-              'Eksplorasi efisiensi komputasi browser terkini dan optimasi bundle web berukuran mikro.',
+          description: 'Eksplorasi efisiensi komputasi browser terkini dan optimasi bundle web berukuran mikro.',
           url: 'https://dev.to',
           coverImage: null,
           authorName: 'Web Digest',
@@ -278,8 +279,7 @@ class TechNewsService {
         const TechNews(
           id: 101,
           title: 'Tren Open Source 2026: Proyek AI Mandiri Kian Mendominasi',
-          description:
-              'Komunitas pengembang global beralih ke model dan tooling open-source dengan dukungan komunitas yang kuat.',
+          description: 'Komunitas pengembang global beralih ke model dan tooling open-source dengan dukungan komunitas yang kuat.',
           url: 'https://github.com/trending',
           coverImage: null,
           authorName: 'GitPulse Tech Digest',
@@ -291,8 +291,7 @@ class TechNewsService {
         const TechNews(
           id: 102,
           title: 'Framework Frontend & Mobile Generasi Baru yang Mengubah Industri',
-          description:
-              'Evolusi rendering engine mutakhir membawa efisiensi memori dan waktu load ke tingkat berikutnya.',
+          description: 'Evolusi rendering engine mutakhir membawa efisiensi memori dan waktu load ke tingkat berikutnya.',
           url: 'https://flutter.dev',
           coverImage: null,
           authorName: 'Developer Hub',
@@ -307,8 +306,7 @@ class TechNewsService {
         const TechNews(
           id: 201,
           title: 'Arsitektur Komputasi Edge & Cloud: Menghadapi Kebutuhan AI Skala Besar',
-          description:
-              'Infrastruktur cloud modern beradaptasi dengan beban kerja inferensi model bahasa berkecepatan tinggi.',
+          description: 'Infrastruktur cloud modern beradaptasi dengan beban kerja inferensi model bahasa berkecepatan tinggi.',
           url: 'https://news.ycombinator.com',
           coverImage: null,
           authorName: 'Cloud Engineering',
@@ -319,9 +317,9 @@ class TechNewsService {
         ),
         const TechNews(
           id: 202,
-          title: 'Praktik Terbaik Keamanan Siber untuk Developer Modern di Era AI',
-          description:
-              'Strategi mitigasi serangan rantai pasok software dan proteksi kredensial API sensitif.',
+          title:
+              'Praktik Terbaik Keamanan Siber untuk Developer Modern di Era AI',
+          description: 'Strategi mitigasi serangan rantai pasok software dan proteksi kredensial API sensitif.',
           url: 'https://news.ycombinator.com',
           coverImage: null,
           authorName: 'SecOps Daily',
@@ -337,8 +335,7 @@ class TechNewsService {
         const TechNews(
           id: 301,
           title: 'Revolusi Agentic AI: Bagaimana AI Mengotomasi Pengembangan Software',
-          description:
-              'AI kini tidak sekadar menulis kode baris per baris, melainkan mampu merencanakan, mendebug, dan menguji solusi end-to-end.',
+          description: 'AI kini tidak sekadar menulis kode baris per baris, melainkan mampu merencanakan, mendebug, dan menguji solusi end-to-end.',
           url: 'https://dev.to',
           coverImage: null,
           authorName: 'AI Research Team',
@@ -350,8 +347,7 @@ class TechNewsService {
         const TechNews(
           id: 302,
           title: 'Model Bahasa Ringan (SLM) untuk Eksekusi Lokal di Perangkat Mobile',
-          description:
-              'Kini menjalankan inferensi AI langsung di smartphone tanpa bergantung pada server cloud telah menjadi kenyataan praktis.',
+          description: 'Kini menjalankan inferensi AI langsung di smartphone tanpa bergantung pada server cloud telah menjadi kenyataan praktis.',
           url: 'https://dev.to',
           coverImage: null,
           authorName: 'Mobile AI Watch',

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppConfig {
   static const String appName = 'GitPulse';
-  static const String appVersion = 'v2.3.2';
-  static const String buildNumber = '20';
-  static const String fullVersion = 'v2.3.2 (Build 20)';
-  static const String releaseTag = 'v2.3.2';
-  static const String githubRepoUrl = 'https://github.com/zerabyte88/gitpulse-mobile';
+  static const String appVersion = 'v2.4.0';
+  static const String buildNumber = '21';
+  static const String fullVersion = 'v2.4.0 (Build 21)';
+  static const String releaseTag = 'v2.4.0';
+  static const String githubRepoUrl =
+      'https://github.com/zerabyte88/gitpulse-mobile';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';
-  static const String developerAvatarUrl = 'https://avatars.githubusercontent.com/zerabyte88';
+  static const String developerAvatarUrl =
+      'https://avatars.githubusercontent.com/zerabyte88';
   static const String license = 'MIT License';
 }
 
@@ -33,107 +34,126 @@ enum AppThemeMode {
 
 class AppTheme {
   static AppThemeMode currentMode = AppThemeMode.dark;
+  static double cardOpacity = 1.0;
 
-  // Dynamic Backgrounds & Surfaces
+  // Dynamic Backgrounds & Surfaces (Phantek Slate Engine)
   static Color get background => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFF000000),
-        AppThemeMode.amoledJapanese => const Color(0xFF000000),
-        AppThemeMode.light => const Color(0xFFF6F8FA),
-        AppThemeMode.dark => const Color(0xFF0D1117),
-      };
+    AppThemeMode.amoled => const Color(0xFF000000),
+    AppThemeMode.amoledJapanese => const Color(0xFF000000),
+    AppThemeMode.light => const Color(0xFFF8FAFC), // Slate 50
+    AppThemeMode.dark => const Color(0xFF0F172A), // Slate 900
+  };
 
-  static Color get surface => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xEB101012),
-        AppThemeMode.amoledJapanese => const Color(0xEB180C1A),
-        AppThemeMode.light => const Color(0xF0FFFFFF),
-        AppThemeMode.dark => const Color(0xEB161B22),
-      };
+  static Color get surface {
+    final base = switch (currentMode) {
+      AppThemeMode.amoled => const Color(0xFF101012),
+      AppThemeMode.amoledJapanese => const Color(0xFF140D13),
+      AppThemeMode.light => const Color(0xFFFFFFFF),
+      AppThemeMode.dark => const Color(0xFF1E293B), // Slate 800
+    };
+    if (cardOpacity < 0.999) {
+      final alpha = (255 * cardOpacity.clamp(0.50, 1.00)).round().clamp(0, 255);
+      return base.withAlpha(alpha);
+    }
+    return base;
+  }
 
-  static Color get surfaceElevated => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xEE1A1A1E),
-        AppThemeMode.amoledJapanese => const Color(0xEE251228),
-        AppThemeMode.light => const Color(0xF2EEF2F6),
-        AppThemeMode.dark => const Color(0xEE21262D),
-      };
+  static Color get surfaceElevated {
+    final base = switch (currentMode) {
+      AppThemeMode.amoled => const Color(0xFF1A1A1E),
+      AppThemeMode.amoledJapanese => const Color(0xFF251228),
+      AppThemeMode.light => const Color(0xFFF1F5F9), // Slate 100
+      AppThemeMode.dark => const Color(0xFF334155), // Slate 700
+    };
+    if (cardOpacity < 0.999) {
+      final alpha = (255 * cardOpacity.clamp(0.50, 1.00)).round().clamp(0, 255);
+      return base.withAlpha(alpha);
+    }
+    return base;
+  }
 
   static Color get border => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFF2B2B33),
-        AppThemeMode.amoledJapanese => const Color(0xFF4D2040),
-        AppThemeMode.light => const Color(0xFFD0D7DE),
-        AppThemeMode.dark => const Color(0xFF30363D),
-      };
+    AppThemeMode.amoled => const Color(0xFF2B2B33),
+    AppThemeMode.amoledJapanese => const Color(0xFF381525),
+    AppThemeMode.light => const Color(0xFFE2E8F0), // Slate 200
+    AppThemeMode.dark => const Color(0xFF334155), // Slate 700
+  };
 
   static Color get borderSubtle => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFF1E1E24),
-        AppThemeMode.amoledJapanese => const Color(0xFF33142A),
-        AppThemeMode.light => const Color(0xFFE6E8EB),
-        AppThemeMode.dark => const Color(0xFF21262D),
-      };
+    AppThemeMode.amoled => const Color(0xFF1E1E24),
+    AppThemeMode.amoledJapanese => const Color(0xFF220C17),
+    AppThemeMode.light => const Color(0xFFF1F5F9), // Slate 100
+    AppThemeMode.dark => const Color(0xFF1E293B), // Slate 800
+  };
 
-  // Semantic Accents
+  // Semantic Accents (Modern Cobalt & Harmonious Accents)
   static Color get primaryCyan => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFF00E5FF),
-        AppThemeMode.amoledJapanese => const Color(0xFFFF65A3), // Radiant Sakura Blossom
-        AppThemeMode.light => const Color(0xFF0969DA),
-        AppThemeMode.dark => const Color(0xFF58A6FF), // Electric GitHub Blue
-      };
+    AppThemeMode.amoled => const Color(0xFF00E5FF),
+    AppThemeMode.amoledJapanese => const Color(
+      0xFFF472B6,
+    ), // Radiant Sakura Blossom
+    AppThemeMode.light => const Color(0xFF2563EB), // Modern Cobalt Blue
+    AppThemeMode.dark => const Color(0xFF38BDF8), // Sky Cyan Slate
+  };
 
   static Color get primaryViolet => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFFA855F7),
-        AppThemeMode.amoledJapanese => const Color(0xFFF472B6), // Soft Sakura Secondary
-        AppThemeMode.light => const Color(0xFF8250DF),
-        AppThemeMode.dark => const Color(0xFFBC8CFF),
-      };
+    AppThemeMode.amoled => const Color(0xFFA855F7),
+    AppThemeMode.amoledJapanese => const Color(
+      0xFFFDA4AF,
+    ), // Rose Quartz Sakura Accent
+    AppThemeMode.light => const Color(0xFF0284C7), // Sky Accent
+    AppThemeMode.dark => const Color(0xFFA78BFA), // Soft Violet
+  };
 
   static Color get accentGreen => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFF00E676),
-        AppThemeMode.amoledJapanese => const Color(0xFF34D399),
-        AppThemeMode.light => const Color(0xFF1A7F37),
-        AppThemeMode.dark => const Color(0xFF3FB950),
-      };
+    AppThemeMode.amoled => const Color(0xFF00E676),
+    AppThemeMode.amoledJapanese => const Color(0xFF34D399),
+    AppThemeMode.light => const Color(0xFF16A34A),
+    AppThemeMode.dark => const Color(0xFF22C55E),
+  };
 
   static Color get accentAmber => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFFFFB300),
-        AppThemeMode.amoledJapanese => const Color(0xFFFBBF24),
-        AppThemeMode.light => const Color(0xFF9A6700),
-        AppThemeMode.dark => const Color(0xFFD29922),
-      };
+    AppThemeMode.amoled => const Color(0xFFFFB300),
+    AppThemeMode.amoledJapanese => const Color(0xFFFBBF24),
+    AppThemeMode.light => const Color(0xFFD97706),
+    AppThemeMode.dark => const Color(0xFFF59E0B),
+  };
 
   static Color get accentRed => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFFFF3366),
-        AppThemeMode.amoledJapanese => const Color(0xFFFB7185),
-        AppThemeMode.light => const Color(0xFFCF222E),
-        AppThemeMode.dark => const Color(0xFFF85149),
-      };
+    AppThemeMode.amoled => const Color(0xFFFF3366),
+    AppThemeMode.amoledJapanese => const Color(0xFFFB7185),
+    AppThemeMode.light => const Color(0xFFDC2626),
+    AppThemeMode.dark => const Color(0xFFEF4444),
+  };
 
   static Color get accentOrange => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFFFF6D00),
-        AppThemeMode.amoledJapanese => const Color(0xFFFB923C),
-        AppThemeMode.light => const Color(0xFFBC4C00),
-        AppThemeMode.dark => const Color(0xFFDB6D28),
-      };
+    AppThemeMode.amoled => const Color(0xFFFF6D00),
+    AppThemeMode.amoledJapanese => const Color(0xFFFB923C),
+    AppThemeMode.light => const Color(0xFFEA580C),
+    AppThemeMode.dark => const Color(0xFFF97316),
+  };
 
   // Typography Monochromatic Hierarchy
   static Color get textPrimary => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFFFFFFFF),
-        AppThemeMode.amoledJapanese => const Color(0xFFFFF0F5),
-        AppThemeMode.light => const Color(0xFF1F2328),
-        AppThemeMode.dark => const Color(0xFFF0F6FC),
-      };
+    AppThemeMode.amoled => const Color(0xFFFFFFFF),
+    AppThemeMode.amoledJapanese => const Color(0xFFFFF1F2),
+    AppThemeMode.light => const Color(0xFF0F172A), // Slate 900
+    AppThemeMode.dark => const Color(0xFFF8FAFC), // Slate 50
+  };
 
   static Color get textSecondary => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFFA1A1AA),
-        AppThemeMode.amoledJapanese => const Color(0xFFE2C4E8),
-        AppThemeMode.light => const Color(0xFF656D76),
-        AppThemeMode.dark => const Color(0xFF8B949E),
-      };
+    AppThemeMode.amoled => const Color(0xFFA1A1AA),
+    AppThemeMode.amoledJapanese => const Color(0xFFD4A5B8),
+    AppThemeMode.light => const Color(0xFF475569), // Slate 600
+    AppThemeMode.dark => const Color(0xFF94A3B8), // Slate 400
+  };
 
   static Color get textMuted => switch (currentMode) {
-        AppThemeMode.amoled => const Color(0xFF71717A),
-        AppThemeMode.amoledJapanese => const Color(0xFFA07FA8),
-        AppThemeMode.light => const Color(0xFF8C959F),
-        AppThemeMode.dark => const Color(0xFF6E7681),
-      };
+    AppThemeMode.amoled => const Color(0xFF71717A),
+    AppThemeMode.amoledJapanese => const Color(0xFFA07FA8),
+    AppThemeMode.light => const Color(0xFF94A3B8), // Slate 400
+    AppThemeMode.dark => const Color(0xFF64748B), // Slate 500
+  };
 
   static bool get isLight => currentMode == AppThemeMode.light;
 
@@ -146,50 +166,55 @@ class AppTheme {
         ? ThemeData.light().textTheme
         : ThemeData.dark().textTheme;
 
-
     final surf = switch (mode) {
-      AppThemeMode.amoled => const Color(0xEB101012),
-      AppThemeMode.amoledJapanese => const Color(0xEB180C1A),
-      AppThemeMode.light => const Color(0xF0FFFFFF),
-      AppThemeMode.dark => const Color(0xEB161B22),
+      AppThemeMode.amoled => const Color(0xFF101012),
+      AppThemeMode.amoledJapanese => const Color(0xFF140D13),
+      AppThemeMode.light => const Color(0xFFFFFFFF),
+      AppThemeMode.dark => const Color(0xFF1E293B),
     };
+
+    final effectiveSurf = cardOpacity < 0.999
+        ? surf.withAlpha(
+            (255 * cardOpacity.clamp(0.50, 1.00)).round().clamp(0, 255),
+          )
+        : surf;
 
     final brd = switch (mode) {
       AppThemeMode.amoled => const Color(0xFF2B2B33),
-      AppThemeMode.amoledJapanese => const Color(0xFF4D2040),
-      AppThemeMode.light => const Color(0xFFD0D7DE),
-      AppThemeMode.dark => const Color(0xFF30363D),
+      AppThemeMode.amoledJapanese => const Color(0xFF381525),
+      AppThemeMode.light => const Color(0xFFE2E8F0),
+      AppThemeMode.dark => const Color(0xFF334155),
     };
 
     final prim = switch (mode) {
       AppThemeMode.amoled => const Color(0xFF00E5FF),
-      AppThemeMode.amoledJapanese => const Color(0xFFFF65A3),
-      AppThemeMode.light => const Color(0xFF0969DA),
-      AppThemeMode.dark => const Color(0xFF58A6FF),
+      AppThemeMode.amoledJapanese => const Color(0xFFF472B6),
+      AppThemeMode.light => const Color(0xFF2563EB),
+      AppThemeMode.dark => const Color(0xFF38BDF8),
     };
 
     final sec = switch (mode) {
       AppThemeMode.amoled => const Color(0xFFA855F7),
-      AppThemeMode.amoledJapanese => const Color(0xFFF472B6),
-      AppThemeMode.light => const Color(0xFF8250DF),
-      AppThemeMode.dark => const Color(0xFFBC8CFF),
+      AppThemeMode.amoledJapanese => const Color(0xFFFDA4AF),
+      AppThemeMode.light => const Color(0xFF0284C7),
+      AppThemeMode.dark => const Color(0xFFA78BFA),
     };
 
     final txtPrim = switch (mode) {
       AppThemeMode.amoled => const Color(0xFFFFFFFF),
-      AppThemeMode.amoledJapanese => const Color(0xFFFFF0F5),
-      AppThemeMode.light => const Color(0xFF1F2328),
-      AppThemeMode.dark => const Color(0xFFF0F6FC),
+      AppThemeMode.amoledJapanese => const Color(0xFFFFF1F2),
+      AppThemeMode.light => const Color(0xFF0F172A),
+      AppThemeMode.dark => const Color(0xFFF8FAFC),
     };
 
     final txtMuted = switch (mode) {
       AppThemeMode.amoled => const Color(0xFF71717A),
       AppThemeMode.amoledJapanese => const Color(0xFFA07FA8),
-      AppThemeMode.light => const Color(0xFF8C959F),
-      AppThemeMode.dark => const Color(0xFF6E7681),
+      AppThemeMode.light => const Color(0xFF94A3B8),
+      AppThemeMode.dark => const Color(0xFF64748B),
     };
 
-    final appTextTheme = GoogleFonts.poppinsTextTheme(baseTextTheme).apply(
+    final appTextTheme = baseTextTheme.apply(
       bodyColor: txtPrim,
       displayColor: txtPrim,
     );
@@ -203,16 +228,20 @@ class AppTheme {
           ? ColorScheme.light(
               primary: prim,
               secondary: sec,
-              surface: surf,
+              surface: effectiveSurf,
               onSurface: txtPrim,
-              error: const Color(0xFFCF222E),
+              outline: brd,
+              outlineVariant: const Color(0xFFF1F5F9),
+              error: const Color(0xFFDC2626),
             )
           : ColorScheme.dark(
               primary: prim,
               secondary: sec,
-              surface: surf,
+              surface: effectiveSurf,
               onSurface: txtPrim,
-              error: const Color(0xFFF85149),
+              outline: brd,
+              outlineVariant: const Color(0xFF1E293B),
+              error: const Color(0xFFEF4444),
             ),
       textTheme: appTextTheme,
       appBarTheme: AppBarTheme(
@@ -229,7 +258,7 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: surf,
+        color: effectiveSurf,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -238,9 +267,12 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surf,
+        fillColor: effectiveSurf,
         hintStyle: TextStyle(color: txtMuted, fontSize: 13.5),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: brd, width: 1),
@@ -257,7 +289,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: prim,
-          foregroundColor: isLightMode ? Colors.white : const Color(0xFF0D1117),
+          foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(
@@ -270,11 +302,7 @@ class AppTheme {
           ),
         ),
       ),
-      dividerTheme: DividerThemeData(
-        color: brd,
-        thickness: 1,
-        space: 1,
-      ),
+      dividerTheme: DividerThemeData(color: brd, thickness: 1, space: 1),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.android: GitPulsePageTransitionsBuilder(),
@@ -299,8 +327,6 @@ class AppTheme {
 ///   using [Curves.easeOutCubic].
 /// - Exiting route: fades out cleanly (1.0 -> 0.0) with subtle retreat (Offset.zero -> Offset(-0.03, 0.0))
 ///   using [Curves.easeInCubic].
-///
-/// Prevents the jarring double-exposure when routes share an underlying canvas background.
 class GitPulsePageTransitionsBuilder extends PageTransitionsBuilder {
   const GitPulsePageTransitionsBuilder();
 
@@ -333,43 +359,42 @@ class _GitPulsePageTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Primary transition (this screen entering / leaving foreground)
-    final primarySlide = Tween<Offset>(
-      begin: const Offset(0.05, 0.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: primaryAnimation,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
-    ));
+    final primarySlide =
+        Tween<Offset>(begin: const Offset(0.05, 0.0), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: primaryAnimation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          ),
+        );
 
-    final primaryFade = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: primaryAnimation,
-      curve: const Interval(0.05, 0.90, curve: Curves.easeOutCubic),
-      reverseCurve: const Interval(0.10, 0.95, curve: Curves.easeInCubic),
-    ));
+    final primaryFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: primaryAnimation,
+        curve: const Interval(0.05, 0.90, curve: Curves.easeOutCubic),
+        reverseCurve: const Interval(0.10, 0.95, curve: Curves.easeInCubic),
+      ),
+    );
 
-    // 2. Secondary transition (another screen being pushed on top of this screen)
-    final secondarySlide = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(-0.03, 0.0),
-    ).animate(CurvedAnimation(
-      parent: secondaryAnimation,
-      curve: Curves.easeOutCubic,
-      reverseCurve: Curves.easeInCubic,
-    ));
+    final secondarySlide =
+        Tween<Offset>(
+          begin: Offset.zero,
+          end: const Offset(-0.03, 0.0),
+        ).animate(
+          CurvedAnimation(
+            parent: secondaryAnimation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          ),
+        );
 
-    final secondaryFade = Tween<double>(
-      begin: 1.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: secondaryAnimation,
-      curve: const Interval(0.0, 0.65, curve: Curves.easeInCubic),
-      reverseCurve: const Interval(0.35, 1.0, curve: Curves.easeOutCubic),
-    ));
+    final secondaryFade = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: secondaryAnimation,
+        curve: const Interval(0.0, 0.65, curve: Curves.easeInCubic),
+        reverseCurve: const Interval(0.35, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
 
     return SlideTransition(
       position: primarySlide,
@@ -377,10 +402,7 @@ class _GitPulsePageTransition extends StatelessWidget {
         opacity: primaryFade,
         child: SlideTransition(
           position: secondarySlide,
-          child: FadeTransition(
-            opacity: secondaryFade,
-            child: child,
-          ),
+          child: FadeTransition(opacity: secondaryFade, child: child),
         ),
       ),
     );

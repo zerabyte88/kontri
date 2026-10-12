@@ -39,7 +39,8 @@ class GitHubRepo {
         ? rawTopics.map((e) => e.toString()).toList()
         : const [];
     final licenseObj = json['license'] as Map<String, dynamic>?;
-    final licenseName = licenseObj?['spdx_id'] as String? ?? licenseObj?['name'] as String?;
+    final licenseName =
+        licenseObj?['spdx_id'] as String? ?? licenseObj?['name'] as String?;
 
     return GitHubRepo(
       name: json['name'] as String? ?? 'Untitled',
@@ -62,7 +63,9 @@ class GitHubRepo {
       defaultBranch: json['default_branch'] as String?,
       openIssuesCount: json['open_issues_count'] as int? ?? 0,
       topics: topics,
-      license: (licenseName != null && licenseName != 'NOASSERTION') ? licenseName : null,
+      license: (licenseName != null && licenseName != 'NOASSERTION')
+          ? licenseName
+          : null,
     );
   }
 
@@ -119,4 +122,3 @@ class GitHubRepo {
     return DateTime.now().difference(date).inDays <= 14;
   }
 }
-

@@ -1,11 +1,15 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
 import '../services/app_theme_service.dart';
 import '../theme/app_theme.dart';
 
 /// Global controller to synchronize header animation lifecycle state across the header.
 class HeaderAnimationState {
-  static final ValueNotifier<bool> isPausedNotifier = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isPausedNotifier = ValueNotifier<bool>(
+    false,
+  );
 
   static void pauseAnimation() {
     isPausedNotifier.value = true;
@@ -45,10 +49,7 @@ class GitPulseLogo extends StatelessWidget {
           height: size,
           fit: BoxFit.cover,
           errorBuilder: (_, _, _) => CustomPaint(
-            painter: _GitPulseLogoPainter(
-              color: color,
-              progress: progress,
-            ),
+            painter: _GitPulseLogoPainter(color: color, progress: progress),
           ),
         ),
       ),
@@ -72,10 +73,7 @@ class _GitPulseLogoPainter extends CustomPainter {
     ..color = Colors.white
     ..style = PaintingStyle.fill;
 
-  _GitPulseLogoPainter({
-    required this.color,
-    required this.progress,
-  });
+  _GitPulseLogoPainter({required this.color, required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -113,7 +111,10 @@ class _GitPulseLogoPainter extends CustomPainter {
     pulsePath.lineTo(w * 0.54, h * 0.14); // High pulse spike (R-wave peak)
     pulsePath.lineTo(w * 0.64, h * 0.70); // Deep S-wave valley
     pulsePath.lineTo(w * 0.72, h * 0.38); // Recovery
-    pulsePath.lineTo(headNode.dx, headNode.dy); // Connecting to HEAD release node
+    pulsePath.lineTo(
+      headNode.dx,
+      headNode.dy,
+    ); // Connecting to HEAD release node
 
     canvas.drawPath(pulsePath, _linePaint);
 
@@ -198,7 +199,10 @@ class AnimatedAppHeader extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildLogoContainer(accentColor, isLight: currentTheme == AppThemeMode.light),
+              _buildLogoContainer(
+                accentColor,
+                isLight: currentTheme == AppThemeMode.light,
+              ),
               const SizedBox(width: 9),
               _buildTitle(),
               const SizedBox(width: 8),
@@ -218,10 +222,7 @@ class AnimatedAppHeader extends StatelessWidget {
         border: isLight ? Border.all(color: AppTheme.border, width: 0.8) : null,
       ),
       clipBehavior: Clip.antiAlias,
-      child: GitPulseLogo(
-        size: 28,
-        color: accentColor,
-      ),
+      child: GitPulseLogo(size: 28, color: accentColor),
     );
   }
 

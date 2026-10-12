@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'localization/app_language.dart';
 import 'localization/app_localizations.dart';
 import 'screens/home_screen.dart';
@@ -26,10 +27,7 @@ void main() async {
   // Auto-clean successfully installed backup APK from public downloads
   UpdateService.cleanInstalledBackupApk();
 
-  runApp(GitPulseApp(
-    storageService: storageService,
-    apiService: apiService,
-  ));
+  runApp(GitPulseApp(storageService: storageService, apiService: apiService));
 }
 
 class GitPulseApp extends StatelessWidget {

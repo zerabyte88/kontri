@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'app_language.dart';
 
 class AppLocalizations {
@@ -15,7 +16,10 @@ class AppLocalizations {
   }
 
   static AppLocalizations of(BuildContext context) {
-    final localizations = Localizations.of<AppLocalizations>(context, AppLocalizations);
+    final localizations = Localizations.of<AppLocalizations>(
+      context,
+      AppLocalizations,
+    );
     return localizations ?? current;
   }
 
@@ -23,7 +27,11 @@ class AppLocalizations {
       _AppLocalizationsDelegate();
 
   // Helper string map lookup
-  String _str(Map<AppLanguage, String> map) => map[language] ?? map[AppLanguage.english] ?? map[AppLanguage.indonesian] ?? '';
+  String _str(Map<AppLanguage, String> map) =>
+      map[language] ??
+      map[AppLanguage.english] ??
+      map[AppLanguage.indonesian] ??
+      '';
 
   // App & General
   String get appTitle => 'GitPulse';
@@ -247,7 +255,6 @@ class AppLocalizations {
     AppLanguage.korean: '그리드 열',
   });
 
-
   String get undo => _str({
     AppLanguage.indonesian: 'Urungkan',
     AppLanguage.english: 'Undo',
@@ -278,7 +285,8 @@ class AppLocalizations {
   String get emptyBookmarks => _str({
     AppLanguage.indonesian: 'Belum ada profil yang disimpan. Cari user dan tekan ikon bookmark untuk menyimpannya di sini!',
     AppLanguage.english: 'No saved profiles yet. Search for a user and tap the bookmark icon to save them here!',
-    AppLanguage.japanese: '保存されたプロフィールはありません。ユーザーを検索し、ブックマークアイコンをタップして保存してください！',
+    AppLanguage.japanese:
+        '保存されたプロフィールはありません。ユーザーを検索し、ブックマークアイコンをタップして保存してください！',
     AppLanguage.chineseSimplified: '暂无保存的个人资料。搜索用户并点击书签图标以保存到此处！',
     AppLanguage.chineseTraditional: '暫無儲存的個人檔案。搜尋使用者並點擊書籤圖示即可儲存於此！',
     AppLanguage.korean: '저장된 프로필이 없습니다. 사용자를 검색하고 북마크 아이콘을 눌러 저장해 보세요!',
@@ -295,7 +303,8 @@ class AppLocalizations {
 
   String get networkError => _str({
     AppLanguage.indonesian: 'Gagal memuat data. Periksa koneksi internet Anda.',
-    AppLanguage.english: 'Failed to load data. Please check your internet connection.',
+    AppLanguage.english:
+        'Failed to load data. Please check your internet connection.',
     AppLanguage.japanese: 'データを読み込めませんでした。インターネット接続を確認してください。',
     AppLanguage.chineseSimplified: '加载数据失败，请检查网络连接。',
     AppLanguage.chineseTraditional: '載入資料失敗，請檢查網路連線。',
@@ -306,9 +315,12 @@ class AppLocalizations {
     AppLanguage.indonesian: 'Batas kuota token / API Anda telah habis. Silakan tunggu waktu reset atau perbarui token di pengaturan.',
     AppLanguage.english: 'Your token / API quota has been exhausted. Please wait for reset time or update your token in settings.',
     AppLanguage.japanese: 'トークン/APIのリクエスト制限を超過しました。リセットを待つか設定でトークンを更新してください。',
-    AppLanguage.chineseSimplified: '您的 Token / API 请求配额已耗尽。请等待重置时间或在设置中更新 Token。',
-    AppLanguage.chineseTraditional: '您的 Token / API 請求配額已耗盡。請等待重置時間或在設定中更新 Token。',
-    AppLanguage.korean: '토큰 / API 요청 한도가 모두 소진되었습니다. 리셋 시간을 기다리거나 설정에서 토큰을 변경해 주세요.',
+    AppLanguage.chineseSimplified:
+        '您的 Token / API 请求配额已耗尽。请等待重置时间或在设置中更新 Token。',
+    AppLanguage.chineseTraditional:
+        '您的 Token / API 請求配額已耗盡。請等待重置時間或在設定中更新 Token。',
+    AppLanguage.korean:
+        '토큰 / API 요청 한도가 모두 소진되었습니다. 리셋 시간을 기다리거나 설정에서 토큰을 변경해 주세요.',
   });
 
   // Tech News
@@ -458,8 +470,10 @@ class AppLocalizations {
   });
 
   String get languageSectionSubtitle => _str({
-    AppLanguage.indonesian: 'Pilih bahasa tampilan (aktif langsung tanpa restart)',
-    AppLanguage.english: 'Select display language (applies instantly without restart)',
+    AppLanguage.indonesian:
+        'Pilih bahasa tampilan (aktif langsung tanpa restart)',
+    AppLanguage.english:
+        'Select display language (applies instantly without restart)',
     AppLanguage.japanese: '表示言語を選択（再起動不要で即時適用）',
     AppLanguage.chineseSimplified: '选择显示语言（立即生效，无需重启）',
     AppLanguage.chineseTraditional: '選擇顯示語言（立即生效，無需重啟）',
@@ -504,8 +518,10 @@ class AppLocalizations {
   });
 
   String get themeOpacitySubtitle => _str({
-    AppLanguage.indonesian: 'Sesuaikan efek kaca transparan (glassmorphism) kartu',
-    AppLanguage.english: 'Adjust card glassmorphism and background transparency',
+    AppLanguage.indonesian:
+        'Sesuaikan efek kaca transparan (glassmorphism) kartu',
+    AppLanguage.english:
+        'Adjust card glassmorphism and background transparency',
     AppLanguage.japanese: 'カードのすりガラス効果と背景の透過度を調整',
     AppLanguage.chineseSimplified: '调整卡片磨砂玻璃效果与背景透明度',
     AppLanguage.chineseTraditional: '調整卡片磨砂玻璃效果與背景透明度',
@@ -601,6 +617,62 @@ class AppLocalizations {
     AppLanguage.chineseTraditional: '清新明亮',
     AppLanguage.korean: '클린 라이트',
   });
+
+  String get settingsBypassShaderNotice => _str({
+    AppLanguage.indonesian: 'Bypass Shader 60 FPS',
+    AppLanguage.english: '60 FPS Shader Bypass',
+    AppLanguage.japanese: '60 FPS バイパス',
+    AppLanguage.chineseSimplified: '60 FPS 着色器直通',
+    AppLanguage.chineseTraditional: '60 FPS 著色器直通',
+    AppLanguage.korean: '60 FPS 셰이더 바이패스',
+  });
+
+  String get activeLanguageBadge => _str({
+    AppLanguage.indonesian: 'Aktif',
+    AppLanguage.english: 'Active',
+    AppLanguage.japanese: '有効',
+    AppLanguage.chineseSimplified: '使用中',
+    AppLanguage.chineseTraditional: '使用中',
+    AppLanguage.korean: '활성',
+  });
+
+  String get resetLabel => _str({
+    AppLanguage.indonesian: 'Reset',
+    AppLanguage.english: 'Reset',
+    AppLanguage.japanese: 'リセット',
+    AppLanguage.chineseSimplified: '重置',
+    AppLanguage.chineseTraditional: '重設',
+    AppLanguage.korean: '재설정',
+  });
+
+  String t(String key) {
+    switch (key) {
+      case 'card_opacity':
+      case 'settings_card_opacity':
+        return themeOpacityTitle;
+      case 'card_opacity_desc':
+      case 'settings_card_opacity_desc':
+        return themeOpacitySubtitle;
+      case 'bypass_shader':
+      case 'bypass_shader_notice':
+        return settingsBypassShaderNotice;
+      case 'reset':
+        return resetLabel;
+      case 'active':
+      case 'active_language_badge':
+        return activeLanguageBadge;
+      case 'theme_dark':
+        return themeDark;
+      case 'theme_oled':
+        return themeAmoled;
+      case 'theme_sakura':
+        return themeAmoledJapanese;
+      case 'theme_light':
+        return themeLight;
+      default:
+        return key;
+    }
+  }
 
   String get easterEggJapaneseToast => _str({
     AppLanguage.indonesian: 'Mode AMOLED Sakura aktif! ✨ ようこそ!',
@@ -868,8 +940,10 @@ class AppLocalizations {
     AppLanguage.indonesian: 'Tambahkan token GitHub untuk menaikkan kuota dari 60 menjadi 5.000 request per jam.',
     AppLanguage.english: 'Add a GitHub token to increase your quota from 60 to 5,000 requests per hour.',
     AppLanguage.japanese: 'GitHubトークンを追加すると、クォータが毎時60件から5,000件に増加します。',
-    AppLanguage.chineseSimplified: '添加 GitHub Token 可将每小时请求配额从 60 次提升至 5,000 次。',
-    AppLanguage.chineseTraditional: '新增 GitHub Token 可將每小時請求配額從 60 次提升至 5,000 次。',
+    AppLanguage.chineseSimplified:
+        '添加 GitHub Token 可将每小时请求配额从 60 次提升至 5,000 次。',
+    AppLanguage.chineseTraditional:
+        '新增 GitHub Token 可將每小時請求配額從 60 次提升至 5,000 次。',
     AppLanguage.korean: 'GitHub 토큰을 추가하면 시간당 요청 한도가 60회에서 5,000회로 늘어납니다.',
   });
 
@@ -942,7 +1016,8 @@ class AppLocalizations {
   });
 
   String get tokenSavedToast => _str({
-    AppLanguage.indonesian: 'Token disimpan! Kuota berhasil ditingkatkan ke 5.000 req/jam.',
+    AppLanguage.indonesian:
+        'Token disimpan! Kuota berhasil ditingkatkan ke 5.000 req/jam.',
     AppLanguage.english: 'Token saved! Quota increased to 5,000 req/hr.',
     AppLanguage.japanese: 'トークンを保存しました！クォータが 5,000 req/時に増量されました。',
     AppLanguage.chineseSimplified: 'Token 已保存！配额已提升至 5,000 请求/小时。',
@@ -951,7 +1026,8 @@ class AppLocalizations {
   });
 
   String get tokenDeletedToast => _str({
-    AppLanguage.indonesian: 'Token dihapus. Kembali ke kuota standar 60 req/jam.',
+    AppLanguage.indonesian:
+        'Token dihapus. Kembali ke kuota standar 60 req/jam.',
     AppLanguage.english: 'Token removed. Returned to standard 60 req/hr quota.',
     AppLanguage.japanese: 'トークンを削除しました。標準の 60 req/時に戻りました。',
     AppLanguage.chineseSimplified: 'Token 已删除，恢复为标准 60 请求/小时配额。',
@@ -1078,8 +1154,10 @@ class AppLocalizations {
   });
 
   String get activityRhythmSubtitle => _str({
-    AppLanguage.indonesian: 'Distribusi aktivitas commit & event menurut jam lokal perangkat',
-    AppLanguage.english: 'Commit & event activity distribution by local device time',
+    AppLanguage.indonesian:
+        'Distribusi aktivitas commit & event menurut jam lokal perangkat',
+    AppLanguage.english:
+        'Commit & event activity distribution by local device time',
     AppLanguage.japanese: '端末のローカル時間によるコミット＆イベント活動分布',
     AppLanguage.chineseSimplified: '按设备本地时间分布的提交与事件活动',
     AppLanguage.chineseTraditional: '按裝置本地時間分佈的提交與事件活動',
@@ -1195,7 +1273,8 @@ class AppLocalizations {
   });
 
   String get topLanguagesSubtitle => _str({
-    AppLanguage.indonesian: 'Persentase bahasa berdasarkan ukuran kode repositori',
+    AppLanguage.indonesian:
+        'Persentase bahasa berdasarkan ukuran kode repositori',
     AppLanguage.english: 'Language percentage based on repository code size',
     AppLanguage.japanese: 'コード容量に基づく言語比率',
     AppLanguage.chineseSimplified: '基于代码大小的语言占比',
@@ -1375,7 +1454,8 @@ class AppLocalizations {
   });
 
   String get noReadmeFound => _str({
-    AppLanguage.indonesian: 'Tidak ada file README ditemukan untuk repositori ini.',
+    AppLanguage.indonesian:
+        'Tidak ada file README ditemukan untuk repositori ini.',
     AppLanguage.english: 'No README found for this repository.',
     AppLanguage.japanese: 'このリポジトリにREADMEは見つかりませんでした。',
     AppLanguage.chineseSimplified: '此仓库未找到 README 文件。',
@@ -1555,8 +1635,10 @@ class AppLocalizations {
   });
 
   String get profileUpToDate => _str({
-    AppLanguage.indonesian: 'Data profil sudah yang terbaru (304 Not Modified) ⚡',
-    AppLanguage.english: 'Profile data is already up to date (304 Not Modified) ⚡',
+    AppLanguage.indonesian:
+        'Data profil sudah yang terbaru (304 Not Modified) ⚡',
+    AppLanguage.english:
+        'Profile data is already up to date (304 Not Modified) ⚡',
     AppLanguage.japanese: 'プロフィールは既に最新です (304 Not Modified) ⚡',
     AppLanguage.chineseSimplified: '个人资料已是最新 (304 Not Modified) ⚡',
     AppLanguage.chineseTraditional: '個人檔案已是最新 (304 Not Modified) ⚡',
@@ -1858,7 +1940,8 @@ class AppLocalizations {
   }
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override

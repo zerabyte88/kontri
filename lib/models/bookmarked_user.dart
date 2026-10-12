@@ -43,7 +43,8 @@ class BookmarkedUser {
     final username = json['username'] as String? ?? '';
     return BookmarkedUser(
       username: username,
-      avatarUrl: json['avatar_url'] as String? ?? 'https://github.com/$username.png',
+      avatarUrl:
+          json['avatar_url'] as String? ?? 'https://github.com/$username.png',
       name: json['name'] as String?,
       bio: json['bio'] as String?,
       location: json['location'] as String?,

@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.3.2&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.4.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -56,15 +56,31 @@
 - **Targeted Safe Deletion Guard:** Scans `/Download/GitPulse/` upon startup and purges only matching GitPulse APKs where `fileVersion <= currentVersion`. User photos, documents, and other downloads remain completely untouched.
 
 ### 7. Multi-Language Internationalization & Privacy
-- **6 Supported Languages:** Complete translation coverage switchable on-the-fly without app restarts:
-  - 🇺🇸 English (Default on first install)
-  - 🇮🇩 Indonesian (Bahasa Indonesia)
-  - 🇯🇵 Japanese (日本語)
-  - 🇨🇳 Simplified Chinese (简体中文)
-  - 🇹🇼 Traditional Chinese (繁體中文)
-  - 🇰🇷 Korean (한국어)
+- **22 Supported Global Languages:** Complete translation coverage switchable on-the-fly without app restarts, sorted alphabetically (A–Z) in the settings selector:
+  - 🇺🇸 English (`en`) - Default on first install
+  - 🇮🇩 Indonesian (`id`)
+  - 🇲🇾 Malay (`ms`)
+  - 🇩🇰 Danish (`da`)
+  - 🇩🇪 German (`de`)
+  - 🇪🇸 Spanish (`es`)
+  - 🇫🇷 French (`fr`)
+  - 🇮🇹 Italian (`it`)
+  - 🇳🇱 Dutch (`nl`)
+  - 🇳🇴 Norwegian (`no`)
+  - 🇵🇹 Portuguese (`pt`)
+  - 🇫🇮 Finnish (`fi`)
+  - 🇸🇪 Swedish (`sv`)
+  - 🇻🇳 Vietnamese (`vi`)
+  - 🇷🇺 Russian (`ru`)
+  - 🇸🇦 Arabic (`ar`)
+  - 🇮🇳 Hindi (`hi`)
+  - 🇹🇭 Thai (`th`)
+  - 🇯🇵 Japanese (`ja`)
+  - 🇨🇳 Simplified Chinese (`zh_Hans`)
+  - 🇹🇼 Traditional Chinese (`zh_Hant`)
+  - 🇰🇷 Korean (`ko`)
 - **Default English Language:** Initializes with English (`en`) on fresh installation for international accessibility, while respecting user manual language selection across sessions.
-- **Anti-Truncation & Localization Integrity:** Complete dictionary audits across all supported locales ensuring UI labels, buttons, headers, and "Favorite Profile" strings render cleanly without clipping or ellipsis cutoff across all screen densities.
+- **Anti-Truncation & Localization Integrity:** Complete dictionary audits across all 22 supported locales ensuring UI labels, buttons, headers, and "Favorite Profile" strings render cleanly without clipping or ellipsis cutoff across all screen densities.
 - **Smart Rate-Limit Interceptor:** Strongly-typed handler for HTTP 403, 429, and exhausted rate limits with optional Personal Access Token (PAT) support stored in Android's private app sandbox.
 - **Zero Intermediary Servers & Total Privacy:** Direct device-to-GitHub TLS 1.3 queries with zero analytics SDKs, trackers, or telemetry scripts.
 
@@ -77,14 +93,15 @@
 - **Radial Empty State Illustration:** Polished centered illustration and welcoming prompt when no profiles are currently favorited.
 
 ### 9. Customizable Surface Opacity & Adaptive Glassmorphism
-- **Real-Time Surface Opacity Slider:** Interactive slider (50% – 100%, default 85%) in Settings with a live percentage badge, giving users full control over background bleed-through.
-- **Hardware-Accelerated Frosted Glass (`GlassCard`):** Custom reusable glassmorphism component featuring GPU-accelerated `BackdropFilter` (`10px` gaussian blur) when opacity is below 1.0, and automatically bypassing blur filtering at 1.0 for zero battery and GPU overhead.
+- **Real-Time Surface Opacity Slider:** Interactive slider (50% – 100%, default 100%) in Settings with a live percentage badge, giving users full control over background bleed-through.
+- **Hardware-Accelerated Frosted Glass (`GlassCard`):** Custom reusable glassmorphism component featuring GPU-accelerated `BackdropFilter` (`10px` gaussian blur) when opacity is below 1.0, and automatically bypassing blur filtering at 1.0 (Solid) for 60/120 FPS zero-overhead rendering.
 - **App-Wide Ambient Persistence:** Background particle loops persist continuously across all screens (Settings, User Profile, Favorite Profiles, Repository Detail, Code Viewer) with lifecycle-aware pausing when minimized to the OS background.
 
 ### 10. Modern & Minimalist UI Redesign
 - **Stats Detail Screen (`StatsDetailScreen`):** Overhauled with avatar halo glow ring, sleek metadata chips (company, location, blog), minimalist quote bio typography, and custom themed filter dropdown.
 - **Favorite Profiles Screen (`FavoriteProfilesScreen`):** Clean segmented pill controls, uncluttered card architecture, and polished developer badges.
-- **Settings Sheet (`SettingsSheet`):** Re-engineered cards 1 through 5 with modern minimalist glassmorphism, accent borders, and clean typography, while preserving the foundational Card 6 About APK card untouched.
+- **Dedicated Settings Screen (`SettingsScreen`):** Re-engineered full-screen experience with centered app bar (`centerTitle: true`), symmetrical 2-column theme selection cards with category badges (`DARK`, `AMOLED`, `LIGHT`), surface opacity controls, 22-language A–Z grid, GitHub token manager, and OTA updater telemetry.
+- **Route Occlusion Animation Pause:** Ambient canvas background animations automatically pause when entering the settings screen, eliminating unnecessary GPU drawing while configuring preferences.
 
 ### 11. Smart Zero-Quota Caching & Conditional Requests Engine
 - **Persistent 10-Minute Smart Cache:** Eliminates redundant GitHub API round-trips by caching user profiles, repositories, activity events, and language aggregates in local storage (`StorageService`). Returning to a profile within 10 minutes loads instantaneously with 0 API calls.
@@ -122,10 +139,10 @@ Developers receive a continuous animated tier badge based on their commit streak
 | **OTA Delivery** | `ota_update` (v7.1.0) | In-app background APK downloader & Android PackageInstaller integration |
 | **Release Signing** | Android Signing Config | Standard release pipeline with safe fallback |
 | **CI/CD Automation** | GitHub Actions (`workflow_dispatch`) | Manual-only automated release compilation and SHA-256 verification |
-| **Typography** | `google_fonts` (Poppins) | Modern, geometric typography and typeface rendering |
+| **Typography** | Native Material 3 System Typeface | Instant cold start, zero HTTP network font fetch, adaptive platform typography |
 | **Local Persistence** | `shared_preferences` (v2.5.5) | On-device sandboxed key-value store for bookmarks, themes, & preferences |
-| **Internationalization** | `intl` (v0.20.3) | Reactive 6-language localization & date/number formatting |
-| **Verification Suite** | `flutter_test` | Comprehensive test coverage (65/65 passing unit and widget tests) |
+| **Internationalization** | `intl` (v0.20.3) | Reactive 22-language global localization & date/number formatting |
+| **Verification Suite** | `flutter_test` | Comprehensive test coverage (69/69 passing unit and widget tests) |
 
 ---
 
@@ -150,7 +167,16 @@ The compiled release APK will be generated at:
 
 # Version History
 
-* ### v2.3.2 (Build 20)
+* ### v2.4.0
+  - **Phantek-Inspired Modern Aesthetics & Global Language Expansion:**
+    - *22 Global Languages Support:* Expanded localization engine from 6 to 22 global languages (`id, ms, da, de, en, es, fr, it, nl, no, pt, fi, sv, vi, ru, ar, hi, th, ja, zh_Hans, zh_Hant, ko`), complete with native names, region flags, dynamic fallback keys, and an A–Z sorted selection interface.
+    - *Phantek Slate Dark & Slate Light Theme Engine:* Transformed color palettes to match Phantek's modern Slate Dark (`#0F172A` / `#1E293B`) and Slate Light (`#F8FAFC` / `#FFFFFF`) themes alongside AMOLED Pitch Black (`#000000`) and AMOLED Sakura Blossom (`#140D13` / `#F472B6`).
+    - *Full-Screen Dedicated Settings Screen (`SettingsScreen`):* Replaced bottom sheet with a dedicated full-screen layout featuring `centerTitle: true`, centered 2-column theme cards with categorized badges (`DARK`, `AMOLED`, `LIGHT`), surface opacity controls, language selector, GitHub API token manager, and about section.
+    - *Route Occlusion Animation Pause:* Background canvas animations automatically pause when entering the settings screen, ensuring 0% GPU waste while configuring options.
+    - *Zero-Network System Typography Switch:* Completely removed external `google_fonts` network dependency in favor of native Material 3 system typefaces (Roboto / SF Pro), achieving zero-HTTP cold boots and faster initial frame rendering.
+    - *60 FPS Shader Bypass at 100% Surface Opacity:* Default surface opacity updated to 1.0 (Solid), automatically bypassing GPU `BackdropFilter` passes for pristine 60/120 FPS rasterization.
+
+* ### v2.3.2
   - **Bespoke Fluid Page Transitions Engine (`GitPulsePageTransitionsBuilder`):**
     - *Eliminated Transparent Scaffold Ghosting & Text Collision:* Replaced rigid default page transitions with a tailored transition builder engineered specifically for persistent canvas backgrounds and transparent Scaffolds.
     - *Synchronized Fade & Micro-Glide Choreography:* Entering routes fade in smoothly (`0.0 -> 1.0`) with an organic forward glide (`Offset(0.05, 0.0) -> Offset.zero`) using `Curves.easeOutCubic`, while exiting routes cleanly fade out (`1.0 -> 0.0`) with a subtle retreat (`Offset(-0.03, 0.0)`) using `Curves.easeInCubic`.
@@ -163,7 +189,7 @@ The compiled release APK will be generated at:
     - *Scroll Idle Reset Fix:* Ensured scroll tracking count resets to zero on idle notifications, guaranteeing instant controller pause during active fling/drag gestures for 120 FPS buttery smooth scrolling.
     - *Settings Sheet BackdropFilter Elimination:* Replaced heavyweight `BackdropFilter` on `SettingsSheet` with optimized `ClipRRect`, and updated switch thumb theming (`activeThumbColor`) to resolve deprecation warnings.
 
-* ### v2.3.1 (Build 19)
+* ### v2.3.1
   - **Comprehensive GPU & Rendering Performance Patch:**
     - *Eliminated BackdropFilter Bottlenecks on Content Cards:* Disabled expensive GPU blur passes (`enableBlur: false`) across `StatCard`, `LanguageChart`, `ActivityChart`, repository Markdown containers, image preview, and detail toolbars while maintaining sleek, translucent glassmorphism aesthetics.
     - *RepaintBoundary Layer Isolation:* Wrapped stat cards and blur-enabled glass surfaces with `RepaintBoundary` to prevent unnecessary canvas repainting during page scroll.
@@ -172,7 +198,7 @@ The compiled release APK will be generated at:
     - *Real-Time Scroll Pause Logic:* Enhanced scroll notification listeners to pause background animations immediately on touch scroll updates.
     - *Search Keystroke Rebuild Scoping:* Isolated search field typing via `ValueListenableBuilder<TextEditingValue>`, completely eliminating full-screen re-renders of the home feed, app bar, and news carousel during keyboard typing.
 
-* ### v2.3.0 (Build 18)
+* ### v2.3.0
   - **Zero-Quota Caching & HTTP Conditional Requests Engine:**
     - *10-Minute Persistent Smart Cache:* Implemented intelligent local caching with a 10-minute TTL for GitHub user profiles (`/users/:username`), repositories (`/users/:username/repos`), public events (`/users/:username/events/public`), and aggregated language footprints via `StorageService`. Repeated profile visits within 10 minutes load instantly with zero API calls.
     - *ETag Conditional Requests (`304 Not Modified`):* Persists HTTP `ETag` headers for every queried endpoint. On cache expiration, requests are dispatched with `If-None-Match: <etag>`. When GitHub responds with `304 Not Modified`, local cached data is reused seamlessly and cache TTL is refreshed without reducing the user's GitHub API quota (`x-ratelimit-remaining` remains completely untouched).
@@ -183,7 +209,7 @@ The compiled release APK will be generated at:
     - Integrated native full-screen `RefreshIndicator` pull-to-refresh swipe gesture on profile detail views.
     - Added feedback SnackBars across all 6 supported languages notifying users whether profile telemetry was updated (`profileRefreshed`) or verified already up-to-date with zero quota consumption (`profileUpToDate`).
 
-* ### v2.2.0 (Build 17)
+* ### v2.2.0
   - **Complete Modern & Minimalist UI Redesign:**
     - *Stats Detail & Profile Screen (`StatsDetailScreen`):* Overhauled header profile layout with avatar halo glow ring, sleek metadata chips (company, location, blog), minimalist quote bio typography, and custom themed filter dropdown.
     - *Favorite Profiles Screen (`FavoriteProfilesScreen`):* Clean segmented pill control for 1-2 column switching, refined developer ID card layout with ripple touch feedback and anti-truncation, and centered radial empty state illustration.
@@ -201,7 +227,7 @@ The compiled release APK will be generated at:
     - Tech news category tab bar dynamically auto-centers the active chip to the exact middle (50%) of the screen upon tapping or swiping with `Scrollable.ensureVisible` and smooth easing curves.
     - Replaced jumpy tab switching with a fluid, synchronized `PageView` experience.
 
-* ### v2.1.0 (Build 16)
+* ### v2.1.0
   - **Overhauled Ambient Canvas Background Animations Across All 4 Themes:**
     - *AMOLED Sakura (Radiant Pink 🌸):* Replaced the thin tree with an organic, majestic Sakura tree with natural bark grain lines and volumetric cherry blossom canopy masses (`volumetric blossom clouds`) featuring layered spring green leaves, rich magenta petal base, soft pink blooms, and sunlit highlight puffs.
     - *AMOLED Night (Starry Cosmos 🌌):* Enhanced diagonal shooting stars into a continuous full-screen multi-meteor shower (6 staggered meteors) crossing edge-to-edge from outside the upper-right canvas completely off the bottom-left boundary without vanishing mid-screen, with radiant glowing heads and smooth tapered gradient trails.
@@ -217,7 +243,7 @@ The compiled release APK will be generated at:
   - **Smooth PageView Tech News Carousel:** Replaced abrupt animated switcher in home screen tech news with interactive, physics-based `PageView` featuring smooth drag transitions and synchronized active category chip snapping.
   - **Light Theme Header Contrast:** Darkened GitPulse logo title text in light theme mode to crisp high-contrast black (`#1F2328`) for optimal clarity against light surfaces.
 
-* ### v2.0.0 (Build 15)
+* ### v2.0.0
   - **Full-Screen Seamless Animated App Background:** Replaced isolated header animations with a continuous, looping ambient canvas across the entire application from top to bottom (status bar down to navigation bar), tailored per theme:
     - *AMOLED Sakura (Radiant Pink 🌸):* Drifting cherry blossom petals with an elegant sakura tree trunk, branches, and blossom clusters on pure AMOLED black.
     - *AMOLED Night (Starry Cosmos 🌌):* Full-height starry cosmos with twinkling diamond stars, glowing crescent moon, and diagonal shooting stars / meteors crossing the screen.
@@ -243,54 +269,54 @@ The compiled release APK will be generated at:
   - **Streamlined Search UX:** Simplified search placeholder hint across all 6 supported languages to clean action verbs (`Search...`, `Cari...`, `検索...`, etc.) removing verbose examples.
   - **Application Package Identifier Migration:** Standardized Android namespace and application package identifier to `com.phantek.orion.rigel`.
 
-* ### v1.0.13 (Build 14)
+* ### v1.0.13
   - **Settings Sheet Visual Polish:** Refined settings sheet layout and theme option cards with responsive layout geometry and smooth touch states.
   - **Header Canvas Fine-Tuning:** Polished particle physics parameters and alpha blending across all 4 theme modes.
 
-* ### v1.0.12 (Build 13)
+* ### v1.0.12
   - **Native In-App Repository Explorer:** Added dual-tab repository screen toggling between README documentation and interactive file tree without external browser redirects.
   - **Syntax-Highlighted File Viewer:** Added `FileViewerScreen` with line numbering, file metadata, character count, and copy action.
   - **Relative Asset Resolution:** Automatic resolution of relative image paths in README files against GitHub raw CDN with dark/light mode image marker support.
   - **Expanded Multi-Language Dictionary:** Full localization dictionary coverage for repository explorer, file viewer, and directory navigation across all 6 languages.
 
-* ### v1.0.11 (Build 12)
+* ### v1.0.11
   - *Internal test build and hotfix staging.*
 
-* ### v1.0.10 (Build 11)
+* ### v1.0.10
   - **Header Animation Pause on Modals:** Implemented `HeaderAnimationState` to suspend background Canvas particle loops when settings or modals open, reducing idle background GPU/CPU usage to 0%.
   - **Zero-saveLayer Optimization:** Replaced offscreen GPU `ShaderMask` allocations with native concentric GPU alpha rings to prevent frame drops on low-tier devices.
 
-* ### v1.0.9 (Build 10)
+* ### v1.0.9
   - **Curated Tech News & Ecosystem Feed:** Aggregated trending GitHub repositories and dev.to articles with category filtering chips and constrained thumbnail cache decoding (`cacheWidth: 450`).
 
-* ### v1.0.8 (Build 9)
+* ### v1.0.8
   - **6-Language Internationalization Overhaul:** Added complete dictionary translations for Bahasa Indonesia, English, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 
-* ### v1.0.7 (Build 8)
+* ### v1.0.7
   - *Internal test build and localization verification.*
 
-* ### v1.0.6 (Build 7)
+* ### v1.0.6
   - **In-App OTA Updater & Safe Storage Pipeline:** Integrated background APK downloading via `ota_update` with automated startup cleanup of installed update binaries in `/Download/GitPulse/`.
   - **Android PackageInstaller Integration:** Configured secure `FileProvider` and Android permissions for seamless in-place APK installation.
 
-* ### v1.0.5 (Build 6)
+* ### v1.0.5
   - *Internal test build and OTA pipeline verification.*
 
-* ### v1.0.4 (Build 5)
+* ### v1.0.4
   - **Commit Activity Tier Engine:** Added 6-tier continuous animated badges (Code Titan, Relentless Committer, Consistent Builder, Weekend Warrior, Dormant Explorer, Fresh Sprout) with physics-based shaders.
   - **4 Dynamic Theme Modes:** Introduced Dark (Navy), Pure Black AMOLED, Clean Light, and hidden AMOLED Sakura mode unlocked via 10-tap gesture.
 
-* ### v1.0.3 (Build 4)
+* ### v1.0.3
   - *Internal test build and theme asset tuning.*
 
-* ### v1.0.2 (Build 3)
+* ### v1.0.2
   - *Internal test build and analytics layout adjustments.*
 
-* ### v1.0.1 (Build 2)
+* ### v1.0.1
   - **24-Hour Activity Rhythm & Portfolio Analytics:** 24-bar diurnal activity histogram, language footprint donut chart, and cumulative stargazer/fork portfolio telemetry.
   - **Sliver Virtualization:** `CustomScrollView` and `SliverList.builder` for smooth 60fps scrolling across 100+ repositories.
 
-* ### v1.0.0 (Build 1)
+* ### v1.0.0
   - **Initial Release:** Initial project setup, base architecture, and GitHub API connection pipeline.
 
 ---

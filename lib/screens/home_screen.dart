@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+
 import '../localization/app_localizations.dart';
 import '../models/bookmarked_user.dart';
 import '../models/tech_news.dart';
+import '../services/app_theme_service.dart';
 import '../services/github_api_service.dart';
 import '../services/storage_service.dart';
 import '../services/tech_news_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/animated_app_header.dart';
-import '../widgets/settings_sheet.dart';
 import '../widgets/tech_news_card.dart';
 import 'favorite_profiles_screen.dart';
+import 'settings_screen.dart';
 import 'stats_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -91,7 +93,10 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  Future<void> _loadCategoryNews(String category, {bool refresh = false}) async {
+  Future<void> _loadCategoryNews(
+    String category, {
+    bool refresh = false,
+  }) async {
     if (!refresh &&
         _categoryNewsCache.containsKey(category) &&
         _categoryNewsCache[category]!.isNotEmpty) {
@@ -130,8 +135,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final targetCategory = categories[index]['id']!;
     if (targetCategory == _selectedCategory) return;
 
-    final currentIndex =
-        categories.indexWhere((c) => c['id'] == _selectedCategory);
+    final currentIndex = categories.indexWhere(
+      (c) => c['id'] == _selectedCategory,
+    );
 
     setState(() {
       _selectedCategory = targetCategory;
@@ -327,15 +333,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openSettingsSheet() async {
-    await SettingsSheet.show(
+    HeaderAnimationState.pauseAnimation();
+    await Navigator.push(
       context,
-      storageService: widget.storageService,
-      apiService: widget.apiService,
-      onSettingsChanged: () {
-        _refreshLocalData();
-        setState(() {});
-      },
+      MaterialPageRoute(
+        builder: (context) => SettingsScreen(
+          storageService: widget.storageService,
+          apiService: widget.apiService,
+          onSettingsChanged: () {
+            _refreshLocalData();
+            if (mounted) setState(() {});
+          },
+        ),
+      ),
     );
+    if (AppThemeService.isBgAnimationEnabled) {
+      HeaderAnimationState.resumeAnimation();
+    }
+    _refreshLocalData();
+    if (mounted) setState(() {});
   }
 
   @override
@@ -362,7 +378,10 @@ class _HomeScreenState extends State<HomeScreen> {
               GestureDetector(
                 onTap: _openSettingsSheet,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   margin: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     color: AppTheme.surfaceElevated,
@@ -394,7 +413,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             IconButton(
               tooltip: loc.settingsTitle,
-              icon: Icon(Icons.tune_rounded, size: 20, color: AppTheme.textSecondary),
+              icon: Icon(
+                Icons.tune_rounded,
+                size: 20,
+                color: AppTheme.textSecondary,
+              ),
               onPressed: _openSettingsSheet,
             ),
           ],
@@ -412,12 +435,17 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() {});
           },
           child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
             // ignore: deprecated_member_use
             cacheExtent: 600.0,
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 sliver: SliverToBoxAdapter(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -429,7 +457,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           final query = searchValue.text.trim().toLowerCase();
                           final recents = query.isEmpty
                               ? allRecents
-                              : allRecents.where((u) => u.toLowerCase().contains(query)).toList();
+                              : allRecents
+                                    .where(
+                                      (u) => u.toLowerCase().contains(query),
+                                    )
+                                    .toList();
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,7 +469,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               _buildSearchBar(loc),
                               if (_isSearchFocused) ...[
                                 const SizedBox(height: 8),
-                                _buildSearchHistoryPanel(loc, recents, allRecents),
+                                _buildSearchHistoryPanel(
+                                  loc,
+                                  recents,
+                                  allRecents,
+                                ),
                               ],
                             ],
                           );
@@ -447,11 +483,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (_errorMessage != null) ...[
                         const SizedBox(height: 12),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: AppTheme.accentRed.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppTheme.accentRed.withValues(alpha: 0.3)),
+                            border: Border.all(
+                              color: AppTheme.accentRed.withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Row(
                             children: [
@@ -524,10 +565,14 @@ class _HomeScreenState extends State<HomeScreen> {
         prefixIcon: Icon(
           Icons.search_rounded,
           size: 20,
-          color: _isSearchFocused ? AppTheme.primaryCyan : AppTheme.textSecondary,
+          color: _isSearchFocused
+              ? AppTheme.primaryCyan
+              : AppTheme.textSecondary,
         ),
         suffixIcon: _isLoading
-            ? Padding(padding: EdgeInsets.all(12), child: SizedBox(
+            ? Padding(
+                padding: EdgeInsets.all(12),
+                child: SizedBox(
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(
@@ -541,7 +586,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   if (_searchController.text.isNotEmpty || _isSearchFocused)
                     IconButton(
-                      icon: Icon(Icons.close_rounded, size: 18, color: AppTheme.textMuted),
+                      icon: Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: AppTheme.textMuted,
+                      ),
                       tooltip: loc.close,
                       onPressed: () {
                         _searchController.clear();
@@ -550,7 +599,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   IconButton(
-                    icon: Icon(Icons.arrow_forward_rounded, size: 18, color: AppTheme.primaryCyan),
+                    icon: Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 18,
+                      color: AppTheme.primaryCyan,
+                    ),
                     tooltip: 'GitHub',
                     onPressed: () => _searchUser(_searchController.text),
                   ),
@@ -578,7 +631,12 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // Header
           Padding(
-            padding: const EdgeInsets.only(left: 14, right: 8, top: 10, bottom: 6),
+            padding: const EdgeInsets.only(
+              left: 14,
+              right: 8,
+              top: 10,
+              bottom: 6,
+            ),
             child: Row(
               children: [
                 Icon(
@@ -604,19 +662,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {});
                     },
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       visualDensity: VisualDensity.compact,
                     ),
                     child: Text(
                       loc.clearAll,
-                      style: TextStyle(
-                        color: AppTheme.accentRed,
-                        fontSize: 11,
-                      ),
+                      style: TextStyle(color: AppTheme.accentRed, fontSize: 11),
                     ),
                   ),
                 IconButton(
-                  icon: Icon(Icons.keyboard_arrow_up_rounded, size: 18, color: AppTheme.textMuted),
+                  icon: Icon(
+                    Icons.keyboard_arrow_up_rounded,
+                    size: 18,
+                    color: AppTheme.textMuted,
+                  ),
                   tooltip: loc.close,
                   onPressed: () => _searchFocusNode.unfocus(),
                   visualDensity: VisualDensity.compact,
@@ -631,7 +693,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ListTile(
               dense: true,
               visualDensity: VisualDensity.compact,
-              leading: Icon(Icons.search_rounded, size: 16, color: AppTheme.primaryCyan),
+              leading: Icon(
+                Icons.search_rounded,
+                size: 16,
+                color: AppTheme.primaryCyan,
+              ),
               title: RichText(
                 text: TextSpan(
                   style: TextStyle(color: AppTheme.textPrimary, fontSize: 13),
@@ -647,7 +713,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              trailing: Icon(Icons.arrow_forward_rounded, size: 15, color: AppTheme.primaryCyan),
+              trailing: Icon(
+                Icons.arrow_forward_rounded,
+                size: 15,
+                color: AppTheme.primaryCyan,
+              ),
               onTap: () => _searchUser(_searchController.text),
             ),
             Divider(height: 1, color: AppTheme.border),
@@ -668,10 +738,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: Text(
                       loc.noRecentSearches,
-                      style: TextStyle(
-                        color: AppTheme.textMuted,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
                     ),
                   ),
                 ],
@@ -704,22 +771,33 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.north_west_rounded, size: 14, color: AppTheme.textMuted),
+                          icon: Icon(
+                            Icons.north_west_rounded,
+                            size: 14,
+                            color: AppTheme.textMuted,
+                          ),
                           tooltip: filteredRecents[i],
                           visualDensity: VisualDensity.compact,
                           onPressed: () {
                             _searchController.text = filteredRecents[i];
-                            _searchController.selection = TextSelection.fromPosition(
+                            _searchController
+                                .selection = TextSelection.fromPosition(
                               TextPosition(offset: filteredRecents[i].length),
                             );
                           },
                         ),
                         IconButton(
-                          icon: Icon(Icons.close_rounded, size: 15, color: AppTheme.textMuted),
+                          icon: Icon(
+                            Icons.close_rounded,
+                            size: 15,
+                            color: AppTheme.textMuted,
+                          ),
                           tooltip: loc.close,
                           visualDensity: VisualDensity.compact,
                           onPressed: () async {
-                            await widget.storageService.removeRecentSearch(filteredRecents[i]);
+                            await widget.storageService.removeRecentSearch(
+                              filteredRecents[i],
+                            );
                             _refreshLocalData();
                             setState(() {});
                           },
@@ -739,7 +817,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBookmarksSection(AppLocalizations loc, List<BookmarkedUser> bookmarks) {
+  Widget _buildBookmarksSection(
+    AppLocalizations loc,
+    List<BookmarkedUser> bookmarks,
+  ) {
     if (bookmarks.isEmpty) {
       return InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -851,7 +932,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppTheme.surfaceElevated,
                     borderRadius: BorderRadius.circular(5),
@@ -914,10 +998,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(10),
                     splashColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
-                    highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
-                    onTap: isCardLoading ? null : () => _openFavoriteProfile(user.username),
+                    highlightColor: AppTheme.primaryCyan.withValues(
+                      alpha: 0.05,
+                    ),
+                    onTap: isCardLoading
+                        ? null
+                        : () => _openFavoriteProfile(user.username),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
                       child: Row(
                         children: [
                           // Avatar Photo with subtle border & loading overlay
@@ -945,30 +1036,37 @@ class _HomeScreenState extends State<HomeScreen> {
                                       cacheWidth: 100,
                                       cacheHeight: 100,
                                       fit: BoxFit.cover,
-                                      loadingBuilder: (context, child, loadingProgress) {
-                                        if (loadingProgress == null) return child;
-                                        return Container(
-                                          color: AppTheme.surfaceElevated,
-                                          child: Center(
-                                            child: SizedBox(
-                                              width: 14,
-                                              height: 14,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 1.5,
-                                                color: AppTheme.primaryCyan,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Container(
+                                              color: AppTheme.surfaceElevated,
+                                              child: Center(
+                                                child: SizedBox(
+                                                  width: 14,
+                                                  height: 14,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 1.5,
+                                                        color: AppTheme
+                                                            .primaryCyan,
+                                                      ),
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      errorBuilder: (context, error, stackTrace) => Container(
-                                        color: AppTheme.surfaceElevated,
-                                        child: Icon(
-                                          Icons.person_outline_rounded,
-                                          size: 18,
-                                          color: AppTheme.textMuted,
-                                        ),
-                                      ),
+                                            );
+                                          },
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Container(
+                                                color: AppTheme.surfaceElevated,
+                                                child: Icon(
+                                                  Icons.person_outline_rounded,
+                                                  size: 18,
+                                                  color: AppTheme.textMuted,
+                                                ),
+                                              ),
                                     ),
                                   ),
                                 ),
@@ -978,7 +1076,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     height: 38,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: AppTheme.background.withValues(alpha: 0.75),
+                                      color: AppTheme.background.withValues(
+                                        alpha: 0.75,
+                                      ),
                                     ),
                                     child: Center(
                                       child: SizedBox(
@@ -1035,7 +1135,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             visualDensity: VisualDensity.compact,
                             tooltip: loc.removeFavorite,
                             onPressed: () async {
-                              await widget.storageService.removeBookmark(user.username);
+                              await widget.storageService.removeBookmark(
+                                user.username,
+                              );
                               _refreshLocalData();
                               setState(() {});
                             },
@@ -1107,8 +1209,9 @@ class _HomeScreenState extends State<HomeScreen> {
     AppLocalizations loc,
     List<Map<String, String>> categories,
   ) {
-    final isCachedOffline =
-        _newsService.isTagCachedOrOffline(_selectedCategory);
+    final isCachedOffline = _newsService.isTagCachedOrOffline(
+      _selectedCategory,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1183,7 +1286,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: AppTheme.textSecondary,
               ),
               tooltip: loc.refresh,
-              onPressed: () => _loadCategoryNews(_selectedCategory, refresh: true),
+              onPressed: () =>
+                  _loadCategoryNews(_selectedCategory, refresh: true),
               visualDensity: VisualDensity.compact,
             ),
           ],
@@ -1203,8 +1307,10 @@ class _HomeScreenState extends State<HomeScreen> {
             itemBuilder: (context, index) {
               final cat = categories[index];
               final isSelected = cat['id'] == _selectedCategory;
-              final catKey =
-                  _categoryKeys.putIfAbsent(cat['id']!, () => GlobalKey());
+              final catKey = _categoryKeys.putIfAbsent(
+                cat['id']!,
+                () => GlobalKey(),
+              );
               return KeyedSubtree(
                 key: catKey,
                 child: AnimatedScale(
@@ -1219,8 +1325,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: AppTheme.primaryCyan
-                                    .withValues(alpha: 0.22),
+                                color: AppTheme.primaryCyan.withValues(
+                                  alpha: 0.22,
+                                ),
                                 blurRadius: 8.0,
                                 spreadRadius: 0.5,
                               ),
@@ -1234,18 +1341,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: isSelected
                               ? AppTheme.primaryCyan
                               : AppTheme.textSecondary,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w400,
                           fontSize: 12,
                         ),
                       ),
                       selected: isSelected,
-                      selectedColor:
-                          AppTheme.primaryCyan.withValues(alpha: 0.12),
+                      selectedColor: AppTheme.primaryCyan.withValues(
+                        alpha: 0.12,
+                      ),
                       backgroundColor: AppTheme.surface,
                       side: BorderSide(
-                        color:
-                            isSelected ? AppTheme.primaryCyan : AppTheme.border,
+                        color: isSelected
+                            ? AppTheme.primaryCyan
+                            : AppTheme.border,
                         width: isSelected ? 1.1 : 0.8,
                       ),
                       shape: RoundedRectangleBorder(
@@ -1295,7 +1405,9 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
   @override
   void initState() {
     super.initState();
-    _currentPage = widget.controller.hasClients ? widget.controller.page?.round() ?? 0 : 0;
+    _currentPage = widget.controller.hasClients
+        ? widget.controller.page?.round() ?? 0
+        : 0;
     _heights = List.filled(widget.itemCount, 520.0);
     widget.controller.addListener(_onPageScroll);
   }
@@ -1305,7 +1417,9 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
     final page = widget.controller.page;
     if (page != null) {
       final newPage = page.round();
-      if (newPage != _currentPage && newPage >= 0 && newPage < widget.itemCount) {
+      if (newPage != _currentPage &&
+          newPage >= 0 &&
+          newPage < widget.itemCount) {
         setState(() {
           _currentPage = newPage;
         });
@@ -1333,7 +1447,8 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
 
   @override
   Widget build(BuildContext context) {
-    final currentHeight = (_currentPage < _heights.length && _heights[_currentPage] > 0)
+    final currentHeight =
+        (_currentPage < _heights.length && _heights[_currentPage] > 0)
         ? _heights[_currentPage]
         : 520.0;
 
@@ -1342,10 +1457,7 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
       duration: const Duration(milliseconds: 250),
       tween: Tween<double>(begin: currentHeight, end: currentHeight),
       builder: (context, height, child) {
-        return SizedBox(
-          height: height,
-          child: child,
-        );
+        return SizedBox(height: height, child: child);
       },
       child: PageView.builder(
         controller: widget.controller,
@@ -1356,7 +1468,8 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
           return _KeepAlivePage(
             child: _PageMeasureWidget(
               onSizeChanged: (size) {
-                if (index < _heights.length && (_heights[index] - size.height).abs() > 1.0) {
+                if (index < _heights.length &&
+                    (_heights[index] - size.height).abs() > 1.0) {
                   if (mounted) {
                     setState(() {
                       _heights[index] = size.height;
@@ -1397,10 +1510,7 @@ class _PageMeasureWidget extends StatefulWidget {
   final Widget child;
   final ValueChanged<Size> onSizeChanged;
 
-  const _PageMeasureWidget({
-    required this.child,
-    required this.onSizeChanged,
-  });
+  const _PageMeasureWidget({required this.child, required this.onSizeChanged});
 
   @override
   State<_PageMeasureWidget> createState() => _PageMeasureWidgetState();
@@ -1442,10 +1552,7 @@ class _PageMeasureWidgetState extends State<_PageMeasureWidget> {
       minHeight: 0,
       maxHeight: double.infinity,
       alignment: Alignment.topCenter,
-      child: Container(
-        key: _key,
-        child: widget.child,
-      ),
+      child: Container(key: _key, child: widget.child),
     );
   }
 }

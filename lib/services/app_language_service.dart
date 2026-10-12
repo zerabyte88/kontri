@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../localization/app_language.dart';
 import '../localization/app_localizations.dart';
 import 'storage_service.dart';
@@ -7,7 +8,9 @@ class AppLanguageService {
   static ValueNotifier<AppLanguage>? _currentLanguageNotifier;
 
   static ValueNotifier<AppLanguage> get currentLanguageNotifier =>
-      _currentLanguageNotifier ??= ValueNotifier<AppLanguage>(AppLanguage.english);
+      _currentLanguageNotifier ??= ValueNotifier<AppLanguage>(
+        AppLanguage.english,
+      );
 
   static void init(StorageService storageService) {
     final code = storageService.getLanguageCode();

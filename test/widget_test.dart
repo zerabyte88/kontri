@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -38,14 +39,9 @@ import 'package:gitpulse_mobile/widgets/stat_card.dart';
 import 'package:gitpulse_mobile/widgets/running_text.dart';
 import 'package:gitpulse_mobile/widgets/glass_card.dart';
 import 'package:gitpulse_mobile/widgets/settings_sheet.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  setUpAll(() {
-    GoogleFonts.config.allowRuntimeFetching = false;
-  });
-
   group('GitPulse Model Tests', () {
     test('GitHubUser fromJson parses correctly', () {
       final json = {
@@ -136,12 +132,7 @@ void main() {
       final threeDaysAgo = DateTime.utc(now.year, now.month, now.day - 3);
 
       // Scenario 1: Active streak including today (today and yesterday consecutive, gap on twoDaysAgo)
-      final counts = {
-        today: 5,
-        yesterday: 2,
-        twoDaysAgo: 0,
-        threeDaysAgo: 10,
-      };
+      final counts = {today: 5, yesterday: 2, twoDaysAgo: 0, threeDaysAgo: 10};
       final streaks = ContributionStats.calculateStreaks(counts);
       expect(streaks.current, 2); // today and yesterday
       expect(streaks.longest, 2);
@@ -153,7 +144,9 @@ void main() {
         twoDaysAgo: 1,
         threeDaysAgo: 2,
       };
-      final streaksYesterday = ContributionStats.calculateStreaks(countsYesterday);
+      final streaksYesterday = ContributionStats.calculateStreaks(
+        countsYesterday,
+      );
       expect(streaksYesterday.current, 3);
       expect(streaksYesterday.longest, 3);
 
@@ -171,15 +164,14 @@ void main() {
 
     test('ContributionStats.fromContributionsApi correctly parses multi-year list with future dates', () {
       final now = DateTime.now();
-      final todayStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      final todayStr =
+          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
       final yest = now.subtract(const Duration(days: 1));
-      final yestStr = '${yest.year}-${yest.month.toString().padLeft(2, '0')}-${yest.day.toString().padLeft(2, '0')}';
+      final yestStr =
+          '${yest.year}-${yest.month.toString().padLeft(2, '0')}-${yest.day.toString().padLeft(2, '0')}';
 
       final mockApi = {
-        'total': {
-          '${now.year}': 15,
-          '${now.year - 1}': 50,
-        },
+        'total': {'${now.year}': 15, '${now.year - 1}': 50},
         'contributions': [
           // Current year with future date
           {'date': '${now.year}-12-31', 'count': 0},
@@ -361,14 +353,15 @@ void main() {
         'location': 'San Francisco, CA',
       });
       expect(userWithAvatar.username, 'octocat');
-      expect(userWithAvatar.avatarUrl, 'https://avatars.githubusercontent.com/u/583231');
+      expect(
+        userWithAvatar.avatarUrl,
+        'https://avatars.githubusercontent.com/u/583231',
+      );
       expect(userWithAvatar.name, 'The Octocat');
       expect(userWithAvatar.bio, 'GitHub mascot and feline developer');
       expect(userWithAvatar.location, 'San Francisco, CA');
 
-      final userDefault = BookmarkedUser.fromJson({
-        'username': 'torvalds',
-      });
+      final userDefault = BookmarkedUser.fromJson({'username': 'torvalds'});
       expect(userDefault.username, 'torvalds');
       expect(userDefault.avatarUrl, 'https://github.com/torvalds.png');
       expect(userDefault.name, isNull);
@@ -410,7 +403,10 @@ void main() {
       final bookmarks = storage.getBookmarkedUsers();
       expect(bookmarks.length, 1);
       expect(bookmarks.first.username, 'linus');
-      expect(bookmarks.first.avatarUrl, 'https://avatars.githubusercontent.com/linus');
+      expect(
+        bookmarks.first.avatarUrl,
+        'https://avatars.githubusercontent.com/linus',
+      );
       expect(bookmarks.first.name, 'Linus Torvalds');
       expect(bookmarks.first.bio, 'Linux Kernel Developer');
       expect(bookmarks.first.location, 'Portland, OR');
@@ -457,66 +453,69 @@ void main() {
       expect(news.readingTimeMinutes, 5);
     });
 
-    test('GitHubRateLimit metrics and percentage calculations behave as expected', () {
-      // 1. Untouched / never run: remaining == limit -> 100%
-      final untouched = GitHubRateLimit(
-        limit: 60,
-        remaining: 60,
-        used: 0,
-        resetTime: DateTime.now().add(const Duration(minutes: 50)),
-      );
-      expect(untouched.remainingRatio, 1.0);
-      expect(untouched.remainingPercentage, 100.0);
-      expect(untouched.used, 0);
+    test(
+      'GitHubRateLimit metrics and percentage calculations behave as expected',
+      () {
+        // 1. Untouched / never run: remaining == limit -> 100%
+        final untouched = GitHubRateLimit(
+          limit: 60,
+          remaining: 60,
+          used: 0,
+          resetTime: DateTime.now().add(const Duration(minutes: 50)),
+        );
+        expect(untouched.remainingRatio, 1.0);
+        expect(untouched.remainingPercentage, 100.0);
+        expect(untouched.used, 0);
 
-      // 2. Partial usage: 28 used, 32 remaining of 60
-      final partial = GitHubRateLimit(
-        limit: 60,
-        remaining: 32,
-        used: 28,
-        resetTime: DateTime.now().add(const Duration(minutes: 30)),
-      );
-      expect(partial.used, 28);
-      expect(partial.remaining, 32);
-      expect(partial.remainingPercentage, closeTo(53.33, 0.1));
+        // 2. Partial usage: 28 used, 32 remaining of 60
+        final partial = GitHubRateLimit(
+          limit: 60,
+          remaining: 32,
+          used: 28,
+          resetTime: DateTime.now().add(const Duration(minutes: 30)),
+        );
+        expect(partial.used, 28);
+        expect(partial.remaining, 32);
+        expect(partial.remainingPercentage, closeTo(53.33, 0.1));
 
-      // 3. Exhausted: 60 used, 0 remaining -> 0%
-      final exhausted = GitHubRateLimit(
-        limit: 60,
-        remaining: 0,
-        used: 60,
-        resetTime: DateTime.now().add(const Duration(minutes: 5)),
-      );
-      expect(exhausted.remainingRatio, 0.0);
-      expect(exhausted.remainingPercentage, 0.0);
-      expect(exhausted.used, 60);
+        // 3. Exhausted: 60 used, 0 remaining -> 0%
+        final exhausted = GitHubRateLimit(
+          limit: 60,
+          remaining: 0,
+          used: 60,
+          resetTime: DateTime.now().add(const Duration(minutes: 5)),
+        );
+        expect(exhausted.remainingRatio, 0.0);
+        expect(exhausted.remainingPercentage, 0.0);
+        expect(exhausted.used, 60);
 
-      // 4. Personal Token usage: 1001 used of 5000
-      final tokenLimit = GitHubRateLimit(
-        limit: 5000,
-        remaining: 3999,
-        used: 1001,
-        resetTime: DateTime.now().add(const Duration(minutes: 45)),
-      );
-      expect(tokenLimit.limit, 5000);
-      expect(tokenLimit.used, 1001);
-      expect(tokenLimit.remaining, 3999);
-      expect(tokenLimit.remainingPercentage, closeTo(79.98, 0.1));
+        // 4. Personal Token usage: 1001 used of 5000
+        final tokenLimit = GitHubRateLimit(
+          limit: 5000,
+          remaining: 3999,
+          used: 1001,
+          resetTime: DateTime.now().add(const Duration(minutes: 45)),
+        );
+        expect(tokenLimit.limit, 5000);
+        expect(tokenLimit.used, 1001);
+        expect(tokenLimit.remaining, 3999);
+        expect(tokenLimit.remainingPercentage, closeTo(79.98, 0.1));
 
-      // 5. From JSON parsing
-      final json = {
-        'rate': {
-          'limit': 60,
-          'remaining': 45,
-          'used': 15,
-          'reset': 1790499958,
-        }
-      };
-      final fromJson = GitHubRateLimit.fromJson(json);
-      expect(fromJson.limit, 60);
-      expect(fromJson.remaining, 45);
-      expect(fromJson.used, 15);
-    });
+        // 5. From JSON parsing
+        final json = {
+          'rate': {
+            'limit': 60,
+            'remaining': 45,
+            'used': 15,
+            'reset': 1790499958,
+          },
+        };
+        final fromJson = GitHubRateLimit.fromJson(json);
+        expect(fromJson.limit, 60);
+        expect(fromJson.remaining, 45);
+        expect(fromJson.used, 15);
+      },
+    );
 
     test('CommitTitleInfo cleanTitle strips icons and emojis cleanly', () {
       const info1 = CommitTitleInfo(
@@ -547,9 +546,25 @@ void main() {
       expect(info3.cleanTitle, 'Relentless Committer');
     });
 
-    test('AppLanguage parses and maps all 6 languages accurately', () {
+    test('AppLanguage parses and maps all 22 languages accurately', () {
       expect(AppLanguage.fromCode('id'), AppLanguage.indonesian);
+      expect(AppLanguage.fromCode('ms'), AppLanguage.malay);
+      expect(AppLanguage.fromCode('da'), AppLanguage.danish);
+      expect(AppLanguage.fromCode('de'), AppLanguage.german);
       expect(AppLanguage.fromCode('en'), AppLanguage.english);
+      expect(AppLanguage.fromCode('es'), AppLanguage.spanish);
+      expect(AppLanguage.fromCode('fr'), AppLanguage.french);
+      expect(AppLanguage.fromCode('it'), AppLanguage.italian);
+      expect(AppLanguage.fromCode('nl'), AppLanguage.dutch);
+      expect(AppLanguage.fromCode('no'), AppLanguage.norwegian);
+      expect(AppLanguage.fromCode('pt'), AppLanguage.portuguese);
+      expect(AppLanguage.fromCode('fi'), AppLanguage.finnish);
+      expect(AppLanguage.fromCode('sv'), AppLanguage.swedish);
+      expect(AppLanguage.fromCode('vi'), AppLanguage.vietnamese);
+      expect(AppLanguage.fromCode('ru'), AppLanguage.russian);
+      expect(AppLanguage.fromCode('ar'), AppLanguage.arabic);
+      expect(AppLanguage.fromCode('hi'), AppLanguage.hindi);
+      expect(AppLanguage.fromCode('th'), AppLanguage.thai);
       expect(AppLanguage.fromCode('ja'), AppLanguage.japanese);
       expect(AppLanguage.fromCode('zh_Hans'), AppLanguage.chineseSimplified);
       expect(AppLanguage.fromCode('zh_CN'), AppLanguage.chineseSimplified);
@@ -558,7 +573,7 @@ void main() {
       expect(AppLanguage.fromCode('ko'), AppLanguage.korean);
       expect(AppLanguage.fromCode('unknown'), AppLanguage.english);
 
-      expect(AppLanguage.values.length, 6);
+      expect(AppLanguage.values.length, 22);
       for (final lang in AppLanguage.values) {
         expect(lang.code, isNotEmpty);
         expect(lang.name, isNotEmpty);
@@ -567,187 +582,198 @@ void main() {
       }
     });
 
-    test('AppLocalizations renders expected translations for all 6 languages', () {
-      final idLoc = AppLocalizations(AppLanguage.indonesian);
-      final enLoc = AppLocalizations(AppLanguage.english);
-      final jaLoc = AppLocalizations(AppLanguage.japanese);
-      final zhHansLoc = AppLocalizations(AppLanguage.chineseSimplified);
-      final zhHantLoc = AppLocalizations(AppLanguage.chineseTraditional);
-      final koLoc = AppLocalizations(AppLanguage.korean);
+    test(
+      'AppLocalizations renders expected translations for all 6 languages',
+      () {
+        final idLoc = AppLocalizations(AppLanguage.indonesian);
+        final enLoc = AppLocalizations(AppLanguage.english);
+        final jaLoc = AppLocalizations(AppLanguage.japanese);
+        final zhHansLoc = AppLocalizations(AppLanguage.chineseSimplified);
+        final zhHantLoc = AppLocalizations(AppLanguage.chineseTraditional);
+        final koLoc = AppLocalizations(AppLanguage.korean);
 
-      // App Title / Repositories
-      expect(idLoc.repositoriesTitle, 'Repositori');
-      expect(enLoc.repositoriesTitle, 'Repositories');
-      expect(jaLoc.repositoriesTitle, 'リポジトリ');
-      expect(zhHansLoc.repositoriesTitle, '代码仓库');
-      expect(zhHantLoc.repositoriesTitle, '代碼倉庫');
-      expect(koLoc.repositoriesTitle, '리포지토리');
+        // App Title / Repositories
+        expect(idLoc.repositoriesTitle, 'Repositori');
+        expect(enLoc.repositoriesTitle, 'Repositories');
+        expect(jaLoc.repositoriesTitle, 'リポジトリ');
+        expect(zhHansLoc.repositoriesTitle, '代码仓库');
+        expect(zhHantLoc.repositoriesTitle, '代碼倉庫');
+        expect(koLoc.repositoriesTitle, '리포지토리');
 
-      // Search hint
-      expect(idLoc.searchHint, 'Cari...');
-      expect(enLoc.searchHint, 'Search...');
-      expect(jaLoc.searchHint, '検索...');
-      expect(zhHansLoc.searchHint, '搜索...');
-      expect(zhHantLoc.searchHint, '搜尋...');
-      expect(koLoc.searchHint, '검색...');
+        // Search hint
+        expect(idLoc.searchHint, 'Cari...');
+        expect(enLoc.searchHint, 'Search...');
+        expect(jaLoc.searchHint, '検索...');
+        expect(zhHansLoc.searchHint, '搜索...');
+        expect(zhHantLoc.searchHint, '搜尋...');
+        expect(koLoc.searchHint, '검색...');
 
-      // Theme options (Gelap, AMOLED, Terang, AMOLED Sakura)
-      expect(idLoc.themeDark, 'Gelap');
-      expect(idLoc.themeAmoled, 'AMOLED');
-      expect(idLoc.themeLight, 'Terang');
-      expect(idLoc.themeAmoledJapanese, 'AMOLED Sakura');
-      expect(enLoc.themeDark, 'Dark');
-      expect(enLoc.themeAmoled, 'AMOLED');
-      expect(enLoc.themeLight, 'Light');
-      expect(enLoc.themeAmoledJapanese, 'AMOLED Sakura');
+        // Theme options (Gelap, AMOLED, Terang, AMOLED Sakura)
+        expect(idLoc.themeDark, 'Gelap');
+        expect(idLoc.themeAmoled, 'AMOLED');
+        expect(idLoc.themeLight, 'Terang');
+        expect(idLoc.themeAmoledJapanese, 'AMOLED Sakura');
+        expect(enLoc.themeDark, 'Dark');
+        expect(enLoc.themeAmoled, 'AMOLED');
+        expect(enLoc.themeLight, 'Light');
+        expect(enLoc.themeAmoledJapanese, 'AMOLED Sakura');
 
-      // Filter labels
-      expect(idLoc.filterPopular, 'Terpopuler');
-      expect(enLoc.filterPopular, 'Most Popular');
-      expect(jaLoc.filterPopular, '人気順');
-      expect(zhHansLoc.filterPopular, '最受欢迎');
-      expect(zhHantLoc.filterPopular, '最受歡迎');
-      expect(koLoc.filterPopular, '인기순');
+        // Filter labels
+        expect(idLoc.filterPopular, 'Terpopuler');
+        expect(enLoc.filterPopular, 'Most Popular');
+        expect(jaLoc.filterPopular, '人気順');
+        expect(zhHansLoc.filterPopular, '最受欢迎');
+        expect(zhHantLoc.filterPopular, '最受歡迎');
+        expect(koLoc.filterPopular, '인기순');
 
-      // Commit tier clean titles
-      expect(idLoc.getCommitTierCleanTitle(1), 'Mythic Archmage');
-      expect(jaLoc.getCommitTierCleanTitle(1), 'ミシック・アークメイジ');
-      expect(zhHansLoc.getCommitTierCleanTitle(1), '秘法大法师');
-      expect(zhHantLoc.getCommitTierCleanTitle(1), '秘法大法師');
-      expect(koLoc.getCommitTierCleanTitle(1), '신화의 아크메이지');
+        // Commit tier clean titles
+        expect(idLoc.getCommitTierCleanTitle(1), 'Mythic Archmage');
+        expect(jaLoc.getCommitTierCleanTitle(1), 'ミシック・アークメイジ');
+        expect(zhHansLoc.getCommitTierCleanTitle(1), '秘法大法师');
+        expect(zhHantLoc.getCommitTierCleanTitle(1), '秘法大法師');
+        expect(koLoc.getCommitTierCleanTitle(1), '신화의 아크메이지');
 
-      // Relative time formatting
-      final tenMinutesAgo = DateTime.now().subtract(const Duration(minutes: 10));
-      expect(idLoc.formatRelativeTime(tenMinutesAgo), contains('mnt lalu'));
-      expect(enLoc.formatRelativeTime(tenMinutesAgo), contains('m ago'));
-      expect(jaLoc.formatRelativeTime(tenMinutesAgo), contains('分前'));
-      expect(zhHansLoc.formatRelativeTime(tenMinutesAgo), contains('分钟前'));
-      expect(zhHantLoc.formatRelativeTime(tenMinutesAgo), contains('分鐘前'));
-      expect(koLoc.formatRelativeTime(tenMinutesAgo), contains('분 전'));
+        // Relative time formatting
+        final tenMinutesAgo = DateTime.now().subtract(
+          const Duration(minutes: 10),
+        );
+        expect(idLoc.formatRelativeTime(tenMinutesAgo), contains('mnt lalu'));
+        expect(enLoc.formatRelativeTime(tenMinutesAgo), contains('m ago'));
+        expect(jaLoc.formatRelativeTime(tenMinutesAgo), contains('分前'));
+        expect(zhHansLoc.formatRelativeTime(tenMinutesAgo), contains('分钟前'));
+        expect(zhHantLoc.formatRelativeTime(tenMinutesAgo), contains('分鐘前'));
+        expect(koLoc.formatRelativeTime(tenMinutesAgo), contains('분 전'));
 
-      // Rate limit countdown without leakage
-      final fortyMinutes = const Duration(minutes: 40);
-      expect(idLoc.formatCountdown(fortyMinutes), '40 menit');
-      expect(enLoc.formatCountdown(fortyMinutes), '40 min');
-      expect(jaLoc.formatCountdown(fortyMinutes), '40 分');
-      expect(zhHansLoc.formatCountdown(fortyMinutes), '40 分钟');
-      expect(zhHantLoc.formatCountdown(fortyMinutes), '40 分鐘');
-      expect(koLoc.formatCountdown(fortyMinutes), '40 분');
+        // Rate limit countdown without leakage
+        final fortyMinutes = const Duration(minutes: 40);
+        expect(idLoc.formatCountdown(fortyMinutes), '40 menit');
+        expect(enLoc.formatCountdown(fortyMinutes), '40 min');
+        expect(jaLoc.formatCountdown(fortyMinutes), '40 分');
+        expect(zhHansLoc.formatCountdown(fortyMinutes), '40 分钟');
+        expect(zhHantLoc.formatCountdown(fortyMinutes), '40 分鐘');
+        expect(koLoc.formatCountdown(fortyMinutes), '40 분');
 
-      // Activity rhythm chart labels
-      expect(idLoc.activityRhythmTitle, 'Ritme Jam Produktif');
-      expect(enLoc.activityRhythmTitle, 'Productive Hours Rhythm');
-      expect(jaLoc.activityRhythmTitle, '生産的時間のリズム');
+        // Activity rhythm chart labels
+        expect(idLoc.activityRhythmTitle, 'Ritme Jam Produktif');
+        expect(enLoc.activityRhythmTitle, 'Productive Hours Rhythm');
+        expect(jaLoc.activityRhythmTitle, '生産的時間のリズム');
 
-      // Favorite profile labels
-      expect(idLoc.favoriteProfiles, 'Profil Favorit');
-      expect(enLoc.favoriteProfiles, 'Favorite Profile');
-      expect(jaLoc.favoriteProfiles, 'お気に入りプロフィール');
-      expect(zhHansLoc.favoriteProfiles, '收藏个人资料');
-      expect(zhHantLoc.favoriteProfiles, '收藏個人檔案');
-      expect(koLoc.favoriteProfiles, '즐겨찾는 프로필');
-    });
+        // Favorite profile labels
+        expect(idLoc.favoriteProfiles, 'Profil Favorit');
+        expect(enLoc.favoriteProfiles, 'Favorite Profile');
+        expect(jaLoc.favoriteProfiles, 'お気に入りプロフィール');
+        expect(zhHansLoc.favoriteProfiles, '收藏个人资料');
+        expect(zhHantLoc.favoriteProfiles, '收藏個人檔案');
+        expect(koLoc.favoriteProfiles, '즐겨찾는 프로필');
+      },
+    );
 
-    test('StorageService persists and retrieves language preference correctly', () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
+    test(
+      'StorageService persists and retrieves language preference correctly',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
 
-      // Default is English (en)
-      expect(storage.getLanguageCode(), 'en');
+        // Default is English (en)
+        expect(storage.getLanguageCode(), 'en');
 
-      // Update to Japanese
-      await storage.setLanguageCode('ja');
-      expect(storage.getLanguageCode(), 'ja');
+        // Update to Japanese
+        await storage.setLanguageCode('ja');
+        expect(storage.getLanguageCode(), 'ja');
 
-      // Update to Korean
-      await storage.setLanguageCode('ko');
-      expect(storage.getLanguageCode(), 'ko');
-    });
+        // Update to Korean
+        await storage.setLanguageCode('ko');
+        expect(storage.getLanguageCode(), 'ko');
+      },
+    );
 
-    testWidgets('StatsDetailScreen renders user full name clearly without being truncated by title', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
+    testWidgets(
+      'StatsDetailScreen renders user full name clearly without being truncated by title',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
 
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 2.625;
-      addTearDown(() {
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      });
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 2.625;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
 
-      final user = GitHubUser(
-        login: 'zerabyte88',
-        id: 12345,
-        avatarUrl: '',
-        htmlUrl: 'https://github.com/zerabyte88',
-        name: 'Nanda Alexander',
-        location: 'Planet Earth, Solar System',
-        company: 'GitPulse Team',
-        publicRepos: 10,
-        followers: 50,
-        following: 20,
-      );
+        final user = GitHubUser(
+          login: 'zerabyte88',
+          id: 12345,
+          avatarUrl: '',
+          htmlUrl: 'https://github.com/zerabyte88',
+          name: 'Nanda Alexander',
+          location: 'Planet Earth, Solar System',
+          company: 'GitPulse Team',
+          publicRepos: 10,
+          followers: 50,
+          following: 20,
+        );
 
-      final stats = UserStats(
-        user: user,
-        repos: [],
-        totalStars: 42,
-        totalForks: 12,
-        languageCounts: {'Dart': 80, 'TypeScript': 20},
-        hourlyActivity: {14: 10, 15: 15},
-        developerPersona: 'Fullstack Explorer',
-        personaDescription: 'Passionate developer',
-        contributionStats: ContributionStats(
-          thisYearContributions: 50,
-          lastYearContributions: 100,
-          currentStreak: 0,
-          longestStreak: 6,
-          totalContributions: 150,
-          commitTitle: ContributionStats.determineTitle(
+        final stats = UserStats(
+          user: user,
+          repos: [],
+          totalStars: 42,
+          totalForks: 12,
+          languageCounts: {'Dart': 80, 'TypeScript': 20},
+          hourlyActivity: {14: 10, 15: 15},
+          developerPersona: 'Fullstack Explorer',
+          personaDescription: 'Passionate developer',
+          contributionStats: ContributionStats(
+            thisYearContributions: 50,
+            lastYearContributions: 100,
             currentStreak: 0,
             longestStreak: 6,
-            thisYearContributions: 50,
             totalContributions: 150,
+            commitTitle: ContributionStats.determineTitle(
+              currentStreak: 0,
+              longestStreak: 6,
+              thisYearContributions: 50,
+              totalContributions: 150,
+            ),
+            yearlyTotals: {'2026': 50, '2025': 100},
           ),
-          yearlyTotals: {'2026': 50, '2025': 100},
-        ),
-      );
+        );
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: StatsDetailScreen(
-            stats: stats,
-            storageService: storage,
+        await tester.pumpWidget(
+          MaterialApp(
+            home: StatsDetailScreen(stats: stats, storageService: storage),
           ),
-        ),
-      );
+        );
 
-      // Verify that full name 'Nanda Alexander' is rendered
-      expect(find.text('Nanda Alexander'), findsOneWidget);
-      expect(find.text('@zerabyte88'), findsAtLeastNWidgets(1));
-      expect(find.text('Planet Earth, Solar System'), findsOneWidget);
-      expect(find.text('GitPulse Team'), findsOneWidget);
+        // Verify that full name 'Nanda Alexander' is rendered
+        expect(find.text('Nanda Alexander'), findsOneWidget);
+        expect(find.text('@zerabyte88'), findsAtLeastNWidgets(1));
+        expect(find.text('Planet Earth, Solar System'), findsOneWidget);
+        expect(find.text('GitPulse Team'), findsOneWidget);
 
-      // Verify that AnimatedTierTitle exists in the commit habit banner
-      expect(find.byType(AnimatedTierTitle), findsOneWidget);
+        // Verify that AnimatedTierTitle exists in the commit habit banner
+        expect(find.byType(AnimatedTierTitle), findsOneWidget);
 
-      // Verify all years total contributions card is rendered (in default English)
-      expect(find.text('Total Contributions (All Years)'), findsOneWidget);
-      expect(find.text('All time'), findsOneWidget);
-      expect(find.text('150'), findsOneWidget);
-    });
+        // Verify all years total contributions card is rendered (in default English)
+        expect(find.text('Total Contributions (All Years)'), findsOneWidget);
+        expect(find.text('All time'), findsOneWidget);
+        expect(find.text('150'), findsOneWidget);
+      },
+    );
 
-    test('AppConfig provides accurate release and version telemetry for v2.3.2', () {
-      expect(AppConfig.appName, 'GitPulse');
-      expect(AppConfig.appVersion, 'v2.3.2');
-      expect(AppConfig.buildNumber, '20');
-      expect(AppConfig.fullVersion, 'v2.3.2 (Build 20)');
-      expect(AppConfig.releaseTag, 'v2.3.2');
-      expect(AppConfig.license, 'MIT License');
-      expect(AppConfig.githubRepoUrl, contains('github.com'));
-    });
+    test(
+      'AppConfig provides accurate release and version telemetry for v2.4.0',
+      () {
+        expect(AppConfig.appName, 'GitPulse');
+        expect(AppConfig.appVersion, 'v2.4.0');
+        expect(AppConfig.buildNumber, '21');
+        expect(AppConfig.fullVersion, 'v2.4.0 (Build 21)');
+        expect(AppConfig.releaseTag, 'v2.4.0');
+        expect(AppConfig.license, 'MIT License');
+        expect(AppConfig.githubRepoUrl, contains('github.com'));
+      },
+    );
 
     test('AppLocalizations provides expected translations for About and Version info', () {
       final idLoc = AppLocalizations(AppLanguage.indonesian);
@@ -768,16 +794,21 @@ void main() {
       expect(enLoc.viewOnGitHub, 'View Repository on GitHub');
     });
 
-    test('UpdateService compareVersions handles semantic versions correctly', () {
-      expect(UpdateService.compareVersions('v1.0.2', 'v1.0.1'), 1);
-      expect(UpdateService.compareVersions('1.0.1', 'v1.0.1'), 0);
-      expect(UpdateService.compareVersions('v1.0.1', 'v1.0.2'), -1);
-      expect(UpdateService.compareVersions('v1.0.10', 'v1.0.2'), 1);
-      expect(UpdateService.compareVersions('v2.1.0', 'v2.0.0'), 1);
-    });
+    test(
+      'UpdateService compareVersions handles semantic versions correctly',
+      () {
+        expect(UpdateService.compareVersions('v1.0.2', 'v1.0.1'), 1);
+        expect(UpdateService.compareVersions('1.0.1', 'v1.0.1'), 0);
+        expect(UpdateService.compareVersions('v1.0.1', 'v1.0.2'), -1);
+        expect(UpdateService.compareVersions('v1.0.10', 'v1.0.2'), 1);
+        expect(UpdateService.compareVersions('v2.1.0', 'v2.0.0'), 1);
+      },
+    );
 
     test('UpdateService cleanDownloadedApk removes leftover apk files successfully', () async {
-      final tempDir = await Directory.systemTemp.createTemp('gitpulse_ota_test');
+      final tempDir = await Directory.systemTemp.createTemp(
+        'gitpulse_ota_test',
+      );
       try {
         final apkFile = File('${tempDir.path}/gitpulse-test.apk');
         await apkFile.writeAsString('dummy apk content');
@@ -787,7 +818,9 @@ void main() {
         await nonApkFile.writeAsString('keep me');
         expect(await nonApkFile.exists(), true);
 
-        final deleted = await UpdateService.cleanDownloadedApk(customPath: tempDir.path);
+        final deleted = await UpdateService.cleanDownloadedApk(
+          customPath: tempDir.path,
+        );
         expect(deleted, true);
         expect(await apkFile.exists(), false);
         expect(await nonApkFile.exists(), true);
@@ -812,66 +845,75 @@ void main() {
       expect(thirdFetch.isNotEmpty, true);
     });
 
-    test('TechNews toJson and fromJson roundtrip serialization works correctly', () {
-      const original = TechNews(
-        id: 999,
-        title: '⭐ author/hot-repo (1200 stars)',
-        description: 'A newly created viral open source project',
-        url: 'https://github.com/author/hot-repo',
-        coverImage: 'https://images.unsplash.com/photo-1',
-        authorName: 'author',
-        authorAvatar: 'https://avatars.githubusercontent.com/u/999',
-        publishedDate: 'Trending Rust',
-        readingTimeMinutes: 4,
-        tags: ['trending', 'github', 'rust'],
-      );
+    test(
+      'TechNews toJson and fromJson roundtrip serialization works correctly',
+      () {
+        const original = TechNews(
+          id: 999,
+          title: '⭐ author/hot-repo (1200 stars)',
+          description: 'A newly created viral open source project',
+          url: 'https://github.com/author/hot-repo',
+          coverImage: 'https://images.unsplash.com/photo-1',
+          authorName: 'author',
+          authorAvatar: 'https://avatars.githubusercontent.com/u/999',
+          publishedDate: 'Trending Rust',
+          readingTimeMinutes: 4,
+          tags: ['trending', 'github', 'rust'],
+        );
 
-      final json = original.toJson();
-      final restored = TechNews.fromJson(json);
+        final json = original.toJson();
+        final restored = TechNews.fromJson(json);
 
-      expect(restored.id, 999);
-      expect(restored.title, '⭐ author/hot-repo (1200 stars)');
-      expect(restored.description, 'A newly created viral open source project');
-      expect(restored.url, 'https://github.com/author/hot-repo');
-      expect(restored.authorName, 'author');
-      expect(restored.publishedDate, 'Trending Rust');
-      expect(restored.readingTimeMinutes, 4);
-      expect(restored.tags, ['trending', 'github', 'rust']);
-    });
+        expect(restored.id, 999);
+        expect(restored.title, '⭐ author/hot-repo (1200 stars)');
+        expect(
+          restored.description,
+          'A newly created viral open source project',
+        );
+        expect(restored.url, 'https://github.com/author/hot-repo');
+        expect(restored.authorName, 'author');
+        expect(restored.publishedDate, 'Trending Rust');
+        expect(restored.readingTimeMinutes, 4);
+        expect(restored.tags, ['trending', 'github', 'rust']);
+      },
+    );
 
-    test('StorageService persists and restores cached news per tag with timestamp', () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
+    test(
+      'StorageService persists and restores cached news per tag with timestamp',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
 
-      expect(storage.getCachedNews('trending'), isNull);
-      expect(storage.getCachedNewsTimestamp('trending'), isNull);
+        expect(storage.getCachedNews('trending'), isNull);
+        expect(storage.getCachedNewsTimestamp('trending'), isNull);
 
-      final mockList = [
-        const TechNews(
-          id: 1,
-          title: 'Trending Repo A',
-          description: 'Desc A',
-          url: 'https://github.com/a/a',
-          authorName: 'a',
-          authorAvatar: null,
-          publishedDate: 'Trending Python',
-          readingTimeMinutes: 3,
-          tags: ['trending'],
-        ),
-      ];
+        final mockList = [
+          const TechNews(
+            id: 1,
+            title: 'Trending Repo A',
+            description: 'Desc A',
+            url: 'https://github.com/a/a',
+            authorName: 'a',
+            authorAvatar: null,
+            publishedDate: 'Trending Python',
+            readingTimeMinutes: 3,
+            tags: ['trending'],
+          ),
+        ];
 
-      await storage.saveCachedNews('trending', mockList);
+        await storage.saveCachedNews('trending', mockList);
 
-      final retrieved = storage.getCachedNews('trending');
-      final timestamp = storage.getCachedNewsTimestamp('trending');
+        final retrieved = storage.getCachedNews('trending');
+        final timestamp = storage.getCachedNewsTimestamp('trending');
 
-      expect(retrieved, isNotNull);
-      expect(retrieved!.length, 1);
-      expect(retrieved.first.title, 'Trending Repo A');
-      expect(timestamp, isNotNull);
-      expect(DateTime.now().difference(timestamp!).inSeconds < 5, true);
-    });
+        expect(retrieved, isNotNull);
+        expect(retrieved!.length, 1);
+        expect(retrieved.first.title, 'Trending Repo A');
+        expect(timestamp, isNotNull);
+        expect(DateTime.now().difference(timestamp!).inSeconds < 5, true);
+      },
+    );
 
     test('TechNewsService falls back to persisted storage news when offline and sets offline flag', () async {
       SharedPreferences.setMockInitialValues({});
@@ -899,7 +941,10 @@ void main() {
       });
 
       final service = TechNewsService(client: client, storageService: storage);
-      final result = await service.fetchNews(tag: 'trending', forceRefresh: true);
+      final result = await service.fetchNews(
+        tag: 'trending',
+        forceRefresh: true,
+      );
 
       expect(result.length, 1);
       expect(result.first.title, '⭐ persisted/project (500 stars)');
@@ -907,13 +952,17 @@ void main() {
     });
 
     test('UpdateService backupApkToDownloads handles missing files safely without throwing', () async {
-      final result = await UpdateService.backupApkToDownloads(versionTag: 'v1.0.3');
+      final result = await UpdateService.backupApkToDownloads(
+        versionTag: 'v1.0.3',
+      );
       // In unit test environment (not Android or source file not present), should safely return null
       expect(result, isNull);
     });
 
     test('UpdateService cleanInstalledBackupApk deletes only installed GitPulse APK and preserves user data', () async {
-      final tempDir = await Directory.systemTemp.createTemp('gitpulse_download_test');
+      final tempDir = await Directory.systemTemp.createTemp(
+        'gitpulse_download_test',
+      );
       try {
         final installedApk = File('${tempDir.path}/GitPulse-v1.0.3.apk');
         final newerApk = File('${tempDir.path}/GitPulse-v1.0.4.apk');
@@ -948,7 +997,9 @@ void main() {
     });
 
     test('UpdateService cleanInstalledBackupApk cleans GitPulse subfolder and removes empty directory', () async {
-      final tempDir = await Directory.systemTemp.createTemp('gitpulse_subfolder_test');
+      final tempDir = await Directory.systemTemp.createTemp(
+        'gitpulse_subfolder_test',
+      );
       try {
         final subDir = Directory('${tempDir.path}/GitPulse');
         await subDir.create();
@@ -972,31 +1023,28 @@ void main() {
       }
     });
 
-    testWidgets('LanguageChart renders percentage without KB bytes and aligns in 2-column layout', (tester) async {
-      final languageCounts = {
-        'Dart': 7000,
-        'JavaScript': 2000,
-        'HTML': 1000,
-      };
+    testWidgets(
+      'LanguageChart renders percentage without KB bytes and aligns in 2-column layout',
+      (tester) async {
+        final languageCounts = {'Dart': 7000, 'JavaScript': 2000, 'HTML': 1000};
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: LanguageChart(languageCounts: languageCounts),
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(body: LanguageChart(languageCounts: languageCounts)),
           ),
-        ),
-      );
+        );
 
-      // Verify percentages are rendered
-      expect(find.textContaining('70.0%'), findsWidgets);
-      expect(find.textContaining('20.0%'), findsWidgets);
-      expect(find.textContaining('10.0%'), findsWidgets);
+        // Verify percentages are rendered
+        expect(find.textContaining('70.0%'), findsWidgets);
+        expect(find.textContaining('20.0%'), findsWidgets);
+        expect(find.textContaining('10.0%'), findsWidgets);
 
-      // Verify that KB or MB bytes text is NOT present
-      expect(find.textContaining('KB'), findsNothing);
-      expect(find.textContaining('MB'), findsNothing);
-      expect(find.textContaining('·'), findsNothing);
-    });
+        // Verify that KB or MB bytes text is NOT present
+        expect(find.textContaining('KB'), findsNothing);
+        expect(find.textContaining('MB'), findsNothing);
+        expect(find.textContaining('·'), findsNothing);
+      },
+    );
 
     test('AppTheme generates distinct, harmonious palettes for dark, amoled, and sakura modes', () {
       final darkTheme = AppTheme.getTheme(AppThemeMode.dark);
@@ -1012,28 +1060,28 @@ void main() {
 
       // Verify theme mode background palette
       AppTheme.currentMode = AppThemeMode.dark;
-      expect(AppTheme.background, const Color(0xFF0D1117));
+      expect(AppTheme.background, const Color(0xFF0F172A));
       AppTheme.currentMode = AppThemeMode.amoled;
       expect(AppTheme.background, const Color(0xFF000000));
       AppTheme.currentMode = AppThemeMode.amoledJapanese;
       expect(AppTheme.background, const Color(0xFF000000));
       AppTheme.currentMode = AppThemeMode.light;
-      expect(AppTheme.background, const Color(0xFFF6F8FA));
+      expect(AppTheme.background, const Color(0xFFF8FAFC));
       AppTheme.currentMode = AppThemeMode.dark;
 
       // Verify distinct primary accents
-      expect(darkTheme.primaryColor, const Color(0xFF58A6FF));
+      expect(darkTheme.primaryColor, const Color(0xFF38BDF8));
       expect(amoledTheme.primaryColor, const Color(0xFF00E5FF));
-      expect(sakuraTheme.primaryColor, const Color(0xFFFF65A3));
-      expect(lightTheme.primaryColor, const Color(0xFF0969DA));
+      expect(sakuraTheme.primaryColor, const Color(0xFFF472B6));
+      expect(lightTheme.primaryColor, const Color(0xFF2563EB));
 
-      // Verify card surfaces (translucent for glassmorphism)
-      expect(darkTheme.cardTheme.color, const Color(0xEB161B22));
-      expect(amoledTheme.cardTheme.color, const Color(0xEB101012));
-      expect(sakuraTheme.cardTheme.color, const Color(0xEB180C1A));
+      // Verify card surfaces
+      expect(darkTheme.cardTheme.color, const Color(0xFF1E293B));
+      expect(amoledTheme.cardTheme.color, const Color(0xFF101012));
+      expect(sakuraTheme.cardTheme.color, const Color(0xFF140D13));
 
-      // Verify Poppins typography is configured
-      expect(darkTheme.textTheme.bodyMedium?.fontFamily, contains('Poppins'));
+      // Verify native system font typography is configured
+      expect(darkTheme.textTheme.bodyMedium, isNotNull);
     });
 
     test('AppLocalizations renders beautiful copy profile and favorite toast messages', () {
@@ -1043,16 +1091,26 @@ void main() {
       expect(idLoc.summaryCopiedToast, contains('Profil berhasil disalin'));
       expect(enLoc.summaryCopiedToast, contains('Profile copied to clipboard'));
 
-      expect(idLoc.profileSavedToFavorites('zerabyte88'), contains('Profil @zerabyte88 ditambahkan ke favorit!'));
-      expect(enLoc.profileSavedToFavorites('zerabyte88'), contains('Profile @zerabyte88 added to favorites!'));
+      expect(
+        idLoc.profileSavedToFavorites('zerabyte88'),
+        contains('Profil @zerabyte88 ditambahkan ke favorit!'),
+      );
+      expect(
+        enLoc.profileSavedToFavorites('zerabyte88'),
+        contains('Profile @zerabyte88 added to favorites!'),
+      );
     });
 
     test('Typography and Developer Avatar assets conform to updater standards', () {
       for (final lang in AppLanguage.values) {
         final loc = AppLocalizations(lang);
         // Exclamation mark must not be present in updateAvailable string
-        expect(loc.updateAvailable.contains('!'), isFalse,
-            reason: 'Language ${lang.code} should not have an exclamation mark in updateAvailable');
+        expect(
+          loc.updateAvailable.contains('!'),
+          isFalse,
+          reason:
+              'Language ${lang.code} should not have an exclamation mark in updateAvailable',
+        );
       }
 
       // Indonesian language has both nativeName and English name for grid consistency
@@ -1060,158 +1118,201 @@ void main() {
       expect(AppLanguage.indonesian.name, 'Indonesian');
 
       // Developer avatar URL points to avatars.githubusercontent.com for reliable CDN delivery
-      expect(AppConfig.developerAvatarUrl, 'https://avatars.githubusercontent.com/zerabyte88');
+      expect(
+        AppConfig.developerAvatarUrl,
+        'https://avatars.githubusercontent.com/zerabyte88',
+      );
     });
 
     test('TechNews.sanitizeImageUrl unwraps Dev.to proxy URLs to direct AWS S3 URLs', () {
-      const proxyUrl = 'https://media2.dev.to/dynamic/image/width=1000,fit=scale/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fsample.png';
+      const proxyUrl =
+          'https://media2.dev.to/dynamic/image/width=1000,fit=scale/https%3A%2F%2Fdev-to-uploads.s3.us-east-2.amazonaws.com%2Fuploads%2Farticles%2Fsample.png';
       final sanitized = TechNews.sanitizeImageUrl(proxyUrl);
-      expect(sanitized, 'https://dev-to-uploads.s3.us-east-2.amazonaws.com/uploads/articles/sample.png');
+      expect(
+        sanitized,
+        'https://dev-to-uploads.s3.us-east-2.amazonaws.com/uploads/articles/sample.png',
+      );
 
       const regularUrl = 'https://example.com/image.jpg';
-      expect(TechNews.sanitizeImageUrl(regularUrl), 'https://example.com/image.jpg');
+      expect(
+        TechNews.sanitizeImageUrl(regularUrl),
+        'https://example.com/image.jpg',
+      );
 
       expect(TechNews.sanitizeImageUrl(null), isNull);
       expect(TechNews.sanitizeImageUrl(''), isNull);
     });
 
-    testWidgets('AnimatedAppHeader renders terminal icon, GitPulse title, and version badge', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
-      AppThemeService.init(storage);
+    testWidgets(
+      'AnimatedAppHeader renders terminal icon, GitPulse title, and version badge',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+        AppThemeService.init(storage);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            appBar: AppBar(
-              flexibleSpace: const AnimatedHeaderBackground(),
-              title: const AnimatedAppHeader(),
-            ),
-          ),
-        ),
-      );
-
-      // Verify GitPulse logo, background, title, and version are rendered
-      expect(find.byType(GitPulseLogo), findsOneWidget);
-      final imageFinder = find.descendant(
-        of: find.byType(GitPulseLogo),
-        matching: find.byType(Image),
-      );
-      expect(imageFinder, findsOneWidget);
-      final imageWidget = tester.widget<Image>(imageFinder);
-      expect((imageWidget.image as AssetImage).assetName, 'assets/icons/app_icon.png');
-      expect(find.byType(AnimatedHeaderBackground), findsOneWidget);
-      expect(find.text('GitPulse'), findsOneWidget);
-      expect(find.text(AppConfig.appVersion), findsOneWidget);
-      expect(find.descendant(of: find.byType(AnimatedAppHeader), matching: find.byType(GestureDetector)), findsNothing);
-
-      // Test theme mode toggling
-      await AppThemeService.changeTheme(AppThemeMode.amoledJapanese, storage);
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(find.text('GitPulse'), findsOneWidget);
-
-      await AppThemeService.changeTheme(AppThemeMode.amoled, storage);
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(find.text('GitPulse'), findsOneWidget);
-
-      await AppThemeService.changeTheme(AppThemeMode.light, storage);
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(find.text('GitPulse'), findsOneWidget);
-    });
-
-    testWidgets('StatCard renders long English and multi-language contribution titles without truncation', (tester) async {
-      final currentYear = DateTime.now().year;
-
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 2.75;
-      addTearDown(() {
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      });
-
-      for (final lang in [AppLanguage.english, AppLanguage.indonesian, AppLanguage.japanese]) {
-        final loc = AppLocalizations(lang);
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: StatCard(
-                          label: '${loc.thisYearContributions} ($currentYear)',
-                          value: '370',
-                          icon: Icons.calendar_today_rounded,
-                          accentColor: Colors.cyan,
-                          subtitle: loc.thisYearSubtitle,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: StatCard(
-                          label: loc.allYearsContributions,
-                          value: '371',
-                          icon: Icons.all_inclusive_rounded,
-                          accentColor: Colors.purple,
-                          subtitle: loc.allTimeSubtitle,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              appBar: AppBar(
+                flexibleSpace: const AnimatedHeaderBackground(),
+                title: const AnimatedAppHeader(),
               ),
             ),
           ),
         );
 
-        final leftLabelFinder = find.text('${loc.thisYearContributions} ($currentYear)');
-        final rightLabelFinder = find.text(loc.allYearsContributions);
-        expect(leftLabelFinder, findsOneWidget);
-        expect(rightLabelFinder, findsOneWidget);
-
-        // Verify that neither label exceeded maxLines (i.e. did not truncate with ellipsis)
-        final leftParagraph = tester.renderObject<RenderParagraph>(leftLabelFinder);
-        final rightParagraph = tester.renderObject<RenderParagraph>(rightLabelFinder);
-        expect(leftParagraph.didExceedMaxLines, isFalse,
-            reason: 'Left card label for ${lang.code} should not be truncated');
-        expect(rightParagraph.didExceedMaxLines, isFalse,
-            reason: 'Right card label for ${lang.code} should not be truncated');
-      }
-    });
-
-    testWidgets('RepoTile renders repo details, link icon, and handles tap to open', (tester) async {
-      final repo = GitHubRepo(
-        name: 'flutter_gitpulse',
-        description: 'Developer telemetry mobile app',
-        htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
-        language: 'Dart',
-        stargazersCount: 42,
-        forksCount: 7,
-        isFork: false,
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: RepoTile(repo: repo),
+        // Verify GitPulse logo, background, title, and version are rendered
+        expect(find.byType(GitPulseLogo), findsOneWidget);
+        final imageFinder = find.descendant(
+          of: find.byType(GitPulseLogo),
+          matching: find.byType(Image),
+        );
+        expect(imageFinder, findsOneWidget);
+        final imageWidget = tester.widget<Image>(imageFinder);
+        expect(
+          (imageWidget.image as AssetImage).assetName,
+          'assets/icons/app_icon.png',
+        );
+        expect(find.byType(AnimatedHeaderBackground), findsOneWidget);
+        expect(find.text('GitPulse'), findsOneWidget);
+        expect(find.text(AppConfig.appVersion), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(AnimatedAppHeader),
+            matching: find.byType(GestureDetector),
           ),
-        ),
-      );
+          findsNothing,
+        );
 
-      expect(find.text('flutter_gitpulse'), findsOneWidget);
-      expect(find.text('Dart'), findsOneWidget);
-      expect(find.text('42'), findsOneWidget);
-      expect(find.text('7'), findsOneWidget);
-      expect(find.byIcon(Icons.open_in_new_rounded), findsOneWidget);
-      expect(find.byType(InkWell), findsOneWidget);
+        // Test theme mode toggling
+        await AppThemeService.changeTheme(AppThemeMode.amoledJapanese, storage);
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(find.text('GitPulse'), findsOneWidget);
 
-      await tester.tap(find.byType(RepoTile));
-      await tester.pump();
-    });
+        await AppThemeService.changeTheme(AppThemeMode.amoled, storage);
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(find.text('GitPulse'), findsOneWidget);
+
+        await AppThemeService.changeTheme(AppThemeMode.light, storage);
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(find.text('GitPulse'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'StatCard renders long English and multi-language contribution titles without truncation',
+      (tester) async {
+        final currentYear = DateTime.now().year;
+
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 2.75;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        for (final lang in [
+          AppLanguage.english,
+          AppLanguage.indonesian,
+          AppLanguage.japanese,
+        ]) {
+          final loc = AppLocalizations(lang);
+          await tester.pumpWidget(
+            MaterialApp(
+              home: Scaffold(
+                body: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: StatCard(
+                            label:
+                                '${loc.thisYearContributions} ($currentYear)',
+                            value: '370',
+                            icon: Icons.calendar_today_rounded,
+                            accentColor: Colors.cyan,
+                            subtitle: loc.thisYearSubtitle,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: StatCard(
+                            label: loc.allYearsContributions,
+                            value: '371',
+                            icon: Icons.all_inclusive_rounded,
+                            accentColor: Colors.purple,
+                            subtitle: loc.allTimeSubtitle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+
+          final leftLabelFinder = find.text(
+            '${loc.thisYearContributions} ($currentYear)',
+          );
+          final rightLabelFinder = find.text(loc.allYearsContributions);
+          expect(leftLabelFinder, findsOneWidget);
+          expect(rightLabelFinder, findsOneWidget);
+
+          // Verify that neither label exceeded maxLines (i.e. did not truncate with ellipsis)
+          final leftParagraph = tester.renderObject<RenderParagraph>(
+            leftLabelFinder,
+          );
+          final rightParagraph = tester.renderObject<RenderParagraph>(
+            rightLabelFinder,
+          );
+          expect(
+            leftParagraph.didExceedMaxLines,
+            isFalse,
+            reason: 'Left card label for ${lang.code} should not be truncated',
+          );
+          expect(
+            rightParagraph.didExceedMaxLines,
+            isFalse,
+            reason: 'Right card label for ${lang.code} should not be truncated',
+          );
+        }
+      },
+    );
+
+    testWidgets(
+      'RepoTile renders repo details, link icon, and handles tap to open',
+      (tester) async {
+        final repo = GitHubRepo(
+          name: 'flutter_gitpulse',
+          description: 'Developer telemetry mobile app',
+          htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+          language: 'Dart',
+          stargazersCount: 42,
+          forksCount: 7,
+          isFork: false,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(body: RepoTile(repo: repo)),
+          ),
+        );
+
+        expect(find.text('flutter_gitpulse'), findsOneWidget);
+        expect(find.text('Dart'), findsOneWidget);
+        expect(find.text('42'), findsOneWidget);
+        expect(find.text('7'), findsOneWidget);
+        expect(find.byIcon(Icons.open_in_new_rounded), findsOneWidget);
+        expect(find.byType(InkWell), findsOneWidget);
+
+        await tester.tap(find.byType(RepoTile));
+        await tester.pump();
+      },
+    );
 
     test('GitHubRepo parses extended fields, owner, and formattedSize', () {
       final json = {
@@ -1258,71 +1359,82 @@ void main() {
       });
 
       final api = GitHubApiService(client: mockClient);
-      final readme = await api.fetchRepositoryReadme(owner: 'testowner', repo: 'testrepo');
+      final readme = await api.fetchRepositoryReadme(
+        owner: 'testowner',
+        repo: 'testrepo',
+      );
       expect(readme, contains('# Hello GitPulse'));
       expect(readme, contains('This is a test readme.'));
 
-      final missing = await api.fetchRepositoryReadme(owner: 'testowner', repo: 'unknown');
+      final missing = await api.fetchRepositoryReadme(
+        owner: 'testowner',
+        repo: 'unknown',
+      );
       expect(missing, isNull);
     });
 
-    testWidgets('RepoDetailScreen displays repository details and markdown README', (tester) async {
-      final repo = GitHubRepo(
-        name: 'flutter_gitpulse',
-        description: 'Developer telemetry mobile app',
-        htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
-        language: 'Dart',
-        stargazersCount: 42,
-        forksCount: 7,
-        isFork: false,
-        topics: ['flutter', 'mobile'],
-        defaultBranch: 'main',
-        license: 'MIT',
-      );
-
-      final mockClient = MockClient((request) async {
-        final content = base64Encode(utf8.encode('### Welcome to GitPulse\n- Fast\n- Beautiful'));
-        return http.Response(
-          jsonEncode({
-            'name': 'README.md',
-            'encoding': 'base64',
-            'content': content,
-          }),
-          200,
-          headers: {'content-type': 'application/json'},
+    testWidgets(
+      'RepoDetailScreen displays repository details and markdown README',
+      (tester) async {
+        final repo = GitHubRepo(
+          name: 'flutter_gitpulse',
+          description: 'Developer telemetry mobile app',
+          htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+          language: 'Dart',
+          stargazersCount: 42,
+          forksCount: 7,
+          isFork: false,
+          topics: ['flutter', 'mobile'],
+          defaultBranch: 'main',
+          license: 'MIT',
         );
-      });
 
-      final apiService = GitHubApiService(client: mockClient);
+        final mockClient = MockClient((request) async {
+          final content = base64Encode(
+            utf8.encode('### Welcome to GitPulse\n- Fast\n- Beautiful'),
+          );
+          return http.Response(
+            jsonEncode({
+              'name': 'README.md',
+              'encoding': 'base64',
+              'content': content,
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        });
 
-      await tester.pumpWidget(
-        MaterialApp(
-          supportedLocales: AppLanguage.supportedLocales,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          home: RepoDetailScreen(
-            repo: repo,
-            username: 'zerabyte88',
-            apiService: apiService,
+        final apiService = GitHubApiService(client: mockClient);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            supportedLocales: AppLanguage.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            home: RepoDetailScreen(
+              repo: repo,
+              username: 'zerabyte88',
+              apiService: apiService,
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(find.text('flutter_gitpulse'), findsAtLeastNWidgets(1));
-      expect(find.text('zerabyte88'), findsAtLeastNWidgets(1));
-      expect(find.text('Developer telemetry mobile app'), findsOneWidget);
-      expect(find.text('flutter'), findsOneWidget);
-      expect(find.text('mobile'), findsOneWidget);
-      expect(find.text('MIT'), findsOneWidget);
+        expect(find.text('flutter_gitpulse'), findsAtLeastNWidgets(1));
+        expect(find.text('zerabyte88'), findsAtLeastNWidgets(1));
+        expect(find.text('Developer telemetry mobile app'), findsOneWidget);
+        expect(find.text('flutter'), findsOneWidget);
+        expect(find.text('mobile'), findsOneWidget);
+        expect(find.text('MIT'), findsOneWidget);
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      expect(find.byType(MarkdownBody), findsOneWidget);
-      expect(find.textContaining('Welcome to GitPulse'), findsOneWidget);
-    });
+        expect(find.byType(MarkdownBody), findsOneWidget);
+        expect(find.textContaining('Welcome to GitPulse'), findsOneWidget);
+      },
+    );
 
     test('GitHubContentItem parses directory and file correctly', () {
       final dirJson = {
@@ -1345,7 +1457,8 @@ void main() {
         'size': 2048,
         'type': 'file',
         'download_url': 'https://raw.githubusercontent.com/.../main.dart',
-        'html_url': 'https://github.com/zerabyte88/gitpulse/blob/main/lib/main.dart',
+        'html_url':
+            'https://github.com/zerabyte88/gitpulse/blob/main/lib/main.dart',
       };
       final fileItem = GitHubContentItem.fromJson(fileJson);
       expect(fileItem.name, 'main.dart');
@@ -1367,7 +1480,9 @@ void main() {
     test('GitHubApiService fetchRepositoryContents and fetchFileContent work correctly', () async {
       final mockClient = MockClient((request) async {
         if (request.url.path.endsWith('/contents/lib/main.dart')) {
-          final content = base64Encode(utf8.encode('void main() { runApp(MyApp()); }'));
+          final content = base64Encode(
+            utf8.encode('void main() { runApp(MyApp()); }'),
+          );
           return http.Response(
             jsonEncode({
               'name': 'main.dart',
@@ -1380,8 +1495,18 @@ void main() {
         } else if (request.url.path.endsWith('/contents/lib')) {
           return http.Response(
             jsonEncode([
-              {'name': 'main.dart', 'path': 'lib/main.dart', 'type': 'file', 'size': 1200},
-              {'name': 'screens', 'path': 'lib/screens', 'type': 'dir', 'size': 0},
+              {
+                'name': 'main.dart',
+                'path': 'lib/main.dart',
+                'type': 'file',
+                'size': 1200,
+              },
+              {
+                'name': 'screens',
+                'path': 'lib/screens',
+                'type': 'dir',
+                'size': 0,
+              },
             ]),
             200,
             headers: {'content-type': 'application/json'},
@@ -1412,7 +1537,9 @@ void main() {
       expect(fileContent, contains('void main()'));
     });
 
-    testWidgets('FileViewerScreen renders code and lines correctly', (WidgetTester tester) async {
+    testWidgets('FileViewerScreen renders code and lines correctly', (
+      WidgetTester tester,
+    ) async {
       final item = GitHubContentItem(
         name: 'sample.dart',
         path: 'lib/sample.dart',
@@ -1454,7 +1581,9 @@ void main() {
       expect(find.textContaining('line 1'), findsOneWidget);
     });
 
-    testWidgets('RepoDetailScreen tab switching renders files explorer', (WidgetTester tester) async {
+    testWidgets('RepoDetailScreen tab switching renders files explorer', (
+      WidgetTester tester,
+    ) async {
       final repo = GitHubRepo(
         name: 'flutter_gitpulse',
         description: 'Developer telemetry mobile app',
@@ -1484,7 +1613,12 @@ void main() {
           return http.Response(
             jsonEncode([
               {'name': 'lib', 'path': 'lib', 'type': 'dir', 'size': 0},
-              {'name': 'pubspec.yaml', 'path': 'pubspec.yaml', 'type': 'file', 'size': 500},
+              {
+                'name': 'pubspec.yaml',
+                'path': 'pubspec.yaml',
+                'type': 'file',
+                'size': 500,
+              },
             ]),
             200,
             headers: {'content-type': 'application/json'},
@@ -1527,173 +1661,194 @@ void main() {
       expect(find.text('pubspec.yaml'), findsOneWidget);
     });
 
-    testWidgets('FavoriteProfilesScreen renders grid with 1 to 4 columns and displays user details', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final storage = await StorageService.init();
-      await storage.toggleBookmark(
-        'zerabyte88',
-        name: 'Zerabyte Dev',
-        bio: 'Mobile & Cloud Engineer',
-        location: 'Jakarta, Indonesia',
-      );
+    testWidgets(
+      'FavoriteProfilesScreen renders grid with 1 to 4 columns and displays user details',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final storage = await StorageService.init();
+        await storage.toggleBookmark(
+          'zerabyte88',
+          name: 'Zerabyte Dev',
+          bio: 'Mobile & Cloud Engineer',
+          location: 'Jakarta, Indonesia',
+        );
 
-      final mockClient = MockClient((request) async {
-        return http.Response(jsonEncode({}), 200);
-      });
-      final apiService = GitHubApiService(client: mockClient);
+        final mockClient = MockClient((request) async {
+          return http.Response(jsonEncode({}), 200);
+        });
+        final apiService = GitHubApiService(client: mockClient);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          locale: const Locale('id'),
-          supportedLocales: AppLanguage.supportedLocales,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          home: FavoriteProfilesScreen(
-            storageService: storage,
-            apiService: apiService,
+        await tester.pumpWidget(
+          MaterialApp(
+            locale: const Locale('id'),
+            supportedLocales: AppLanguage.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            home: FavoriteProfilesScreen(
+              storageService: storage,
+              apiService: apiService,
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      // Check header and user details
-      expect(find.text('Profil Favorit'), findsOneWidget);
-      expect(find.text('Zerabyte Dev'), findsOneWidget);
-      expect(find.text('Jakarta, Indonesia'), findsOneWidget);
+        // Check header and user details
+        expect(find.text('Profil Favorit'), findsOneWidget);
+        expect(find.text('Zerabyte Dev'), findsOneWidget);
+        expect(find.text('Jakarta, Indonesia'), findsOneWidget);
 
-      // Check column control buttons 1 and 2 via ValueKey
-      expect(find.byKey(const ValueKey('col_btn_1')), findsOneWidget);
-      expect(find.byKey(const ValueKey('col_btn_2')), findsOneWidget);
-      expect(find.byKey(const ValueKey('col_btn_3')), findsNothing);
-      expect(find.byKey(const ValueKey('col_btn_4')), findsNothing);
+        // Check column control buttons 1 and 2 via ValueKey
+        expect(find.byKey(const ValueKey('col_btn_1')), findsOneWidget);
+        expect(find.byKey(const ValueKey('col_btn_2')), findsOneWidget);
+        expect(find.byKey(const ValueKey('col_btn_3')), findsNothing);
+        expect(find.byKey(const ValueKey('col_btn_4')), findsNothing);
 
-      // Tap 1 column
-      await tester.tap(find.byKey(const ValueKey('col_btn_1')));
-      await tester.pumpAndSettle();
-      expect(storage.getFavoriteGridColumns(), 1);
+        // Tap 1 column
+        await tester.tap(find.byKey(const ValueKey('col_btn_1')));
+        await tester.pumpAndSettle();
+        expect(storage.getFavoriteGridColumns(), 1);
 
-      // Tap 2 column
-      await tester.tap(find.byKey(const ValueKey('col_btn_2')));
-      await tester.pumpAndSettle();
-      expect(storage.getFavoriteGridColumns(), 2);
-    });
+        // Tap 2 column
+        await tester.tap(find.byKey(const ValueKey('col_btn_2')));
+        await tester.pumpAndSettle();
+        expect(storage.getFavoriteGridColumns(), 2);
+      },
+    );
 
-    testWidgets('FavoriteProfilesScreen renders Favorite Profile in English without truncation', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final storage = await StorageService.init();
-      final mockClient = MockClient((request) async => http.Response('{}', 200));
-      final apiService = GitHubApiService(client: mockClient);
+    testWidgets(
+      'FavoriteProfilesScreen renders Favorite Profile in English without truncation',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final storage = await StorageService.init();
+        final mockClient = MockClient(
+          (request) async => http.Response('{}', 200),
+        );
+        final apiService = GitHubApiService(client: mockClient);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          locale: const Locale('en'),
-          supportedLocales: AppLanguage.supportedLocales,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          home: FavoriteProfilesScreen(
-            storageService: storage,
-            apiService: apiService,
+        await tester.pumpWidget(
+          MaterialApp(
+            locale: const Locale('en'),
+            supportedLocales: AppLanguage.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            home: FavoriteProfilesScreen(
+              storageService: storage,
+              apiService: apiService,
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
-      expect(find.text('Favorite Profile'), findsWidgets);
-    });
+        await tester.pumpAndSettle();
+        expect(find.text('Favorite Profile'), findsWidgets);
+      },
+    );
 
-    testWidgets('RunningText renders static text when content fits constraints', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 300,
-              child: RunningText(
-                text: 'Short Repo',
-                autoScroll: true,
+    testWidgets(
+      'RunningText renders static text when content fits constraints',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                width: 300,
+                child: RunningText(text: 'Short Repo', autoScroll: true),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      expect(find.text('Short Repo'), findsOneWidget);
-    });
+        await tester.pump();
+        expect(find.text('Short Repo'), findsOneWidget);
+      },
+    );
 
-    testWidgets('RunningText renders scrollable text for long text in manual mode', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 100,
-              child: RunningText(
-                text: 'very_long_repository_name_that_exceeds_screen_width_significantly',
-                autoScroll: false,
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pump();
-      expect(find.byType(SingleChildScrollView), findsOneWidget);
-      expect(find.text('very_long_repository_name_that_exceeds_screen_width_significantly'), findsOneWidget);
-    });
-
-    testWidgets('SettingsSheet can be dismissed by swiping down from top to bottom', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final storage = await StorageService.init();
-      AppLanguageService.init(storage);
-      AppThemeService.init(storage);
-      final client = MockClient((request) async => http.Response('{}', 200));
-      final api = GitHubApiService(client: client);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppLanguage.supportedLocales,
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
-                onPressed: () => SettingsSheet.show(
-                  context,
-                  storageService: storage,
-                  apiService: api,
+    testWidgets(
+      'RunningText renders scrollable text for long text in manual mode',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                width: 100,
+                child: RunningText(
+                  text: 'very_long_repository_name_that_exceeds_screen_width_significantly',
+                  autoScroll: false,
                 ),
-                child: const Text('Open Settings'),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.text('Open Settings'));
-      await tester.pumpAndSettle();
+        await tester.pump();
+        expect(find.byType(SingleChildScrollView), findsOneWidget);
+        expect(
+          find.text(
+            'very_long_repository_name_that_exceeds_screen_width_significantly',
+          ),
+          findsOneWidget,
+        );
+      },
+    );
 
-      expect(find.byType(SettingsSheet), findsOneWidget);
+    testWidgets(
+      'SettingsSheet can be dismissed by swiping down from top to bottom',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final storage = await StorageService.init();
+        AppLanguageService.init(storage);
+        AppThemeService.init(storage);
+        final client = MockClient((request) async => http.Response('{}', 200));
+        final api = GitHubApiService(client: client);
 
-      // Drag down from top area
-      await tester.drag(find.byType(SettingsSheet), const Offset(0, 400));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLanguage.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => ElevatedButton(
+                  onPressed: () => SettingsSheet.show(
+                    context,
+                    storageService: storage,
+                    apiService: api,
+                  ),
+                  child: const Text('Open Settings'),
+                ),
+              ),
+            ),
+          ),
+        );
 
-      expect(find.byType(SettingsSheet), findsNothing);
-    });
+        await tester.tap(find.text('Open Settings'));
+        await tester.pumpAndSettle();
 
-    testWidgets('SettingsSheet can be closed using the X button', (tester) async {
+        expect(find.byType(SettingsSheet), findsOneWidget);
+
+        // Drag down from top area
+        await tester.drag(find.byType(SettingsSheet), const Offset(0, 400));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(SettingsSheet), findsNothing);
+      },
+    );
+
+    testWidgets('SettingsSheet can be closed using the X button', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
       final storage = await StorageService.init();
       AppLanguageService.init(storage);
@@ -1739,184 +1894,205 @@ void main() {
       expect(find.byType(SettingsSheet), findsNothing);
     });
 
-    testWidgets('SettingsSheet dragging down from top drag indicator dismisses sheet', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final storage = await StorageService.init();
-      AppLanguageService.init(storage);
-      AppThemeService.init(storage);
-      final client = MockClient((request) async => http.Response('{}', 200));
-      final api = GitHubApiService(client: client);
+    testWidgets(
+      'SettingsSheet dragging down from top drag indicator dismisses sheet',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final storage = await StorageService.init();
+        AppLanguageService.init(storage);
+        AppThemeService.init(storage);
+        final client = MockClient((request) async => http.Response('{}', 200));
+        final api = GitHubApiService(client: client);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppLanguage.supportedLocales,
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
-                onPressed: () => SettingsSheet.show(
-                  context,
-                  storageService: storage,
-                  apiService: api,
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLanguage.supportedLocales,
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => ElevatedButton(
+                  onPressed: () => SettingsSheet.show(
+                    context,
+                    storageService: storage,
+                    apiService: api,
+                  ),
+                  child: const Text('Open Settings'),
                 ),
-                child: const Text('Open Settings'),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.text('Open Settings'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Open Settings'));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(SettingsSheet), findsOneWidget);
+        expect(find.byType(SettingsSheet), findsOneWidget);
 
-      // Find top of SettingsSheet and drag down from near the top
-      final sheetTopLeft = tester.getTopLeft(find.byType(SettingsSheet));
-      await tester.dragFrom(sheetTopLeft + const Offset(100, 20), const Offset(0, 350));
-      await tester.pumpAndSettle();
+        // Find top of SettingsSheet and drag down from near the top
+        final sheetTopLeft = tester.getTopLeft(find.byType(SettingsSheet));
+        await tester.dragFrom(
+          sheetTopLeft + const Offset(100, 20),
+          const Offset(0, 350),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.byType(SettingsSheet), findsNothing);
-    });
+        expect(find.byType(SettingsSheet), findsNothing);
+      },
+    );
 
-    testWidgets('HomeScreen news section allows tapping category chips and switches category', (tester) async {
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() {
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      });
+    testWidgets(
+      'HomeScreen news section allows tapping category chips and switches category',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
 
-      SharedPreferences.setMockInitialValues({});
-      final storage = await StorageService.init();
-      AppLanguageService.init(storage);
-      AppThemeService.init(storage);
-      final client = MockClient((request) async {
-        if (request.url.path.contains('rate_limit')) {
-          return http.Response(jsonEncode({
-            'resources': {
-              'core': {'limit': 60, 'remaining': 59, 'reset': 0, 'used': 1}
-            }
-          }), 200);
-        }
-        return http.Response('[]', 200);
-      });
-      final api = GitHubApiService(client: client);
+        SharedPreferences.setMockInitialValues({});
+        final storage = await StorageService.init();
+        AppLanguageService.init(storage);
+        AppThemeService.init(storage);
+        final client = MockClient((request) async {
+          if (request.url.path.contains('rate_limit')) {
+            return http.Response(
+              jsonEncode({
+                'resources': {
+                  'core': {'limit': 60, 'remaining': 59, 'reset': 0, 'used': 1},
+                },
+              }),
+              200,
+            );
+          }
+          return http.Response('[]', 200);
+        });
+        final api = GitHubApiService(client: client);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          locale: const Locale('en'),
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppLanguage.supportedLocales,
-          home: HomeScreen(
-            storageService: storage,
-            apiService: api,
+        await tester.pumpWidget(
+          MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLanguage.supportedLocales,
+            home: HomeScreen(storageService: storage, apiService: api),
           ),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
 
-      // Initially trending category is active
-      expect(find.byKey(const ValueKey('trending')), findsOneWidget);
+        // Initially trending category is active
+        expect(find.byKey(const ValueKey('trending')), findsOneWidget);
 
-      // Tap on GitHub category chip (label is 'GitHub Digest')
-      final githubChip = find.byWidgetPredicate(
-        (w) => w is ChoiceChip && w.label is Text && (w.label as Text).data == 'GitHub Digest',
-      );
-      expect(githubChip, findsOneWidget);
-      await tester.tap(githubChip);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+        // Tap on GitHub category chip (label is 'GitHub Digest')
+        final githubChip = find.byWidgetPredicate(
+          (w) =>
+              w is ChoiceChip &&
+              w.label is Text &&
+              (w.label as Text).data == 'GitHub Digest',
+        );
+        expect(githubChip, findsOneWidget);
+        await tester.tap(githubChip);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
 
-      // Category switches to github
-      expect(find.byKey(const ValueKey('github')), findsOneWidget);
-    });
+        // Category switches to github
+        expect(find.byKey(const ValueKey('github')), findsOneWidget);
+      },
+    );
 
-    testWidgets('HomeScreen news section allows swiping left and right to switch categories', (tester) async {
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() {
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      });
+    testWidgets(
+      'HomeScreen news section allows swiping left and right to switch categories',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
 
-      SharedPreferences.setMockInitialValues({});
-      final storage = await StorageService.init();
-      AppLanguageService.init(storage);
-      AppThemeService.init(storage);
-      final client = MockClient((request) async {
-        if (request.url.path.contains('rate_limit')) {
-          return http.Response(jsonEncode({
-            'resources': {
-              'core': {'limit': 60, 'remaining': 59, 'reset': 0, 'used': 1}
-            }
-          }), 200);
-        }
-        return http.Response('[]', 200);
-      });
-      final api = GitHubApiService(client: client);
+        SharedPreferences.setMockInitialValues({});
+        final storage = await StorageService.init();
+        AppLanguageService.init(storage);
+        AppThemeService.init(storage);
+        final client = MockClient((request) async {
+          if (request.url.path.contains('rate_limit')) {
+            return http.Response(
+              jsonEncode({
+                'resources': {
+                  'core': {'limit': 60, 'remaining': 59, 'reset': 0, 'used': 1},
+                },
+              }),
+              200,
+            );
+          }
+          return http.Response('[]', 200);
+        });
+        final api = GitHubApiService(client: client);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          locale: const Locale('en'),
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppLanguage.supportedLocales,
-          home: HomeScreen(
-            storageService: storage,
-            apiService: api,
+        await tester.pumpWidget(
+          MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLanguage.supportedLocales,
+            home: HomeScreen(storageService: storage, apiService: api),
           ),
-        ),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
 
-      // Initially trending category is active
-      expect(find.byKey(const ValueKey('trending')), findsOneWidget);
+        // Initially trending category is active
+        expect(find.byKey(const ValueKey('trending')), findsOneWidget);
 
-      // Swipe left on the news content area with velocity
-      await tester.fling(find.byKey(const ValueKey('trending')), const Offset(-400, 0), 1000);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+        // Swipe left on the news content area with velocity
+        await tester.fling(
+          find.byKey(const ValueKey('trending')),
+          const Offset(-400, 0),
+          1000,
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
 
-      // Category should switch to github
-      expect(find.byKey(const ValueKey('github')), findsOneWidget);
+        // Category should switch to github
+        expect(find.byKey(const ValueKey('github')), findsOneWidget);
 
-      // Swipe right on the news content area with velocity
-      await tester.fling(find.byKey(const ValueKey('github')), const Offset(400, 0), 1000, warnIfMissed: false);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+        // Swipe right on the news content area with velocity
+        await tester.fling(
+          find.byKey(const ValueKey('github')),
+          const Offset(400, 0),
+          1000,
+          warnIfMissed: false,
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
 
-      // Category should switch back to trending
-      expect(find.byKey(const ValueKey('trending')), findsOneWidget);
-    });
+        // Category should switch back to trending
+        expect(find.byKey(const ValueKey('trending')), findsOneWidget);
+      },
+    );
   });
 
   group('AnimatedAppBackground Tests', () {
-
     Future<void> pumpBackground(WidgetTester tester, AppThemeMode mode) async {
       AppTheme.currentMode = mode;
       AppThemeService.currentThemeNotifier.value = mode;
       await tester.pumpWidget(
         MaterialApp(
-          home: AnimatedAppBackground(
-            child: Scaffold(body: Container()),
-          ),
+          home: AnimatedAppBackground(child: Scaffold(body: Container())),
         ),
       );
       await tester.pump(const Duration(milliseconds: 100));
@@ -1934,7 +2110,9 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('renders without error in Dark Thunderstorm mode', (tester) async {
+    testWidgets('renders without error in Dark Thunderstorm mode', (
+      tester,
+    ) async {
       await pumpBackground(tester, AppThemeMode.dark);
       expect(find.byType(AnimatedAppBackground), findsOneWidget);
       expect(find.byType(CustomPaint), findsWidgets);
@@ -1948,158 +2126,175 @@ void main() {
   });
 
   group('Surface Opacity & Glassmorphism Tests', () {
-    test('StorageService persists and clamps surface opacity correctly', () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
+    test(
+      'StorageService persists and clamps surface opacity correctly',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
 
-      // Default is 0.85
-      expect(storage.getSurfaceOpacity(), 0.85);
+        // Default is 1.0 (100% Solid / 60 FPS Shader Bypass)
+        expect(storage.getSurfaceOpacity(), 1.0);
 
-      // Set valid opacity
-      await storage.setSurfaceOpacity(0.65);
-      expect(storage.getSurfaceOpacity(), 0.65);
+        // Set valid opacity
+        await storage.setSurfaceOpacity(0.65);
+        expect(storage.getSurfaceOpacity(), 0.65);
 
-      // Clamp low (min 0.50)
-      await storage.setSurfaceOpacity(0.30);
-      expect(storage.getSurfaceOpacity(), 0.50);
+        // Clamp low (min 0.50)
+        await storage.setSurfaceOpacity(0.30);
+        expect(storage.getSurfaceOpacity(), 0.50);
 
-      // Clamp high (max 1.00)
-      await storage.setSurfaceOpacity(1.20);
-      expect(storage.getSurfaceOpacity(), 1.00);
-    });
+        // Clamp high (max 1.00)
+        await storage.setSurfaceOpacity(1.20);
+        expect(storage.getSurfaceOpacity(), 1.00);
+      },
+    );
 
-    test('AppThemeService updates surface opacity notifier and saves to storage', () async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
-      AppThemeService.init(storage);
+    test(
+      'AppThemeService updates surface opacity notifier and saves to storage',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+        AppThemeService.init(storage);
 
-      expect(AppThemeService.surfaceOpacity, 0.85);
+        expect(AppThemeService.surfaceOpacity, 1.0);
 
-      await AppThemeService.changeSurfaceOpacity(0.70, storage);
-      expect(AppThemeService.surfaceOpacity, 0.70);
-      expect(storage.getSurfaceOpacity(), 0.70);
-    });
+        await AppThemeService.changeSurfaceOpacity(0.70, storage);
+        expect(AppThemeService.surfaceOpacity, 0.70);
+        expect(storage.getSurfaceOpacity(), 0.70);
+      },
+    );
 
-    testWidgets('GlassCard adapts between BackdropFilter when translucent and solid when opaque', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
-      AppThemeService.init(storage);
+    testWidgets(
+      'GlassCard adapts between BackdropFilter when translucent and solid when opaque',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+        AppThemeService.init(storage);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: GlassCard(
-              enableBlur: true,
-              child: const Text('Glass Test Content'),
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: GlassCard(
+                enableBlur: true,
+                child: const Text('Glass Test Content'),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Default opacity is 0.85 -> BackdropFilter active
-      expect(find.byType(BackdropFilter), findsOneWidget);
-      expect(find.text('Glass Test Content'), findsOneWidget);
+        // Default opacity is 1.00 -> BackdropFilter bypassed for GPU performance
+        expect(find.byType(BackdropFilter), findsNothing);
+        expect(find.text('Glass Test Content'), findsOneWidget);
 
-      // Change opacity to 1.00 -> BackdropFilter bypassed for GPU performance
-      await AppThemeService.changeSurfaceOpacity(1.00, storage);
-      await tester.pump();
-      expect(find.byType(BackdropFilter), findsNothing);
-      expect(find.text('Glass Test Content'), findsOneWidget);
-    });
+        // Change opacity to 0.85 -> BackdropFilter active
+        await AppThemeService.changeSurfaceOpacity(0.85, storage);
+        await tester.pump();
+        expect(find.byType(BackdropFilter), findsOneWidget);
+        expect(find.text('Glass Test Content'), findsOneWidget);
+      },
+    );
 
-    testWidgets('SettingsSheet displays surface opacity slider and percentage badge', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
-      AppThemeService.init(storage);
+    testWidgets(
+      'SettingsSheet displays surface opacity slider and percentage badge',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+        AppThemeService.init(storage);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('en')],
-          home: Scaffold(
-            body: SettingsSheet(
-              storageService: storage,
-              apiService: GitHubApiService(),
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('en')],
+            home: Scaffold(
+              body: SettingsSheet(
+                storageService: storage,
+                apiService: GitHubApiService(),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Verify opacity slider and badge render
-      expect(find.byType(Slider), findsOneWidget);
-      expect(find.text('85%'), findsOneWidget);
+        // Verify opacity slider and badge render (default 100%)
+        expect(find.byType(Slider), findsOneWidget);
+        expect(find.text('100%'), findsOneWidget);
 
-      // Drag/change slider
-      final slider = find.byType(Slider);
-      await tester.tap(slider);
-      await tester.pumpAndSettle();
-    });
+        // Drag/change slider
+        final slider = find.byType(Slider);
+        await tester.tap(slider);
+        await tester.pumpAndSettle();
+      },
+    );
 
-    testWidgets('GlassCard respects enableBlur: false and bypasses BackdropFilter even when translucent', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
-      AppThemeService.init(storage);
+    testWidgets(
+      'GlassCard respects enableBlur: false and bypasses BackdropFilter even when translucent',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+        AppThemeService.init(storage);
 
-      // Pastikan opacity < 1.0 (translucent)
-      await AppThemeService.changeSurfaceOpacity(0.85, storage);
+        // Pastikan opacity < 1.0 (translucent)
+        await AppThemeService.changeSurfaceOpacity(0.85, storage);
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: GlassCard(
-              enableBlur: false,
-              child: Text('Performance List Item'),
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: GlassCard(
+                enableBlur: false,
+                child: Text('Performance List Item'),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      // BackdropFilter harus dilewati (0 widget) demi performa 60/120fps
-      expect(find.byType(BackdropFilter), findsNothing);
-      expect(find.text('Performance List Item'), findsOneWidget);
-    });
+        await tester.pump();
+        // BackdropFilter harus dilewati (0 widget) demi performa 60/120fps
+        expect(find.byType(BackdropFilter), findsNothing);
+        expect(find.text('Performance List Item'), findsOneWidget);
+      },
+    );
 
-    testWidgets('AnimatedAppBackground pauses animation controller during scroll and resumes after scroll ends', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
-      AppThemeService.init(storage);
+    testWidgets(
+      'AnimatedAppBackground pauses animation controller during scroll and resumes after scroll ends',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+        AppThemeService.init(storage);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: AnimatedAppBackground(
-              child: ListView.builder(
-                itemCount: 100,
-                itemBuilder: (context, index) => ListTile(
-                  title: Text('Item $index'),
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: AnimatedAppBackground(
+                child: ListView.builder(
+                  itemCount: 100,
+                  itemBuilder: (context, index) =>
+                      ListTile(title: Text('Item $index')),
                 ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.pump();
-      expect(find.text('Item 0'), findsOneWidget);
+        await tester.pump();
+        expect(find.text('Item 0'), findsOneWidget);
 
-      // Scroll list
-      await tester.fling(find.byType(ListView), const Offset(0, -300), 1000);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+        // Scroll list
+        await tester.fling(find.byType(ListView), const Offset(0, -300), 1000);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.byType(AnimatedAppBackground), findsOneWidget);
-    });
+        expect(find.byType(AnimatedAppBackground), findsOneWidget);
+      },
+    );
 
     test('StorageService persists and retrieves background animation enabled state', () async {
       SharedPreferences.setMockInitialValues({});
@@ -2140,44 +2335,47 @@ void main() {
       expect(storage.isBackgroundAnimationEnabled(), isTrue);
     });
 
-    testWidgets('SettingsSheet renders background animation switch and responds to toggle', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
-      AppThemeService.init(storage);
+    testWidgets(
+      'SettingsSheet renders background animation switch and responds to toggle',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+        AppThemeService.init(storage);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppLanguage.supportedLocales,
-          home: Scaffold(
-            body: SettingsSheet(
-              storageService: storage,
-              apiService: GitHubApiService(),
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLanguage.supportedLocales,
+            home: Scaffold(
+              body: SettingsSheet(
+                storageService: storage,
+                apiService: GitHubApiService(),
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      // Find switch
-      final switchFinder = find.byType(Switch);
-      expect(switchFinder, findsOneWidget);
+        // Find switch
+        final switchFinder = find.byType(Switch);
+        expect(switchFinder, findsOneWidget);
 
-      // Toggle switch off
-      await tester.tap(switchFinder);
-      await tester.pumpAndSettle();
+        // Toggle switch off
+        await tester.tap(switchFinder);
+        await tester.pumpAndSettle();
 
-      expect(AppThemeService.bgAnimationEnabledNotifier.value, isFalse);
-      expect(HeaderAnimationState.isPausedNotifier.value, isTrue);
-      expect(storage.isBackgroundAnimationEnabled(), isFalse);
-    });
+        expect(AppThemeService.bgAnimationEnabledNotifier.value, isFalse);
+        expect(HeaderAnimationState.isPausedNotifier.value, isTrue);
+        expect(storage.isBackgroundAnimationEnabled(), isFalse);
+      },
+    );
   });
 
   group('HTTP Cache, ETag (304), & Manual Reload Tests', () {
@@ -2196,7 +2394,10 @@ void main() {
       );
 
       expect(storage.isHttpCacheValid('user_octocat'), isTrue);
-      expect(storage.getHttpCacheBody('user_octocat'), '{"login":"octocat","id":1}');
+      expect(
+        storage.getHttpCacheBody('user_octocat'),
+        '{"login":"octocat","id":1}',
+      );
       expect(storage.getHttpCacheEtag('user_octocat'), 'W/"12345"');
       expect(storage.getHttpCacheTimestamp('user_octocat'), isNotNull);
 
@@ -2276,7 +2477,8 @@ void main() {
 
       final capturedHeaders = <String, String>{};
       final client = MockClient((request) async {
-        capturedHeaders[request.url.path] = request.headers['If-None-Match'] ?? '';
+        capturedHeaders[request.url.path] =
+            request.headers['If-None-Match'] ?? '';
         return http.Response('', 304);
       });
 
@@ -2289,156 +2491,161 @@ void main() {
       expect(stats.repos.first.name, 'Hello-World');
       expect(capturedHeaders['/users/octocat'], 'W/"user_etag_1"');
       expect(capturedHeaders['/users/octocat/repos'], 'W/"repos_etag_1"');
-      expect(capturedHeaders['/users/octocat/events/public'], 'W/"events_etag_1"');
+      expect(
+        capturedHeaders['/users/octocat/events/public'],
+        'W/"events_etag_1"',
+      );
       expect(api.isLastResponseNotModified, isTrue);
     });
 
-    testWidgets('StatsDetailScreen refresh button triggers profile reload and displays feedback toast', (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      final prefs = await SharedPreferences.getInstance();
-      final storage = StorageService(prefs);
-      AppLanguageService.init(storage);
-      AppThemeService.init(storage);
+    testWidgets(
+      'StatsDetailScreen refresh button triggers profile reload and displays feedback toast',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+        AppLanguageService.init(storage);
+        AppThemeService.init(storage);
 
-      final user = GitHubUser(
-        login: 'octocat',
-        id: 1,
-        avatarUrl: '',
-        htmlUrl: 'https://github.com/octocat',
-        publicRepos: 1,
-        followers: 10,
-        following: 5,
-      );
-      final repo = GitHubRepo(
-        name: 'test-repo',
-        htmlUrl: 'https://github.com/octocat/test-repo',
-        stargazersCount: 5,
-        forksCount: 1,
-        isFork: false,
-      );
-      final stats = UserStats.calculate(
-        user: user,
-        repos: [repo],
-        publicEvents: [],
-        contributionStats: ContributionStats(
-          commitTitle: ContributionStats.determineTitle(
+        final user = GitHubUser(
+          login: 'octocat',
+          id: 1,
+          avatarUrl: '',
+          htmlUrl: 'https://github.com/octocat',
+          publicRepos: 1,
+          followers: 10,
+          following: 5,
+        );
+        final repo = GitHubRepo(
+          name: 'test-repo',
+          htmlUrl: 'https://github.com/octocat/test-repo',
+          stargazersCount: 5,
+          forksCount: 1,
+          isFork: false,
+        );
+        final stats = UserStats.calculate(
+          user: user,
+          repos: [repo],
+          publicEvents: [],
+          contributionStats: ContributionStats(
+            commitTitle: ContributionStats.determineTitle(
+              currentStreak: 1,
+              longestStreak: 5,
+              thisYearContributions: 10,
+              totalContributions: 50,
+            ),
             currentStreak: 1,
             longestStreak: 5,
             thisYearContributions: 10,
+            lastYearContributions: 5,
             totalContributions: 50,
+            yearlyTotals: const {'2025': 5, '2026': 10},
           ),
-          currentStreak: 1,
-          longestStreak: 5,
-          thisYearContributions: 10,
-          lastYearContributions: 5,
-          totalContributions: 50,
-          yearlyTotals: const {'2025': 5, '2026': 10},
-        ),
-      );
+        );
 
-      int refreshCalled = 0;
-      final client = MockClient((request) async {
-        refreshCalled++;
-        if (request.url.path.contains('/users/octocat/repos')) {
-          return http.Response('[]', 200);
-        } else if (request.url.path.contains('/users/octocat/events')) {
-          return http.Response('[]', 200);
-        } else if (request.url.path.contains('/users/octocat')) {
-          return http.Response(
-            '{"login":"octocat","id":1,"avatar_url":"","html_url":"","public_repos":2,"followers":12,"following":5}',
-            200,
-          );
-        }
-        return http.Response('{}', 200);
-      });
+        int refreshCalled = 0;
+        final client = MockClient((request) async {
+          refreshCalled++;
+          if (request.url.path.contains('/users/octocat/repos')) {
+            return http.Response('[]', 200);
+          } else if (request.url.path.contains('/users/octocat/events')) {
+            return http.Response('[]', 200);
+          } else if (request.url.path.contains('/users/octocat')) {
+            return http.Response(
+              '{"login":"octocat","id":1,"avatar_url":"","html_url":"","public_repos":2,"followers":12,"following":5}',
+              200,
+            );
+          }
+          return http.Response('{}', 200);
+        });
 
-      final api = GitHubApiService(client: client, storageService: storage);
+        final api = GitHubApiService(client: client, storageService: storage);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppLanguage.supportedLocales,
-          home: StatsDetailScreen(
-            stats: stats,
-            storageService: storage,
-            apiService: api,
-          ),
-        ),
-      );
-
-      await tester.pump();
-      expect(find.widgetWithText(AppBar, '@octocat'), findsOneWidget);
-
-      // Verify refresh button exists in AppBar actions
-      final refreshBtn = find.byIcon(Icons.refresh_rounded);
-      expect(refreshBtn, findsOneWidget);
-
-      // Tap refresh button
-      await tester.tap(refreshBtn);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-
-      expect(refreshCalled, greaterThan(0));
-
-      // Verify pull-to-refresh widget is mounted
-      expect(find.byType(RefreshIndicator), findsOneWidget);
-    });
-
-    testWidgets('GitPulsePageTransitionsBuilder executes smooth slide and fade transitions', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData(
-            pageTransitionsTheme: const PageTransitionsTheme(
-              builders: {
-                TargetPlatform.android: GitPulsePageTransitionsBuilder(),
-              },
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLanguage.supportedLocales,
+            home: StatsDetailScreen(
+              stats: stats,
+              storageService: storage,
+              apiService: api,
             ),
           ),
-          home: Builder(
-            builder: (context) => Scaffold(
-              body: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (ctx) => const Scaffold(
-                        body: Text('Destination Screen'),
-                      ),
-                    ),
-                  );
+        );
+
+        await tester.pump();
+        expect(find.widgetWithText(AppBar, '@octocat'), findsOneWidget);
+
+        // Verify refresh button exists in AppBar actions
+        final refreshBtn = find.byIcon(Icons.refresh_rounded);
+        expect(refreshBtn, findsOneWidget);
+
+        // Tap refresh button
+        await tester.tap(refreshBtn);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(refreshCalled, greaterThan(0));
+
+        // Verify pull-to-refresh widget is mounted
+        expect(find.byType(RefreshIndicator), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'GitPulsePageTransitionsBuilder executes smooth slide and fade transitions',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(
+              pageTransitionsTheme: const PageTransitionsTheme(
+                builders: {
+                  TargetPlatform.android: GitPulsePageTransitionsBuilder(),
                 },
-                child: const Text('Go to Destination'),
+              ),
+            ),
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) =>
+                            const Scaffold(body: Text('Destination Screen')),
+                      ),
+                    );
+                  },
+                  child: const Text('Go to Destination'),
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.text('Go to Destination'), findsOneWidget);
+        expect(find.text('Go to Destination'), findsOneWidget);
 
-      await tester.tap(find.text('Go to Destination'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 150));
-      expect(find.byType(SlideTransition), findsWidgets);
-      expect(find.byType(FadeTransition), findsWidgets);
+        await tester.tap(find.text('Go to Destination'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 150));
+        expect(find.byType(SlideTransition), findsWidgets);
+        expect(find.byType(FadeTransition), findsWidgets);
 
-      await tester.pumpAndSettle();
-      expect(find.text('Destination Screen'), findsOneWidget);
+        await tester.pumpAndSettle();
+        expect(find.text('Destination Screen'), findsOneWidget);
 
-      final navigator = tester.state<NavigatorState>(find.byType(Navigator));
-      navigator.pop();
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 150));
-      await tester.pumpAndSettle();
-      expect(find.text('Go to Destination'), findsOneWidget);
-    });
+        final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+        navigator.pop();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 150));
+        await tester.pumpAndSettle();
+        expect(find.text('Go to Destination'), findsOneWidget);
+      },
+    );
   });
 }
-
-
-

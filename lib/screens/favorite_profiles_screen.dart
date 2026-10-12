@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../localization/app_localizations.dart';
 import '../models/bookmarked_user.dart';
 import '../theme/app_theme.dart';
@@ -45,7 +46,9 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
     for (final user in _bookmarks) {
       if (user.name == null && user.bio == null && user.location == null) {
         try {
-          final profile = await widget.apiService.fetchUserProfile(user.username);
+          final profile = await widget.apiService.fetchUserProfile(
+            user.username,
+          );
           if (profile != null && mounted) {
             await widget.storageService.updateBookmarkDetails(
               user.username,
@@ -181,11 +184,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.bookmark_rounded,
-              color: AppTheme.accentAmber,
-              size: 20,
-            ),
+            Icon(Icons.bookmark_rounded, color: AppTheme.accentAmber, size: 20),
             const SizedBox(width: 8),
             Text(
               loc.favoriteProfiles,
@@ -239,11 +238,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: Row(
         children: [
-          Icon(
-            Icons.grid_view_rounded,
-            size: 16,
-            color: AppTheme.primaryCyan,
-          ),
+          Icon(Icons.grid_view_rounded, size: 16, color: AppTheme.primaryCyan),
           const SizedBox(width: 8),
           Text(
             loc.gridColumnsLabel,
@@ -287,7 +282,9 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: AppTheme.primaryCyan.withValues(alpha: 0.25),
+                                  color: AppTheme.primaryCyan.withValues(
+                                    alpha: 0.25,
+                                  ),
                                   blurRadius: 4,
                                   offset: const Offset(0, 1),
                                 ),
@@ -302,8 +299,9 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                                 ? const Color(0xFF0D1117)
                                 : AppTheme.textSecondary,
                             fontSize: 12,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
                           ),
                         ),
                       ),
@@ -476,7 +474,10 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                   ),
                   const SizedBox(width: 6),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1.5,
+                    ),
                     decoration: BoxDecoration(
                       color: AppTheme.primaryCyan.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(4),
@@ -515,7 +516,9 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
                   Icon(
                     Icons.location_on_outlined,
                     size: 13,
-                    color: user.location != null && user.location!.trim().isNotEmpty
+                    color:
+                        user.location != null &&
+                            user.location!.trim().isNotEmpty
                         ? AppTheme.accentAmber
                         : AppTheme.textMuted,
                   ),

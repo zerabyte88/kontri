@@ -1,5 +1,7 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
 import '../localization/app_localizations.dart';
 import '../models/contribution_stats.dart';
 
@@ -87,8 +89,10 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     final microFlutter =
         math.sin(t * 8 * math.pi) * 0.07 + math.sin(t * 16 * math.pi) * 0.03;
     final flameSurge = (math.sin(t * 2 * math.pi) + 1) / 2;
-    final flameIntensity =
-        (auraPulse * 0.65 + microFlutter.abs() * 0.35).clamp(0.0, 1.0);
+    final flameIntensity = (auraPulse * 0.65 + microFlutter.abs() * 0.35).clamp(
+      0.0,
+      1.0,
+    );
     final auraIntensity = flameIntensity;
 
     // Dynamic heat haze shadow flicker
@@ -127,8 +131,9 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
               offset: const Offset(0, -1),
             ),
             Shadow(
-              color: const Color(0xFFF59E0B)
-                  .withValues(alpha: (0.45 + 0.45 * flameIntensity).clamp(0.0, 1.0)),
+              color: const Color(0xFFF59E0B).withValues(
+                alpha: (0.45 + 0.45 * flameIntensity).clamp(0.0, 1.0),
+              ),
               blurRadius: shadowBlur,
               offset: Offset(0, -1.0 - 1.2 * flameIntensity),
             ),
@@ -154,7 +159,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     )!;
 
     return Container(
-      padding: widget.padding ??
+      padding:
+          widget.padding ??
           const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -203,7 +209,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
   /// Tier 2 (Diamond Vanguard): Glacial Thunderstorm Crystal & Lightning Arc
   Widget _buildTier2GlacialThunderEffect(String title, double t) {
     // High-frequency crystal spark & electric micro-jitter
-    final crackle = math.sin(t * 8 * math.pi) * 0.18 + math.sin(t * 16 * math.pi) * 0.09;
+    final crackle =
+        math.sin(t * 8 * math.pi) * 0.18 + math.sin(t * 16 * math.pi) * 0.09;
     final pulse = (math.sin(t * 2 * math.pi) + 1) / 2;
     final sweep = -2.6 + 5.2 * t;
 
@@ -236,12 +243,14 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           letterSpacing: -0.2,
           shadows: [
             Shadow(
-              color: const Color(0xFF00E5FF).withValues(alpha: 0.75 + crackle.abs()),
+              color: const Color(0xFF00E5FF)
+                  .withValues(alpha: 0.75 + crackle.abs()),
               blurRadius: 5.5,
               offset: const Offset(0, -0.5),
             ),
             Shadow(
-              color: const Color(0xFF6366F1).withValues(alpha: 0.40 + 0.30 * pulse),
+              color: const Color(0xFF6366F1)
+                  .withValues(alpha: 0.40 + 0.30 * pulse),
               blurRadius: 7.0,
             ),
           ],
@@ -254,7 +263,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     }
 
     return Container(
-      padding: widget.padding ??
+      padding:
+          widget.padding ??
           const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -272,7 +282,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0284C7).withValues(alpha: 0.30 + 0.25 * pulse),
+            color: const Color(0xFF0284C7)
+                .withValues(alpha: 0.30 + 0.25 * pulse),
             blurRadius: 8.0,
           ),
         ],
@@ -330,7 +341,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           letterSpacing: -0.2,
           shadows: [
             Shadow(
-              color: const Color(0xFF10B981).withValues(alpha: 0.55 + 0.35 * pulse),
+              color: const Color(0xFF10B981)
+                  .withValues(alpha: 0.55 + 0.35 * pulse),
               blurRadius: 5.0,
             ),
           ],
@@ -343,7 +355,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     }
 
     return Container(
-      padding: widget.padding ??
+      padding:
+          widget.padding ??
           const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
         color: const Color(0xFF021E14).withValues(alpha: 0.90),
@@ -354,7 +367,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF047857).withValues(alpha: 0.25 + 0.20 * pulse),
+            color: const Color(0xFF047857)
+                .withValues(alpha: 0.25 + 0.20 * pulse),
             blurRadius: 7.0,
           ),
         ],
@@ -407,7 +421,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           letterSpacing: -0.2,
           shadows: [
             Shadow(
-              color: const Color(0xFFF59E0B).withValues(alpha: 0.50 + 0.30 * pulse),
+              color: const Color(0xFFF59E0B)
+                  .withValues(alpha: 0.50 + 0.30 * pulse),
               blurRadius: 4.5,
             ),
           ],
@@ -420,7 +435,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     }
 
     return Container(
-      padding: widget.padding ??
+      padding:
+          widget.padding ??
           const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
         color: const Color(0xFF231604).withValues(alpha: 0.88),
@@ -431,7 +447,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFB45309).withValues(alpha: 0.20 + 0.18 * pulse),
+            color: const Color(0xFFB45309)
+                .withValues(alpha: 0.20 + 0.18 * pulse),
             blurRadius: 6.5,
           ),
         ],
@@ -484,7 +501,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           letterSpacing: -0.2,
           shadows: [
             Shadow(
-              color: const Color(0xFFC4B5FD).withValues(alpha: 0.35 + 0.20 * pulse),
+              color: const Color(0xFFC4B5FD)
+                  .withValues(alpha: 0.35 + 0.20 * pulse),
               blurRadius: 4.5,
             ),
           ],
@@ -497,7 +515,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     }
 
     return Container(
-      padding: widget.padding ??
+      padding:
+          widget.padding ??
           const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
         color: const Color(0xFF0F172A).withValues(alpha: 0.84),
@@ -508,7 +527,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFC4B5FD).withValues(alpha: 0.12 + 0.10 * pulse),
+            color: const Color(0xFFC4B5FD)
+                .withValues(alpha: 0.12 + 0.10 * pulse),
             blurRadius: 5.5,
           ),
         ],
@@ -548,7 +568,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
         ),
         shadows: [
           Shadow(
-            color: const Color(0xFF22C55E).withValues(alpha: 0.20 + 0.25 * breath),
+            color: const Color(0xFF22C55E)
+                .withValues(alpha: 0.20 + 0.25 * breath),
             blurRadius: 4.0,
           ),
         ],
@@ -560,7 +581,8 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     }
 
     return Container(
-      padding: widget.padding ??
+      padding:
+          widget.padding ??
           const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
         color: const Color(0xFF181006).withValues(alpha: 0.82),
@@ -604,14 +626,54 @@ class _ArcaneRuneEmbersPainter extends CustomPainter {
   static final Paint _corePaint = Paint();
 
   static const List<_RuneSparkSpec> _sparks = [
-    _RuneSparkSpec(xRatio: 0.08, size: 1.6, phase: 0.00, color: Color(0xFFE11D48)), // Ruby
-    _RuneSparkSpec(xRatio: 0.22, size: 1.3, phase: 0.25, color: Color(0xFF9333EA)), // Violet
-    _RuneSparkSpec(xRatio: 0.38, size: 1.9, phase: 0.50, color: Color(0xFFF59E0B)), // Gold
-    _RuneSparkSpec(xRatio: 0.52, size: 1.4, phase: 0.75, color: Color(0xFFC026D3)), // Magenta
-    _RuneSparkSpec(xRatio: 0.68, size: 1.7, phase: 0.12, color: Color(0xFFF97316)), // Dragon flame
-    _RuneSparkSpec(xRatio: 0.82, size: 1.4, phase: 0.38, color: Color(0xFFFBBF24)), // Gold
-    _RuneSparkSpec(xRatio: 0.94, size: 1.8, phase: 0.62, color: Color(0xFF9333EA)), // Violet
-    _RuneSparkSpec(xRatio: 0.44, size: 1.2, phase: 0.88, color: Color(0xFFE11D48)), // Ruby
+    _RuneSparkSpec(
+      xRatio: 0.08,
+      size: 1.6,
+      phase: 0.00,
+      color: Color(0xFFE11D48),
+    ), // Ruby
+    _RuneSparkSpec(
+      xRatio: 0.22,
+      size: 1.3,
+      phase: 0.25,
+      color: Color(0xFF9333EA),
+    ), // Violet
+    _RuneSparkSpec(
+      xRatio: 0.38,
+      size: 1.9,
+      phase: 0.50,
+      color: Color(0xFFF59E0B),
+    ), // Gold
+    _RuneSparkSpec(
+      xRatio: 0.52,
+      size: 1.4,
+      phase: 0.75,
+      color: Color(0xFFC026D3),
+    ), // Magenta
+    _RuneSparkSpec(
+      xRatio: 0.68,
+      size: 1.7,
+      phase: 0.12,
+      color: Color(0xFFF97316),
+    ), // Dragon flame
+    _RuneSparkSpec(
+      xRatio: 0.82,
+      size: 1.4,
+      phase: 0.38,
+      color: Color(0xFFFBBF24),
+    ), // Gold
+    _RuneSparkSpec(
+      xRatio: 0.94,
+      size: 1.8,
+      phase: 0.62,
+      color: Color(0xFF9333EA),
+    ), // Violet
+    _RuneSparkSpec(
+      xRatio: 0.44,
+      size: 1.2,
+      phase: 0.88,
+      color: Color(0xFFE11D48),
+    ), // Ruby
   ];
 
   @override

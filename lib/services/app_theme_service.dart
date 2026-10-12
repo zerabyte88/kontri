@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 import '../widgets/animated_app_header.dart';
 import 'storage_service.dart';
@@ -7,7 +8,7 @@ class AppThemeService {
   static final ValueNotifier<AppThemeMode> currentThemeNotifier =
       ValueNotifier<AppThemeMode>(AppThemeMode.dark);
   static final ValueNotifier<double> surfaceOpacityNotifier =
-      ValueNotifier<double>(0.85);
+      ValueNotifier<double>(1.0);
   static final ValueNotifier<bool> bgAnimationEnabledNotifier =
       ValueNotifier<bool>(true);
 
@@ -22,6 +23,7 @@ class AppThemeService {
     currentThemeNotifier.value = mode;
 
     final savedOpacity = storageService.getSurfaceOpacity();
+    AppTheme.cardOpacity = savedOpacity;
     surfaceOpacityNotifier.value = savedOpacity;
 
     final savedBgAnim = storageService.isBackgroundAnimationEnabled();
@@ -43,6 +45,7 @@ class AppThemeService {
     StorageService storageService,
   ) async {
     final clamped = opacity.clamp(0.50, 1.00);
+    AppTheme.cardOpacity = clamped;
     surfaceOpacityNotifier.value = clamped;
     await storageService.setSurfaceOpacity(clamped);
   }

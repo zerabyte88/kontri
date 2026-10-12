@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../localization/app_localizations.dart';
 import '../models/tech_news.dart';
 import '../theme/app_theme.dart';
@@ -7,17 +8,17 @@ import '../theme/app_theme.dart';
 class TechNewsCard extends StatelessWidget {
   final TechNews news;
 
-  const TechNewsCard({
-    super.key,
-    required this.news,
-  });
+  const TechNewsCard({super.key, required this.news});
 
   Future<void> _openArticle(BuildContext context) async {
     final uri = Uri.tryParse(news.url);
     if (uri != null) {
       final loc = AppLocalizations.of(context);
       try {
-        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
         if (!launched && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -74,8 +75,7 @@ class TechNewsCard extends StatelessWidget {
                           cacheWidth: 450,
                           cacheHeight: 250,
                           headers: const {
-                            'User-Agent':
-                                'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+                            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
                             'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
                           },
                           loadingBuilder: (context, child, loadingProgress) {
@@ -89,7 +89,9 @@ class TechNewsCard extends StatelessWidget {
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: AppTheme.primaryCyan.withValues(alpha: 0.4),
+                                    color: AppTheme.primaryCyan.withValues(
+                                      alpha: 0.4,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -98,177 +100,182 @@ class TechNewsCard extends StatelessWidget {
                           errorBuilder: (context, error, stackTrace) =>
                               _buildFallbackThumbnail(),
                         ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        height: 36,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              AppTheme.surface.withValues(alpha: 0.95),
-                            ],
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          height: 36,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                AppTheme.surface.withValues(alpha: 0.95),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Tags row
-                    if (news.tags.isNotEmpty)
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: news.tags.take(3).map((tag) {
-                          return Container(
+                    ],
+                  ),
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Tags row
+                      if (news.tags.isNotEmpty)
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: news.tags.take(3).map((tag) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2.5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.surfaceElevated,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  color: AppTheme.border,
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Text(
+                                '#$tag',
+                                style: TextStyle(
+                                  color: AppTheme.primaryCyan,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      const SizedBox(height: 8),
+
+                      // Title
+                      Text(
+                        news.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Description
+                      if (news.description.isNotEmpty)
+                        Text(
+                          news.description,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: 12,
+                            height: 1.4,
+                          ),
+                        ),
+                      const SizedBox(height: 12),
+
+                      // Meta footer
+                      Row(
+                        children: [
+                          if (news.authorAvatar != null &&
+                              news.authorAvatar!.isNotEmpty)
+                            ClipOval(
+                              child: Image.network(
+                                news.authorAvatar!,
+                                width: 18,
+                                height: 18,
+                                cacheWidth: 60,
+                                cacheHeight: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(
+                                      Icons.person_outline_rounded,
+                                      size: 15,
+                                      color: AppTheme.textMuted,
+                                    ),
+                              ),
+                            )
+                          else
+                            Icon(
+                              Icons.person_outline_rounded,
+                              size: 15,
+                              color: AppTheme.textMuted,
+                            ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              news.authorName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: AppTheme.textMuted,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 7,
-                              vertical: 2.5,
+                              horizontal: 6,
+                              vertical: 2,
                             ),
                             decoration: BoxDecoration(
                               color: AppTheme.surfaceElevated,
-                              borderRadius: BorderRadius.circular(5),
+                              borderRadius: BorderRadius.circular(4),
                               border: Border.all(
                                 color: AppTheme.border,
                                 width: 0.8,
                               ),
                             ),
-                            child: Text(
-                              '#$tag',
-                              style: TextStyle(
-                                color: AppTheme.primaryCyan,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    const SizedBox(height: 8),
-
-                    // Title
-                    Text(
-                      news.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppTheme.textPrimary,
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w600,
-                        height: 1.3,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-
-                    // Description
-                    if (news.description.isNotEmpty)
-                      Text(
-                        news.description,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: AppTheme.textSecondary,
-                          fontSize: 12,
-                          height: 1.4,
-                        ),
-                      ),
-                    const SizedBox(height: 12),
-
-                    // Meta footer
-                    Row(
-                      children: [
-                        if (news.authorAvatar != null && news.authorAvatar!.isNotEmpty)
-                          ClipOval(
-                            child: Image.network(
-                              news.authorAvatar!,
-                              width: 18,
-                              height: 18,
-                              cacheWidth: 60,
-                              cacheHeight: 60,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Icon(
-                                Icons.person_outline_rounded,
-                                size: 15,
-                                color: AppTheme.textMuted,
-                              ),
-                            ),
-                          )
-                        else
-                          Icon(
-                            Icons.person_outline_rounded,
-                            size: 15,
-                            color: AppTheme.textMuted,
-                          ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            news.authorName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: AppTheme.textMuted,
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceElevated,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: AppTheme.border, width: 0.8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.access_time_rounded,
-                                size: 11,
-                                color: AppTheme.textMuted,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${news.readingTimeMinutes} ${AppLocalizations.of(context).minRead}',
-                                style: TextStyle(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.access_time_rounded,
+                                  size: 11,
                                   color: AppTheme.textMuted,
-                                  fontSize: 10.5,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${news.readingTimeMinutes} ${AppLocalizations.of(context).minRead}',
+                                  style: TextStyle(
+                                    color: AppTheme.textMuted,
+                                    fontSize: 10.5,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          Icons.open_in_new_rounded,
-                          size: 13,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.open_in_new_rounded,
+                            size: 13,
+                            color: AppTheme.textSecondary,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildFallbackThumbnail() {
     return Container(
@@ -276,10 +283,7 @@ class TechNewsCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            AppTheme.surfaceElevated,
-            AppTheme.surface,
-          ],
+          colors: [AppTheme.surfaceElevated, AppTheme.surface],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -466,4 +470,3 @@ class _TechNewsShimmerCardState extends State<TechNewsShimmerCard>
     );
   }
 }
-

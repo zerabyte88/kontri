@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+
 import '../localization/app_localizations.dart';
 import '../theme/app_theme.dart';
 import 'glass_card.dart';
@@ -112,11 +113,7 @@ class LanguageChart extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.code_rounded,
-                  size: 16,
-                  color: AppTheme.primaryCyan,
-                ),
+                Icon(Icons.code_rounded, size: 16, color: AppTheme.primaryCyan),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:http/http.dart' as http;
+
 import '../models/contribution_stats.dart';
 import '../models/github_content_item.dart';
 import '../models/github_rate_limit.dart';
@@ -88,7 +90,9 @@ class GitHubApiService {
   Future<GitHubRateLimit> fetchRateLimit() async {
     try {
       final uri = Uri.parse('$_baseUrl/rate_limit');
-      final res = await _client.get(uri, headers: _headers).timeout(const Duration(seconds: 8));
+      final res = await _client
+          .get(uri, headers: _headers)
+          .timeout(const Duration(seconds: 8));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         final rateLimit = GitHubRateLimit.fromJson(data);
@@ -101,7 +105,9 @@ class GitHubApiService {
 
     return _lastRateLimit ??
         GitHubRateLimit.defaultLimit(
-          hasToken: personalAccessToken != null && personalAccessToken!.trim().isNotEmpty,
+          hasToken:
+              personalAccessToken != null &&
+              personalAccessToken!.trim().isNotEmpty,
         );
   }
 
@@ -115,7 +121,9 @@ class GitHubApiService {
 
     try {
       final uri = Uri.parse('$_baseUrl/repos/$cleanOwner/$cleanRepo/readme');
-      final res = await _client.get(uri, headers: _headers).timeout(_timeoutDuration);
+      final res = await _client
+          .get(uri, headers: _headers)
+          .timeout(_timeoutDuration);
       _updateRateLimitFromHeaders(res.headers);
 
       if (res.statusCode == 200) {
@@ -165,11 +173,15 @@ class GitHubApiService {
       final endpoint = cleanPath.isEmpty
           ? '$_baseUrl/repos/$cleanOwner/$cleanRepo/contents'
           : '$_baseUrl/repos/$cleanOwner/$cleanRepo/contents/$cleanPath';
-      final uri = Uri.parse(ref != null && ref.trim().isNotEmpty
-          ? '$endpoint?ref=${Uri.encodeComponent(ref.trim())}'
-          : endpoint);
+      final uri = Uri.parse(
+        ref != null && ref.trim().isNotEmpty
+            ? '$endpoint?ref=${Uri.encodeComponent(ref.trim())}'
+            : endpoint,
+      );
 
-      final res = await _client.get(uri, headers: _headers).timeout(_timeoutDuration);
+      final res = await _client
+          .get(uri, headers: _headers)
+          .timeout(_timeoutDuration);
       _updateRateLimitFromHeaders(res.headers);
 
       if (res.statusCode == 200) {
@@ -228,12 +240,17 @@ class GitHubApiService {
         }
       }
 
-      final endpoint = '$_baseUrl/repos/$cleanOwner/$cleanRepo/contents/$cleanPath';
-      final uri = Uri.parse(ref != null && ref.trim().isNotEmpty
-          ? '$endpoint?ref=${Uri.encodeComponent(ref.trim())}'
-          : endpoint);
+      final endpoint =
+          '$_baseUrl/repos/$cleanOwner/$cleanRepo/contents/$cleanPath';
+      final uri = Uri.parse(
+        ref != null && ref.trim().isNotEmpty
+            ? '$endpoint?ref=${Uri.encodeComponent(ref.trim())}'
+            : endpoint,
+      );
 
-      final res = await _client.get(uri, headers: _headers).timeout(_timeoutDuration);
+      final res = await _client
+          .get(uri, headers: _headers)
+          .timeout(_timeoutDuration);
       _updateRateLimitFromHeaders(res.headers);
 
       if (res.statusCode == 200) {
@@ -255,10 +272,14 @@ class GitHubApiService {
     return null;
   }
 
-
-  Future<ContributionStats?> _fetchContributionsWithCache(String username, String cacheKey) async {
+  Future<ContributionStats?> _fetchContributionsWithCache(
+    String username,
+    String cacheKey,
+  ) async {
     try {
-      final uri = Uri.parse('https://github-contributions-api.jogruber.de/v4/$username');
+      final uri = Uri.parse(
+        'https://github-contributions-api.jogruber.de/v4/$username',
+      );
       final res = await _client.get(uri).timeout(const Duration(seconds: 8));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
@@ -272,7 +293,9 @@ class GitHubApiService {
     final cached = storageService?.getHttpCacheBody('contrib_$cacheKey');
     if (cached != null) {
       try {
-        return ContributionStats.fromContributionsApi(jsonDecode(cached) as Map<String, dynamic>);
+        return ContributionStats.fromContributionsApi(
+          jsonDecode(cached) as Map<String, dynamic>,
+        );
       } catch (_) {}
     }
     return null;
@@ -290,13 +313,17 @@ class GitHubApiService {
         headers['If-None-Match'] = etag;
       }
 
-      final res = await _client.get(userUri, headers: headers).timeout(_timeoutDuration);
+      final res = await _client
+          .get(userUri, headers: headers)
+          .timeout(_timeoutDuration);
       _updateRateLimitFromHeaders(res.headers);
 
       if (res.statusCode == 304) {
         final cached = storageService?.getHttpCacheBody('user_$cacheKey');
         if (cached != null && cached.isNotEmpty) {
-          return GitHubUser.fromJson(jsonDecode(cached) as Map<String, dynamic>);
+          return GitHubUser.fromJson(
+            jsonDecode(cached) as Map<String, dynamic>,
+          );
         }
       } else if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
@@ -321,10 +348,14 @@ class GitHubApiService {
     final userBody = storageService!.getHttpCacheBody('user_$cacheKey');
     final reposBody = storageService!.getHttpCacheBody('repos_$cacheKey');
     final eventsBody = storageService!.getHttpCacheBody('events_$cacheKey');
-    if (userBody == null || reposBody == null || eventsBody == null) return null;
+    if (userBody == null || reposBody == null || eventsBody == null) {
+      return null;
+    }
 
     try {
-      final user = GitHubUser.fromJson(jsonDecode(userBody) as Map<String, dynamic>);
+      final user = GitHubUser.fromJson(
+        jsonDecode(userBody) as Map<String, dynamic>,
+      );
       final List<GitHubRepo> repos = (jsonDecode(reposBody) as List)
           .map((e) => GitHubRepo.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -333,12 +364,15 @@ class GitHubApiService {
           .toList();
       final langBody = storageService!.getHttpCacheBody('languages_$cacheKey');
       final Map<String, int> languages = langBody != null
-          ? (jsonDecode(langBody) as Map<String, dynamic>)
-              .map((k, v) => MapEntry(k, (v as num).toInt()))
+          ? (jsonDecode(langBody) as Map<String, dynamic>).map(
+              (k, v) => MapEntry(k, (v as num).toInt()),
+            )
           : {};
       final contribBody = storageService!.getHttpCacheBody('contrib_$cacheKey');
       final contrib = contribBody != null
-          ? ContributionStats.fromContributionsApi(jsonDecode(contribBody) as Map<String, dynamic>)
+          ? ContributionStats.fromContributionsApi(
+              jsonDecode(contribBody) as Map<String, dynamic>,
+            )
           : ContributionStats.fromEvents(events);
 
       return UserStats.calculate(
@@ -353,7 +387,10 @@ class GitHubApiService {
     }
   }
 
-  Future<UserStats> fetchUserStats(String username, {bool forceRefresh = false}) async {
+  Future<UserStats> fetchUserStats(
+    String username, {
+    bool forceRefresh = false,
+  }) async {
     final cleanUsername = username.trim();
     if (cleanUsername.isEmpty) {
       throw GitHubApiException('Username GitHub tidak boleh kosong.');
@@ -364,8 +401,11 @@ class GitHubApiService {
 
     // 1. Cek in-memory cache jika masih dalam batas TTL 10 menit
     if (!forceRefresh && _statsCache.containsKey(cacheKey)) {
-      final cachedTime = storageService?.getHttpCacheTimestamp('user_stats_$cacheKey');
-      if (cachedTime == null || DateTime.now().difference(cachedTime) < const Duration(minutes: 10)) {
+      final cachedTime = storageService?.getHttpCacheTimestamp(
+        'user_stats_$cacheKey',
+      );
+      if (cachedTime == null ||
+          DateTime.now().difference(cachedTime) < const Duration(minutes: 10)) {
         return _statsCache[cacheKey]!;
       }
     }
@@ -373,7 +413,10 @@ class GitHubApiService {
     // 2. Cek disk storage cache jika masih dalam batas TTL 10 menit
     if (!forceRefresh &&
         storageService != null &&
-        storageService!.isHttpCacheValid('user_stats_$cacheKey', ttl: const Duration(minutes: 10))) {
+        storageService!.isHttpCacheValid(
+          'user_stats_$cacheKey',
+          ttl: const Duration(minutes: 10),
+        )) {
       final cachedStats = _tryLoadOfflineStats(cacheKey);
       if (cachedStats != null) {
         _statsCache[cacheKey] = cachedStats;
@@ -383,11 +426,18 @@ class GitHubApiService {
 
     try {
       // Kick off contributions fetch in background with local caching
-      final contribFuture = _fetchContributionsWithCache(cleanUsername, cacheKey);
+      final contribFuture = _fetchContributionsWithCache(
+        cleanUsername,
+        cacheKey,
+      );
 
       final userUri = Uri.parse('$_baseUrl/users/$cleanUsername');
-      final reposUri = Uri.parse('$_baseUrl/users/$cleanUsername/repos?per_page=100&sort=updated');
-      final eventsUri = Uri.parse('$_baseUrl/users/$cleanUsername/events/public?per_page=100');
+      final reposUri = Uri.parse(
+        '$_baseUrl/users/$cleanUsername/repos?per_page=100&sort=updated',
+      );
+      final eventsUri = Uri.parse(
+        '$_baseUrl/users/$cleanUsername/events/public?per_page=100',
+      );
 
       // Ambil ETag sebelumnya untuk conditional requests (304 Not Modified)
       final userEtag = storageService?.getHttpCacheEtag('user_$cacheKey');
@@ -395,18 +445,26 @@ class GitHubApiService {
       final eventsEtag = storageService?.getHttpCacheEtag('events_$cacheKey');
 
       final userHeaders = Map<String, String>.from(_headers);
-      if (userEtag != null && userEtag.isNotEmpty) userHeaders['If-None-Match'] = userEtag;
+      if (userEtag != null && userEtag.isNotEmpty) {
+        userHeaders['If-None-Match'] = userEtag;
+      }
 
       final reposHeaders = Map<String, String>.from(_headers);
-      if (reposEtag != null && reposEtag.isNotEmpty) reposHeaders['If-None-Match'] = reposEtag;
+      if (reposEtag != null && reposEtag.isNotEmpty) {
+        reposHeaders['If-None-Match'] = reposEtag;
+      }
 
       final eventsHeaders = Map<String, String>.from(_headers);
-      if (eventsEtag != null && eventsEtag.isNotEmpty) eventsHeaders['If-None-Match'] = eventsEtag;
+      if (eventsEtag != null && eventsEtag.isNotEmpty) {
+        eventsHeaders['If-None-Match'] = eventsEtag;
+      }
 
       final responses = await Future.wait([
         _client.get(userUri, headers: userHeaders).timeout(_timeoutDuration),
         _client.get(reposUri, headers: reposHeaders).timeout(_timeoutDuration),
-        _client.get(eventsUri, headers: eventsHeaders).timeout(_timeoutDuration),
+        _client
+            .get(eventsUri, headers: eventsHeaders)
+            .timeout(_timeoutDuration),
       ]);
 
       final userRes = responses[0];
@@ -443,7 +501,8 @@ class GitHubApiService {
       }
 
       // Tandai jika seluruh respon adalah 304 Not Modified (0 kuota terpakai)
-      _isLastResponseNotModified = (userRes.statusCode == 304 &&
+      _isLastResponseNotModified =
+          (userRes.statusCode == 304 &&
           reposRes.statusCode == 304 &&
           eventsRes.statusCode == 304);
 
@@ -452,7 +511,9 @@ class GitHubApiService {
       if (userRes.statusCode == 304) {
         final cached = storageService?.getHttpCacheBody('user_$cacheKey');
         if (cached == null) {
-          throw GitHubApiException('Gagal memuat profil: cache lokal tidak ditemukan.');
+          throw GitHubApiException(
+            'Gagal memuat profil: cache lokal tidak ditemukan.',
+          );
         }
         userData = jsonDecode(cached) as Map<String, dynamic>;
       } else if (userRes.statusCode == 200) {
@@ -485,7 +546,8 @@ class GitHubApiService {
         }
       } else if (reposRes.statusCode == 200) {
         reposUpdated = true;
-        final List<dynamic> reposData = jsonDecode(reposRes.body) as List<dynamic>;
+        final List<dynamic> reposData =
+            jsonDecode(reposRes.body) as List<dynamic>;
         for (final item in reposData) {
           if (item is Map<String, dynamic>) {
             repos.add(GitHubRepo.fromJson(item));
@@ -512,7 +574,8 @@ class GitHubApiService {
           }
         }
       } else if (eventsRes.statusCode == 200) {
-        final List<dynamic> eventsData = jsonDecode(eventsRes.body) as List<dynamic>;
+        final List<dynamic> eventsData =
+            jsonDecode(eventsRes.body) as List<dynamic>;
         for (final item in eventsData) {
           if (item is Map<String, dynamic>) {
             events.add(item);
@@ -528,12 +591,17 @@ class GitHubApiService {
       // 4. Bahasa Pemrograman (Hemat 8 - 25 request jika repos 304 & cache bahasa tersedia)
       final nonForkRepos = repos.where((r) => !r.isFork).toList();
       Map<String, int> aggregatedLanguages = {};
-      final cachedLang = storageService?.getHttpCacheBody('languages_$cacheKey');
+      final cachedLang = storageService?.getHttpCacheBody(
+        'languages_$cacheKey',
+      );
 
       if (!reposUpdated && cachedLang != null) {
         try {
-          final Map<String, dynamic> langData = jsonDecode(cachedLang) as Map<String, dynamic>;
-          aggregatedLanguages = langData.map((k, v) => MapEntry(k, (v as num).toInt()));
+          final Map<String, dynamic> langData =
+              jsonDecode(cachedLang) as Map<String, dynamic>;
+          aggregatedLanguages = langData.map(
+            (k, v) => MapEntry(k, (v as num).toInt()),
+          );
         } catch (_) {}
       } else if (nonForkRepos.isNotEmpty) {
         final prioritizedRepos = List<GitHubRepo>.from(nonForkRepos)
@@ -543,11 +611,16 @@ class GitHubApiService {
 
         final futures = targetRepos.map((repo) async {
           try {
-            final langUri = Uri.parse('$_baseUrl/repos/$cleanUsername/${repo.name}/languages');
-            final langRes = await _client.get(langUri, headers: _headers).timeout(const Duration(seconds: 8));
+            final langUri = Uri.parse(
+              '$_baseUrl/repos/$cleanUsername/${repo.name}/languages',
+            );
+            final langRes = await _client
+                .get(langUri, headers: _headers)
+                .timeout(const Duration(seconds: 8));
             _updateRateLimitFromHeaders(langRes.headers);
             if (langRes.statusCode == 200) {
-              final Map<String, dynamic> data = jsonDecode(langRes.body) as Map<String, dynamic>;
+              final Map<String, dynamic> data =
+                  jsonDecode(langRes.body) as Map<String, dynamic>;
               return data.map((k, v) => MapEntry(k, (v as num).toInt()));
             }
           } catch (_) {}
@@ -557,7 +630,8 @@ class GitHubApiService {
         final results = await Future.wait(futures);
         for (final repoLangs in results) {
           repoLangs.forEach((lang, bytes) {
-            aggregatedLanguages[lang] = (aggregatedLanguages[lang] ?? 0) + bytes;
+            aggregatedLanguages[lang] =
+                (aggregatedLanguages[lang] ?? 0) + bytes;
           });
         }
 
@@ -569,7 +643,8 @@ class GitHubApiService {
 
       // Ambil data kontribusi
       final fetchedContributions = await contribFuture;
-      final contributionStats = fetchedContributions ?? ContributionStats.fromEvents(events);
+      final contributionStats =
+          fetchedContributions ?? ContributionStats.fromEvents(events);
 
       final calculated = UserStats.calculate(
         user: user,
@@ -594,17 +669,24 @@ class GitHubApiService {
         _statsCache[cacheKey] = offlineCached;
         return offlineCached;
       }
-      if (e.osError?.errorCode == 13 || e.message.toLowerCase().contains('permission')) {
-        throw GitHubApiException('Izin akses internet belum diaktifkan pada sistem aplikasi.');
+      if (e.osError?.errorCode == 13 ||
+          e.message.toLowerCase().contains('permission')) {
+        throw GitHubApiException(
+          'Izin akses internet belum diaktifkan pada sistem aplikasi.',
+        );
       }
-      throw GitHubApiException('Tidak ada koneksi internet. Periksa jaringan kamu.');
+      throw GitHubApiException(
+        'Tidak ada koneksi internet. Periksa jaringan kamu.',
+      );
     } on TimeoutException {
       final offlineCached = _tryLoadOfflineStats(cacheKey);
       if (offlineCached != null) {
         _statsCache[cacheKey] = offlineCached;
         return offlineCached;
       }
-      throw GitHubApiException('Koneksi timeout. Server GitHub tidak merespons tepat waktu.');
+      throw GitHubApiException(
+        'Koneksi timeout. Server GitHub tidak merespons tepat waktu.',
+      );
     } on http.ClientException {
       final offlineCached = _tryLoadOfflineStats(cacheKey);
       if (offlineCached != null) {

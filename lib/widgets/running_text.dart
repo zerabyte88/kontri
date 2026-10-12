@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class RunningText extends StatefulWidget {
@@ -111,7 +112,8 @@ class _RunningTextState extends State<RunningText> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final effectiveStyle = widget.style ?? DefaultTextStyle.of(context).style;
+        final effectiveStyle =
+            widget.style ?? DefaultTextStyle.of(context).style;
         final direction = Directionality.maybeOf(context) ?? TextDirection.ltr;
 
         final painter = TextPainter(
@@ -139,29 +141,23 @@ class _RunningTextState extends State<RunningText> {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
-            child: Text(
-              widget.text,
-              style: effectiveStyle,
-              maxLines: 1,
-            ),
+            child: Text(widget.text, style: effectiveStyle, maxLines: 1),
           );
         }
 
         // Auto ping-pong scroll mode
         _scrollController ??= ScrollController();
         if (!_isLoopRunning) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => _startScrollLoop());
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _startScrollLoop(),
+          );
         }
 
         return SingleChildScrollView(
           controller: _scrollController,
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
-          child: Text(
-            widget.text,
-            style: effectiveStyle,
-            maxLines: 1,
-          ),
+          child: Text(widget.text, style: effectiveStyle, maxLines: 1),
         );
       },
     );

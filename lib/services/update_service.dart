@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:http/http.dart' as http;
 import 'package:ota_update/ota_update.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../theme/app_theme.dart';
 
 class AppUpdateInfo {
@@ -74,7 +76,8 @@ class UpdateService {
         final tagName = (json['tag_name'] as String?)?.trim() ?? '';
         final releaseName = (json['name'] as String?) ?? tagName;
         final body = (json['body'] as String?) ?? '';
-        final htmlUrl = (json['html_url'] as String?) ??
+        final htmlUrl =
+            (json['html_url'] as String?) ??
             '${AppConfig.githubRepoUrl}/releases';
 
         String? apkUrl;
@@ -125,8 +128,7 @@ class UpdateService {
       return OtaUpdate().execute(
         downloadUrl,
         destinationFilename: 'gitpulse-latest.apk',
-        androidProviderAuthority:
-            'com.phantek.orion.rigel.ota_update_provider',
+        androidProviderAuthority: 'com.phantek.orion.rigel.ota_update_provider',
       );
     } catch (e) {
       return Stream.error(e);
@@ -162,8 +164,12 @@ class UpdateService {
       // Standard Android internal data directory paths
       candidates.add('/data/user/0/com.phantek.orion.rigel/files/ota_update');
       candidates.add('/data/data/com.phantek.orion.rigel/files/ota_update');
-      candidates.add('/data/user/0/com.gitpulse.gitpulse_mobile/files/ota_update');
-      candidates.add('/data/data/com.gitpulse.gitpulse_mobile/files/ota_update');
+      candidates.add(
+        '/data/user/0/com.gitpulse.gitpulse_mobile/files/ota_update',
+      );
+      candidates.add(
+        '/data/data/com.gitpulse.gitpulse_mobile/files/ota_update',
+      );
 
       for (final dirPath in candidates) {
         final dir = Directory(dirPath);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../localization/app_localizations.dart';
 import '../models/github_repo.dart';
 import '../models/user_stats.dart';
@@ -15,11 +16,7 @@ import '../widgets/language_chart.dart';
 import '../widgets/repo_tile.dart';
 import '../widgets/stat_card.dart';
 
-enum RepoSortFilter {
-  popular,
-  newest,
-  oldest,
-}
+enum RepoSortFilter { popular, newest, oldest }
 
 class StatsDetailScreen extends StatefulWidget {
   final UserStats stats;
@@ -133,12 +130,17 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
 
   Future<void> _refreshProfile() async {
     if (_isRefreshing) return;
-    final api = widget.apiService ?? GitHubApiService(storageService: widget.storageService);
+    final api =
+        widget.apiService ??
+        GitHubApiService(storageService: widget.storageService);
     setState(() => _isRefreshing = true);
     final loc = AppLocalizations.of(context);
 
     try {
-      final updated = await api.fetchUserStats(_stats.user.login, forceRefresh: true);
+      final updated = await api.fetchUserStats(
+        _stats.user.login,
+        forceRefresh: true,
+      );
       if (mounted) {
         setState(() {
           _stats = updated;
@@ -182,7 +184,9 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
     });
 
     _showThemedSnackBar(
-      icon: _isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+      icon: _isBookmarked
+          ? Icons.bookmark_rounded
+          : Icons.bookmark_border_rounded,
       iconColor: _isBookmarked ? AppTheme.accentAmber : AppTheme.textMuted,
       message: _isBookmarked
           ? loc.profileSavedToFavorites(username)
@@ -196,12 +200,13 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
     final cStats = _stats.contributionStats;
     final topLang = _stats.languageCounts.entries.isNotEmpty
         ? (_stats.languageCounts.entries.toList()
-              ..sort((a, b) => b.value.compareTo(a.value)))
-            .first
-            .key
+                ..sort((a, b) => b.value.compareTo(a.value)))
+              .first
+              .key
         : 'N/A';
 
-    final text = '''
+    final text =
+        '''
 --- GitPulse Profile Snapshot ---
 Username: @${u.login} (${u.name ?? 'Developer'})
 Title: ${cStats.commitTitle.cleanTitle} (${loc.getCommitTierLevelName(cStats.commitTitle.tier)})
@@ -228,7 +233,10 @@ GitHub: https://github.com/${u.login}
     if (uri != null) {
       final loc = AppLocalizations.of(context);
       try {
-        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
         if (!launched && mounted) {
           _showThemedSnackBar(
             icon: Icons.error_outline_rounded,
@@ -297,17 +305,16 @@ GitHub: https://github.com/${u.login}
                 Text(
                   title,
                   style: TextStyle(
-                    color: isSelected ? AppTheme.primaryCyan : AppTheme.textPrimary,
+                    color: isSelected
+                        ? AppTheme.primaryCyan
+                        : AppTheme.textPrimary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     fontSize: 13,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: TextStyle(
-                    color: AppTheme.textMuted,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 11),
                 ),
               ],
             ),
@@ -338,10 +345,7 @@ GitHub: https://github.com/${u.login}
         flexibleSpace: const AnimatedHeaderBackground(),
         title: Text(
           '@${user.login}',
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 17,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
         ),
         actions: [
           _isRefreshing
@@ -360,21 +364,33 @@ GitHub: https://github.com/${u.login}
                 )
               : IconButton(
                   tooltip: loc.refreshProfile,
-                  icon: Icon(Icons.refresh_rounded, size: 21, color: AppTheme.textSecondary),
+                  icon: Icon(
+                    Icons.refresh_rounded,
+                    size: 21,
+                    color: AppTheme.textSecondary,
+                  ),
                   onPressed: _refreshProfile,
                 ),
           IconButton(
             tooltip: _isBookmarked ? loc.removeFavorite : loc.saveFavorite,
             icon: Icon(
-              _isBookmarked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-              color: _isBookmarked ? AppTheme.accentAmber : AppTheme.textSecondary,
+              _isBookmarked
+                  ? Icons.bookmark_rounded
+                  : Icons.bookmark_border_rounded,
+              color: _isBookmarked
+                  ? AppTheme.accentAmber
+                  : AppTheme.textSecondary,
               size: 21,
             ),
             onPressed: _toggleBookmark,
           ),
           IconButton(
             tooltip: loc.shareProfile,
-            icon: Icon(Icons.share_outlined, size: 20, color: AppTheme.textSecondary),
+            icon: Icon(
+              Icons.share_outlined,
+              size: 20,
+              color: AppTheme.textSecondary,
+            ),
             onPressed: _shareSummary,
           ),
         ],
@@ -389,646 +405,736 @@ GitHub: https://github.com/${u.login}
           ),
           // ignore: deprecated_member_use
           cacheExtent: 600.0,
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            sliver: SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-            // User Header Card
-            GlassCard(
-              enableBlur: false,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(2.5),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppTheme.primaryCyan.withValues(alpha: 0.8),
-                              AppTheme.primaryViolet.withValues(alpha: 0.8),
-                            ],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primaryCyan.withValues(alpha: 0.18),
-                              blurRadius: 10,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                        ),
-                        child: CircleAvatar(
-                          radius: 32,
-                          backgroundColor: AppTheme.surfaceElevated,
-                          backgroundImage: user.avatarUrl.isNotEmpty
-                              ? ResizeImage(
-                                  NetworkImage(user.avatarUrl),
-                                  width: 160,
-                                  height: 160,
-                                )
-                              : null,
-                          child: user.avatarUrl.isEmpty
-                              ? Text(
-                                  user.login.isNotEmpty
-                                      ? user.login[0].toUpperCase()
-                                      : '?',
-                                  style: TextStyle(
-                                    color: AppTheme.primaryCyan,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 8,
-                              runSpacing: 5,
-                              children: [
-                                Text(
-                                  (user.name != null && user.name!.trim().isNotEmpty)
-                                      ? user.name!
-                                      : user.login,
-                                  style: TextStyle(
-                                    color: AppTheme.textPrimary,
-                                    fontSize: 17.5,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: -0.3,
-                                  ),
-                                ),
-                                AnimatedTierTitle(
-                                  titleInfo: titleInfo,
-                                  fontSize: 11,
-                                  showBadgeContainer: true,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: _openUserProfile,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // User Header Card
+                    GlassCard(
+                      enableBlur: false,
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(2.5),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.primaryCyan.withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: AppTheme.primaryCyan.withValues(alpha: 0.25),
-                                    width: 0.8,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      '@${user.login}',
-                                      style: TextStyle(
-                                        color: AppTheme.primaryCyan,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      AppTheme.primaryCyan.withValues(
+                                        alpha: 0.8,
                                       ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Icon(
-                                      Icons.open_in_new_rounded,
-                                      size: 11,
-                                      color: AppTheme.primaryCyan,
+                                      AppTheme.primaryViolet.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                    ],
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppTheme.primaryCyan.withValues(
+                                        alpha: 0.18,
+                                      ),
+                                      blurRadius: 10,
+                                      spreadRadius: 1,
                                     ),
                                   ],
                                 ),
+                                child: CircleAvatar(
+                                  radius: 32,
+                                  backgroundColor: AppTheme.surfaceElevated,
+                                  backgroundImage: user.avatarUrl.isNotEmpty
+                                      ? ResizeImage(
+                                          NetworkImage(user.avatarUrl),
+                                          width: 160,
+                                          height: 160,
+                                        )
+                                      : null,
+                                  child: user.avatarUrl.isEmpty
+                                      ? Text(
+                                          user.login.isNotEmpty
+                                              ? user.login[0].toUpperCase()
+                                              : '?',
+                                          style: TextStyle(
+                                            color: AppTheme.primaryCyan,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        )
+                                      : null,
+                                ),
                               ),
-                            ),
-                            if ((user.location != null && user.location!.trim().isNotEmpty) ||
-                                (user.company != null && user.company!.trim().isNotEmpty)) ...[
-                              const SizedBox(height: 6),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 4,
-                                children: [
-                                  if (user.location != null && user.location!.trim().isNotEmpty)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.surfaceElevated.withValues(alpha: 0.6),
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(color: AppTheme.border.withValues(alpha: 0.6), width: 0.7),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.location_on_outlined,
-                                            size: 12,
-                                            color: AppTheme.accentAmber,
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Wrap(
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      spacing: 8,
+                                      runSpacing: 5,
+                                      children: [
+                                        Text(
+                                          (user.name != null &&
+                                                  user.name!.trim().isNotEmpty)
+                                              ? user.name!
+                                              : user.login,
+                                          style: TextStyle(
+                                            color: AppTheme.textPrimary,
+                                            fontSize: 17.5,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: -0.3,
                                           ),
-                                          const SizedBox(width: 3.5),
-                                          ConstrainedBox(
-                                            constraints: const BoxConstraints(maxWidth: 180),
-                                            child: Text(
-                                              user.location!.trim(),
+                                        ),
+                                        AnimatedTierTitle(
+                                          titleInfo: titleInfo,
+                                          fontSize: 11,
+                                          showBadgeContainer: true,
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    InkWell(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onTap: _openUserProfile,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.primaryCyan
+                                              .withValues(alpha: 0.08),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          border: Border.all(
+                                            color: AppTheme.primaryCyan
+                                                .withValues(alpha: 0.25),
+                                            width: 0.8,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              '@${user.login}',
                                               style: TextStyle(
-                                                color: AppTheme.textSecondary,
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w500,
+                                                color: AppTheme.primaryCyan,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
                                               ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(width: 4),
+                                            Icon(
+                                              Icons.open_in_new_rounded,
+                                              size: 11,
+                                              color: AppTheme.primaryCyan,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  if (user.company != null && user.company!.trim().isNotEmpty)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.surfaceElevated.withValues(alpha: 0.6),
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(color: AppTheme.border.withValues(alpha: 0.6), width: 0.7),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
+                                    if ((user.location != null &&
+                                            user.location!.trim().isNotEmpty) ||
+                                        (user.company != null &&
+                                            user.company!
+                                                .trim()
+                                                .isNotEmpty)) ...[
+                                      const SizedBox(height: 6),
+                                      Wrap(
+                                        spacing: 6,
+                                        runSpacing: 4,
                                         children: [
-                                          Icon(
-                                            Icons.business_outlined,
-                                            size: 12,
-                                            color: AppTheme.primaryViolet,
-                                          ),
-                                          const SizedBox(width: 3.5),
-                                          ConstrainedBox(
-                                            constraints: const BoxConstraints(maxWidth: 180),
-                                            child: Text(
-                                              user.company!.trim(),
-                                              style: TextStyle(
-                                                color: AppTheme.textSecondary,
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w500,
+                                          if (user.location != null &&
+                                              user.location!.trim().isNotEmpty)
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 7,
+                                                    vertical: 2.5,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: AppTheme.surfaceElevated
+                                                    .withValues(alpha: 0.6),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                border: Border.all(
+                                                  color: AppTheme.border
+                                                      .withValues(alpha: 0.6),
+                                                  width: 0.7,
+                                                ),
                                               ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.location_on_outlined,
+                                                    size: 12,
+                                                    color: AppTheme.accentAmber,
+                                                  ),
+                                                  const SizedBox(width: 3.5),
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                          maxWidth: 180,
+                                                        ),
+                                                    child: Text(
+                                                      user.location!.trim(),
+                                                      style: TextStyle(
+                                                        color: AppTheme
+                                                            .textSecondary,
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
+                                          if (user.company != null &&
+                                              user.company!.trim().isNotEmpty)
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 7,
+                                                    vertical: 2.5,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: AppTheme.surfaceElevated
+                                                    .withValues(alpha: 0.6),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                border: Border.all(
+                                                  color: AppTheme.border
+                                                      .withValues(alpha: 0.6),
+                                                  width: 0.7,
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.business_outlined,
+                                                    size: 12,
+                                                    color:
+                                                        AppTheme.primaryViolet,
+                                                  ),
+                                                  const SizedBox(width: 3.5),
+                                                  ConstrainedBox(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                          maxWidth: 180,
+                                                        ),
+                                                    child: Text(
+                                                      user.company!.trim(),
+                                                      style: TextStyle(
+                                                        color: AppTheme
+                                                            .textSecondary,
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                         ],
                                       ),
-                                    ),
-                                ],
+                                    ],
+                                  ],
+                                ),
                               ),
                             ],
+                          ),
+                          if (user.bio != null && user.bio!.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryCyan.withValues(
+                                  alpha: 0.04,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border(
+                                  left: BorderSide(
+                                    color: AppTheme.primaryCyan.withValues(
+                                      alpha: 0.6,
+                                    ),
+                                    width: 2.5,
+                                  ),
+                                  top: BorderSide(
+                                    color: AppTheme.border.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                    width: 0.6,
+                                  ),
+                                  right: BorderSide(
+                                    color: AppTheme.border.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                    width: 0.6,
+                                  ),
+                                  bottom: BorderSide(
+                                    color: AppTheme.border.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                    width: 0.6,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                user.bio!,
+                                style: TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: 12.5,
+                                  height: 1.45,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ),
                           ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (user.bio != null && user.bio!.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryCyan.withValues(alpha: 0.04),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border(
-                          left: BorderSide(
-                            color: AppTheme.primaryCyan.withValues(alpha: 0.6),
-                            width: 2.5,
-                          ),
-                          top: BorderSide(color: AppTheme.border.withValues(alpha: 0.4), width: 0.6),
-                          right: BorderSide(color: AppTheme.border.withValues(alpha: 0.4), width: 0.6),
-                          bottom: BorderSide(color: AppTheme.border.withValues(alpha: 0.4), width: 0.6),
-                        ),
-                      ),
-                      child: Text(
-                        user.bio!,
-                        style: TextStyle(
-                          color: AppTheme.textSecondary,
-                          fontSize: 12.5,
-                          height: 1.45,
-                          fontStyle: FontStyle.italic,
-                        ),
+                        ],
                       ),
                     ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-            // Section: GitHub Contributions & Streak Statistics
-            Row(
-              children: [
-                Icon(
-                  Icons.local_fire_department_rounded,
-                  size: 18,
-                  color: AppTheme.accentOrange,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    loc.streakStatsTitle,
-                    style: TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: StatCard(
-                      label: loc.currentStreak,
-                      value: '${cStats.currentStreak} ${loc.daysUnit}',
-                      icon: Icons.whatshot_rounded,
-                      accentColor: AppTheme.accentOrange,
-                      subtitle: cStats.currentStreak > 0
-                          ? loc.activeNowBadge
-                          : loc.notActiveYetBadge,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: StatCard(
-                      label: loc.longestStreak,
-                      value: '${cStats.longestStreak} ${loc.daysUnit}',
-                      icon: Icons.emoji_events_rounded,
-                      accentColor: AppTheme.accentAmber,
-                      subtitle: loc.consistencyRecord,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: StatCard(
-                      label: '${loc.thisYearContributions} ($currentYear)',
-                      value: '${cStats.thisYearContributions}',
-                      icon: Icons.calendar_today_rounded,
-                      accentColor: AppTheme.primaryCyan,
-                      subtitle: loc.thisYearSubtitle,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: StatCard(
-                      label: loc.allYearsContributions,
-                      value: '${cStats.totalContributions}',
-                      icon: Icons.all_inclusive_rounded,
-                      accentColor: AppTheme.primaryViolet,
-                      subtitle: loc.allTimeSubtitle,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Key Metrics Grid
-            Row(
-              children: [
-                Icon(
-                  Icons.analytics_outlined,
-                  size: 18,
-                  color: AppTheme.primaryCyan,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    loc.accountOverviewTitle,
-                    style: TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: StatCard(
-                      label: loc.totalStars,
-                      value: '${widget.stats.totalStars}',
-                      icon: Icons.star_outline_rounded,
-                      accentColor: AppTheme.accentAmber,
-                      subtitle: loc.acrossAllRepos,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: StatCard(
-                      label: loc.publicRepos,
-                      value: '${user.publicRepos}',
-                      icon: Icons.folder_open_rounded,
-                      accentColor: AppTheme.primaryCyan,
-                      subtitle: loc.registeredReposSubtitle,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: StatCard(
-                      label: loc.followers,
-                      value: '${user.followers}',
-                      icon: Icons.people_outline_rounded,
-                      accentColor: AppTheme.accentGreen,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: StatCard(
-                      label: loc.totalForks,
-                      value: '${widget.stats.totalForks}',
-                      icon: Icons.call_split_rounded,
-                      accentColor: AppTheme.primaryViolet,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 18),
-
-            // Language Chart
-            LanguageChart(languageCounts: widget.stats.languageCounts),
-            const SizedBox(height: 16),
-
-            // Activity Chart
-            ActivityChart(hourlyActivity: widget.stats.hourlyActivity),
-            const SizedBox(height: 20),
-
-            // Repositories Section Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.folder_special_outlined,
-                        size: 18,
-                        color: AppTheme.primaryCyan,
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          loc.repositoriesTitle,
-                          style: TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppTheme.border, width: 0.8),
-                        ),
-                        child: Text(
-                          '${widget.stats.repos.length} ${loc.totalCountBadge}',
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                PopupMenuButton<RepoSortFilter>(
-                  initialValue: _currentFilter,
-                  tooltip: loc.filterRepositories,
-                  onSelected: (filter) {
-                    setState(() {
-                      _currentFilter = filter;
-                      _sortRepos();
-                    });
-                  },
-                  color: AppTheme.surfaceElevated,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: BorderSide(color: AppTheme.border, width: 1),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.5),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryCyan.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: AppTheme.primaryCyan.withValues(alpha: 0.22),
-                        width: 0.8,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    // Section: GitHub Contributions & Streak Statistics
+                    Row(
                       children: [
                         Icon(
-                          Icons.sort_rounded,
-                          size: 14,
-                          color: AppTheme.primaryCyan,
+                          Icons.local_fire_department_rounded,
+                          size: 18,
+                          color: AppTheme.accentOrange,
                         ),
-                        const SizedBox(width: 5),
-                        Text(
-                          _getFilterLabel(_currentFilter, loc),
-                          style: TextStyle(
-                            color: AppTheme.primaryCyan,
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            loc.streakStatsTitle,
+                            style: TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        const SizedBox(width: 3),
-                        Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          size: 15,
-                          color: AppTheme.primaryCyan,
                         ),
                       ],
                     ),
-                  ),
-                  itemBuilder: (context) => [
-                    _buildPopupMenuItem(
-                      RepoSortFilter.popular,
-                      loc.filterPopular,
-                      loc.filterPopularDesc,
-                      Icons.star_outline_rounded,
-                      AppTheme.accentAmber,
+                    const SizedBox(height: 10),
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: StatCard(
+                              label: loc.currentStreak,
+                              value: '${cStats.currentStreak} ${loc.daysUnit}',
+                              icon: Icons.whatshot_rounded,
+                              accentColor: AppTheme.accentOrange,
+                              subtitle: cStats.currentStreak > 0
+                                  ? loc.activeNowBadge
+                                  : loc.notActiveYetBadge,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: StatCard(
+                              label: loc.longestStreak,
+                              value: '${cStats.longestStreak} ${loc.daysUnit}',
+                              icon: Icons.emoji_events_rounded,
+                              accentColor: AppTheme.accentAmber,
+                              subtitle: loc.consistencyRecord,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    _buildPopupMenuItem(
-                      RepoSortFilter.newest,
-                      loc.filterNewest,
-                      loc.filterNewestDesc,
-                      Icons.update_rounded,
-                      AppTheme.primaryCyan,
+                    const SizedBox(height: 10),
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: StatCard(
+                              label:
+                                  '${loc.thisYearContributions} ($currentYear)',
+                              value: '${cStats.thisYearContributions}',
+                              icon: Icons.calendar_today_rounded,
+                              accentColor: AppTheme.primaryCyan,
+                              subtitle: loc.thisYearSubtitle,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: StatCard(
+                              label: loc.allYearsContributions,
+                              value: '${cStats.totalContributions}',
+                              icon: Icons.all_inclusive_rounded,
+                              accentColor: AppTheme.primaryViolet,
+                              subtitle: loc.allTimeSubtitle,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    _buildPopupMenuItem(
-                      RepoSortFilter.oldest,
-                      loc.filterOldest,
-                      loc.filterOldestDesc,
-                      Icons.history_rounded,
-                      AppTheme.primaryViolet,
+                    const SizedBox(height: 20),
+
+                    // Key Metrics Grid
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.analytics_outlined,
+                          size: 18,
+                          color: AppTheme.primaryCyan,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            loc.accountOverviewTitle,
+                            style: TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: StatCard(
+                              label: loc.totalStars,
+                              value: '${widget.stats.totalStars}',
+                              icon: Icons.star_outline_rounded,
+                              accentColor: AppTheme.accentAmber,
+                              subtitle: loc.acrossAllRepos,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: StatCard(
+                              label: loc.publicRepos,
+                              value: '${user.publicRepos}',
+                              icon: Icons.folder_open_rounded,
+                              accentColor: AppTheme.primaryCyan,
+                              subtitle: loc.registeredReposSubtitle,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: StatCard(
+                              label: loc.followers,
+                              value: '${user.followers}',
+                              icon: Icons.people_outline_rounded,
+                              accentColor: AppTheme.accentGreen,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: StatCard(
+                              label: loc.totalForks,
+                              value: '${widget.stats.totalForks}',
+                              icon: Icons.call_split_rounded,
+                              accentColor: AppTheme.primaryViolet,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Language Chart
+                    LanguageChart(languageCounts: widget.stats.languageCounts),
+                    const SizedBox(height: 16),
+
+                    // Activity Chart
+                    ActivityChart(hourlyActivity: widget.stats.hourlyActivity),
+                    const SizedBox(height: 20),
+
+                    // Repositories Section Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.folder_special_outlined,
+                                size: 18,
+                                color: AppTheme.primaryCyan,
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  loc.repositoriesTitle,
+                                  style: TextStyle(
+                                    color: AppTheme.textPrimary,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.surfaceElevated,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: AppTheme.border,
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Text(
+                                  '${widget.stats.repos.length} ${loc.totalCountBadge}',
+                                  style: TextStyle(
+                                    color: AppTheme.textSecondary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        PopupMenuButton<RepoSortFilter>(
+                          initialValue: _currentFilter,
+                          tooltip: loc.filterRepositories,
+                          onSelected: (filter) {
+                            setState(() {
+                              _currentFilter = filter;
+                              _sortRepos();
+                            });
+                          },
+                          color: AppTheme.surfaceElevated,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(color: AppTheme.border, width: 1),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryCyan.withValues(
+                                alpha: 0.08,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: AppTheme.primaryCyan.withValues(
+                                  alpha: 0.22,
+                                ),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.sort_rounded,
+                                  size: 14,
+                                  color: AppTheme.primaryCyan,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  _getFilterLabel(_currentFilter, loc),
+                                  style: TextStyle(
+                                    color: AppTheme.primaryCyan,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(width: 3),
+                                Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  size: 15,
+                                  color: AppTheme.primaryCyan,
+                                ),
+                              ],
+                            ),
+                          ),
+                          itemBuilder: (context) => [
+                            _buildPopupMenuItem(
+                              RepoSortFilter.popular,
+                              loc.filterPopular,
+                              loc.filterPopularDesc,
+                              Icons.star_outline_rounded,
+                              AppTheme.accentAmber,
+                            ),
+                            _buildPopupMenuItem(
+                              RepoSortFilter.newest,
+                              loc.filterNewest,
+                              loc.filterNewestDesc,
+                              Icons.update_rounded,
+                              AppTheme.primaryCyan,
+                            ),
+                            _buildPopupMenuItem(
+                              RepoSortFilter.oldest,
+                              loc.filterOldest,
+                              loc.filterOldestDesc,
+                              Icons.history_rounded,
+                              AppTheme.primaryViolet,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
+            if (repos.isEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Center(
+                    child: Text(
+                      loc.noPublicRepos,
+                      style: TextStyle(color: AppTheme.textMuted),
+                    ),
+                  ),
+                ),
+              )
+            else ...[
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => RepoTile(
+                      repo: displayedRepos[index],
+                      username: widget.stats.user.login,
+                      apiService: widget.apiService,
+                    ),
+                    childCount: displayedRepos.length,
+                  ),
+                ),
+              ),
+              if (repos.length > 10)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 6, bottom: 24),
+                    child: Center(
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 12,
+                        runSpacing: 8,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _showAllRepos = !_showAllRepos;
+                              });
+                            },
+                            icon: Icon(
+                              _showAllRepos
+                                  ? Icons.keyboard_arrow_up_rounded
+                                  : Icons.keyboard_arrow_down_rounded,
+                              size: 16,
+                              color: AppTheme.primaryCyan,
+                            ),
+                            label: Text(
+                              _showAllRepos
+                                  ? loc.showFewerRepos
+                                  : loc.showAllReposCount(repos.length),
+                              style: TextStyle(
+                                color: AppTheme.primaryCyan,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12.5,
+                              ),
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed: _openUserRepositories,
+                            icon: Icon(
+                              Icons.open_in_new_rounded,
+                              size: 14,
+                              color: AppTheme.textSecondary,
+                            ),
+                            label: Text(
+                              loc.openInGithub,
+                              style: TextStyle(
+                                color: AppTheme.textSecondary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 6, bottom: 24),
+                    child: Center(
+                      child: TextButton.icon(
+                        onPressed: _openUserRepositories,
+                        icon: Icon(
+                          Icons.open_in_new_rounded,
+                          size: 14,
+                          color: AppTheme.textSecondary,
+                        ),
+                        label: Text(
+                          loc.openInGithub,
+                          style: TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ],
         ),
       ),
-    ),
-      if (repos.isEmpty)
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Center(
-              child: Text(
-                loc.noPublicRepos,
-                style: TextStyle(color: AppTheme.textMuted),
-              ),
-            ),
-          ),
-        )
-      else ...[
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => RepoTile(
-                repo: displayedRepos[index],
-                username: widget.stats.user.login,
-                apiService: widget.apiService,
-              ),
-              childCount: displayedRepos.length,
-            ),
-          ),
-        ),
-        if (repos.length > 10)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 6, bottom: 24),
-              child: Center(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 12,
-                  runSpacing: 8,
-                  children: [
-                    TextButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          _showAllRepos = !_showAllRepos;
-                        });
-                      },
-                      icon: Icon(
-                        _showAllRepos
-                            ? Icons.keyboard_arrow_up_rounded
-                            : Icons.keyboard_arrow_down_rounded,
-                        size: 16,
-                        color: AppTheme.primaryCyan,
-                      ),
-                      label: Text(
-                        _showAllRepos
-                            ? loc.showFewerRepos
-                            : loc.showAllReposCount(repos.length),
-                        style: TextStyle(
-                          color: AppTheme.primaryCyan,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12.5,
-                        ),
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: _openUserRepositories,
-                      icon: Icon(
-                        Icons.open_in_new_rounded,
-                        size: 14,
-                        color: AppTheme.textSecondary,
-                      ),
-                      label: Text(
-                        loc.openInGithub,
-                        style: TextStyle(
-                          color: AppTheme.textSecondary,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          )
-        else
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 6, bottom: 24),
-              child: Center(
-                child: TextButton.icon(
-                  onPressed: _openUserRepositories,
-                  icon: Icon(
-                    Icons.open_in_new_rounded,
-                    size: 14,
-                    color: AppTheme.textSecondary,
-                  ),
-                  label: Text(
-                    loc.openInGithub,
-                    style: TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12.5,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ],
-    ),
-  ),
-);
+    );
   }
 }

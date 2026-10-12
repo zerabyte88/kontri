@@ -49,7 +49,9 @@ class ContributionStats {
     required int totalContributions,
   }) {
     // Tier 1: Sangat Rajin Ekstrem (Mythic/Legendary)
-    if (currentStreak >= 30 || longestStreak >= 60 || thisYearContributions >= 500) {
+    if (currentStreak >= 30 ||
+        longestStreak >= 60 ||
+        thisYearContributions >= 500) {
       return const CommitTitleInfo(
         title: 'Mythic Archmage',
         levelName: 'Sangat Rajin (Master)',
@@ -59,7 +61,9 @@ class ContributionStats {
       );
     }
     // Tier 2: Rajin & Berkelanjutan (Diamond)
-    else if (currentStreak >= 14 || longestStreak >= 30 || thisYearContributions >= 200) {
+    else if (currentStreak >= 14 ||
+        longestStreak >= 30 ||
+        thisYearContributions >= 200) {
       return const CommitTitleInfo(
         title: 'Diamond Vanguard',
         levelName: 'Sangat Rajin',
@@ -69,17 +73,22 @@ class ContributionStats {
       );
     }
     // Tier 3: Rutin & Teratur (Platinum)
-    else if (currentStreak >= 7 || longestStreak >= 14 || thisYearContributions >= 60) {
+    else if (currentStreak >= 7 ||
+        longestStreak >= 14 ||
+        thisYearContributions >= 60) {
       return const CommitTitleInfo(
         title: 'Platinum Artisan',
         levelName: 'Rajin & Stabil',
         badgeText: 'Tier: Platinum',
         tier: 3,
-        description: 'Mahir menempa karya kode dengan ritme yang konsisten dan stabil.',
+        description:
+            'Mahir menempa karya kode dengan ritme yang konsisten dan stabil.',
       );
     }
     // Tier 4: Terkadang / Sewaktu-waktu (Gold)
-    else if (currentStreak >= 3 || longestStreak >= 7 || thisYearContributions >= 20) {
+    else if (currentStreak >= 3 ||
+        longestStreak >= 7 ||
+        thisYearContributions >= 20) {
       return const CommitTitleInfo(
         title: 'Gold Adventurer',
         levelName: 'Commit Terkadang',
@@ -105,14 +114,17 @@ class ContributionStats {
         levelName: 'Belum Aktif',
         badgeText: 'Tier: Bronze',
         tier: 6,
-        description: 'Petualang baru di dunia open source. Nyalakan streak pertamamu!',
+        description:
+            'Petualang baru di dunia open source. Nyalakan streak pertamamu!',
       );
     }
   }
 
   /// Computes current and longest consecutive daily contribution streaks.
   /// Handles multi-year arrays, leap years, timezone offsets, and non-chronological lists.
-  static ({int current, int longest}) calculateStreaks(Map<DateTime, int> dayCounts) {
+  static ({int current, int longest}) calculateStreaks(
+    Map<DateTime, int> dayCounts,
+  ) {
     if (dayCounts.isEmpty) return (current: 0, longest: 0);
 
     final sortedDates = dayCounts.keys.toList()..sort();
@@ -137,7 +149,11 @@ class ContributionStats {
 
     int current = 0;
     final nowLocal = DateTime.now();
-    final todayLocal = DateTime.utc(nowLocal.year, nowLocal.month, nowLocal.day);
+    final todayLocal = DateTime.utc(
+      nowLocal.year,
+      nowLocal.month,
+      nowLocal.day,
+    );
 
     DateTime? lastActiveDate;
     for (int i = sortedDates.length - 1; i >= 0; i--) {
@@ -246,7 +262,8 @@ class ContributionStats {
     for (final event in events) {
       if (event['type'] == 'PushEvent') {
         final payload = event['payload'] as Map<String, dynamic>?;
-        final commitCount = (payload?['commits'] as List?)?.length ??
+        final commitCount =
+            (payload?['commits'] as List?)?.length ??
             (payload?['size'] as num?)?.toInt() ??
             1;
 

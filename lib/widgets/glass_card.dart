@@ -1,5 +1,7 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../services/app_theme_service.dart';
 import '../theme/app_theme.dart';
 
@@ -39,9 +41,11 @@ class GlassCard extends StatelessWidget {
       builder: (context, opacity, _) {
         final isGlass = opacity < 0.999;
         final baseColor = color ?? AppTheme.surface;
-        final effectiveColor =
-            isGlass ? baseColor.withValues(alpha: opacity) : baseColor;
-        final effectiveBorder = border ??
+        final effectiveColor = isGlass
+            ? baseColor.withValues(alpha: opacity)
+            : baseColor;
+        final effectiveBorder =
+            border ??
             Border.all(
               color: AppTheme.border.withValues(alpha: isGlass ? 0.65 : 1.0),
               width: 1.0,
@@ -54,10 +58,7 @@ class GlassCard extends StatelessWidget {
             borderRadius: effectiveRadius,
             border: effectiveBorder,
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: child,
-          ),
+          child: Material(color: Colors.transparent, child: child),
         );
 
         if (isGlass && enableBlur) {
@@ -65,7 +66,10 @@ class GlassCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: effectiveRadius,
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: blurAmount, sigmaY: blurAmount),
+                filter: ImageFilter.blur(
+                  sigmaX: blurAmount,
+                  sigmaY: blurAmount,
+                ),
                 child: box,
               ),
             ),

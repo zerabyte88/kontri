@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../localization/app_localizations.dart';
 import '../models/github_content_item.dart';
 import '../models/github_repo.dart';
@@ -190,7 +191,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     if (uri != null) {
       final loc = AppLocalizations.of(context);
       try {
-        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
         if (!launched && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -231,7 +235,12 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
   }
 
   /// Normalizes image URLs from markdown or HTML tags into raw direct URLs
-  String _normalizeImageUrl(String url, String owner, String repo, String branch) {
+  String _normalizeImageUrl(
+    String url,
+    String owner,
+    String repo,
+    String branch,
+  ) {
     var cleanUrl = url.trim();
     if (cleanUrl.startsWith('./')) {
       cleanUrl = cleanUrl.substring(2);
@@ -256,14 +265,31 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
   }
 
   /// Preprocesses raw README markdown: converts HTML <img> tags and normalizes relative image paths
-  String _preprocessReadme(String rawMarkdown, String owner, String repo, String branch) {
+  String _preprocessReadme(
+    String rawMarkdown,
+    String owner,
+    String repo,
+    String branch,
+  ) {
     var text = rawMarkdown;
 
     // 1. Convert HTML <img ... src="..." alt="..."> to Markdown ![alt](src)
-    final imgRegex = RegExp(r'<img\s+[^>]*src=["'']([^"'']+)["''][^>]*>', caseSensitive: false);
+    final imgRegex = RegExp(
+      r'<img\s+[^>]*src=["'
+      ']([^"'
+      ']+)["'
+      '][^>]*>',
+      caseSensitive: false,
+    );
     text = text.replaceAllMapped(imgRegex, (match) {
       final src = match.group(1) ?? '';
-      final altMatch = RegExp(r'alt=["'']([^"'']*)["'']', caseSensitive: false).firstMatch(match.group(0) ?? '');
+      final altMatch = RegExp(
+        r'alt=["'
+        ']([^"'
+        ']*)["'
+        ']',
+        caseSensitive: false,
+      ).firstMatch(match.group(0) ?? '');
       final alt = altMatch?.group(1) ?? '';
       final normalizedSrc = _normalizeImageUrl(src, owner, repo, branch);
       return '![$alt]($normalizedSrc)';
@@ -461,7 +487,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
               ),
               if (widget.repo.isFork)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppTheme.surfaceElevated,
                     borderRadius: BorderRadius.circular(6),
@@ -497,7 +526,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
               runSpacing: 6,
               children: widget.repo.topics.map((topic) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppTheme.primaryCyan.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
@@ -677,10 +709,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                   const SizedBox(width: 4),
                   Text(
                     widget.repo.relativeTimeAgo,
-                    style: TextStyle(
-                      color: AppTheme.textMuted,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
                   ),
                 ],
               ),
@@ -829,10 +858,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
             const SizedBox(height: 14),
             Text(
               loc.loadingReadme,
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
           ],
         ),
@@ -854,10 +880,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
             const SizedBox(height: 10),
             Text(
               _readmeError!,
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 14),
@@ -885,18 +908,11 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
         borderRadius: BorderRadius.circular(14),
         child: Column(
           children: [
-            Icon(
-              Icons.article_outlined,
-              size: 36,
-              color: AppTheme.textMuted,
-            ),
+            Icon(Icons.article_outlined, size: 36, color: AppTheme.textMuted),
             const SizedBox(height: 12),
             Text(
               loc.noReadmeFound,
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 13.5,
-              ),
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13.5),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 14),
@@ -936,14 +952,17 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
             if (href.startsWith('http://') || href.startsWith('https://')) {
               _openExternal(href);
             } else if (owner.isNotEmpty) {
-              final resolved = 'https://github.com/$owner/${widget.repo.name}/blob/$branch/$href';
+              final resolved =
+                  'https://github.com/$owner/${widget.repo.name}/blob/$branch/$href';
               _openExternal(resolved);
             }
           }
         },
         sizedImageBuilder: (config) {
           final url = config.uri.toString();
-          final isSvg = url.toLowerCase().contains('.svg') || url.contains('img.shields.io');
+          final isSvg =
+              url.toLowerCase().contains('.svg') ||
+              url.contains('img.shields.io');
 
           if (isSvg) {
             return Padding(
@@ -982,7 +1001,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: AppTheme.surfaceElevated,
                       borderRadius: BorderRadius.circular(6),
@@ -1074,14 +1096,9 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
             fontWeight: FontWeight.w600,
             fontSize: 12.5,
           ),
-          tableBody: TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 12,
-          ),
+          tableBody: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
           horizontalRuleDecoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(color: AppTheme.border, width: 0.8),
-            ),
+            border: Border(top: BorderSide(color: AppTheme.border, width: 0.8)),
           ),
         ),
       ),
@@ -1112,10 +1129,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
             const SizedBox(height: 14),
             Text(
               loc.loadingContents,
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
           ],
         ),
@@ -1163,85 +1177,88 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
       padding: EdgeInsets.zero,
       borderRadius: BorderRadius.circular(14),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Breadcrumb header
-            _buildBreadcrumbsBar(),
-            Divider(height: 1, color: AppTheme.border),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Breadcrumb header
+          _buildBreadcrumbsBar(),
+          Divider(height: 1, color: AppTheme.border),
 
-            // File / Directory list
-            if (_contents.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
-                child: Center(
-                  child: Text(
-                    loc.emptyDirectory,
-                    style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
-                  ),
+          // File / Directory list
+          if (_contents.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
+              child: Center(
+                child: Text(
+                  loc.emptyDirectory,
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
                 ),
-              )
-            else
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _contents.length,
-                separatorBuilder: (_, _) => Divider(
-                  height: 1,
-                  color: AppTheme.border.withValues(alpha: 0.5),
-                  indent: 44,
-                ),
-                itemBuilder: (context, index) {
-                  final item = _contents[index];
-                  return ListTile(
-                    dense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
-                    leading: Icon(
-                      item.iconData,
-                      size: 19,
-                      color: item.iconColor,
-                    ),
-                    title: Text(
-                      item.name,
-                      style: TextStyle(
-                        color: item.isDirectory
-                            ? AppTheme.primaryCyan
-                            : AppTheme.textPrimary,
-                        fontSize: 13.5,
-                        fontWeight: item.isDirectory ? FontWeight.w600 : FontWeight.w400,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: item.isDirectory
-                        ? Icon(
-                            Icons.chevron_right_rounded,
-                            size: 18,
-                            color: AppTheme.textMuted,
-                          )
-                        : Text(
-                            item.formattedSize,
-                            style: TextStyle(
-                              color: AppTheme.textMuted,
-                              fontSize: 11.5,
-                            ),
-                          ),
-                    onTap: () {
-                      if (item.isDirectory) {
-                        _navigateToDir(item.path);
-                      } else {
-                        _openFile(item);
-                      }
-                    },
-                  );
-                },
               ),
-          ],
-        ),
-      );
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _contents.length,
+              separatorBuilder: (_, _) => Divider(
+                height: 1,
+                color: AppTheme.border.withValues(alpha: 0.5),
+                indent: 44,
+              ),
+              itemBuilder: (context, index) {
+                final item = _contents[index];
+                return ListTile(
+                  dense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 0,
+                  ),
+                  leading: Icon(item.iconData, size: 19, color: item.iconColor),
+                  title: Text(
+                    item.name,
+                    style: TextStyle(
+                      color: item.isDirectory
+                          ? AppTheme.primaryCyan
+                          : AppTheme.textPrimary,
+                      fontSize: 13.5,
+                      fontWeight: item.isDirectory
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: item.isDirectory
+                      ? Icon(
+                          Icons.chevron_right_rounded,
+                          size: 18,
+                          color: AppTheme.textMuted,
+                        )
+                      : Text(
+                          item.formattedSize,
+                          style: TextStyle(
+                            color: AppTheme.textMuted,
+                            fontSize: 11.5,
+                          ),
+                        ),
+                  onTap: () {
+                    if (item.isDirectory) {
+                      _navigateToDir(item.path);
+                    } else {
+                      _openFile(item);
+                    }
+                  },
+                );
+              },
+            ),
+        ],
+      ),
+    );
   }
 
   Widget _buildBreadcrumbsBar() {
-    final segments = _currentPath.isEmpty ? <String>[] : _currentPath.split('/');
+    final segments = _currentPath.isEmpty
+        ? <String>[]
+        : _currentPath.split('/');
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -1272,10 +1289,15 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   InkWell(
-                    onTap: _currentPath.isNotEmpty ? () => _fetchContents('') : null,
+                    onTap: _currentPath.isNotEmpty
+                        ? () => _fetchContents('')
+                        : null,
                     borderRadius: BorderRadius.circular(6),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1315,7 +1337,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                             },
                       borderRadius: BorderRadius.circular(6),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 2,
+                          vertical: 2,
+                        ),
                         child: Text(
                           segments[i],
                           style: TextStyle(

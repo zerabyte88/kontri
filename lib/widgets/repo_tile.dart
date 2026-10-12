@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../localization/app_localizations.dart';
 import '../models/github_repo.dart';
 import '../screens/repo_detail_screen.dart';
@@ -46,7 +47,10 @@ class RepoTile extends StatelessWidget {
     if (uri != null) {
       final loc = AppLocalizations.of(context);
       try {
-        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
         if (!launched && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -157,11 +161,17 @@ class RepoTile extends StatelessWidget {
                       if (repo.isFork)
                         Container(
                           margin: const EdgeInsets.only(left: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: AppTheme.surfaceElevated,
                             borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: AppTheme.border, width: 0.8),
+                            border: Border.all(
+                              color: AppTheme.border,
+                              width: 0.8,
+                            ),
                           ),
                           child: Text(
                             'Fork',
@@ -192,139 +202,146 @@ class RepoTile extends StatelessWidget {
                       ),
                     ],
                   ),
-          if (repo.description != null && repo.description!.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(
-              repo.description!,
-              style: TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 12.5,
-                height: 1.35,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (repo.language != null && repo.language!.isNotEmpty) ...[
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: langColor,
-                        shape: BoxShape.circle,
+                  if (repo.description != null &&
+                      repo.description!.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      repo.description!,
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 12.5,
+                        height: 1.35,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(width: 5),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 80),
-                      child: Text(
-                        repo.language!,
-                        style: TextStyle(
-                          color: AppTheme.textSecondary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
                   ],
-                  Icon(
-                    Icons.star_outline_rounded,
-                    size: 15,
-                    color: AppTheme.accentAmber,
-                  ),
-                  const SizedBox(width: 3),
-                  Text(
-                    '${repo.stargazersCount}',
-                    style: TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Icon(
-                    Icons.call_split_rounded,
-                    size: 14,
-                    color: AppTheme.textMuted,
-                  ),
-                  const SizedBox(width: 3),
-                  Text(
-                    '${repo.forksCount}',
-                    style: TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                  decoration: BoxDecoration(
-                    color: repo.isRecentlyActive
-                      ? AppTheme.accentGreen.withValues(alpha: 0.10)
-                      : AppTheme.surfaceElevated,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: repo.isRecentlyActive
-                        ? AppTheme.accentGreen.withValues(alpha: 0.25)
-                        : AppTheme.border,
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(
-                        repo.isRecentlyActive
-                            ? Icons.update_rounded
-                            : Icons.history_rounded,
-                        size: 11,
-                        color: repo.isRecentlyActive
-                            ? AppTheme.accentGreen
-                            : AppTheme.textMuted,
-                      ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          AppLocalizations.of(context).formatRelativeTime(repo.latestActivityDate),
-                          style: TextStyle(
-                            color: repo.isRecentlyActive
-                                ? AppTheme.accentGreen
-                                : AppTheme.textMuted,
-                            fontSize: 10.5,
-                            fontWeight: repo.isRecentlyActive
-                                ? FontWeight.w600
-                                : FontWeight.w500,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (repo.language != null &&
+                              repo.language!.isNotEmpty) ...[
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: langColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 80),
+                              child: Text(
+                                repo.language!,
+                                style: TextStyle(
+                                  color: AppTheme.textSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          Icon(
+                            Icons.star_outline_rounded,
+                            size: 15,
+                            color: AppTheme.accentAmber,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          const SizedBox(width: 3),
+                          Text(
+                            '${repo.stargazersCount}',
+                            style: TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Icon(
+                            Icons.call_split_rounded,
+                            size: 14,
+                            color: AppTheme.textMuted,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${repo.forksCount}',
+                            style: TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 2.5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: repo.isRecentlyActive
+                                ? AppTheme.accentGreen.withValues(alpha: 0.10)
+                                : AppTheme.surfaceElevated,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: repo.isRecentlyActive
+                                  ? AppTheme.accentGreen.withValues(alpha: 0.25)
+                                  : AppTheme.border,
+                              width: 0.8,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                repo.isRecentlyActive
+                                    ? Icons.update_rounded
+                                    : Icons.history_rounded,
+                                size: 11,
+                                color: repo.isRecentlyActive
+                                    ? AppTheme.accentGreen
+                                    : AppTheme.textMuted,
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  ).formatRelativeTime(repo.latestActivityDate),
+                                  style: TextStyle(
+                                    color: repo.isRecentlyActive
+                                        ? AppTheme.accentGreen
+                                        : AppTheme.textMuted,
+                                    fontSize: 10.5,
+                                    fontWeight: repo.isRecentlyActive
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ],
+        ),
       ),
-    ),
-  ),
-),
-),
-);
+    );
   }
 }

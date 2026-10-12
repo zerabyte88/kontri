@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/bookmarked_user.dart';
 import '../models/tech_news.dart';
 
@@ -30,7 +32,9 @@ class StorageService {
     if (raw == null || raw.isEmpty) return {};
     try {
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
-      return decoded.map((key, value) => MapEntry(key.toLowerCase(), value.toString()));
+      return decoded.map(
+        (key, value) => MapEntry(key.toLowerCase(), value.toString()),
+      );
     } catch (_) {
       return {};
     }
@@ -72,7 +76,8 @@ class StorageService {
         username: username,
         avatarUrl: (avatar != null && avatar.isNotEmpty)
             ? avatar
-            : (userDetail['avatar_url'] as String? ?? 'https://github.com/$username.png'),
+            : (userDetail['avatar_url'] as String? ??
+                  'https://github.com/$username.png'),
         name: userDetail['name'] as String?,
         bio: userDetail['bio'] as String?,
         location: userDetail['location'] as String?,
@@ -226,7 +231,8 @@ class StorageService {
 
   // Theme Settings
   static const String _keyThemeMode = 'gitpulse_theme_mode';
-  static const String _keyJapaneseEasterEgg = 'gitpulse_japanese_theme_unlocked';
+  static const String _keyJapaneseEasterEgg =
+      'gitpulse_japanese_theme_unlocked';
 
   String getThemeMode() {
     return _prefs.getString(_keyThemeMode) ?? 'dark';
@@ -248,7 +254,7 @@ class StorageService {
   static const String _keySurfaceOpacity = 'gitpulse_surface_opacity';
 
   double getSurfaceOpacity() {
-    return _prefs.getDouble(_keySurfaceOpacity) ?? 0.85;
+    return _prefs.getDouble(_keySurfaceOpacity) ?? 1.0;
   }
 
   Future<void> setSurfaceOpacity(double opacity) async {
@@ -337,7 +343,10 @@ class StorageService {
     return DateTime.fromMillisecondsSinceEpoch(epoch);
   }
 
-  bool isHttpCacheValid(String key, {Duration ttl = const Duration(minutes: 10)}) {
+  bool isHttpCacheValid(
+    String key, {
+    Duration ttl = const Duration(minutes: 10),
+  }) {
     final cleanKey = key.trim().toLowerCase();
     final hasBody = _prefs.containsKey('$_keyHttpCachePrefix$cleanKey');
     if (!hasBody) return false;
@@ -346,7 +355,10 @@ class StorageService {
     return DateTime.now().difference(timestamp) < ttl;
   }
 
-  Future<void> updateHttpCacheTimestamp(String key, [DateTime? timestamp]) async {
+  Future<void> updateHttpCacheTimestamp(
+    String key, [
+    DateTime? timestamp,
+  ]) async {
     final cleanKey = key.trim().toLowerCase();
     await _prefs.setInt(
       '$_keyHttpTimePrefix$cleanKey',

@@ -37,7 +37,8 @@ class TechNews {
           .toList();
     }
 
-    final rawCover = json['cover_image'] as String? ?? json['social_image'] as String?;
+    final rawCover =
+        json['cover_image'] as String? ?? json['social_image'] as String?;
 
     return TechNews(
       id: json['id'] as int? ?? 0,
@@ -45,14 +46,17 @@ class TechNews {
       description: json['description'] as String? ?? '',
       url: json['url'] as String? ?? '',
       coverImage: sanitizeImageUrl(rawCover),
-      authorName: user?['name'] as String? ??
+      authorName:
+          user?['name'] as String? ??
           user?['username'] as String? ??
           json['author_name'] as String? ??
           'Tech Contributor',
-      authorAvatar: user?['profile_image_90'] as String? ??
+      authorAvatar:
+          user?['profile_image_90'] as String? ??
           user?['profile_image'] as String? ??
           json['author_avatar'] as String?,
-      publishedDate: json['readable_publish_date'] as String? ??
+      publishedDate:
+          json['readable_publish_date'] as String? ??
           json['published_date'] as String? ??
           'Terbaru',
       readingTimeMinutes: json['reading_time_minutes'] as int? ?? 3,
