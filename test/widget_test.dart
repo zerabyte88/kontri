@@ -608,15 +608,15 @@ void main() {
         expect(zhHantLoc.searchHint, '搜尋...');
         expect(koLoc.searchHint, '검색...');
 
-        // Theme options (Gelap, AMOLED, Terang, AMOLED Sakura)
-        expect(idLoc.themeDark, 'Gelap');
-        expect(idLoc.themeAmoled, 'AMOLED');
-        expect(idLoc.themeLight, 'Terang');
-        expect(idLoc.themeAmoledJapanese, 'AMOLED Sakura');
-        expect(enLoc.themeDark, 'Dark');
-        expect(enLoc.themeAmoled, 'AMOLED');
-        expect(enLoc.themeLight, 'Light');
-        expect(enLoc.themeAmoledJapanese, 'AMOLED Sakura');
+        // Theme options (Snowfall, Midnight, Daylight, Sakura)
+        expect(idLoc.themeDark, 'Snowfall');
+        expect(idLoc.themeAmoled, 'Midnight');
+        expect(idLoc.themeLight, 'Daylight');
+        expect(idLoc.themeAmoledJapanese, 'Sakura');
+        expect(enLoc.themeDark, 'Snowfall');
+        expect(enLoc.themeAmoled, 'Midnight');
+        expect(enLoc.themeLight, 'Daylight');
+        expect(enLoc.themeAmoledJapanese, 'Sakura');
 
         // Filter labels
         expect(idLoc.filterPopular, 'Terpopuler');
@@ -763,13 +763,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v2.4.0',
+      'AppConfig provides accurate release and version telemetry for v2.4.1',
       () {
         expect(AppConfig.appName, 'GitPulse');
-        expect(AppConfig.appVersion, 'v2.4.0');
-        expect(AppConfig.buildNumber, '21');
-        expect(AppConfig.fullVersion, 'v2.4.0 (Build 21)');
-        expect(AppConfig.releaseTag, 'v2.4.0');
+        expect(AppConfig.appVersion, 'v2.4.1');
+        expect(AppConfig.buildNumber, '22');
+        expect(AppConfig.fullVersion, 'v2.4.1 (Build 22)');
+        expect(AppConfig.releaseTag, 'v2.4.1');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1070,7 +1070,7 @@ void main() {
       AppTheme.currentMode = AppThemeMode.dark;
 
       // Verify distinct primary accents
-      expect(darkTheme.primaryColor, const Color(0xFF38BDF8));
+      expect(darkTheme.primaryColor, const Color(0xFF2563EB));
       expect(amoledTheme.primaryColor, const Color(0xFF00E5FF));
       expect(sakuraTheme.primaryColor, const Color(0xFFF472B6));
       expect(lightTheme.primaryColor, const Color(0xFF2563EB));
@@ -2104,15 +2104,13 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('renders without error in AMOLED Night mode', (tester) async {
+    testWidgets('renders without error in Midnight mode', (tester) async {
       await pumpBackground(tester, AppThemeMode.amoled);
       expect(find.byType(AnimatedAppBackground), findsOneWidget);
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('renders without error in Dark Thunderstorm mode', (
-      tester,
-    ) async {
+    testWidgets('renders without error in Snowfall mode', (tester) async {
       await pumpBackground(tester, AppThemeMode.dark);
       expect(find.byType(AnimatedAppBackground), findsOneWidget);
       expect(find.byType(CustomPaint), findsWidgets);
@@ -2263,7 +2261,7 @@ void main() {
     );
 
     testWidgets(
-      'AnimatedAppBackground pauses animation controller during scroll and resumes after scroll ends',
+      'AnimatedAppBackground continues rendering smoothly during scroll and idle',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
         final prefs = await SharedPreferences.getInstance();

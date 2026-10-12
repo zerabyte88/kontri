@@ -547,75 +547,79 @@ class AppLocalizations {
   });
 
   String get themeDark => _str({
-    AppLanguage.indonesian: 'Gelap',
-    AppLanguage.english: 'Dark',
-    AppLanguage.japanese: 'ダーク',
-    AppLanguage.chineseSimplified: '暗色',
-    AppLanguage.chineseTraditional: '暗色',
-    AppLanguage.korean: '다크',
+    AppLanguage.indonesian: 'Snowfall',
+    AppLanguage.english: 'Snowfall',
+    AppLanguage.japanese: 'Snowfall',
+    AppLanguage.chineseSimplified: 'Snowfall',
+    AppLanguage.chineseTraditional: 'Snowfall',
+    AppLanguage.korean: 'Snowfall',
   });
 
   String get themeDarkSubtitle => _str({
-    AppLanguage.indonesian: 'GitHub Slate',
-    AppLanguage.english: 'GitHub Slate',
-    AppLanguage.japanese: 'GitHub Slate 風',
-    AppLanguage.chineseSimplified: 'GitHub Slate 风格',
-    AppLanguage.chineseTraditional: 'GitHub Slate 風格',
-    AppLanguage.korean: 'GitHub Slate 스타일',
+    AppLanguage.indonesian:
+        'Malam Pedesaan Berselimut Salju & Cahaya Hangat Pondok',
+    AppLanguage.english: 'Snowy village night & warm cabin glow',
+    AppLanguage.japanese: '雪に覆われた村の夜と温かい小屋の明かり',
+    AppLanguage.chineseSimplified: '雪覆村落之夜与温馨木屋暖光',
+    AppLanguage.chineseTraditional: '雪覆村落之夜與溫馨木屋暖光',
+    AppLanguage.korean: '눈 덮인 시골 마을의 밤과 아늑한 오두막의 온기',
   });
 
   String get themeAmoled => _str({
-    AppLanguage.indonesian: 'AMOLED',
-    AppLanguage.english: 'AMOLED',
-    AppLanguage.japanese: 'AMOLED',
-    AppLanguage.chineseSimplified: 'AMOLED',
-    AppLanguage.chineseTraditional: 'AMOLED',
-    AppLanguage.korean: 'AMOLED',
+    AppLanguage.indonesian: 'Midnight',
+    AppLanguage.english: 'Midnight',
+    AppLanguage.japanese: 'Midnight',
+    AppLanguage.chineseSimplified: 'Midnight',
+    AppLanguage.chineseTraditional: 'Midnight',
+    AppLanguage.korean: 'Midnight',
   });
 
   String get themeAmoledSubtitle => _str({
-    AppLanguage.indonesian: 'OLED Pure Black',
-    AppLanguage.english: 'OLED Pure Black',
-    AppLanguage.japanese: 'OLED 完全な黒',
-    AppLanguage.chineseSimplified: 'OLED 纯黑底色',
-    AppLanguage.chineseTraditional: 'OLED 純黑底色',
-    AppLanguage.korean: 'OLED 퓨어 블랙',
+    AppLanguage.indonesian:
+        'Hitam Pekat AMOLED • Bulan Sabit, Bintang & Hujan Meteor',
+    AppLanguage.english:
+        'True AMOLED black • Crescent moon, stars & shooting stars',
+    AppLanguage.japanese: '真のAMOLEDブラック • 三日月、星、流れ星',
+    AppLanguage.chineseSimplified: '极致纯黑 AMOLED • 新月、星辰与流星雨',
+    AppLanguage.chineseTraditional: '極致純黑 AMOLED • 新月、星辰與流星雨',
+    AppLanguage.korean: '트루 AMOLED 블랙 • 초승달, 별 그리고 별똥별',
   });
 
   String get themeAmoledJapanese => _str({
-    AppLanguage.indonesian: 'AMOLED Sakura',
-    AppLanguage.english: 'AMOLED Sakura',
-    AppLanguage.japanese: 'AMOLED Sakura',
-    AppLanguage.chineseSimplified: 'AMOLED 樱花',
-    AppLanguage.chineseTraditional: 'AMOLED 櫻花',
-    AppLanguage.korean: 'AMOLED 사쿠라',
+    AppLanguage.indonesian: 'Sakura',
+    AppLanguage.english: 'Sakura',
+    AppLanguage.japanese: 'Sakura',
+    AppLanguage.chineseSimplified: 'Sakura',
+    AppLanguage.chineseTraditional: 'Sakura',
+    AppLanguage.korean: 'Sakura',
   });
 
   String get themeAmoledJapaneseSubtitle => _str({
-    AppLanguage.indonesian: 'Neo-Tokyo Sakura',
-    AppLanguage.english: 'Neo-Tokyo Sakura',
-    AppLanguage.japanese: 'ネオ東京・桜',
-    AppLanguage.chineseSimplified: '新东京・樱花',
-    AppLanguage.chineseTraditional: '新東京・櫻花',
-    AppLanguage.korean: '네오도쿄 사쿠라',
+    AppLanguage.indonesian: 'Hitam Pekat AMOLED • Ranting & Bunga Sakura Mekar',
+    AppLanguage.english:
+        'True AMOLED black • Blooming branches & sakura blossoms',
+    AppLanguage.japanese: '真のAMOLEDブラック • 咲き誇る枝と桜の花びら',
+    AppLanguage.chineseSimplified: '极致纯黑 AMOLED • 盛开枝桠与纷飞樱花',
+    AppLanguage.chineseTraditional: '極致純黑 AMOLED • 盛開枝椏與紛飛櫻花',
+    AppLanguage.korean: '트루 AMOLED 블랙 • 꽃핀 가지와 벚꽃 잎',
   });
 
   String get themeLight => _str({
-    AppLanguage.indonesian: 'Terang',
-    AppLanguage.english: 'Light',
-    AppLanguage.japanese: 'ライト',
-    AppLanguage.chineseSimplified: '明亮',
-    AppLanguage.chineseTraditional: '明亮',
-    AppLanguage.korean: '라이트',
+    AppLanguage.indonesian: 'Daylight',
+    AppLanguage.english: 'Daylight',
+    AppLanguage.japanese: 'Daylight',
+    AppLanguage.chineseSimplified: 'Daylight',
+    AppLanguage.chineseTraditional: 'Daylight',
+    AppLanguage.korean: 'Daylight',
   });
 
   String get themeLightSubtitle => _str({
-    AppLanguage.indonesian: 'Clean Light',
-    AppLanguage.english: 'Clean Light',
-    AppLanguage.japanese: 'クリーンライト',
-    AppLanguage.chineseSimplified: '清新明亮',
-    AppLanguage.chineseTraditional: '清新明亮',
-    AppLanguage.korean: '클린 라이트',
+    AppLanguage.indonesian: 'Sinar Mentari Hangat & Hembusan Angin Segar',
+    AppLanguage.english: 'Warm golden sunrays & fresh daylight breeze',
+    AppLanguage.japanese: '暖かい黄金色の陽射しと爽やかな日中の風',
+    AppLanguage.chineseSimplified: '温暖金色暖阳与清新日间微风',
+    AppLanguage.chineseTraditional: '溫暖金色暖陽與清新日間微風',
+    AppLanguage.korean: '따스한 황금빛 햇살과 상쾌한 낮의 산들바람',
   });
 
   String get settingsBypassShaderNotice => _str({

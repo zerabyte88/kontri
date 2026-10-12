@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.4.0&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.4.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -167,6 +167,13 @@ The compiled release APK will be generated at:
 
 # Version History
 
+* ### v2.4.1
+  - **Phantek Ambient Visuals & Engine Unification:**
+    - *Snowfall Village Night (Dark Mode):* 1:1 ambient canvas rendering from Phantek featuring distant rolling snow hills, 3-tier snow-capped pine trees (`_drawSnowyPine`), warm glowing cabins with chimney smoke puffs and window halo pulses (`_drawSnowyCabin`), and 3 varieties of crystalline snowflakes (cross-crystal, soft halo, and snow dots).
+    - *Sunlight Flare & Daylight Breeze (Light Mode):* 1:1 ambient canvas rendering from Phantek featuring radiant top-right sunlight flare bloom (`#F59E0B` & `#FBBF24`) and 34 upward-drifting sunlight motes and fresh breeze particles.
+    - *100% Seamless Continuous Looping Dynamics:* All particle and celestial trajectories (Snowflakes, Sunlight motes, Sakura petals, Meteors) calibrated with strict integer cycles, eliminating any loop seam, pop-in, or trajectory jump at boundary wrapping.
+    - *60 FPS Buttery Smooth Framerate & 12-Second Majestic Pacing:* Extended cycle duration to 12.0 seconds with ~60 FPS quantized pacing (`720` steps), ensuring fluid motion while preserving battery life on 90Hz/120Hz displays.
+
 * ### v2.4.0
   - **Phantek-Inspired Modern Aesthetics & Global Language Expansion:**
     - *22 Global Languages Support:* Expanded localization engine from 6 to 22 global languages (`id, ms, da, de, en, es, fr, it, nl, no, pt, fi, sv, vi, ru, ar, hi, th, ja, zh_Hans, zh_Hant, ko`), complete with native names, region flags, dynamic fallback keys, and an A–Z sorted selection interface.
@@ -175,6 +182,7 @@ The compiled release APK will be generated at:
     - *Route Occlusion Animation Pause:* Background canvas animations automatically pause when entering the settings screen, ensuring 0% GPU waste while configuring options.
     - *Zero-Network System Typography Switch:* Completely removed external `google_fonts` network dependency in favor of native Material 3 system typefaces (Roboto / SF Pro), achieving zero-HTTP cold boots and faster initial frame rendering.
     - *60 FPS Shader Bypass at 100% Surface Opacity:* Default surface opacity updated to 1.0 (Solid), automatically bypassing GPU `BackdropFilter` passes for pristine 60/120 FPS rasterization.
+    - *Continuous Ambient Background Flow (Scroll & Idle):* Enhanced background canvas to flow seamlessly without stopping during scroll gestures or when idle, leveraging isolated `RepaintBoundary` layers for jitter-free 60/120 FPS compositing.
 
 * ### v2.3.2
   - **Bespoke Fluid Page Transitions Engine (`GitPulsePageTransitionsBuilder`):**

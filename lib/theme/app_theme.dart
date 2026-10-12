@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'GitPulse';
-  static const String appVersion = 'v2.4.0';
-  static const String buildNumber = '21';
-  static const String fullVersion = 'v2.4.0 (Build 21)';
-  static const String releaseTag = 'v2.4.0';
+  static const String appVersion = 'v2.4.1';
+  static const String buildNumber = '22';
+  static const String fullVersion = 'v2.4.1 (Build 22)';
+  static const String releaseTag = 'v2.4.1';
   static const String githubRepoUrl =
       'https://github.com/zerabyte88/gitpulse-mobile';
   static const String developerUsername = 'zerabyte88';
@@ -93,7 +93,7 @@ class AppTheme {
       0xFFF472B6,
     ), // Radiant Sakura Blossom
     AppThemeMode.light => const Color(0xFF2563EB), // Modern Cobalt Blue
-    AppThemeMode.dark => const Color(0xFF38BDF8), // Sky Cyan Slate
+    AppThemeMode.dark => const Color(0xFF2563EB), // Modern Cobalt Blue
   };
 
   static Color get primaryViolet => switch (currentMode) {
@@ -102,7 +102,7 @@ class AppTheme {
       0xFFFDA4AF,
     ), // Rose Quartz Sakura Accent
     AppThemeMode.light => const Color(0xFF0284C7), // Sky Accent
-    AppThemeMode.dark => const Color(0xFFA78BFA), // Soft Violet
+    AppThemeMode.dark => const Color(0xFF0284C7), // Sky Accent
   };
 
   static Color get accentGreen => switch (currentMode) {
@@ -190,14 +190,14 @@ class AppTheme {
       AppThemeMode.amoled => const Color(0xFF00E5FF),
       AppThemeMode.amoledJapanese => const Color(0xFFF472B6),
       AppThemeMode.light => const Color(0xFF2563EB),
-      AppThemeMode.dark => const Color(0xFF38BDF8),
+      AppThemeMode.dark => const Color(0xFF2563EB),
     };
 
     final sec = switch (mode) {
       AppThemeMode.amoled => const Color(0xFFA855F7),
       AppThemeMode.amoledJapanese => const Color(0xFFFDA4AF),
       AppThemeMode.light => const Color(0xFF0284C7),
-      AppThemeMode.dark => const Color(0xFFA78BFA),
+      AppThemeMode.dark => const Color(0xFF0284C7),
     };
 
     final txtPrim = switch (mode) {
