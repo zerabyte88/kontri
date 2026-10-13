@@ -608,15 +608,15 @@ void main() {
         expect(zhHantLoc.searchHint, '搜尋...');
         expect(koLoc.searchHint, '검색...');
 
-        // Theme options (SNOWFALL, MIDNIGHT, DAYLIGHT, SAKURA)
-        expect(idLoc.themeDark, 'SNOWFALL');
-        expect(idLoc.themeAmoled, 'MIDNIGHT');
-        expect(idLoc.themeLight, 'DAYLIGHT');
-        expect(idLoc.themeAmoledJapanese, 'SAKURA');
-        expect(enLoc.themeDark, 'SNOWFALL');
-        expect(enLoc.themeAmoled, 'MIDNIGHT');
-        expect(enLoc.themeLight, 'DAYLIGHT');
-        expect(enLoc.themeAmoledJapanese, 'SAKURA');
+        // Theme options (Snowfall, Midnight, Daylight, Sakura)
+        expect(idLoc.themeDark, 'Snowfall');
+        expect(idLoc.themeAmoled, 'Midnight');
+        expect(idLoc.themeLight, 'Daylight');
+        expect(idLoc.themeAmoledJapanese, 'Sakura');
+        expect(enLoc.themeDark, 'Snowfall');
+        expect(enLoc.themeAmoled, 'Midnight');
+        expect(enLoc.themeLight, 'Daylight');
+        expect(enLoc.themeAmoledJapanese, 'Sakura');
 
         // Filter labels
         expect(idLoc.filterPopular, 'Terpopuler');
@@ -763,13 +763,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v2.4.2',
+      'AppConfig provides accurate release and version telemetry for v2.4.3',
       () {
         expect(AppConfig.appName, 'GitPulse');
-        expect(AppConfig.appVersion, 'v2.4.2');
-        expect(AppConfig.buildNumber, '23');
-        expect(AppConfig.fullVersion, 'v2.4.2 (Build 23)');
-        expect(AppConfig.releaseTag, 'v2.4.2');
+        expect(AppConfig.appVersion, 'v2.4.3');
+        expect(AppConfig.buildNumber, '24');
+        expect(AppConfig.fullVersion, 'v2.4.3 (Build 24)');
+        expect(AppConfig.releaseTag, 'v2.4.3');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1993,15 +1993,10 @@ void main() {
         // Initially trending category is active
         expect(find.byKey(const ValueKey('trending')), findsOneWidget);
 
-        // Tap on GitHub category chip (label is 'GitHub Digest')
-        final githubChip = find.byWidgetPredicate(
-          (w) =>
-              w is ChoiceChip &&
-              w.label is Text &&
-              (w.label as Text).data == 'GitHub Digest',
-        );
-        expect(githubChip, findsOneWidget);
-        await tester.tap(githubChip);
+        // Tap on GitHub category tab (label is 'GitHub Digest')
+        final githubTab = find.text('GitHub Digest');
+        expect(githubTab, findsOneWidget);
+        await tester.tap(githubTab);
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 300));
 

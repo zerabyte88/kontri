@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
 import '../localization/app_localizations.dart';
@@ -33,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final FocusNode _searchFocusNode = FocusNode();
   late final TechNewsService _newsService;
   final ScrollController _categoryScrollController = ScrollController();
-  final Map<String, GlobalKey> _categoryKeys = {};
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -130,6 +132,35 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  (List<double>, List<double>) _calculateCategoryMetrics(
+    List<Map<String, String>> categories,
+    BuildContext context,
+  ) {
+    const gap = 4.0;
+    final widths = <double>[];
+    final offsets = <double>[];
+    double currentOffset = 0.0;
+
+    for (int i = 0; i < categories.length; i++) {
+      final label = categories[i]['label']!;
+      final textSpan = TextSpan(
+        text: label,
+        style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.w600),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+
+      final w = math.max(76.0, textPainter.width + 26.0);
+      widths.add(w);
+      offsets.add(currentOffset);
+      currentOffset += w + gap;
+    }
+    return (widths, offsets);
+  }
+
   void _onCategoryChipTapped(int index, List<Map<String, String>> categories) {
     if (index < 0 || index >= categories.length) return;
     final targetCategory = categories[index]['id']!;
@@ -143,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_newsPageController.hasClients) {
       _newsPageController.animateToPage(
         index,
-        duration: const Duration(milliseconds: 320),
+        duration: const Duration(milliseconds: 280),
         curve: Curves.easeOutCubic,
       );
     }
@@ -167,32 +198,24 @@ class _HomeScreenState extends State<HomeScreen> {
     List<Map<String, String>> categories,
   ) {
     if (index < 0 || index >= categories.length) return;
-    final catId = categories[index]['id']!;
-    final key = _categoryKeys[catId];
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final keyContext = key?.currentContext;
-      if (keyContext != null) {
-        Scrollable.ensureVisible(
-          keyContext,
-          alignment: 0.5,
-          duration: const Duration(milliseconds: 320),
-          curve: Curves.easeOutCubic,
-        );
-      } else if (_categoryScrollController.hasClients) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final estimatedCenter = (index * 105.0) + 52.0;
-        final targetOffset = (estimatedCenter - (screenWidth / 2)).clamp(
-          0.0,
-          _categoryScrollController.position.maxScrollExtent,
-        );
-        _categoryScrollController.animateTo(
-          targetOffset,
-          duration: const Duration(milliseconds: 320),
-          curve: Curves.easeOutCubic,
-        );
-      }
+      if (!mounted || !_categoryScrollController.hasClients) return;
+      final (widths, offsets) = _calculateCategoryMetrics(categories, context);
+      if (index >= widths.length || index >= offsets.length) return;
+
+      final screenWidth = MediaQuery.of(context).size.width;
+      final tabCenter = offsets[index] + (widths[index] / 2);
+      final maxScroll = _categoryScrollController.position.maxScrollExtent;
+      final targetOffset = (tabCenter - (screenWidth / 2)).clamp(
+        0.0,
+        maxScroll,
+      );
+      _categoryScrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+      );
     });
   }
 
@@ -1286,87 +1309,181 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 10),
 
-        // Category Filter Chips
-        SizedBox(
-          height: 38,
-          child: ListView.separated(
-            controller: _categoryScrollController,
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            clipBehavior: Clip.none,
-            itemCount: categories.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 8),
-            itemBuilder: (context, index) {
-              final cat = categories[index];
-              final isSelected = cat['id'] == _selectedCategory;
-              final catKey = _categoryKeys.putIfAbsent(
-                cat['id']!,
-                () => GlobalKey(),
-              );
-              return KeyedSubtree(
-                key: catKey,
-                child: AnimatedScale(
-                  scale: isSelected ? 1.04 : 1.0,
-                  duration: const Duration(milliseconds: 320),
-                  curve: Curves.easeOutCubic,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 320),
-                    curve: Curves.easeOutCubic,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(9),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
+        // Phantek Gallery Continuous Sliding Capsule Category Bar
+        Builder(
+          builder: (context) {
+            final (widths, offsets) = _calculateCategoryMetrics(
+              categories,
+              context,
+            );
+            final totalWidth =
+                offsets.isNotEmpty ? offsets.last + widths.last : 0.0;
+            final selectedIndex = categories.indexWhere(
+              (c) => c['id'] == _selectedCategory,
+            );
+            final safeIndex = selectedIndex >= 0 ? selectedIndex : 0;
+
+            return Container(
+              height: 42,
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: AppTheme.border,
+                  width: 1.0,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+              child: SingleChildScrollView(
+                controller: _categoryScrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: SizedBox(
+                  width: totalWidth,
+                  height: 34,
+                  child: Stack(
+                    children: [
+                      // Continuous sliding capsule indicator (Interpolated from PageController)
+                      AnimatedBuilder(
+                        animation: _newsPageController,
+                        builder: (context, _) {
+                          double page = safeIndex.toDouble();
+                          if (_newsPageController.hasClients) {
+                            page =
+                                _newsPageController.page ?? safeIndex.toDouble();
+                          }
+                          page = page.clamp(
+                            0.0,
+                            (categories.length - 1).toDouble(),
+                          );
+
+                          final int from =
+                              page.floor().clamp(0, categories.length - 1);
+                          final int to =
+                              page.ceil().clamp(0, categories.length - 1);
+                          final double progress = page - from;
+
+                          final double currentLeft = ui.lerpDouble(
+                            offsets[from],
+                            offsets[to],
+                            progress,
+                          )!;
+                          final double currentWidth = ui.lerpDouble(
+                            widths[from],
+                            widths[to],
+                            progress,
+                          )!;
+
+                          return Positioned(
+                            left: currentLeft,
+                            top: 0,
+                            bottom: 0,
+                            width: currentWidth,
+                            child: Container(
+                              decoration: BoxDecoration(
                                 color: AppTheme.primaryCyan.withValues(
-                                  alpha: 0.22,
+                                  alpha: 0.16,
                                 ),
-                                blurRadius: 8.0,
-                                spreadRadius: 0.5,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppTheme.primaryCyan.withValues(
+                                    alpha: 0.70,
+                                  ),
+                                  width: 1.2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppTheme.primaryCyan.withValues(
+                                      alpha: 0.22,
+                                    ),
+                                    blurRadius: 8.0,
+                                    spreadRadius: 0.5,
+                                  ),
+                                ],
                               ),
-                            ]
-                          : null,
-                    ),
-                    child: ChoiceChip(
-                      label: Text(
-                        cat['label']!,
-                        style: TextStyle(
-                          color: isSelected
-                              ? AppTheme.primaryCyan
-                              : AppTheme.textSecondary,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.w400,
-                          fontSize: 12,
-                        ),
+                            ),
+                          );
+                        },
                       ),
-                      selected: isSelected,
-                      selectedColor: AppTheme.primaryCyan.withValues(
-                        alpha: 0.12,
+
+                      // Category tab labels
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          for (int i = 0; i < categories.length; i++) ...[
+                            if (i > 0) const SizedBox(width: 4),
+                            _buildCategoryTabItem(
+                              i,
+                              categories[i],
+                              widths[i],
+                              safeIndex,
+                              categories,
+                            ),
+                          ],
+                        ],
                       ),
-                      backgroundColor: AppTheme.surface,
-                      side: BorderSide(
-                        color: isSelected
-                            ? AppTheme.primaryCyan
-                            : AppTheme.border,
-                        width: isSelected ? 1.1 : 0.8,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      showCheckmark: false,
-                      onSelected: (selected) {
-                        if (selected && _selectedCategory != cat['id']) {
-                          _onCategoryChipTapped(index, categories);
-                        }
-                      },
-                    ),
+                    ],
                   ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ],
+    );
+  }
+
+  Widget _buildCategoryTabItem(
+    int index,
+    Map<String, String> cat,
+    double width,
+    int activeIndex,
+    List<Map<String, String>> categories,
+  ) {
+    return AnimatedBuilder(
+      animation: _newsPageController,
+      builder: (context, _) {
+        double page = activeIndex.toDouble();
+        if (_newsPageController.hasClients) {
+          page = _newsPageController.page ?? activeIndex.toDouble();
+        }
+        final double distance = (page - index).abs();
+        final double activeFactor = (1.0 - distance).clamp(0.0, 1.0);
+        final color = Color.lerp(
+          AppTheme.textSecondary,
+          AppTheme.primaryCyan,
+          activeFactor,
+        )!;
+        final fontWeight =
+            activeFactor > 0.5 ? FontWeight.w600 : FontWeight.w500;
+
+        return SizedBox(
+          width: width,
+          height: 34,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              splashColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
+              highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
+              onTap: () => _onCategoryChipTapped(index, categories),
+              child: Center(
+                child: Text(
+                  cat['label']!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 12,
+                    fontWeight: fontWeight,
+                    letterSpacing: 0.1,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -547,12 +547,12 @@ class AppLocalizations {
   });
 
   String get themeDark => _str({
-    AppLanguage.indonesian: 'SNOWFALL',
-    AppLanguage.english: 'SNOWFALL',
-    AppLanguage.japanese: 'SNOWFALL',
-    AppLanguage.chineseSimplified: 'SNOWFALL',
-    AppLanguage.chineseTraditional: 'SNOWFALL',
-    AppLanguage.korean: 'SNOWFALL',
+    AppLanguage.indonesian: 'Snowfall',
+    AppLanguage.english: 'Snowfall',
+    AppLanguage.japanese: 'Snowfall',
+    AppLanguage.chineseSimplified: 'Snowfall',
+    AppLanguage.chineseTraditional: 'Snowfall',
+    AppLanguage.korean: 'Snowfall',
   });
 
   String get themeDarkSubtitle => _str({
@@ -566,12 +566,12 @@ class AppLocalizations {
   });
 
   String get themeAmoled => _str({
-    AppLanguage.indonesian: 'MIDNIGHT',
-    AppLanguage.english: 'MIDNIGHT',
-    AppLanguage.japanese: 'MIDNIGHT',
-    AppLanguage.chineseSimplified: 'MIDNIGHT',
-    AppLanguage.chineseTraditional: 'MIDNIGHT',
-    AppLanguage.korean: 'MIDNIGHT',
+    AppLanguage.indonesian: 'Midnight',
+    AppLanguage.english: 'Midnight',
+    AppLanguage.japanese: 'Midnight',
+    AppLanguage.chineseSimplified: 'Midnight',
+    AppLanguage.chineseTraditional: 'Midnight',
+    AppLanguage.korean: 'Midnight',
   });
 
   String get themeAmoledSubtitle => _str({
@@ -586,12 +586,12 @@ class AppLocalizations {
   });
 
   String get themeAmoledJapanese => _str({
-    AppLanguage.indonesian: 'SAKURA',
-    AppLanguage.english: 'SAKURA',
-    AppLanguage.japanese: 'SAKURA',
-    AppLanguage.chineseSimplified: 'SAKURA',
-    AppLanguage.chineseTraditional: 'SAKURA',
-    AppLanguage.korean: 'SAKURA',
+    AppLanguage.indonesian: 'Sakura',
+    AppLanguage.english: 'Sakura',
+    AppLanguage.japanese: 'Sakura',
+    AppLanguage.chineseSimplified: 'Sakura',
+    AppLanguage.chineseTraditional: 'Sakura',
+    AppLanguage.korean: 'Sakura',
   });
 
   String get themeAmoledJapaneseSubtitle => _str({
@@ -605,12 +605,12 @@ class AppLocalizations {
   });
 
   String get themeLight => _str({
-    AppLanguage.indonesian: 'DAYLIGHT',
-    AppLanguage.english: 'DAYLIGHT',
-    AppLanguage.japanese: 'DAYLIGHT',
-    AppLanguage.chineseSimplified: 'DAYLIGHT',
-    AppLanguage.chineseTraditional: 'DAYLIGHT',
-    AppLanguage.korean: 'DAYLIGHT',
+    AppLanguage.indonesian: 'Daylight',
+    AppLanguage.english: 'Daylight',
+    AppLanguage.japanese: 'Daylight',
+    AppLanguage.chineseSimplified: 'Daylight',
+    AppLanguage.chineseTraditional: 'Daylight',
+    AppLanguage.korean: 'Daylight',
   });
 
   String get themeLightSubtitle => _str({
@@ -679,12 +679,12 @@ class AppLocalizations {
   }
 
   String get easterEggJapaneseToast => _str({
-    AppLanguage.indonesian: 'Mode AMOLED Sakura aktif! ✨ ようこそ!',
-    AppLanguage.english: 'AMOLED Sakura Mode Activated! ✨ Welcome!',
-    AppLanguage.japanese: 'AMOLED Sakuraモードが有効になりました！✨ ようこそ！',
-    AppLanguage.chineseSimplified: 'AMOLED 樱花和风模式已激活！✨ 欢迎！',
-    AppLanguage.chineseTraditional: 'AMOLED 櫻花和風模式已啟動！✨ 歡迎！',
-    AppLanguage.korean: 'AMOLED 사쿠라 테마가 활성화되었습니다! ✨ 환영합니다!',
+    AppLanguage.indonesian: 'Mode AMOLED Sakura aktif.',
+    AppLanguage.english: 'AMOLED Sakura mode activated.',
+    AppLanguage.japanese: 'AMOLED Sakuraモードが有効になりました。',
+    AppLanguage.chineseSimplified: 'AMOLED 樱花模式已启用。',
+    AppLanguage.chineseTraditional: 'AMOLED 櫻花模式已啟用。',
+    AppLanguage.korean: 'AMOLED 사쿠라 모드가 활성화되었습니다.',
   });
 
   // App Updates
@@ -798,12 +798,12 @@ class AppLocalizations {
   });
 
   String get madeWithLove => _str({
-    AppLanguage.indonesian: 'Made with ❤️ by zerabyte88',
-    AppLanguage.english: 'Made with ❤️ by zerabyte88',
-    AppLanguage.japanese: 'Made with ❤️ by zerabyte88',
-    AppLanguage.chineseSimplified: 'Made with ❤️ by zerabyte88',
-    AppLanguage.chineseTraditional: 'Made with ❤️ by zerabyte88',
-    AppLanguage.korean: 'Made with ❤️ by zerabyte88',
+    AppLanguage.indonesian: 'Dikembangkan oleh zerabyte88',
+    AppLanguage.english: 'Developed by zerabyte88',
+    AppLanguage.japanese: 'Developed by zerabyte88',
+    AppLanguage.chineseSimplified: '由 zerabyte88 开发',
+    AppLanguage.chineseTraditional: '由 zerabyte88 開發',
+    AppLanguage.korean: 'zerabyte88 개발',
   });
 
   // API Rate Limit
@@ -956,12 +956,12 @@ class AppLocalizations {
   });
 
   String get tokenHint => _str({
-    AppLanguage.indonesian: 'Tempel Personal Access Token (ghp_...)',
-    AppLanguage.english: 'Paste Personal Access Token (ghp_...)',
-    AppLanguage.japanese: 'Personal Access Token を貼り付け (ghp_...)',
-    AppLanguage.chineseSimplified: '粘贴个人访问令牌 (ghp_...)',
-    AppLanguage.chineseTraditional: '貼上個人存取權杖 (ghp_...)',
-    AppLanguage.korean: '개인 액세스 토큰 붙여넣기 (ghp_...)',
+    AppLanguage.indonesian: 'Tempel token (ghp_...)',
+    AppLanguage.english: 'Paste token (ghp_...)',
+    AppLanguage.japanese: 'トークン貼付 (ghp_...)',
+    AppLanguage.chineseSimplified: '粘贴 Token (ghp_...)',
+    AppLanguage.chineseTraditional: '貼上 Token (ghp_...)',
+    AppLanguage.korean: '토큰 붙여넣기 (ghp_...)',
   });
 
   String get howToCreateToken => _str({
@@ -1605,21 +1605,21 @@ class AppLocalizations {
   });
 
   String get profileLinkCopied => _str({
-    AppLanguage.indonesian: 'Profil berhasil disalin ke clipboard! 📋✨',
-    AppLanguage.english: 'Profile copied to clipboard! 📋✨',
-    AppLanguage.japanese: 'プロフィールをクリップボードにコピーしました！ 📋✨',
-    AppLanguage.chineseSimplified: '主页信息已复制到剪贴板！ 📋✨',
-    AppLanguage.chineseTraditional: '主頁資訊已複製至剪貼簿！ 📋✨',
-    AppLanguage.korean: '프로필이 클립보드에 복사되었습니다! 📋✨',
+    AppLanguage.indonesian: 'Profil berhasil disalin ke papan klip',
+    AppLanguage.english: 'Profile copied to clipboard',
+    AppLanguage.japanese: 'プロフィールをクリップボードにコピーしました',
+    AppLanguage.chineseSimplified: '主页信息已复制到剪贴板',
+    AppLanguage.chineseTraditional: '主頁資訊已複製至剪貼簿',
+    AppLanguage.korean: '프로필이 클립보드에 복사되었습니다',
   });
 
   String profileSavedToFavorites(String username) => _str({
-    AppLanguage.indonesian: 'Profil @$username ditambahkan ke favorit! ⭐',
-    AppLanguage.english: 'Profile @$username added to favorites! ⭐',
-    AppLanguage.japanese: '@$username をお気に入りに追加しました！ ⭐',
-    AppLanguage.chineseSimplified: '已将 @$username 添加至收藏！ ⭐',
-    AppLanguage.chineseTraditional: '已將 @$username 新增至收藏！ ⭐',
-    AppLanguage.korean: '@$username 즐겨찾기에 추가되었습니다! ⭐',
+    AppLanguage.indonesian: 'Profil @$username ditambahkan ke favorit!',
+    AppLanguage.english: 'Profile @$username added to favorites!',
+    AppLanguage.japanese: '@$username をお気に入りに追加しました！',
+    AppLanguage.chineseSimplified: '已将 @$username 添加至收藏！',
+    AppLanguage.chineseTraditional: '已將 @$username 新增至收藏！',
+    AppLanguage.korean: '@$username 즐겨찾기에 추가되었습니다!',
   });
 
   String get profileRemovedFromFavorites => _str({
@@ -1641,32 +1641,30 @@ class AppLocalizations {
   });
 
   String get profileRefreshed => _str({
-    AppLanguage.indonesian: 'Data profil berhasil diperbarui dari GitHub! 🔄✨',
-    AppLanguage.english: 'Profile data updated from GitHub! 🔄✨',
-    AppLanguage.japanese: 'GitHubからプロフィールを更新しました！ 🔄✨',
-    AppLanguage.chineseSimplified: '已从 GitHub 更新个人资料！ 🔄✨',
-    AppLanguage.chineseTraditional: '已從 GitHub 更新個人檔案！ 🔄✨',
-    AppLanguage.korean: 'GitHub에서 프로필 데이터를 업데이트했습니다! 🔄✨',
+    AppLanguage.indonesian: 'Data profil berhasil diperbarui dari GitHub',
+    AppLanguage.english: 'Profile data updated from GitHub',
+    AppLanguage.japanese: 'GitHubからプロフィールを更新しました',
+    AppLanguage.chineseSimplified: '已从 GitHub 更新个人资料',
+    AppLanguage.chineseTraditional: '已從 GitHub 更新個人檔案',
+    AppLanguage.korean: 'GitHub에서 프로필 데이터를 업데이트했습니다',
   });
 
   String get profileUpToDate => _str({
-    AppLanguage.indonesian:
-        'Data profil sudah yang terbaru (304 Not Modified) ⚡',
-    AppLanguage.english:
-        'Profile data is already up to date (304 Not Modified) ⚡',
-    AppLanguage.japanese: 'プロフィールは既に最新です (304 Not Modified) ⚡',
-    AppLanguage.chineseSimplified: '个人资料已是最新 (304 Not Modified) ⚡',
-    AppLanguage.chineseTraditional: '個人檔案已是最新 (304 Not Modified) ⚡',
-    AppLanguage.korean: '프로필 데이터가 이미 최신 상태입니다 (304 Not Modified) ⚡',
+    AppLanguage.indonesian: 'Data profil sudah yang terbaru (304 Not Modified)',
+    AppLanguage.english: 'Profile data is already up to date (304 Not Modified)',
+    AppLanguage.japanese: 'プロフィールは既に最新です (304 Not Modified)',
+    AppLanguage.chineseSimplified: '个人资料已是最新 (304 Not Modified)',
+    AppLanguage.chineseTraditional: '個人檔案已是最新 (304 Not Modified)',
+    AppLanguage.korean: '프로필 데이터가 이미 최신 상태입니다 (304 Not Modified)',
   });
 
   String get summaryCopiedToast => _str({
-    AppLanguage.indonesian: 'Profil berhasil disalin ke clipboard! 📋✨',
-    AppLanguage.english: 'Profile copied to clipboard! 📋✨',
-    AppLanguage.japanese: 'プロフィールをクリップボードにコピーしました！ 📋✨',
-    AppLanguage.chineseSimplified: '主页信息已复制到剪贴板！ 📋✨',
-    AppLanguage.chineseTraditional: '主頁資訊已複製至剪貼簿！ 📋✨',
-    AppLanguage.korean: '프로필이 클립보드에 복사되었습니다! 📋✨',
+    AppLanguage.indonesian: 'Profil berhasil disalin ke papan klip',
+    AppLanguage.english: 'Profile copied to clipboard',
+    AppLanguage.japanese: 'プロフィールをクリップボードにコピーしました',
+    AppLanguage.chineseSimplified: '主页信息已复制到剪贴板',
+    AppLanguage.chineseTraditional: '主頁資訊已複製至剪貼簿',
+    AppLanguage.korean: '프로필이 클립보드에 복사되었습니다',
   });
 
   String get activeNowBadge => _str({
