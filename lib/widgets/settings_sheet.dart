@@ -1021,39 +1021,44 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             ),
                             const SizedBox(height: 12),
 
-                            // Grid of 6 Languages
-                            Column(
-                              children: [
-                                for (
-                                  int i = 0;
-                                  i < AppLanguage.values.length;
-                                  i += 2
-                                ) ...[
-                                  if (i > 0) const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: _buildLanguageOptionCard(
-                                          lang: AppLanguage.values[i],
-                                          currentLang: currentLang,
-                                          loc: loc,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      if (i + 1 < AppLanguage.values.length)
-                                        Expanded(
-                                          child: _buildLanguageOptionCard(
-                                            lang: AppLanguage.values[i + 1],
-                                            currentLang: currentLang,
-                                            loc: loc,
+                            // Grid of Languages
+                            Builder(
+                              builder: (context) {
+                                final sortedLangs = AppLanguage.sortedAlphabetically;
+                                return Column(
+                                  children: [
+                                    for (
+                                      int i = 0;
+                                      i < sortedLangs.length;
+                                      i += 2
+                                    ) ...[
+                                      if (i > 0) const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: _buildLanguageOptionCard(
+                                              lang: sortedLangs[i],
+                                              currentLang: currentLang,
+                                              loc: loc,
+                                            ),
                                           ),
-                                        )
-                                      else
-                                        const Expanded(child: SizedBox()),
+                                          const SizedBox(width: 8),
+                                          if (i + 1 < sortedLangs.length)
+                                            Expanded(
+                                              child: _buildLanguageOptionCard(
+                                                lang: sortedLangs[i + 1],
+                                                currentLang: currentLang,
+                                                loc: loc,
+                                              ),
+                                            )
+                                          else
+                                            const Expanded(child: SizedBox()),
+                                        ],
+                                      ),
                                     ],
-                                  ),
-                                ],
-                              ],
+                                  ],
+                                );
+                              },
                             ),
                           ],
                         ),

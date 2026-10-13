@@ -175,8 +175,12 @@ The compiled release APK will be generated at:
   - **Theme Typography Restoration & Token Input Anti-Truncation:**
     - *Title Case Theme Branding:* Restored theme identifiers to clean Title Case (`Snowfall`, `Midnight`, `Sakura`, `Daylight`) across all 22 supported languages.
     - *Token Input Anti-Truncation:* Shortened token hint text (`Tempel token (ghp_...)` / `Paste token (ghp_...)`), eliminating text truncation (`...`) on narrow mobile displays while maintaining clear input guidance.
+  - **Complete 22 Global Languages Support & A–Z Sorting:**
+    - *Full Translation Dictionaries for All 22 Languages:* Implemented complete native translations across all 22 languages (`id, ms, da, de, en, es, fr, it, nl, no, pt, fi, sv, vi, ru, ar, hi, th, ja, zh_Hans, zh_Hant, ko`), resolving untranslated fallback issues when selecting non-primary languages.
+    - *Universal Developer Terminology:* Preserved universal Git technical standards (`Repository`, `Commit`, `Fork`, `Stars`, `Branch`, `Pull Request`) across all language packs.
+    - *Alphabetical Language Grid:* Sorted the language selection grid alphabetically (A–Z) by English name in Settings for effortless navigation.
   - **Minimalist & Professional Copywriting Refinement:**
-    - *Zero-Emoji UI Strings:* Purged informal emojis from app localization text across all 6 primary and 22 fallback languages, establishing clean, distraction-free, and professional interface copy.
+    - *Zero-Emoji UI Strings:* Purged informal emojis from app localization text across all 22 languages, establishing clean, distraction-free, and professional interface copy.
 
 * ### v2.4.2
   - **Synchronized Fluid Tab Choreography & Direct Navigation (`HomeScreen`):**

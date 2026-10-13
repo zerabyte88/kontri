@@ -669,6 +669,35 @@ void main() {
     );
 
     test(
+      'AppLocalizations covers all 22 global languages and sortedAlphabetically is correct',
+      () {
+        expect(AppLanguage.values.length, 22);
+
+        // Verify sortedAlphabetically orders all 22 languages A-Z by English name
+        final sorted = AppLanguage.sortedAlphabetically;
+        expect(sorted.length, 22);
+        for (int i = 0; i < sorted.length - 1; i++) {
+          expect(sorted[i].name.compareTo(sorted[i + 1].name) <= 0, isTrue);
+        }
+
+        // Verify all 22 languages return non-empty strings and pass quality standards
+        for (final lang in AppLanguage.values) {
+          final loc = AppLocalizations(lang);
+          expect(loc.repositoriesTitle.isNotEmpty, isTrue);
+          expect(loc.searchHint.isNotEmpty, isTrue);
+          expect(loc.settingsTitle.isNotEmpty, isTrue);
+          expect(loc.close.isNotEmpty, isTrue);
+          expect(loc.save.isNotEmpty, isTrue);
+          expect(loc.filterPopular.isNotEmpty, isTrue);
+          expect(loc.filterNewest.isNotEmpty, isTrue);
+          expect(loc.techNewsTitle.isNotEmpty, isTrue);
+          expect(loc.updateAvailable.contains('!'), isFalse);
+          expect(loc.getCommitTierCleanTitle(1).isNotEmpty, isTrue);
+        }
+      },
+    );
+
+    test(
       'StorageService persists and retrieves language preference correctly',
       () async {
         SharedPreferences.setMockInitialValues({});
