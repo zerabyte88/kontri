@@ -28,7 +28,7 @@
 ### 2. Language Footprint & Portfolio Analytics
 - **Weighted Language Distribution:** Multi-language donut chart weighted by repository codebase volume with authentic GitHub language colors.
 - **Portfolio Telemetry Aggregation:** Real-time summation of cumulative stargazers, forks, repository counts (original vs. forked), and follower ratios.
-- **Sliver Virtualization:** Butter-smooth 60/120 FPS scrolling across 100+ repositories using `CustomScrollView` and `SliverList.builder`.
+- **Sliver Virtualization:** Butter-smooth fluid scrolling across 100+ repositories using `CustomScrollView` and `SliverList.builder`.
 
 ### 3. Native In-App Repository Explorer & Code Viewer
 - **Instant In-App Inspection:** Tap any repository from a user's portfolio or the news feed to open it directly inside the app—no external browser redirect required.
@@ -94,7 +94,7 @@
 
 ### 9. Customizable Surface Opacity & Adaptive Glassmorphism
 - **Real-Time Surface Opacity Slider:** Interactive slider (50% – 100%, default 100%) in Settings with a live percentage badge, giving users full control over background bleed-through.
-- **Hardware-Accelerated Frosted Glass (`GlassCard`):** Custom reusable glassmorphism component featuring GPU-accelerated `BackdropFilter` (`10px` gaussian blur) when opacity is below 1.0, and automatically bypassing blur filtering at 1.0 (Solid) for 60/120 FPS zero-overhead rendering.
+- **Hardware-Accelerated Frosted Glass (`GlassCard`):** Custom reusable glassmorphism component featuring GPU-accelerated `BackdropFilter` (`10px` gaussian blur) when opacity is below 1.0, and automatically bypassing blur filtering at 1.0 (Solid) for smooth, zero-overhead rendering.
 - **App-Wide Ambient Persistence:** Background particle loops persist continuously across all screens (Settings, User Profile, Favorite Profiles, Repository Detail, Code Viewer) with lifecycle-aware pausing when minimized to the OS background.
 
 ### 10. Modern & Minimalist UI Redesign
@@ -181,7 +181,7 @@ The compiled release APK will be generated at:
     - *Snowfall Village Night (Dark Mode):* 1:1 ambient canvas rendering from Phantek featuring distant rolling snow hills, 3-tier snow-capped pine trees (`_drawSnowyPine`), warm glowing cabins with chimney smoke puffs and window halo pulses (`_drawSnowyCabin`), and 3 varieties of crystalline snowflakes (cross-crystal, soft halo, and snow dots).
     - *Sunlight Flare & Daylight Breeze (Light Mode):* 1:1 ambient canvas rendering from Phantek featuring radiant top-right sunlight flare bloom (`#F59E0B` & `#FBBF24`) and 34 upward-drifting sunlight motes and fresh breeze particles.
     - *100% Seamless Continuous Looping Dynamics:* All particle and celestial trajectories (Snowflakes, Sunlight motes, Sakura petals, Meteors) calibrated with strict integer cycles, eliminating any loop seam, pop-in, or trajectory jump at boundary wrapping.
-    - *60 FPS Buttery Smooth Framerate & 12-Second Majestic Pacing:* Extended cycle duration to 12.0 seconds with ~60 FPS quantized pacing (`720` steps), ensuring fluid motion while preserving battery life on 90Hz/120Hz displays.
+    - *Buttery Smooth Motion & 12-Second Majestic Pacing:* Extended cycle duration to 12.0 seconds with quantized pacing (`720` steps), ensuring fluid motion and smooth operation while preserving battery life.
 
 * ### v2.4.0
   - **Phantek-Inspired Modern Aesthetics & Global Language Expansion:**
@@ -190,8 +190,8 @@ The compiled release APK will be generated at:
     - *Full-Screen Dedicated Settings Screen (`SettingsScreen`):* Replaced bottom sheet with a dedicated full-screen layout featuring `centerTitle: true`, centered 2-column theme cards with categorized badges (`DARK`, `AMOLED`, `LIGHT`), surface opacity controls, language selector, GitHub API token manager, and about section.
     - *Route Occlusion Animation Pause:* Background canvas animations automatically pause when entering the settings screen, ensuring 0% GPU waste while configuring options.
     - *Zero-Network System Typography Switch:* Completely removed external `google_fonts` network dependency in favor of native Material 3 system typefaces (Roboto / SF Pro), achieving zero-HTTP cold boots and faster initial frame rendering.
-    - *60 FPS Shader Bypass at 100% Surface Opacity:* Default surface opacity updated to 1.0 (Solid), automatically bypassing GPU `BackdropFilter` passes for pristine 60/120 FPS rasterization.
-    - *Continuous Ambient Background Flow (Scroll & Idle):* Enhanced background canvas to flow seamlessly without stopping during scroll gestures or when idle, leveraging isolated `RepaintBoundary` layers for jitter-free 60/120 FPS compositing.
+    - *Shader Bypass at 100% Surface Opacity:* Default surface opacity updated to 1.0 (Solid), automatically bypassing GPU `BackdropFilter` passes for pristine, smooth rasterization.
+    - *Continuous Ambient Background Flow (Scroll & Idle):* Enhanced background canvas to flow seamlessly without stopping during scroll gestures or when idle, leveraging isolated `RepaintBoundary` layers for jitter-free, fluid compositing.
 
 * ### v2.3.2
   - **Bespoke Fluid Page Transitions Engine (`GitPulsePageTransitionsBuilder`):**
@@ -199,11 +199,11 @@ The compiled release APK will be generated at:
     - *Synchronized Fade & Micro-Glide Choreography:* Entering routes fade in smoothly (`0.0 -> 1.0`) with an organic forward glide (`Offset(0.05, 0.0) -> Offset.zero`) using `Curves.easeOutCubic`, while exiting routes cleanly fade out (`1.0 -> 0.0`) with a subtle retreat (`Offset(-0.03, 0.0)`) using `Curves.easeInCubic`.
     - *Seamless Route Switching Across Entire App:* Completely resolves card clashing, text double-exposure, and sudden pop-in glitches when transitioning between Home and Favorite Profiles, Profile Details and Repository Details, and Repository and File Viewer.
   - **High-Refresh-Rate Ambient Background Pacing & GPU Optimization:**
-    - *Quantized Frame Pacing (`~30 FPS`):* Quantized `shouldRepaint` ticks in `AnimatedAppBackground` to ~30 FPS intervals over the 8-second animation loop. On 90Hz/120Hz displays, skips up to 75% of background canvas repaints, allowing Skia/Impeller to reuse cached Picture layers with zero trigonometrics and zero CPU overhead.
+    - *Quantized Frame Pacing (`~30 FPS`):* Quantized `shouldRepaint` ticks in `AnimatedAppBackground` to ~30 FPS intervals over the 8-second animation loop. Skips up to 75% of background canvas repaints, allowing Skia/Impeller to reuse cached Picture layers with zero trigonometrics and zero CPU overhead.
     - *Static Shader Caching:* Cached all dynamic gradient shaders (`_cachedCurtain1-3Shader`, `_cachedRibbon1-3Shader`, `_cachedMoonShader`) by display `Size`. Eliminates up to 360 native shader allocations per second, eliminating GC pauses and preventing thermal throttling.
     - *Trigonometric Path Optimization:* Precomputed top wave coordinates (`yTops`) in aurora curtains, eliminating redundant `math.sin` and `math.cos` calculations for the bottom wave pass.
     - *Foreground RepaintBoundary Layer Isolation:* Wrapped foreground UI tree with `RepaintBoundary` inside `AnimatedAppBackground`, isolating interactive widget tree compositing from the ambient canvas background layer.
-    - *Scroll Idle Reset Fix:* Ensured scroll tracking count resets to zero on idle notifications, guaranteeing instant controller pause during active fling/drag gestures for 120 FPS buttery smooth scrolling.
+    - *Scroll Idle Reset Fix:* Ensured scroll tracking count resets to zero on idle notifications, guaranteeing instant controller pause during active fling/drag gestures for buttery-smooth scrolling.
     - *Settings Sheet BackdropFilter Elimination:* Replaced heavyweight `BackdropFilter` on `SettingsSheet` with optimized `ClipRRect`, and updated switch thumb theming (`activeThumbColor`) to resolve deprecation warnings.
 
 * ### v2.3.1
