@@ -135,10 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final targetCategory = categories[index]['id']!;
     if (targetCategory == _selectedCategory) return;
 
-    final currentIndex = categories.indexWhere(
-      (c) => c['id'] == _selectedCategory,
-    );
-
     setState(() {
       _selectedCategory = targetCategory;
     });
