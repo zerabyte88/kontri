@@ -608,15 +608,15 @@ void main() {
         expect(zhHantLoc.searchHint, '搜尋...');
         expect(koLoc.searchHint, '검색...');
 
-        // Theme options (Snowfall, Midnight, Daylight, Sakura)
-        expect(idLoc.themeDark, 'Snowfall');
-        expect(idLoc.themeAmoled, 'Midnight');
-        expect(idLoc.themeLight, 'Daylight');
-        expect(idLoc.themeAmoledJapanese, 'Sakura');
-        expect(enLoc.themeDark, 'Snowfall');
-        expect(enLoc.themeAmoled, 'Midnight');
-        expect(enLoc.themeLight, 'Daylight');
-        expect(enLoc.themeAmoledJapanese, 'Sakura');
+        // Theme options (SNOWFALL, MIDNIGHT, DAYLIGHT, SAKURA)
+        expect(idLoc.themeDark, 'SNOWFALL');
+        expect(idLoc.themeAmoled, 'MIDNIGHT');
+        expect(idLoc.themeLight, 'DAYLIGHT');
+        expect(idLoc.themeAmoledJapanese, 'SAKURA');
+        expect(enLoc.themeDark, 'SNOWFALL');
+        expect(enLoc.themeAmoled, 'MIDNIGHT');
+        expect(enLoc.themeLight, 'DAYLIGHT');
+        expect(enLoc.themeAmoledJapanese, 'SAKURA');
 
         // Filter labels
         expect(idLoc.filterPopular, 'Terpopuler');
@@ -763,13 +763,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v2.4.1',
+      'AppConfig provides accurate release and version telemetry for v2.4.2',
       () {
         expect(AppConfig.appName, 'GitPulse');
-        expect(AppConfig.appVersion, 'v2.4.1');
-        expect(AppConfig.buildNumber, '22');
-        expect(AppConfig.fullVersion, 'v2.4.1 (Build 22)');
-        expect(AppConfig.releaseTag, 'v2.4.1');
+        expect(AppConfig.appVersion, 'v2.4.2');
+        expect(AppConfig.buildNumber, '23');
+        expect(AppConfig.fullVersion, 'v2.4.2 (Build 23)');
+        expect(AppConfig.releaseTag, 'v2.4.2');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },

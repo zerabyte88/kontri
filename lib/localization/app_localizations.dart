@@ -547,12 +547,12 @@ class AppLocalizations {
   });
 
   String get themeDark => _str({
-    AppLanguage.indonesian: 'Snowfall',
-    AppLanguage.english: 'Snowfall',
-    AppLanguage.japanese: 'Snowfall',
-    AppLanguage.chineseSimplified: 'Snowfall',
-    AppLanguage.chineseTraditional: 'Snowfall',
-    AppLanguage.korean: 'Snowfall',
+    AppLanguage.indonesian: 'SNOWFALL',
+    AppLanguage.english: 'SNOWFALL',
+    AppLanguage.japanese: 'SNOWFALL',
+    AppLanguage.chineseSimplified: 'SNOWFALL',
+    AppLanguage.chineseTraditional: 'SNOWFALL',
+    AppLanguage.korean: 'SNOWFALL',
   });
 
   String get themeDarkSubtitle => _str({
@@ -566,12 +566,12 @@ class AppLocalizations {
   });
 
   String get themeAmoled => _str({
-    AppLanguage.indonesian: 'Midnight',
-    AppLanguage.english: 'Midnight',
-    AppLanguage.japanese: 'Midnight',
-    AppLanguage.chineseSimplified: 'Midnight',
-    AppLanguage.chineseTraditional: 'Midnight',
-    AppLanguage.korean: 'Midnight',
+    AppLanguage.indonesian: 'MIDNIGHT',
+    AppLanguage.english: 'MIDNIGHT',
+    AppLanguage.japanese: 'MIDNIGHT',
+    AppLanguage.chineseSimplified: 'MIDNIGHT',
+    AppLanguage.chineseTraditional: 'MIDNIGHT',
+    AppLanguage.korean: 'MIDNIGHT',
   });
 
   String get themeAmoledSubtitle => _str({
@@ -586,12 +586,12 @@ class AppLocalizations {
   });
 
   String get themeAmoledJapanese => _str({
-    AppLanguage.indonesian: 'Sakura',
-    AppLanguage.english: 'Sakura',
-    AppLanguage.japanese: 'Sakura',
-    AppLanguage.chineseSimplified: 'Sakura',
-    AppLanguage.chineseTraditional: 'Sakura',
-    AppLanguage.korean: 'Sakura',
+    AppLanguage.indonesian: 'SAKURA',
+    AppLanguage.english: 'SAKURA',
+    AppLanguage.japanese: 'SAKURA',
+    AppLanguage.chineseSimplified: 'SAKURA',
+    AppLanguage.chineseTraditional: 'SAKURA',
+    AppLanguage.korean: 'SAKURA',
   });
 
   String get themeAmoledJapaneseSubtitle => _str({
@@ -605,12 +605,12 @@ class AppLocalizations {
   });
 
   String get themeLight => _str({
-    AppLanguage.indonesian: 'Daylight',
-    AppLanguage.english: 'Daylight',
-    AppLanguage.japanese: 'Daylight',
-    AppLanguage.chineseSimplified: 'Daylight',
-    AppLanguage.chineseTraditional: 'Daylight',
-    AppLanguage.korean: 'Daylight',
+    AppLanguage.indonesian: 'DAYLIGHT',
+    AppLanguage.english: 'DAYLIGHT',
+    AppLanguage.japanese: 'DAYLIGHT',
+    AppLanguage.chineseSimplified: 'DAYLIGHT',
+    AppLanguage.chineseTraditional: 'DAYLIGHT',
+    AppLanguage.korean: 'DAYLIGHT',
   });
 
   String get themeLightSubtitle => _str({
@@ -941,17 +941,28 @@ class AppLocalizations {
   String get tokenSubtitle => tokenDescription;
 
   String get tokenDescription => _str({
-    AppLanguage.indonesian: 'Tambahkan token GitHub untuk menaikkan kuota dari 60 menjadi 5.000 request per jam.',
-    AppLanguage.english: 'Add a GitHub token to increase your quota from 60 to 5,000 requests per hour.',
-    AppLanguage.japanese: 'GitHubトークンを追加すると、クォータが毎時60件から5,000件に増加します。',
+    AppLanguage.indonesian:
+        'Gunakan Personal Access Token Anda untuk membuka kuota 5.000 permintaan/jam. Token hanya disimpan secara lokal di perangkat Anda.',
+    AppLanguage.english:
+        'Use your Personal Access Token to unlock 5,000 requests/hour. Your token is stored safely and locally on your device.',
+    AppLanguage.japanese:
+        'Personal Access Token を設定して毎時5,000件のリクエスト制限を解除。トークンは端末ローカルに安全に保存されます。',
     AppLanguage.chineseSimplified:
-        '添加 GitHub Token 可将每小时请求配额从 60 次提升至 5,000 次。',
+        '使用个人访问令牌解锁每小时 5,000 次请求配额。Token 仅安全保存在本地设备。',
     AppLanguage.chineseTraditional:
-        '新增 GitHub Token 可將每小時請求配額從 60 次提升至 5,000 次。',
-    AppLanguage.korean: 'GitHub 토큰을 추가하면 시간당 요청 한도가 60회에서 5,000회로 늘어납니다.',
+        '使用個人存取權杖解鎖每小時 5,000 次請求配額。權杖僅安全保存在本機裝置。',
+    AppLanguage.korean:
+        '개인 액세스 토큰을 등록하여 시간당 5,000회 요청 한도를 활성화하세요. 토큰은 기기 로컬에만 안전하게 저장됩니다.',
   });
 
-  String get tokenHint => 'ghp_xxxxxxxxxxxx / github_pat_...';
+  String get tokenHint => _str({
+    AppLanguage.indonesian: 'Tempel Personal Access Token (ghp_...)',
+    AppLanguage.english: 'Paste Personal Access Token (ghp_...)',
+    AppLanguage.japanese: 'Personal Access Token を貼り付け (ghp_...)',
+    AppLanguage.chineseSimplified: '粘贴个人访问令牌 (ghp_...)',
+    AppLanguage.chineseTraditional: '貼上個人存取權杖 (ghp_...)',
+    AppLanguage.korean: '개인 액세스 토큰 붙여넣기 (ghp_...)',
+  });
 
   String get howToCreateToken => _str({
     AppLanguage.indonesian: 'Cara membuat GitHub Token',

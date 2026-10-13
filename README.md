@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.4.1&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.4.2&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -166,6 +166,15 @@ The compiled release APK will be generated at:
 ---
 
 # Version History
+
+* ### v2.4.2
+  - **Synchronized Fluid Tab Animations & Direct Slide (`HomeScreen`):**
+    - *Phantek Gallery-Inspired Tab Choreography:* Unified category tab switching, chip centering (`Scrollable.ensureVisible`), and dynamic card height adjustments (`ExpandablePageView`) to an exact **320ms `Curves.easeOutCubic`** curve.
+    - *Eliminated Multi-Tab Jump Glitches:* Removed intermediate jumping when tapping distant category tabs, transitioning directly and seamlessly to the target category.
+    - *Animated Scale & Glow Alignment:* Aligned active category chip scaling (1.04x) and cyan glow box-shadow timing to 320ms for buttery-smooth visual responses.
+  - **Uppercase Theme Typography & Polished Settings Copy:**
+    - *Uppercase Theme Branding:* Standardized theme identifiers to full uppercase (`SNOWFALL`, `MIDNIGHT`, `SAKURA`, `DAYLIGHT`) across all supported languages.
+    - *GitHub Token UX Refinement:* Modernized token input placeholder (`Tempel Personal Access Token (ghp_...)`) and description clarifying 5,000 req/hour limit and 100% on-device local storage.
 
 * ### v2.4.1
   - **Phantek Ambient Visuals & Engine Unification:**

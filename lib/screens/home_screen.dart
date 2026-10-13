@@ -145,14 +145,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _animateCategoryChipToView(index, categories);
     if (_newsPageController.hasClients) {
-      if (currentIndex != -1 && (index - currentIndex).abs() > 1) {
-        final intermediate = index > currentIndex ? index - 1 : index + 1;
-        _newsPageController.jumpToPage(intermediate);
-      }
       _newsPageController.animateToPage(
         index,
-        duration: const Duration(milliseconds: 380),
-        curve: Curves.fastOutSlowIn,
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeOutCubic,
       );
     }
     _loadCategoryNews(targetCategory);
@@ -185,8 +181,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Scrollable.ensureVisible(
           keyContext,
           alignment: 0.5,
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.fastOutSlowIn,
+          duration: const Duration(milliseconds: 320),
+          curve: Curves.easeOutCubic,
         );
       } else if (_categoryScrollController.hasClients) {
         final screenWidth = MediaQuery.of(context).size.width;
@@ -197,8 +193,8 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         _categoryScrollController.animateTo(
           targetOffset,
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.fastOutSlowIn,
+          duration: const Duration(milliseconds: 320),
+          curve: Curves.easeOutCubic,
         );
       }
     });
@@ -1315,10 +1311,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 key: catKey,
                 child: AnimatedScale(
                   scale: isSelected ? 1.04 : 1.0,
-                  duration: const Duration(milliseconds: 250),
+                  duration: const Duration(milliseconds: 320),
                   curve: Curves.easeOutCubic,
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
+                    duration: const Duration(milliseconds: 320),
                     curve: Curves.easeOutCubic,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(9),
@@ -1454,7 +1450,7 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
 
     return TweenAnimationBuilder<double>(
       curve: Curves.easeOutCubic,
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 320),
       tween: Tween<double>(begin: currentHeight, end: currentHeight),
       builder: (context, height, child) {
         return SizedBox(height: height, child: child);
