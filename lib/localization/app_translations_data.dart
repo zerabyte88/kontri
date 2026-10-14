@@ -71,20 +71,24 @@ const Map<String, String> idTranslations = {
   'settingsTitle': 'Pengaturan & Kuota API',
   'settingsSubtitle': 'Kelola bahasa, kuota API & token',
   'languageSectionTitle': 'Bahasa Aplikasi',
-  'languageSectionSubtitle': 'Pilih bahasa tampilan (aktif langsung tanpa restart)',
+  'languageSectionSubtitle':
+      'Pilih bahasa tampilan (aktif langsung tanpa restart)',
   'languageChangedToast': 'Bahasa berhasil diubah ke',
   'themeSectionTitle': 'Tema Tampilan',
   'themeSectionSubtitle': 'Pilih mode visual antarmuka aplikasi',
   'themeOpacityTitle': 'Transparansi Tampilan',
-  'themeOpacitySubtitle': 'Sesuaikan efek kaca transparan (glassmorphism) kartu',
+  'themeOpacitySubtitle':
+      'Sesuaikan efek kaca transparan (glassmorphism) kartu',
   'bgAnimationTitle': 'Animasi Latar Belakang',
   'bgAnimationSubtitle': 'Aktifkan kanvas dinamis atau matikan untuk performa maksimal & hemat baterai',
   'themeDark': 'Snowfall',
   'themeDarkSubtitle': 'Malam Pedesaan Berselimut Salju & Cahaya Hangat Pondok',
   'themeAmoled': 'Midnight',
-  'themeAmoledSubtitle': 'Hitam Pekat AMOLED • Bulan Sabit, Bintang & Hujan Meteor',
+  'themeAmoledSubtitle':
+      'Hitam Pekat AMOLED • Bulan Sabit, Bintang & Hujan Meteor',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Hitam Pekat AMOLED • Ranting & Bunga Sakura Mekar',
+  'themeAmoledJapaneseSubtitle':
+      'Hitam Pekat AMOLED • Ranting & Bunga Sakura Mekar',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Sinar Mentari Hangat & Hembusan Angin Segar',
   'settingsBypassShaderNotice': 'Bypass Shader 60 FPS',
@@ -119,7 +123,8 @@ const Map<String, String> idTranslations = {
   'tokenGuideContent': '1. Buka github.com > Profil > Settings.\\n',
   'deleteToken': 'Hapus Token',
   'saveToken': 'Simpan Token',
-  'tokenSavedToast': 'Token disimpan! Kuota berhasil ditingkatkan ke 5.000 req/jam.',
+  'tokenSavedToast':
+      'Token disimpan! Kuota berhasil ditingkatkan ke 5.000 req/jam.',
   'tokenDeletedToast': 'Token dihapus. Kembali ke kuota standar 60 req/jam.',
   'statsDetailTitle': 'Statistik GitHub',
   'joinedSince': 'Bergabung sejak',
@@ -134,7 +139,8 @@ const Map<String, String> idTranslations = {
   'followers': 'Pengikut',
   'following': 'Mengikuti',
   'activityRhythmTitle': 'Ritme Jam Produktif',
-  'activityRhythmSubtitle': 'Distribusi aktivitas commit & event menurut jam lokal perangkat',
+  'activityRhythmSubtitle':
+      'Distribusi aktivitas commit & event menurut jam lokal perangkat',
   'peakLabel': 'Peak',
   'eventsUnit': 'event',
   'commitHabitTitle': 'Tingkat Aktivitas Commit',
@@ -147,7 +153,8 @@ const Map<String, String> idTranslations = {
   'daysUnit': 'hari',
   'contributionsUnit': 'kontribusi',
   'topLanguagesTitle': 'Bahasa Pemrograman Terbanyak',
-  'topLanguagesSubtitle': 'Persentase bahasa berdasarkan ukuran kode repositori',
+  'topLanguagesSubtitle':
+      'Persentase bahasa berdasarkan ukuran kode repositori',
   'languageDistribution': 'Distribusi Bahasa Pemrograman',
   'otherLanguages': 'Lainnya',
   'noLanguageData': 'Belum ada data bahasa pemrograman.',
@@ -285,10 +292,12 @@ const Map<String, String> msTranslations = {
   'themeAmoled': 'Midnight',
   'themeAmoledSubtitle': 'Hitam pekat tulen untuk paparan OLED cekap kuasa',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Hitam legam dengan kilauan merah jambu sakura halus',
+  'themeAmoledJapaneseSubtitle':
+      'Hitam legam dengan kilauan merah jambu sakura halus',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Terang, bersih dan selesa untuk kerja siang hari',
-  'settingsBypassShaderNotice': 'Kesan visual dilaraskan untuk prestasi peranti optimum',
+  'settingsBypassShaderNotice':
+      'Kesan visual dilaraskan untuk prestasi peranti optimum',
   'activeLanguageBadge': 'Aktif',
   'resetLabel': 'Set Semula',
   'easterEggJapaneseToast': 'Tema Sakura diaktifkan!',
@@ -348,7 +357,8 @@ const Map<String, String> msTranslations = {
   'daysUnit': 'hari',
   'contributionsUnit': 'sumbangan',
   'topLanguagesTitle': 'Bahasa Pengaturcaraan Teratas',
-  'topLanguagesSubtitle': 'Taburan penggunaan bahasa di seluruh repositori awam',
+  'topLanguagesSubtitle':
+      'Taburan penggunaan bahasa di seluruh repositori awam',
   'languageDistribution': 'Taburan Bahasa',
   'otherLanguages': 'Lain-lain',
   'noLanguageData': 'Tiada data bahasa pengaturcaraan',
@@ -489,7 +499,8 @@ const Map<String, String> daTranslations = {
   'themeAmoledJapaneseSubtitle': 'Dybsort med diskret sakura pink glød',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Lys, ren og behagelig til dagtimerne',
-  'settingsBypassShaderNotice': 'Visuelle effekter skaleret til optimal enhedsydelse',
+  'settingsBypassShaderNotice':
+      'Visuelle effekter skaleret til optimal enhedsydelse',
   'activeLanguageBadge': 'Aktiv',
   'resetLabel': 'Nulstil',
   'easterEggJapaneseToast': 'Sakura-tema aktiveret!',
@@ -549,7 +560,8 @@ const Map<String, String> daTranslations = {
   'daysUnit': 'dage',
   'contributionsUnit': 'bidrag',
   'topLanguagesTitle': 'Mest brugte programmeringssprog',
-  'topLanguagesSubtitle': 'Brugsfordeling på tværs af alle offentlige repositories',
+  'topLanguagesSubtitle':
+      'Brugsfordeling på tværs af alle offentlige repositories',
   'languageDistribution': 'Sprogfordeling',
   'otherLanguages': 'Andre',
   'noLanguageData': 'Ingen sprogdata tilgængelige',
@@ -685,12 +697,15 @@ const Map<String, String> deTranslations = {
   'themeDark': 'Snowfall',
   'themeDarkSubtitle': 'Kühle Eleganz mit Cyan-Akzenten',
   'themeAmoled': 'Midnight',
-  'themeAmoledSubtitle': 'Tiefschwarz, optimiert für stromsparende OLED-Displays',
+  'themeAmoledSubtitle':
+      'Tiefschwarz, optimiert für stromsparende OLED-Displays',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Tiefes Obsidian-Schwarz mit zartem Sakura-Rosa',
+  'themeAmoledJapaneseSubtitle':
+      'Tiefes Obsidian-Schwarz mit zartem Sakura-Rosa',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Hell, sauber und angenehm für das Arbeiten am Tag',
-  'settingsBypassShaderNotice': 'Visuelle Effekte für optimale Geräteleistung angepasst',
+  'settingsBypassShaderNotice':
+      'Visuelle Effekte für optimale Geräteleistung angepasst',
   'activeLanguageBadge': 'Aktiv',
   'resetLabel': 'Zurücksetzen',
   'easterEggJapaneseToast': 'Sakura-Design aktiviert!',
@@ -750,7 +765,8 @@ const Map<String, String> deTranslations = {
   'daysUnit': 'Tage',
   'contributionsUnit': 'Beiträge',
   'topLanguagesTitle': 'Häufigste Programmiersprachen',
-  'topLanguagesSubtitle': 'Nutzungsverteilung über alle öffentlichen Repositories',
+  'topLanguagesSubtitle':
+      'Nutzungsverteilung über alle öffentlichen Repositories',
   'languageDistribution': 'Sprachverteilung',
   'otherLanguages': 'Andere',
   'noLanguageData': 'Keine Sprachdaten verfügbar',
@@ -778,7 +794,8 @@ const Map<String, String> deTranslations = {
   'emptyDirectory': 'Leeres Verzeichnis',
   'fileContent': 'Dateiinhalt',
   'loadingFile': 'Datei wird geladen...',
-  'cannotPreviewBinary': 'Binärdateien können nicht in der Vorschau angezeigt werden',
+  'cannotPreviewBinary':
+      'Binärdateien können nicht in der Vorschau angezeigt werden',
   'copyCode': 'Code kopieren',
   'codeCopied': 'Code in die Zwischenablage kopiert',
   'shareProfile': 'Profil teilen',
@@ -875,20 +892,24 @@ const Map<String, String> enTranslations = {
   'settingsTitle': 'Settings & API Quota',
   'settingsSubtitle': 'Manage language, API quota & token',
   'languageSectionTitle': 'App Language',
-  'languageSectionSubtitle': 'Select display language (applies instantly without restart)',
+  'languageSectionSubtitle':
+      'Select display language (applies instantly without restart)',
   'languageChangedToast': 'Language changed to',
   'themeSectionTitle': 'App Theme',
   'themeSectionSubtitle': 'Select visual interface mode',
   'themeOpacityTitle': 'Surface Opacity',
-  'themeOpacitySubtitle': 'Adjust card glassmorphism and background transparency',
+  'themeOpacitySubtitle':
+      'Adjust card glassmorphism and background transparency',
   'bgAnimationTitle': 'Background Animation',
   'bgAnimationSubtitle': 'Enable dynamic ambient canvas or turn off for maximum performance & battery saving',
   'themeDark': 'Snowfall',
   'themeDarkSubtitle': 'Snowy village night & warm cabin glow',
   'themeAmoled': 'Midnight',
-  'themeAmoledSubtitle': 'True AMOLED black • Crescent moon, stars & shooting stars',
+  'themeAmoledSubtitle':
+      'True AMOLED black • Crescent moon, stars & shooting stars',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'True AMOLED black • Blooming branches & sakura blossoms',
+  'themeAmoledJapaneseSubtitle':
+      'True AMOLED black • Blooming branches & sakura blossoms',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Warm golden sunrays & fresh daylight breeze',
   'settingsBypassShaderNotice': '60 FPS Shader Bypass',
@@ -938,7 +959,8 @@ const Map<String, String> enTranslations = {
   'followers': 'Followers',
   'following': 'Following',
   'activityRhythmTitle': 'Productive Hours Rhythm',
-  'activityRhythmSubtitle': 'Commit & event activity distribution by local device time',
+  'activityRhythmSubtitle':
+      'Commit & event activity distribution by local device time',
   'peakLabel': 'Peak',
   'eventsUnit': 'events',
   'commitHabitTitle': 'Commit Habit Activity Tier',
@@ -1058,7 +1080,8 @@ const Map<String, String> esTranslations = {
   'saved': 'Guardado',
   'emptyBookmarks': 'Aún no hay perfiles guardados',
   'userNotFound': 'Usuario no encontrado',
-  'networkError': 'Error al cargar los datos. Compruebe su conexión a internet.',
+  'networkError':
+      'Error al cargar los datos. Compruebe su conexión a internet.',
   'rateLimitExceeded': 'Su cuota de API se ha agotado. Espere al tiempo de restablecimiento o actualice su token en ajustes.',
   'techNewsTitle': 'Noticias tecnológicas',
   'techNewsSubtitle': 'Últimas novedades del ecosistema de desarrollo',
@@ -1092,7 +1115,8 @@ const Map<String, String> esTranslations = {
   'themeAmoledJapaneseSubtitle': 'Negro obsidiana con brillo rosa sakura sutil',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Claro, nítido y agradable para trabajar de día',
-  'settingsBypassShaderNotice': 'Efectos visuales ajustados para un rendimiento óptimo',
+  'settingsBypassShaderNotice':
+      'Efectos visuales ajustados para un rendimiento óptimo',
   'activeLanguageBadge': 'Activo',
   'resetLabel': 'Restablecer',
   'easterEggJapaneseToast': '¡Tema Sakura activado!',
@@ -1139,7 +1163,8 @@ const Map<String, String> esTranslations = {
   'followers': 'Seguidores',
   'following': 'Siguiendo',
   'activityRhythmTitle': 'Ritmo de actividad',
-  'activityRhythmSubtitle': 'Patrones de contribución por horas y días laborables',
+  'activityRhythmSubtitle':
+      'Patrones de contribución por horas y días laborables',
   'peakLabel': 'Pico',
   'eventsUnit': 'eventos',
   'commitHabitTitle': 'Hábito de commit',
@@ -1152,7 +1177,8 @@ const Map<String, String> esTranslations = {
   'daysUnit': 'días',
   'contributionsUnit': 'contribuciones',
   'topLanguagesTitle': 'Principales lenguajes de programación',
-  'topLanguagesSubtitle': 'Distribución de uso en todos los repositories públicos',
+  'topLanguagesSubtitle':
+      'Distribución de uso en todos los repositories públicos',
   'languageDistribution': 'Distribución de lenguajes',
   'otherLanguages': 'Otros',
   'noLanguageData': 'Sin datos de lenguaje disponibles',
@@ -1200,7 +1226,8 @@ const Map<String, String> esTranslations = {
   'allTimeSubtitle': 'Histórico total en GitHub',
   'accountOverviewTitle': 'Resumen de la cuenta',
   'acrossAllRepos': 'En todos los repositories públicos',
-  'registeredReposSubtitle': 'Repositories de código fuente original registrados',
+  'registeredReposSubtitle':
+      'Repositories de código fuente original registrados',
   'updatedPrefix': 'Actualizado',
   'cannotOpenLink': 'No se puede abrir el enlace: {url}',
   'failedToOpenLink': 'Error al abrir el enlace: {error}',
@@ -1277,7 +1304,8 @@ const Map<String, String> frTranslations = {
   'settingsTitle': 'Paramètres',
   'settingsSubtitle': 'Personnalisez votre expérience GitPulse',
   'languageSectionTitle': 'Langue',
-  'languageSectionSubtitle': 'Sélectionnez la langue d\'affichage de l\'application',
+  'languageSectionSubtitle':
+      'Sélectionnez la langue d\'affichage de l\'application',
   'languageChangedToast': 'Langue modifiée avec succès',
   'themeSectionTitle': 'Thème et apparence',
   'themeSectionSubtitle': 'Choisissez votre palette de couleurs préférée',
@@ -1290,10 +1318,12 @@ const Map<String, String> frTranslations = {
   'themeAmoled': 'Midnight',
   'themeAmoledSubtitle': 'Noir absolu optimisé pour les écrans OLED',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Noir obsidienne profond avec lueurs rose sakura',
+  'themeAmoledJapaneseSubtitle':
+      'Noir obsidienne profond avec lueurs rose sakura',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Clair, net et confortable pour le travail en journée',
-  'settingsBypassShaderNotice': 'Effets visuels ajustés pour des performances optimales',
+  'settingsBypassShaderNotice':
+      'Effets visuels ajustés pour des performances optimales',
   'activeLanguageBadge': 'Actif',
   'resetLabel': 'Réinitialiser',
   'easterEggJapaneseToast': 'Thème Sakura activé !',
@@ -1340,7 +1370,8 @@ const Map<String, String> frTranslations = {
   'followers': 'Abonnés',
   'following': 'Abonnements',
   'activityRhythmTitle': 'Rythme d\'activité',
-  'activityRhythmSubtitle': 'Modèles de contribution par heures et jours ouvrables',
+  'activityRhythmSubtitle':
+      'Modèles de contribution par heures et jours ouvrables',
   'peakLabel': 'Pic',
   'eventsUnit': 'événements',
   'commitHabitTitle': 'Habitude de commit',
@@ -1353,7 +1384,8 @@ const Map<String, String> frTranslations = {
   'daysUnit': 'jours',
   'contributionsUnit': 'contributions',
   'topLanguagesTitle': 'Langages de programmation principaux',
-  'topLanguagesSubtitle': 'Distribution d\'utilisation sur tous les repositories publics',
+  'topLanguagesSubtitle':
+      'Distribution d\'utilisation sur tous les repositories publics',
   'languageDistribution': 'Distribution des langages',
   'otherLanguages': 'Autres',
   'noLanguageData': 'Aucune donnée de langage disponible',
@@ -1381,7 +1413,8 @@ const Map<String, String> frTranslations = {
   'emptyDirectory': 'Dossier vide',
   'fileContent': 'Contenu du fichier',
   'loadingFile': 'Chargement du fichier...',
-  'cannotPreviewBinary': 'Les fichiers binaires ne peuvent pas être prévisualisés',
+  'cannotPreviewBinary':
+      'Les fichiers binaires ne peuvent pas être prévisualisés',
   'copyCode': 'Copier le code',
   'codeCopied': 'Code copié dans le presse-papiers',
   'shareProfile': 'Partager le profil',
@@ -1460,7 +1493,8 @@ const Map<String, String> itTranslations = {
   'saved': 'Salvato',
   'emptyBookmarks': 'Nessun profilo ancora salvato',
   'userNotFound': 'Utente non trovato',
-  'networkError': 'Impossibile caricare i dati. Verifica la connessione Internet.',
+  'networkError':
+      'Impossibile caricare i dati. Verifica la connessione Internet.',
   'rateLimitExceeded': 'La quota API è esaurita. Attendi il reset o aggiorna il token nelle impostazioni.',
   'techNewsTitle': 'Notizie Tech',
   'techNewsSubtitle': 'Ultimi aggiornamenti dall\'ecosistema sviluppatori',
@@ -1491,10 +1525,12 @@ const Map<String, String> itTranslations = {
   'themeAmoled': 'Midnight',
   'themeAmoledSubtitle': 'Nero assoluto ottimizzato per display OLED',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Nero ossidiana profondo con riflessi rosa sakura',
+  'themeAmoledJapaneseSubtitle':
+      'Nero ossidiana profondo con riflessi rosa sakura',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Luminoso, nitido e rilassante per il lavoro diurno',
-  'settingsBypassShaderNotice': 'Effetti visivi regolati per prestazioni ottimali',
+  'settingsBypassShaderNotice':
+      'Effetti visivi regolati per prestazioni ottimali',
   'activeLanguageBadge': 'Attivo',
   'resetLabel': 'Reimposta',
   'easterEggJapaneseToast': 'Tema Sakura attivato!',
@@ -1541,7 +1577,8 @@ const Map<String, String> itTranslations = {
   'followers': 'Follower',
   'following': 'Seguiti',
   'activityRhythmTitle': 'Ritmo di attività',
-  'activityRhythmSubtitle': 'Modelli di contribuzione per orari e giorni lavorativi',
+  'activityRhythmSubtitle':
+      'Modelli di contribuzione per orari e giorni lavorativi',
   'peakLabel': 'Picco',
   'eventsUnit': 'eventi',
   'commitHabitTitle': 'Abitudine di commit',
@@ -1554,7 +1591,8 @@ const Map<String, String> itTranslations = {
   'daysUnit': 'giorni',
   'contributionsUnit': 'contribuzioni',
   'topLanguagesTitle': 'Linguaggi di programmazione principali',
-  'topLanguagesSubtitle': 'Distribuzione di utilizzo su tutti i repositories pubblici',
+  'topLanguagesSubtitle':
+      'Distribuzione di utilizzo su tutti i repositories pubblici',
   'languageDistribution': 'Distribuzione linguaggi',
   'otherLanguages': 'Altri',
   'noLanguageData': 'Nessun dato sul linguaggio disponibile',
@@ -1582,7 +1620,8 @@ const Map<String, String> itTranslations = {
   'emptyDirectory': 'Directory vuota',
   'fileContent': 'Contenuto file',
   'loadingFile': 'Caricamento file...',
-  'cannotPreviewBinary': 'I file binari non possono essere visualizzati in anteprima',
+  'cannotPreviewBinary':
+      'I file binari non possono essere visualizzati in anteprima',
   'copyCode': 'Copia codice',
   'codeCopied': 'Codice copiato negli appunti',
   'shareProfile': 'Condividi profilo',
@@ -1684,7 +1723,8 @@ const Map<String, String> nlTranslations = {
   'themeSectionTitle': 'Thema en weergave',
   'themeSectionSubtitle': 'Kies uw favoriete kleurenpalet',
   'themeOpacityTitle': 'Kaartdekking',
-  'themeOpacitySubtitle': 'Pas de transparantie van glazen kaartachtergronden aan',
+  'themeOpacitySubtitle':
+      'Pas de transparantie van glazen kaartachtergronden aan',
   'bgAnimationTitle': 'Achtergrondanimatie',
   'bgAnimationSubtitle': 'Subtiele geanimeerde deeltjes op de achtergrond',
   'themeDark': 'Snowfall',
@@ -1692,10 +1732,12 @@ const Map<String, String> nlTranslations = {
   'themeAmoled': 'Midnight',
   'themeAmoledSubtitle': 'Puur zwart geoptimaliseerd voor OLED-schermen',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Diep obsidiaanzwart met subtiele sakura roze gloed',
+  'themeAmoledJapaneseSubtitle':
+      'Diep obsidiaanzwart met subtiele sakura roze gloed',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Helder, fris en comfortabel voor overdag',
-  'settingsBypassShaderNotice': 'Visuele effecten aangepast voor optimale prestaties',
+  'settingsBypassShaderNotice':
+      'Visuele effecten aangepast voor optimale prestaties',
   'activeLanguageBadge': 'Actief',
   'resetLabel': 'Herstellen',
   'easterEggJapaneseToast': 'Sakura-thema geactiveerd!',
@@ -1862,7 +1904,8 @@ const Map<String, String> noTranslations = {
   'saved': 'Lagret',
   'emptyBookmarks': 'Ingen lagrede profiler ennå',
   'userNotFound': 'Bruker ikke funnet',
-  'networkError': 'Kunne ikke laste data. Vennligst sjekk internettforbindelsen din.',
+  'networkError':
+      'Kunne ikke laste data. Vennligst sjekk internettforbindelsen din.',
   'rateLimitExceeded': 'Din API-kvote er oppbrukt. Vennligst vent på tilbakestilling eller oppdater tokenet i innstillinger.',
   'techNewsTitle': 'Teknologinyheter',
   'techNewsSubtitle': 'Siste nytt fra utviklerverdenen',
@@ -1893,7 +1936,8 @@ const Map<String, String> noTranslations = {
   'themeAmoled': 'Midnight',
   'themeAmoledSubtitle': 'Helt sort lerret optimalisert for OLED-skjermer',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Dyp obsidian sort med delikat sakura rosa glød',
+  'themeAmoledJapaneseSubtitle':
+      'Dyp obsidian sort med delikat sakura rosa glød',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Lys, ren og behagelig for dagsarbeid',
   'settingsBypassShaderNotice': 'Visuelle effekter skalert for optimal ytelse',
@@ -2063,7 +2107,8 @@ const Map<String, String> ptTranslations = {
   'saved': 'Salvo',
   'emptyBookmarks': 'Nenhum perfil salvo ainda',
   'userNotFound': 'Usuário não encontrado',
-  'networkError': 'Falha ao carregar dados. Verifique sua conexão com a internet.',
+  'networkError':
+      'Falha ao carregar dados. Verifique sua conexão com a internet.',
   'rateLimitExceeded': 'Sua cota de API foi esgotada. Aguarde o tempo de redefinição ou atualize seu token nas configurações.',
   'techNewsTitle': 'Notícias Tech',
   'techNewsSubtitle': 'Últimas atualizações do ecossistema de desenvolvimento',
@@ -2094,10 +2139,12 @@ const Map<String, String> ptTranslations = {
   'themeAmoled': 'Midnight',
   'themeAmoledSubtitle': 'Preto profundo otimizado para telas OLED',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Preto obsidiana profundo com brilho rosa sakura delicado',
+  'themeAmoledJapaneseSubtitle':
+      'Preto obsidiana profundo com brilho rosa sakura delicado',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Claro, nítido e confortável para o dia a dia',
-  'settingsBypassShaderNotice': 'Efeitos visuais ajustados para o melhor desempenho do dispositivo',
+  'settingsBypassShaderNotice':
+      'Efeitos visuais ajustados para o melhor desempenho do dispositivo',
   'activeLanguageBadge': 'Ativo',
   'resetLabel': 'Redefinir',
   'easterEggJapaneseToast': 'Tema Sakura ativado!',
@@ -2144,7 +2191,8 @@ const Map<String, String> ptTranslations = {
   'followers': 'Seguidores',
   'following': 'Seguindo',
   'activityRhythmTitle': 'Ritmo de atividade',
-  'activityRhythmSubtitle': 'Padrões de contribuição por horas e dias de trabalho',
+  'activityRhythmSubtitle':
+      'Padrões de contribuição por horas e dias de trabalho',
   'peakLabel': 'Pico',
   'eventsUnit': 'eventos',
   'commitHabitTitle': 'Hábito de commit',
@@ -2157,7 +2205,8 @@ const Map<String, String> ptTranslations = {
   'daysUnit': 'dias',
   'contributionsUnit': 'contribuições',
   'topLanguagesTitle': 'Principais linguagens de programação',
-  'topLanguagesSubtitle': 'Distribuição de uso em todos os repositories públicos',
+  'topLanguagesSubtitle':
+      'Distribuição de uso em todos os repositories públicos',
   'languageDistribution': 'Distribuição de linguagens',
   'otherLanguages': 'Outros',
   'noLanguageData': 'Nenhum dado de linguagem disponível',
@@ -2205,7 +2254,8 @@ const Map<String, String> ptTranslations = {
   'allTimeSubtitle': 'Desde o início no GitHub',
   'accountOverviewTitle': 'Visão geral da conta',
   'acrossAllRepos': 'Em todos os repositories públicos',
-  'registeredReposSubtitle': 'Repositories de código-fonte original registrados',
+  'registeredReposSubtitle':
+      'Repositories de código-fonte original registrados',
   'updatedPrefix': 'Atualizado',
   'cannotOpenLink': 'Não é possível abrir o link: {url}',
   'failedToOpenLink': 'Falha ao abrir o link: {error}',
@@ -2264,7 +2314,8 @@ const Map<String, String> fiTranslations = {
   'saved': 'Tallennettu',
   'emptyBookmarks': 'Ei tallennettuja profiileja vielä',
   'userNotFound': 'Käyttäjää ei löytynyt',
-  'networkError': 'Tietojen lataaminen epäonnistui. Tarkista internetyhteytesi.',
+  'networkError':
+      'Tietojen lataaminen epäonnistui. Tarkista internetyhteytesi.',
   'rateLimitExceeded': 'API-kiintiösi on käytetty loppuun. Odota nollausta tai päivitä token asetuksissa.',
   'techNewsTitle': 'Teknologiauutiset',
   'techNewsSubtitle': 'Viimeisimmät päivitykset kehittäjäyhteisöstä',
@@ -2295,10 +2346,12 @@ const Map<String, String> fiTranslations = {
   'themeAmoled': 'Midnight',
   'themeAmoledSubtitle': 'Täysin musta, optimoitu OLED-näytöille',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Syvänmusta hennolla kirsikankukan vaaleanpunaisella hehkulla',
+  'themeAmoledJapaneseSubtitle':
+      'Syvänmusta hennolla kirsikankukan vaaleanpunaisella hehkulla',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Kirkas, selkeä ja silmille miellyttävä päiväkäyttöön',
-  'settingsBypassShaderNotice': 'Visuaaliset tehosteet skaalattu laitteen suorituskyvyn mukaan',
+  'settingsBypassShaderNotice':
+      'Visuaaliset tehosteet skaalattu laitteen suorituskyvyn mukaan',
   'activeLanguageBadge': 'Aktiivinen',
   'resetLabel': 'Palauta',
   'easterEggJapaneseToast': 'Sakura-teema aktivoitu!',
@@ -2316,7 +2369,8 @@ const Map<String, String> fiTranslations = {
   'developerRole': 'Mobiili- ja Full-stack -kehittäjä',
   'madeWithLove': 'Tehty omistautumisella avoimen lähdekoodin yhteisölle',
   'rateLimitStatus': 'API-rajapinnan tilarajoitus',
-  'personalTokenActive': 'Henkilökohtainen token aktiivinen (5 000 pyyntöä/tunti)',
+  'personalTokenActive':
+      'Henkilökohtainen token aktiivinen (5 000 pyyntöä/tunti)',
   'standardMode': 'Vakiotila (60 pyyntöä/tunti)',
   'requestsUsed': 'Käytetyt pyynnöt',
   'remainingQuota': 'Jäljellä oleva kiintiö',
@@ -2465,7 +2519,8 @@ const Map<String, String> svTranslations = {
   'saved': 'Sparad',
   'emptyBookmarks': 'Inga sparade profiler än',
   'userNotFound': 'Användaren hittades inte',
-  'networkError': 'Det gick inte att läsa in data. Kontrollera din internetanslutning.',
+  'networkError':
+      'Det gick inte att läsa in data. Kontrollera din internetanslutning.',
   'rateLimitExceeded': 'Din API-kvot har tagit slut. Vänta på återställning eller uppdatera din token i inställningarna.',
   'techNewsTitle': 'Tekniknyheter',
   'techNewsSubtitle': 'Senaste uppdateringarna från utvecklarekologin',
@@ -2496,10 +2551,12 @@ const Map<String, String> svTranslations = {
   'themeAmoled': 'Midnight',
   'themeAmoledSubtitle': 'Kolsvarthäftad design optimerad för OLED-skärmar',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Djupt obsidiansvart med mjuk sakura rosa lyster',
+  'themeAmoledJapaneseSubtitle':
+      'Djupt obsidiansvart med mjuk sakura rosa lyster',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Ljust, rent och behagligt för arbete dagtid',
-  'settingsBypassShaderNotice': 'Visuella effekter skalade för optimal prestanda',
+  'settingsBypassShaderNotice':
+      'Visuella effekter skalade för optimal prestanda',
   'activeLanguageBadge': 'Aktiv',
   'resetLabel': 'Återställ',
   'easterEggJapaneseToast': 'Sakura-tema aktiverat!',
@@ -2559,7 +2616,8 @@ const Map<String, String> svTranslations = {
   'daysUnit': 'dagar',
   'contributionsUnit': 'bidrag',
   'topLanguagesTitle': 'Mest använda programmeringsspråk',
-  'topLanguagesSubtitle': 'Användningsfördelning över alla offentliga repositories',
+  'topLanguagesSubtitle':
+      'Användningsfördelning över alla offentliga repositories',
   'languageDistribution': 'Språkfördelning',
   'otherLanguages': 'Övriga',
   'noLanguageData': 'Inga språkdata tillgängliga',
@@ -2666,7 +2724,8 @@ const Map<String, String> viTranslations = {
   'saved': 'Đã lưu',
   'emptyBookmarks': 'Chưa có hồ sơ nào được lưu',
   'userNotFound': 'Không tìm thấy người dùng',
-  'networkError': 'Không thể tải dữ liệu. Vui lòng kiểm tra kết nối internet của bạn.',
+  'networkError':
+      'Không thể tải dữ liệu. Vui lòng kiểm tra kết nối internet của bạn.',
   'rateLimitExceeded': 'Hạn mức API của bạn đã hết. Vui lòng đợi thời gian làm mới hoặc cập nhật token trong cài đặt.',
   'techNewsTitle': 'Tin tức công nghệ',
   'techNewsSubtitle': 'Cập nhật mới nhất từ hệ sinh thái lập trình viên',
@@ -2695,12 +2754,15 @@ const Map<String, String> viTranslations = {
   'themeDark': 'Snowfall',
   'themeDarkSubtitle': 'Nét sang trọng hiện đại với điểm nhấn xanh lơ',
   'themeAmoled': 'Midnight',
-  'themeAmoledSubtitle': 'Nền đen tuyền tối ưu hóa cho màn hình OLED tiết kiệm pin',
+  'themeAmoledSubtitle':
+      'Nền đen tuyền tối ưu hóa cho màn hình OLED tiết kiệm pin',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Nền đen thạch anh với ánh hồng hoa anh đào tinh tế',
+  'themeAmoledJapaneseSubtitle':
+      'Nền đen thạch anh với ánh hồng hoa anh đào tinh tế',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Sáng sủa, sắc nét và dễ chịu cho công việc ban ngày',
-  'settingsBypassShaderNotice': 'Hiệu ứng hình ảnh được tối ưu hóa cho hiệu năng thiết bị',
+  'settingsBypassShaderNotice':
+      'Hiệu ứng hình ảnh được tối ưu hóa cho hiệu năng thiết bị',
   'activeLanguageBadge': 'Đang dùng',
   'resetLabel': 'Đặt lại',
   'easterEggJapaneseToast': 'Đã kích hoạt chủ đề Sakura!',
@@ -2760,7 +2822,8 @@ const Map<String, String> viTranslations = {
   'daysUnit': 'ngày',
   'contributionsUnit': 'đóng góp',
   'topLanguagesTitle': 'Ngôn ngữ lập trình hàng đầu',
-  'topLanguagesSubtitle': 'Phân bố sử dụng trên tất cả các repositories công khai',
+  'topLanguagesSubtitle':
+      'Phân bố sử dụng trên tất cả các repositories công khai',
   'languageDistribution': 'Phân bố ngôn ngữ',
   'otherLanguages': 'Khác',
   'noLanguageData': 'Không có dữ liệu ngôn ngữ',
@@ -2867,7 +2930,8 @@ const Map<String, String> ruTranslations = {
   'saved': 'Сохранено',
   'emptyBookmarks': 'Пока нет сохранённых профилей',
   'userNotFound': 'Пользователь не найден',
-  'networkError': 'Не удалось загрузить данные. Проверьте подключение к интернету.',
+  'networkError':
+      'Не удалось загрузить данные. Проверьте подключение к интернету.',
   'rateLimitExceeded': 'Лимит запросов API исчерпан. Дождитесь времени сброса или обновите токен в настройках.',
   'techNewsTitle': 'Новости технологий',
   'techNewsSubtitle': 'Свежие обновления экосистемы разработчиков',
@@ -2890,15 +2954,18 @@ const Map<String, String> ruTranslations = {
   'themeSectionTitle': 'Тема и оформление',
   'themeSectionSubtitle': 'Выберите предпочитаемую цветовую схему',
   'themeOpacityTitle': 'Прозрачность карточек',
-  'themeOpacitySubtitle': 'Регулировка прозрачности элементов в стиле стекломорфизма',
+  'themeOpacitySubtitle':
+      'Регулировка прозрачности элементов в стиле стекломорфизма',
   'bgAnimationTitle': 'Анимация фона',
   'bgAnimationSubtitle': 'Плавный эффект анимированных частиц на фоне',
   'themeDark': 'Snowfall',
   'themeDarkSubtitle': 'Холодная элегантность с неоновыми циан-акцентами',
   'themeAmoled': 'Midnight',
-  'themeAmoledSubtitle': 'Истинный глубокий чёрный, оптимизированный для OLED-экранов',
+  'themeAmoledSubtitle':
+      'Истинный глубокий чёрный, оптимизированный для OLED-экранов',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'Глубокий обсидиановый чёрный с нежным свечением сакуры',
+  'themeAmoledJapaneseSubtitle':
+      'Глубокий обсидиановый чёрный с нежным свечением сакуры',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Светлый, чистый и комфортный для дневной работы',
   'settingsBypassShaderNotice': 'Визуальные эффекты оптимизированы для максимальной производительности устройства',
@@ -2917,7 +2984,8 @@ const Map<String, String> ruTranslations = {
   'openInBrowser': 'Открыть в браузере',
   'developerLabel': 'Разработчик',
   'developerRole': 'Мобильный и Full-stack инженер',
-  'madeWithLove': 'Создано с любовью для сообщества разработчиков открытого исходного кода',
+  'madeWithLove':
+      'Создано с любовью для сообщества разработчиков открытого исходного кода',
   'rateLimitStatus': 'Статус лимита вызовов API',
   'personalTokenActive': 'Персональный токен активен (5 000 запросов/час)',
   'standardMode': 'Стандартный режим (60 запросов/час)',
@@ -3099,10 +3167,12 @@ const Map<String, String> arTranslations = {
   'themeAmoled': 'Midnight',
   'themeAmoledSubtitle': 'أسود نقي مثالي لشاشات OLED الموفرة للطاقة',
   'themeAmoledJapanese': 'Sakura',
-  'themeAmoledJapaneseSubtitle': 'أسود بركاني عميق مع توهج وردي رقيق كأزهار الكرز',
+  'themeAmoledJapaneseSubtitle':
+      'أسود بركاني عميق مع توهج وردي رقيق كأزهار الكرز',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'مشرق ونقي ومريح للعين أثناء العمل نهارًا',
-  'settingsBypassShaderNotice': 'تم ضبط التأثيرات البصرية لضمان أعلى أداء للجهاز',
+  'settingsBypassShaderNotice':
+      'تم ضبط التأثيرات البصرية لضمان أعلى أداء للجهاز',
   'activeLanguageBadge': 'نشط',
   'resetLabel': 'إعادة ضبط',
   'easterEggJapaneseToast': 'تم تفعيل مظهر ساكورا!',
@@ -3292,7 +3362,8 @@ const Map<String, String> hiTranslations = {
   'themeSectionTitle': 'थीम और दिखावट',
   'themeSectionSubtitle': 'अपना पसंदीदा रंग पैलेट चुनें',
   'themeOpacityTitle': 'कार्ड अपारदर्शिता',
-  'themeOpacitySubtitle': 'ग्लासमॉर्फ़िज्म कार्ड पृष्ठभूमि पारदर्शिता समायोजित करें',
+  'themeOpacitySubtitle':
+      'ग्लासमॉर्फ़िज्म कार्ड पृष्ठभूमि पारदर्शिता समायोजित करें',
   'bgAnimationTitle': 'पृष्ठभूमि एनीमेशन',
   'bgAnimationSubtitle': 'पृष्ठभूमि में सूक्ष्म कण एनीमेशन',
   'themeDark': 'Snowfall',
@@ -3303,7 +3374,8 @@ const Map<String, String> hiTranslations = {
   'themeAmoledJapaneseSubtitle': 'नाजुक सकुरा गुलाबी चमक के साथ गहरा काला रंग',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'दिन के काम के लिए उज्ज्वल, स्पष्ट और साफ-सुथरा',
-  'settingsBypassShaderNotice': 'डिवाइस के बेहतर प्रदर्शन के लिए दृश्य प्रभाव अनुकूलित हैं',
+  'settingsBypassShaderNotice':
+      'डिवाइस के बेहतर प्रदर्शन के लिए दृश्य प्रभाव अनुकूलित हैं',
   'activeLanguageBadge': 'सक्रिय',
   'resetLabel': 'रीसेट',
   'easterEggJapaneseToast': 'सकुरा थीम सक्रिय की गई!',
@@ -3470,8 +3542,10 @@ const Map<String, String> thTranslations = {
   'saved': 'บันทึกแล้ว',
   'emptyBookmarks': 'ยังไม่มีโปรไฟล์ที่บันทึกไว้',
   'userNotFound': 'ไม่พบผู้ใช้',
-  'networkError': 'โหลดข้อมูลไม่สำเร็จ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ',
-  'rateLimitExceeded': 'โควต้า API ของคุณหมดแล้ว โปรดรอเวลารีเซ็ตหรืออัปเดตโทเค็นในการตั้งค่า',
+  'networkError':
+      'โหลดข้อมูลไม่สำเร็จ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ',
+  'rateLimitExceeded':
+      'โควต้า API ของคุณหมดแล้ว โปรดรอเวลารีเซ็ตหรืออัปเดตโทเค็นในการตั้งค่า',
   'techNewsTitle': 'ข่าวเทคโนโลยี',
   'techNewsSubtitle': 'อัปเดตล่าสุดจากระบบนิเวศนักพัฒนา',
   'categoryAi': 'AI และ ML',
@@ -3499,12 +3573,14 @@ const Map<String, String> thTranslations = {
   'themeDark': 'Snowfall',
   'themeDarkSubtitle': 'ความเรียบหรูทันสมัยพร้อมโทนสีฟ้าไซแอน',
   'themeAmoled': 'Midnight',
-  'themeAmoledSubtitle': 'สีดำสนิทที่ปรับแต่งสำหรับหน้าจอ OLED เพื่อประหยัดพลังงาน',
+  'themeAmoledSubtitle':
+      'สีดำสนิทที่ปรับแต่งสำหรับหน้าจอ OLED เพื่อประหยัดพลังงาน',
   'themeAmoledJapanese': 'Sakura',
   'themeAmoledJapaneseSubtitle': 'สีดำสนิทผสานประกายสีชมพูซากุระอันนุ่มนวล',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'สว่าง สะอาดตา สบายตาสำหรับการทำงานในเวลากลางวัน',
-  'settingsBypassShaderNotice': 'ปรับแต่งเอฟเฟกต์ภาพเพื่อประสิทธิภาพสูงสุดของอุปกรณ์',
+  'settingsBypassShaderNotice':
+      'ปรับแต่งเอฟเฟกต์ภาพเพื่อประสิทธิภาพสูงสุดของอุปกรณ์',
   'activeLanguageBadge': 'ใช้งานอยู่',
   'resetLabel': 'รีเซ็ต',
   'easterEggJapaneseToast': 'เปิดใช้งานธีมซากุระแล้ว!',
@@ -3731,7 +3807,8 @@ const Map<String, String> jaTranslations = {
   'resetting': 'リセット中...',
   'optionalBadge': '任意',
   'tokenActiveBadge': '有効',
-  'tokenDescription': 'Personal Access Token を設定して毎時5,000件のリクエスト制限を解除。トークンは端末ローカルに安全に保存されます。',
+  'tokenDescription':
+      'Personal Access Token を設定して毎時5,000件のリクエスト制限を解除。トークンは端末ローカルに安全に保存されます。',
   'tokenHint': 'トークン貼付 (ghp_...)',
   'howToCreateToken': 'GitHubトークンの作成方法',
   'tokenGuideContent': '1. github.com を開く > プロフィール > Settings。\\n',
@@ -4275,7 +4352,8 @@ const Map<String, String> koTranslations = {
   'emptyBookmarks': '저장된 프로필이 없습니다. 사용자를 검색하고 북마크 아이콘을 눌러 저장해 보세요!',
   'userNotFound': '사용자를 찾을 수 없습니다',
   'networkError': '데이터를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.',
-  'rateLimitExceeded': '토큰 / API 요청 한도가 모두 소진되었습니다. 리셋 시간을 기다리거나 설정에서 토큰을 변경해 주세요.',
+  'rateLimitExceeded':
+      '토큰 / API 요청 한도가 모두 소진되었습니다. 리셋 시간을 기다리거나 설정에서 토큰을 변경해 주세요.',
   'techNewsTitle': 'AI 및 기술 뉴스',
   'techNewsSubtitle': '최신 글로벌 기술 트렌드 업데이트',
   'categoryAi': 'AI 및 머신러닝',
@@ -4334,7 +4412,8 @@ const Map<String, String> koTranslations = {
   'resetting': '재설정 중...',
   'optionalBadge': '선택',
   'tokenActiveBadge': '활성',
-  'tokenDescription': '개인 액세스 토큰을 등록하여 시간당 5,000회 요청 한도를 활성화하세요. 토큰은 기기 로컬에만 안전하게 저장됩니다.',
+  'tokenDescription':
+      '개인 액세스 토큰을 등록하여 시간당 5,000회 요청 한도를 활성화하세요. 토큰은 기기 로컬에만 안전하게 저장됩니다.',
   'tokenHint': '토큰 붙여넣기 (ghp_...)',
   'howToCreateToken': 'GitHub 토큰 생성 방법',
   'tokenGuideContent': '1. github.com 접속 > 프로필 > Settings.\\n',
@@ -4447,4 +4526,3 @@ const Map<String, String> koTranslations = {
   'tierClean5': '실버 탐험가',
   'tierClean6': '브론즈 노비스',
 };
-

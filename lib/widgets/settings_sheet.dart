@@ -1024,7 +1024,8 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             // Grid of Languages
                             Builder(
                               builder: (context) {
-                                final sortedLangs = AppLanguage.sortedAlphabetically;
+                                final sortedLangs =
+                                    AppLanguage.sortedAlphabetically;
                                 return Column(
                                   children: [
                                     for (

@@ -1316,8 +1316,9 @@ class _HomeScreenState extends State<HomeScreen> {
               categories,
               context,
             );
-            final totalWidth =
-                offsets.isNotEmpty ? offsets.last + widths.last : 0.0;
+            final totalWidth = offsets.isNotEmpty
+                ? offsets.last + widths.last
+                : 0.0;
             final selectedIndex = categories.indexWhere(
               (c) => c['id'] == _selectedCategory,
             );
@@ -1328,10 +1329,7 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: AppTheme.border,
-                  width: 1.0,
-                ),
+                border: Border.all(color: AppTheme.border, width: 1.0),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
               child: SingleChildScrollView(
@@ -1350,17 +1348,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           double page = safeIndex.toDouble();
                           if (_newsPageController.hasClients) {
                             page =
-                                _newsPageController.page ?? safeIndex.toDouble();
+                                _newsPageController.page ??
+                                safeIndex.toDouble();
                           }
                           page = page.clamp(
                             0.0,
                             (categories.length - 1).toDouble(),
                           );
 
-                          final int from =
-                              page.floor().clamp(0, categories.length - 1);
-                          final int to =
-                              page.ceil().clamp(0, categories.length - 1);
+                          final int from = page.floor().clamp(
+                            0,
+                            categories.length - 1,
+                          );
+                          final int to = page.ceil().clamp(
+                            0,
+                            categories.length - 1,
+                          );
                           final double progress = page - from;
 
                           final double currentLeft = ui.lerpDouble(
@@ -1454,8 +1457,9 @@ class _HomeScreenState extends State<HomeScreen> {
           AppTheme.primaryCyan,
           activeFactor,
         )!;
-        final fontWeight =
-            activeFactor > 0.5 ? FontWeight.w600 : FontWeight.w500;
+        final fontWeight = activeFactor > 0.5
+            ? FontWeight.w600
+            : FontWeight.w500;
 
         return SizedBox(
           width: width,

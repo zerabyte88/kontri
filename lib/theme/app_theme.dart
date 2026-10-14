@@ -49,7 +49,9 @@ class AppTheme {
       AppThemeMode.amoled => const Color(0xFF101012),
       AppThemeMode.amoledJapanese => const Color(0xFF140D13),
       AppThemeMode.light => const Color(0xFFFFFFFF),
-      AppThemeMode.dark => const Color(0xFF0B132B), // Deep Midnight Slate (Snowfall)
+      AppThemeMode.dark => const Color(
+        0xFF0B132B,
+      ), // Deep Midnight Slate (Snowfall)
     };
     if (cardOpacity < 0.999) {
       final alpha = (255 * cardOpacity.clamp(0.50, 1.00)).round().clamp(0, 255);
