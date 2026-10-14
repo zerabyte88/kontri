@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../services/app_theme_service.dart';
@@ -8,8 +6,8 @@ import '../theme/app_theme.dart';
 /// Reusable adaptive Glassmorphism card container.
 ///
 /// Automatically reads [AppThemeService.surfaceOpacityNotifier].
-/// When opacity < 1.0, applies [BackdropFilter] with frosted glass blur and semi-transparent surface.
-/// When opacity == 1.0, automatically bypasses blur filtering for optimal rendering performance.
+/// Uses pure alpha color transparency (zero [BackdropFilter]) to ensure
+/// smooth 60/120 FPS rendering without GPU offscreen buffering overhead.
 class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -60,21 +58,6 @@ class GlassCard extends StatelessWidget {
           ),
           child: Material(color: Colors.transparent, child: child),
         );
-
-        if (isGlass && enableBlur) {
-          box = RepaintBoundary(
-            child: ClipRRect(
-              borderRadius: effectiveRadius,
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: blurAmount,
-                  sigmaY: blurAmount,
-                ),
-                child: box,
-              ),
-            ),
-          );
-        }
 
         if (margin != null) {
           box = Padding(padding: margin!, child: box);

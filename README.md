@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/static/v1?label=Platform&message=Android&color=059669&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Platform" />
   <img src="https://img.shields.io/static/v1?label=Architecture&message=arm64-v8a&color=7c3aed&style=for-the-badge&logo=arm&logoColor=white&labelColor=0f172a" alt="Architecture" />
   <img src="https://img.shields.io/static/v1?label=Application%20ID&message=com.phantek.orion.rigel&color=6366f1&style=for-the-badge&logo=android&logoColor=white&labelColor=0f172a" alt="Application ID" />
-  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.4.3&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse_mobile/releases"><img src="https://img.shields.io/static/v1?label=Version&message=v2.4.4&color=2563eb&style=for-the-badge&logo=github&logoColor=white&labelColor=0f172a" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/static/v1?label=License&message=MIT&color=475569&style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=0f172a" alt="License" /></a>
 </div>
 
@@ -44,7 +44,7 @@
 ### 5. Commit Activity Tier Engine & Dynamic Visuals
 - **6-Level Animated Tier Badges:** Continuous streak and annual contribution volume ranking with custom canvas shaders (`Mythic Archmage`, `Diamond Vanguard`, `Platinum Artisan`, `Gold Adventurer`, `Silver Explorer`, `Bronze Novice`).
 - **Full-Screen Dynamic Ambient Background:** GPU-accelerated continuous looping canvas across the entire application viewport tailored to each active theme:
-  - **Dark Mode (Midnight Cyber Aurora 🌌):** Undulating multi-layered aurora curtains, micro cosmic stars, and continuous upward-streaming stardust embers with 100% seamless mathematical loop continuity.
+  - **Dark Mode (Snowfall & Winter Village Night ❄️):** Rolling winter snow hills, pine silhouettes, warm illuminated cabin windows, and continuous floating snowfall particles with 100% seamless mathematical loop continuity.
   - **AMOLED (Pure Black Cosmos 🌌):** Starry cosmos with twinkling diamond stars, glowing crescent moon, and continuous full-screen staggered meteor shower (6 meteors crossing edge-to-edge).
   - **AMOLED Sakura (Radiant Pink 🌸):** Artistic sumi-e sakura boughs, drifting cherry blossom petals, and an ethereal full moon repositioned below the header to guarantee crystal-clear title readability.
   - **Light Mode (Solar Horizon & Prismatic Breeze ☀️):** Luminous ceramic dawn sky with flowing topographic horizon ribbons, drifting prismatic daylight motes, and soft breathing komorebi sunbeams.
@@ -92,9 +92,9 @@
 - **Silent Background Enrichment:** Automatically fetches missing location and bio details from GitHub REST API in the background for older bookmarks.
 - **Radial Empty State Illustration:** Polished centered illustration and welcoming prompt when no profiles are currently favorited.
 
-### 9. Customizable Surface Opacity & Adaptive Glassmorphism
+### 9. Customizable Surface Opacity & Pure Alpha Transparency
 - **Real-Time Surface Opacity Slider:** Interactive slider (50% – 100%, default 100%) in Settings with a live percentage badge, giving users full control over background bleed-through.
-- **Hardware-Accelerated Frosted Glass (`GlassCard`):** Custom reusable glassmorphism component featuring GPU-accelerated `BackdropFilter` (`10px` gaussian blur) when opacity is below 1.0, and automatically bypassing blur filtering at 1.0 (Solid) for smooth, zero-overhead rendering.
+- **Pure Alpha Color Transparency (`GlassCard`):** Custom reusable container component utilizing direct alpha color calculation (`withValues(alpha: opacity)`) with zero `BackdropFilter` or `saveLayer` overhead. Completely eliminates GPU offscreen render-pass bottlenecks, guaranteeing butter-smooth 60/120 FPS scrolling across all opacity levels.
 - **App-Wide Ambient Persistence:** Background particle loops persist continuously across all screens (Settings, User Profile, Favorite Profiles, Repository Detail, Code Viewer) with lifecycle-aware pausing when minimized to the OS background.
 
 ### 10. Modern & Minimalist UI Redesign
@@ -109,6 +109,12 @@
 - **Intelligent Language Query Bypass:** Skips 8–25 repetitive language breakdown calls whenever repositories return 304, protecting the 60 req/hr unauthenticated rate limit.
 - **Manual Profile Reload & Pull-to-Refresh:** Includes an AppBar refresh button with loading spinner and full-screen `RefreshIndicator` pull-to-refresh gesture, accompanied by status SnackBars indicating whether updates were pulled or verified up-to-date with zero quota cost.
 - **Graceful Offline Fallback:** When network connectivity is lost, cached profiles load immediately with full analytics.
+
+### 12. Real-Time Tech & Open-Source News Feed
+- **Multi-Source Developer News (`TechNewsService`):** Curates real-time trending repositories and developer articles directly from GitHub and the Dev.to REST API across 6 distinct categories: **Trending**, **GitHub**, **AI**, **Technology**, **Open Source**, and **Web Dev**.
+- **Continuous Sliding Category Capsule Bar:** Interactive horizontal navigation bar with a smooth mathematical sliding indicator capsule (`_calculateCategoryMetrics`) and synchronized swipeable `PageView` transitions.
+- **Local Cache & Offline Continuity:** In-memory and disk caching with 15-minute TTL (`StorageService`), providing instant article loading and seamless offline viewing with cached visual status indicators.
+- **In-App Article Inspection & External Redirection:** Directly launch repository explorations or read full articles via `url_launcher`.
 
 ---
 
@@ -137,12 +143,14 @@ Developers receive a continuous animated tier badge based on their commit streak
 | **Markdown Engine** | `flutter_markdown` (v0.7.7+1) | Native in-app GitHub README markdown parsing with CDN asset resolution |
 | **Networking** | `http` (v1.6.0) | Composable HTTP client for GitHub REST API v3 queries & rate limit tracking |
 | **OTA Delivery** | `ota_update` (v7.1.0) | In-app background APK downloader & Android PackageInstaller integration |
+| **External Links** | `url_launcher` (v6.3.2) | Seamless browser intents for articles, profiles, and external assets |
+| **Vector Graphics** | `flutter_svg` (v2.3.0) | High-performance SVG asset and icon rendering |
 | **Release Signing** | Android Signing Config | Standard release pipeline with safe fallback |
 | **CI/CD Automation** | GitHub Actions (`workflow_dispatch`) | Manual-only automated release compilation and SHA-256 verification |
 | **Typography** | Native Material 3 System Typeface | Instant cold start, zero HTTP network font fetch, adaptive platform typography |
 | **Local Persistence** | `shared_preferences` (v2.5.5) | On-device sandboxed key-value store for bookmarks, themes, & preferences |
 | **Internationalization** | `intl` (v0.20.3) | Reactive 22-language global localization & date/number formatting |
-| **Verification Suite** | `flutter_test` | Comprehensive test coverage (69/69 passing unit and widget tests) |
+| **Verification Suite** | `flutter_test` | Comprehensive test coverage (70/70 passing unit and widget tests) |
 
 ---
 

@@ -792,13 +792,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v2.4.3',
+      'AppConfig provides accurate release and version telemetry for v2.4.4',
       () {
         expect(AppConfig.appName, 'GitPulse');
-        expect(AppConfig.appVersion, 'v2.4.3');
-        expect(AppConfig.buildNumber, '24');
-        expect(AppConfig.fullVersion, 'v2.4.3 (Build 24)');
-        expect(AppConfig.releaseTag, 'v2.4.3');
+        expect(AppConfig.appVersion, 'v2.4.4');
+        expect(AppConfig.buildNumber, '25');
+        expect(AppConfig.fullVersion, 'v2.4.4 (Build 25)');
+        expect(AppConfig.releaseTag, 'v2.4.4');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1099,13 +1099,13 @@ void main() {
       AppTheme.currentMode = AppThemeMode.dark;
 
       // Verify distinct primary accents
-      expect(darkTheme.primaryColor, const Color(0xFF2563EB));
+      expect(darkTheme.primaryColor, const Color(0xFF38BDF8));
       expect(amoledTheme.primaryColor, const Color(0xFF00E5FF));
       expect(sakuraTheme.primaryColor, const Color(0xFFF472B6));
       expect(lightTheme.primaryColor, const Color(0xFF2563EB));
 
       // Verify card surfaces
-      expect(darkTheme.cardTheme.color, const Color(0xFF1E293B));
+      expect(darkTheme.cardTheme.color, const Color(0xFF0B132B));
       expect(amoledTheme.cardTheme.color, const Color(0xFF101012));
       expect(sakuraTheme.cardTheme.color, const Color(0xFF140D13));
 
@@ -2189,7 +2189,7 @@ void main() {
     );
 
     testWidgets(
-      'GlassCard adapts between BackdropFilter when translucent and solid when opaque',
+      'GlassCard uses pure alpha color transparency and never spawns BackdropFilter',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
         final prefs = await SharedPreferences.getInstance();
@@ -2207,14 +2207,14 @@ void main() {
           ),
         );
 
-        // Default opacity is 1.00 -> BackdropFilter bypassed for GPU performance
+        // Default opacity is 1.00 -> pure surface color, no BackdropFilter
         expect(find.byType(BackdropFilter), findsNothing);
         expect(find.text('Glass Test Content'), findsOneWidget);
 
-        // Change opacity to 0.85 -> BackdropFilter active
+        // Change opacity to 0.85 -> uses pure alpha color blending, zero BackdropFilter
         await AppThemeService.changeSurfaceOpacity(0.85, storage);
         await tester.pump();
-        expect(find.byType(BackdropFilter), findsOneWidget);
+        expect(find.byType(BackdropFilter), findsNothing);
         expect(find.text('Glass Test Content'), findsOneWidget);
       },
     );

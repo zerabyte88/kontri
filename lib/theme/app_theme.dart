@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'GitPulse';
-  static const String appVersion = 'v2.4.3';
-  static const String buildNumber = '24';
-  static const String fullVersion = 'v2.4.3 (Build 24)';
-  static const String releaseTag = 'v2.4.3';
+  static const String appVersion = 'v2.4.4';
+  static const String buildNumber = '25';
+  static const String fullVersion = 'v2.4.4 (Build 25)';
+  static const String releaseTag = 'v2.4.4';
   static const String githubRepoUrl =
       'https://github.com/zerabyte88/gitpulse-mobile';
   static const String developerUsername = 'zerabyte88';
@@ -49,7 +49,7 @@ class AppTheme {
       AppThemeMode.amoled => const Color(0xFF101012),
       AppThemeMode.amoledJapanese => const Color(0xFF140D13),
       AppThemeMode.light => const Color(0xFFFFFFFF),
-      AppThemeMode.dark => const Color(0xFF1E293B), // Slate 800
+      AppThemeMode.dark => const Color(0xFF0B132B), // Deep Midnight Slate (Snowfall)
     };
     if (cardOpacity < 0.999) {
       final alpha = (255 * cardOpacity.clamp(0.50, 1.00)).round().clamp(0, 255);
@@ -63,7 +63,7 @@ class AppTheme {
       AppThemeMode.amoled => const Color(0xFF1A1A1E),
       AppThemeMode.amoledJapanese => const Color(0xFF251228),
       AppThemeMode.light => const Color(0xFFF1F5F9), // Slate 100
-      AppThemeMode.dark => const Color(0xFF334155), // Slate 700
+      AppThemeMode.dark => const Color(0xFF151D2F), // Slate Navy (Snowfall)
     };
     if (cardOpacity < 0.999) {
       final alpha = (255 * cardOpacity.clamp(0.50, 1.00)).round().clamp(0, 255);
@@ -76,14 +76,14 @@ class AppTheme {
     AppThemeMode.amoled => const Color(0xFF2B2B33),
     AppThemeMode.amoledJapanese => const Color(0xFF381525),
     AppThemeMode.light => const Color(0xFFE2E8F0), // Slate 200
-    AppThemeMode.dark => const Color(0xFF334155), // Slate 700
+    AppThemeMode.dark => const Color(0xFF1E293B), // Ice Slate (Snowfall)
   };
 
   static Color get borderSubtle => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFF1E1E24),
     AppThemeMode.amoledJapanese => const Color(0xFF220C17),
     AppThemeMode.light => const Color(0xFFF1F5F9), // Slate 100
-    AppThemeMode.dark => const Color(0xFF1E293B), // Slate 800
+    AppThemeMode.dark => const Color(0xFF131C2E), // Subtle Slate (Snowfall)
   };
 
   // Semantic Accents (Modern Cobalt & Harmonious Accents)
@@ -93,7 +93,7 @@ class AppTheme {
       0xFFF472B6,
     ), // Radiant Sakura Blossom
     AppThemeMode.light => const Color(0xFF2563EB), // Modern Cobalt Blue
-    AppThemeMode.dark => const Color(0xFF2563EB), // Modern Cobalt Blue
+    AppThemeMode.dark => const Color(0xFF38BDF8), // Frost Cyan (Snowfall)
   };
 
   static Color get primaryViolet => switch (currentMode) {
@@ -102,7 +102,7 @@ class AppTheme {
       0xFFFDA4AF,
     ), // Rose Quartz Sakura Accent
     AppThemeMode.light => const Color(0xFF0284C7), // Sky Accent
-    AppThemeMode.dark => const Color(0xFF0284C7), // Sky Accent
+    AppThemeMode.dark => const Color(0xFF0EA5E9), // Vivid Sky (Snowfall)
   };
 
   static Color get accentGreen => switch (currentMode) {
@@ -138,21 +138,21 @@ class AppTheme {
     AppThemeMode.amoled => const Color(0xFFFFFFFF),
     AppThemeMode.amoledJapanese => const Color(0xFFFFF1F2),
     AppThemeMode.light => const Color(0xFF0F172A), // Slate 900
-    AppThemeMode.dark => const Color(0xFFF8FAFC), // Slate 50
+    AppThemeMode.dark => const Color(0xFFFFFFFF), // Pure Snow White (Snowfall)
   };
 
   static Color get textSecondary => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFFA1A1AA),
     AppThemeMode.amoledJapanese => const Color(0xFFD4A5B8),
     AppThemeMode.light => const Color(0xFF475569), // Slate 600
-    AppThemeMode.dark => const Color(0xFF94A3B8), // Slate 400
+    AppThemeMode.dark => const Color(0xFFE2E8F0), // Slate 200 (Snowfall)
   };
 
   static Color get textMuted => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFF71717A),
     AppThemeMode.amoledJapanese => const Color(0xFFA07FA8),
     AppThemeMode.light => const Color(0xFF94A3B8), // Slate 400
-    AppThemeMode.dark => const Color(0xFF64748B), // Slate 500
+    AppThemeMode.dark => const Color(0xFF94A3B8), // Slate 400 (Snowfall)
   };
 
   static bool get isLight => currentMode == AppThemeMode.light;
@@ -170,7 +170,7 @@ class AppTheme {
       AppThemeMode.amoled => const Color(0xFF101012),
       AppThemeMode.amoledJapanese => const Color(0xFF140D13),
       AppThemeMode.light => const Color(0xFFFFFFFF),
-      AppThemeMode.dark => const Color(0xFF1E293B),
+      AppThemeMode.dark => const Color(0xFF0B132B),
     };
 
     final effectiveSurf = cardOpacity < 0.999
@@ -183,35 +183,35 @@ class AppTheme {
       AppThemeMode.amoled => const Color(0xFF2B2B33),
       AppThemeMode.amoledJapanese => const Color(0xFF381525),
       AppThemeMode.light => const Color(0xFFE2E8F0),
-      AppThemeMode.dark => const Color(0xFF334155),
+      AppThemeMode.dark => const Color(0xFF1E293B),
     };
 
     final prim = switch (mode) {
       AppThemeMode.amoled => const Color(0xFF00E5FF),
       AppThemeMode.amoledJapanese => const Color(0xFFF472B6),
       AppThemeMode.light => const Color(0xFF2563EB),
-      AppThemeMode.dark => const Color(0xFF2563EB),
+      AppThemeMode.dark => const Color(0xFF38BDF8),
     };
 
     final sec = switch (mode) {
       AppThemeMode.amoled => const Color(0xFFA855F7),
       AppThemeMode.amoledJapanese => const Color(0xFFFDA4AF),
       AppThemeMode.light => const Color(0xFF0284C7),
-      AppThemeMode.dark => const Color(0xFF0284C7),
+      AppThemeMode.dark => const Color(0xFF0EA5E9),
     };
 
     final txtPrim = switch (mode) {
       AppThemeMode.amoled => const Color(0xFFFFFFFF),
       AppThemeMode.amoledJapanese => const Color(0xFFFFF1F2),
       AppThemeMode.light => const Color(0xFF0F172A),
-      AppThemeMode.dark => const Color(0xFFF8FAFC),
+      AppThemeMode.dark => const Color(0xFFFFFFFF),
     };
 
     final txtMuted = switch (mode) {
       AppThemeMode.amoled => const Color(0xFF71717A),
       AppThemeMode.amoledJapanese => const Color(0xFFA07FA8),
       AppThemeMode.light => const Color(0xFF94A3B8),
-      AppThemeMode.dark => const Color(0xFF64748B),
+      AppThemeMode.dark => const Color(0xFF94A3B8),
     };
 
     final appTextTheme = baseTextTheme.apply(
@@ -240,7 +240,7 @@ class AppTheme {
               surface: effectiveSurf,
               onSurface: txtPrim,
               outline: brd,
-              outlineVariant: const Color(0xFF1E293B),
+              outlineVariant: const Color(0xFF151D2F),
               error: const Color(0xFFEF4444),
             ),
       textTheme: appTextTheme,
@@ -289,7 +289,9 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: prim,
-          foregroundColor: Colors.white,
+          foregroundColor: mode == AppThemeMode.dark
+              ? const Color(0xFF0F172A)
+              : Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(
