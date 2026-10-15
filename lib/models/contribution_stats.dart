@@ -49,9 +49,8 @@ class ContributionStats {
     required int totalContributions,
   }) {
     // Tier 1: Sangat Rajin Ekstrem (Mythic/Legendary)
-    if (currentStreak >= 30 ||
-        longestStreak >= 60 ||
-        thisYearContributions >= 500) {
+    if (thisYearContributions >= 1000 &&
+        (currentStreak >= 30 || longestStreak >= 60)) {
       return const CommitTitleInfo(
         title: 'Mythic Archmage',
         levelName: 'Sangat Rajin (Master)',
@@ -61,9 +60,8 @@ class ContributionStats {
       );
     }
     // Tier 2: Rajin & Berkelanjutan (Diamond)
-    else if (currentStreak >= 14 ||
-        longestStreak >= 30 ||
-        thisYearContributions >= 200) {
+    else if (thisYearContributions >= 500 &&
+        (currentStreak >= 21 || longestStreak >= 45)) {
       return const CommitTitleInfo(
         title: 'Diamond Vanguard',
         levelName: 'Sangat Rajin',
@@ -73,9 +71,8 @@ class ContributionStats {
       );
     }
     // Tier 3: Rutin & Teratur (Platinum)
-    else if (currentStreak >= 7 ||
-        longestStreak >= 14 ||
-        thisYearContributions >= 60) {
+    else if (thisYearContributions >= 250 &&
+        (currentStreak >= 7 || longestStreak >= 14)) {
       return const CommitTitleInfo(
         title: 'Platinum Artisan',
         levelName: 'Rajin & Stabil',
@@ -86,9 +83,9 @@ class ContributionStats {
       );
     }
     // Tier 4: Terkadang / Sewaktu-waktu (Gold)
-    else if (currentStreak >= 3 ||
-        longestStreak >= 7 ||
-        thisYearContributions >= 20) {
+    else if (thisYearContributions >= 125 ||
+        currentStreak >= 14 ||
+        longestStreak >= 21) {
       return const CommitTitleInfo(
         title: 'Gold Adventurer',
         levelName: 'Commit Terkadang',
@@ -98,7 +95,7 @@ class ContributionStats {
       );
     }
     // Tier 5: Jarang Commit (Silver)
-    else if (thisYearContributions > 0 || totalContributions > 0) {
+    else if (thisYearContributions >= 20 || totalContributions >= 30) {
       return const CommitTitleInfo(
         title: 'Silver Explorer',
         levelName: 'Jarang Commit',

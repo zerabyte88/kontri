@@ -124,12 +124,12 @@ Developers receive a continuous animated tier badge based on their commit streak
 
 | Tier Level | Badge Title | Qualifying Criteria | Real-Time Canvas Shader Effect |
 | :--- | :--- | :--- | :--- |
-| **Tier 1** | **Mythic Archmage** | `Streak >= 30d` or `Max >= 60d` or `Year >= 500` | 🔮 **Arcane Dragonflame & Rune Sparks**: Multi-hue violet-crimson-gold heatwave shader with orbiting floating magic embers |
-| **Tier 2** | **Diamond Vanguard** | `Streak >= 14d` or `Max >= 30d` or `Year >= 200` | ⚡ **Glacial Thunderstorm & Diamond Arc**: Diamond crystal cyan & electric blue lightning arc with high-frequency micro-crackle |
-| **Tier 3** | **Platinum Artisan** | `Streak >= 7d` or `Max >= 14d` or `Year >= 60` | ⚔️ **Sacred Emerald Blade Sweep**: Gleaming holy blade light sweep with emerald forge glints and platinum sheen |
-| **Tier 4** | **Gold Adventurer** | `Streak >= 3d` or `Max >= 7d` or `Year >= 20` | 🛡️ **Sunburst Guild Crest Radiance**: Warm golden sunfire sweep with radiant adventurer crest glow |
-| **Tier 5** | **Silver Explorer** | `This Year > 0` or `Total Contributions > 0` | 🌌 **Moonlit Silver Mist**: Calm ethereal starlight mist wave with gentle cosmic lavender drift |
-| **Tier 6** | **Bronze Novice** | *Default / 0 Contributions Recorded* | 🌿 **Living Verdant Dewdrop**: Earthy bronze casing with organic living sprout breath & morning dew gleam |
+| **Tier 1** | **Mythic Archmage** | `Year >= 1000` **AND** (`Streak >= 30d` or `Max >= 60d`) | 🔮 **Arcane Dragonflame & Rune Sparks**: Multi-hue violet-crimson-gold heatwave shader with orbiting floating magic embers |
+| **Tier 2** | **Diamond Vanguard** | `Year >= 500` **AND** (`Streak >= 21d` or `Max >= 45d`) | ⚡ **Glacial Thunderstorm & Diamond Arc**: Diamond crystal cyan & electric blue lightning arc with high-frequency micro-crackle |
+| **Tier 3** | **Platinum Artisan** | `Year >= 250` **AND** (`Streak >= 7d` or `Max >= 14d`) | ⚔️ **Sacred Emerald Blade Sweep**: Gleaming holy blade light sweep with emerald forge glints and platinum sheen |
+| **Tier 4** | **Gold Adventurer** | `Year >= 125` **OR** `Streak >= 14d` **OR** `Max >= 21d` | 🛡️ **Sunburst Guild Crest Radiance**: Warm golden sunfire sweep with radiant adventurer crest glow |
+| **Tier 5** | **Silver Explorer** | `Year >= 20` **OR** `Total Contributions >= 30` | 🌌 **Moonlit Silver Mist**: Calm ethereal starlight mist wave with gentle cosmic lavender drift |
+| **Tier 6** | **Bronze Novice** | *Default / `< 20` this year and `< 30` total* | 🌿 **Living Verdant Dewdrop**: Earthy bronze casing with organic living sprout breath & morning dew gleam |
 
 ---
 

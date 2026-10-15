@@ -65,55 +65,70 @@ void main() {
 
     test('ContributionStats determines commit titles correctly for different frequencies', () {
       // 1. Sangat Rajin Ekstrem (Mythic Archmage)
+      // Wajib: thisYear >= 1000 && (currentStreak >= 30 || longestStreak >= 60)
       final mythic = ContributionStats.determineTitle(
         currentStreak: 32,
         longestStreak: 65,
-        thisYearContributions: 520,
-        totalContributions: 800,
+        thisYearContributions: 1050,
+        totalContributions: 1500,
       );
       expect(mythic.title, contains('Mythic Archmage'));
       expect(mythic.levelName, contains('Sangat Rajin'));
 
+      // Gagal Mythic jika volume tinggi tapi streak tidak cukup -> turun ke Diamond
+      final notMythic = ContributionStats.determineTitle(
+        currentStreak: 20,
+        longestStreak: 25,
+        thisYearContributions: 1200,
+        totalContributions: 1500,
+      );
+      expect(notMythic.title, isNot(contains('Mythic Archmage')));
+
       // 2. Sangat Rajin (Diamond Vanguard)
+      // Wajib: thisYear >= 500 && (currentStreak >= 21 || longestStreak >= 45)
       final diamond = ContributionStats.determineTitle(
-        currentStreak: 16,
-        longestStreak: 32,
-        thisYearContributions: 210,
-        totalContributions: 300,
+        currentStreak: 22,
+        longestStreak: 48,
+        thisYearContributions: 520,
+        totalContributions: 700,
       );
       expect(diamond.title, contains('Diamond Vanguard'));
       expect(diamond.levelName, contains('Sangat Rajin'));
 
       // 3. Rajin & Stabil (Platinum Artisan)
+      // Wajib: thisYear >= 250 && (currentStreak >= 7 || longestStreak >= 14)
       final platinum = ContributionStats.determineTitle(
         currentStreak: 8,
-        longestStreak: 15,
-        thisYearContributions: 75,
-        totalContributions: 100,
+        longestStreak: 16,
+        thisYearContributions: 260,
+        totalContributions: 350,
       );
       expect(platinum.title, contains('Platinum Artisan'));
 
       // 4. Terkadang Commit (Gold Adventurer)
+      // Wajib: thisYear >= 125 || currentStreak >= 14 || longestStreak >= 21
       final gold = ContributionStats.determineTitle(
-        currentStreak: 4,
-        longestStreak: 8,
-        thisYearContributions: 25,
-        totalContributions: 40,
+        currentStreak: 15,
+        longestStreak: 22,
+        thisYearContributions: 130,
+        totalContributions: 180,
       );
       expect(gold.title, contains('Gold Adventurer'));
       expect(gold.levelName, contains('Commit Terkadang'));
 
       // 5. Jarang Commit (Silver Explorer)
+      // Wajib: thisYear >= 20 || totalContributions >= 30
       final silver = ContributionStats.determineTitle(
         currentStreak: 0,
-        longestStreak: 1,
-        thisYearContributions: 3,
-        totalContributions: 5,
+        longestStreak: 2,
+        thisYearContributions: 25,
+        totalContributions: 35,
       );
       expect(silver.title, contains('Silver Explorer'));
       expect(silver.levelName, contains('Jarang Commit'));
 
       // 6. Belum Aktif (Bronze Novice)
+      // < 20 thisYear && < 30 total
       final bronze = ContributionStats.determineTitle(
         currentStreak: 0,
         longestStreak: 0,
@@ -122,6 +137,15 @@ void main() {
       );
       expect(bronze.title, contains('Bronze Novice'));
       expect(bronze.levelName, contains('Belum Aktif'));
+
+      // Akun dengan 5 commit tahun ini & 10 total tetap berada di Bronze
+      final lowCommitBronze = ContributionStats.determineTitle(
+        currentStreak: 1,
+        longestStreak: 2,
+        thisYearContributions: 5,
+        totalContributions: 10,
+      );
+      expect(lowCommitBronze.title, contains('Bronze Novice'));
     });
 
     test('ContributionStats calculates active and longest streaks accurately across dates', () {
