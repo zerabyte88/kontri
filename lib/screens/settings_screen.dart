@@ -13,6 +13,7 @@ import '../services/github_api_service.dart';
 import '../services/storage_service.dart';
 import '../services/update_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/glass_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   final StorageService storageService;
@@ -241,13 +242,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required Widget child,
     EdgeInsetsGeometry padding = const EdgeInsets.all(16),
   }) {
-    return Container(
+    return GlassCard(
       padding: padding,
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceElevated,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.border, width: 1.0),
-      ),
+      color: AppTheme.surfaceElevated,
+      borderRadius: BorderRadius.circular(16),
       child: child,
     );
   }

@@ -386,6 +386,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
         valueListenable: AppThemeService.surfaceOpacityNotifier,
         builder: (context, surfaceOpacity, _) {
           final isGlass = surfaceOpacity < 0.999;
+          final cardOpacity = isGlass
+              ? (0.45 + 0.55 * surfaceOpacity).clamp(0.0, 1.0)
+              : 1.0;
           const sheetRadius = BorderRadius.vertical(top: Radius.circular(20));
 
           Widget sheetContent = AnimatedContainer(
@@ -545,12 +548,16 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         curve: Curves.easeInOut,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated.withValues(
-                            alpha: 0.85,
-                          ),
+                          color: isGlass
+                              ? AppTheme.surfaceElevated.withValues(
+                                  alpha: cardOpacity,
+                                )
+                              : AppTheme.surfaceElevated,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppTheme.border.withValues(alpha: 0.7),
+                            color: AppTheme.border.withValues(
+                              alpha: isGlass ? 0.65 : 1.0,
+                            ),
                             width: 1,
                           ),
                         ),
@@ -941,12 +948,16 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         curve: Curves.easeInOut,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated.withValues(
-                            alpha: 0.85,
-                          ),
+                          color: isGlass
+                              ? AppTheme.surfaceElevated.withValues(
+                                  alpha: cardOpacity,
+                                )
+                              : AppTheme.surfaceElevated,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppTheme.border.withValues(alpha: 0.7),
+                            color: AppTheme.border.withValues(
+                              alpha: isGlass ? 0.65 : 1.0,
+                            ),
                             width: 1,
                           ),
                         ),
@@ -1072,12 +1083,16 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         curve: Curves.easeInOut,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated.withValues(
-                            alpha: 0.85,
-                          ),
+                          color: isGlass
+                              ? AppTheme.surfaceElevated.withValues(
+                                  alpha: cardOpacity,
+                                )
+                              : AppTheme.surfaceElevated,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppTheme.border.withValues(alpha: 0.7),
+                            color: AppTheme.border.withValues(
+                              alpha: isGlass ? 0.65 : 1.0,
+                            ),
                             width: 1,
                           ),
                         ),
@@ -1202,12 +1217,16 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         curve: Curves.easeInOut,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated.withValues(
-                            alpha: 0.85,
-                          ),
+                          color: isGlass
+                              ? AppTheme.surfaceElevated.withValues(
+                                  alpha: cardOpacity,
+                                )
+                              : AppTheme.surfaceElevated,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppTheme.border.withValues(alpha: 0.7),
+                            color: AppTheme.border.withValues(
+                              alpha: isGlass ? 0.65 : 1.0,
+                            ),
                             width: 1,
                           ),
                         ),
@@ -1460,12 +1479,16 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         curve: Curves.easeInOut,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated.withValues(
-                            alpha: 0.85,
-                          ),
+                          color: isGlass
+                              ? AppTheme.surfaceElevated.withValues(
+                                  alpha: cardOpacity,
+                                )
+                              : AppTheme.surfaceElevated,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppTheme.border.withValues(alpha: 0.7),
+                            color: AppTheme.border.withValues(
+                              alpha: isGlass ? 0.65 : 1.0,
+                            ),
                             width: 1,
                           ),
                         ),
@@ -1811,9 +1834,18 @@ class _SettingsSheetState extends State<SettingsSheet> {
                         curve: Curves.easeInOut,
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated,
+                          color: isGlass
+                              ? AppTheme.surfaceElevated.withValues(
+                                  alpha: cardOpacity,
+                                )
+                              : AppTheme.surfaceElevated,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppTheme.border, width: 1),
+                          border: Border.all(
+                            color: AppTheme.border.withValues(
+                              alpha: isGlass ? 0.65 : 1.0,
+                            ),
+                            width: 1,
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
