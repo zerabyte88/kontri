@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>Mobile GitHub Analytics, Streak Tracking, and Repository Exploration.</strong>
+  <strong>Android application for GitHub analytics, contribution streaks, and repository exploration.</strong>
 </p>
 
 <p align="center">
