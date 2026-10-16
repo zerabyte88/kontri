@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'GitPulse';
-  static const String appVersion = 'v2.4.4';
-  static const String buildNumber = '25';
-  static const String fullVersion = 'v2.4.4 (Build 25)';
-  static const String releaseTag = 'v2.4.4';
+  static const String appVersion = 'v2.4.5';
+  static const String buildNumber = '26';
+  static const String fullVersion = 'v2.4.5 (Build 26)';
+  static const String releaseTag = 'v2.4.5';
   static const String githubRepoUrl =
       'https://github.com/zerabyte88/gitpulse-mobile';
   static const String developerUsername = 'zerabyte88';

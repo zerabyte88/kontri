@@ -813,13 +813,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v2.4.4',
+      'AppConfig provides accurate release and version telemetry for v2.4.5',
       () {
         expect(AppConfig.appName, 'GitPulse');
-        expect(AppConfig.appVersion, 'v2.4.4');
-        expect(AppConfig.buildNumber, '25');
-        expect(AppConfig.fullVersion, 'v2.4.4 (Build 25)');
-        expect(AppConfig.releaseTag, 'v2.4.4');
+        expect(AppConfig.appVersion, 'v2.4.5');
+        expect(AppConfig.buildNumber, '26');
+        expect(AppConfig.fullVersion, 'v2.4.5 (Build 26)');
+        expect(AppConfig.releaseTag, 'v2.4.5');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
