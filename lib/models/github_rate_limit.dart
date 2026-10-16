@@ -22,6 +22,20 @@ class GitHubRateLimit {
   double get usedPercentage =>
       limit > 0 ? ((used / limit).clamp(0.0, 1.0)) * 100 : 0.0;
 
+  GitHubRateLimit copyWith({
+    int? limit,
+    int? remaining,
+    int? used,
+    DateTime? resetTime,
+  }) {
+    return GitHubRateLimit(
+      limit: limit ?? this.limit,
+      remaining: remaining ?? this.remaining,
+      used: used ?? this.used,
+      resetTime: resetTime ?? this.resetTime,
+    );
+  }
+
   /// Relative countdown text until rate limit reset.
   String get resetCountdown {
     final now = DateTime.now();

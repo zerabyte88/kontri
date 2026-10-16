@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../localization/app_localizations.dart';
+import '../models/github_commit_info.dart';
 import '../models/github_content_item.dart';
 import '../services/github_api_service.dart';
 import '../theme/app_theme.dart';
@@ -36,6 +37,7 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
   bool _isLoading = true;
   String? _content;
   String? _errorMessage;
+  GitHubCommitInfo? _latestCommit;
 
   bool get _isImage => widget.item.isImage;
   bool get _isSvg => widget.item.isSvg;
@@ -78,10 +80,29 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
   void initState() {
     super.initState();
     _apiService = widget.apiService ?? GitHubApiService();
+    _loadCommit();
     if (!_isImage && !_isBinary) {
       _loadFile();
     } else {
       _isLoading = false;
+    }
+  }
+
+  Future<void> _loadCommit() async {
+    try {
+      final commit = await _apiService.fetchLatestCommitForPath(
+        owner: widget.owner,
+        repo: widget.repo,
+        path: widget.item.path,
+        ref: widget.ref,
+      );
+      if (mounted && commit != null) {
+        setState(() {
+          _latestCommit = commit;
+        });
+      }
+    } catch (_) {
+      // Graceful degradation: silent fallback
     }
   }
 
@@ -377,6 +398,16 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
     final lines = (_content ?? '').split('\n');
     final totalLines = lines.length;
 
+    final String telemetryText;
+    if (_latestCommit != null) {
+      final relative = loc.formatRelativeTime(_latestCommit!.date);
+      final commitPart = 'commit ${_latestCommit!.shortSha} ($relative)';
+      telemetryText =
+          '$totalLines lines • ${_latestCommit!.firstLineMessage} • $commitPart • ${widget.item.formattedSize}';
+    } else {
+      telemetryText = '$totalLines lines • ${widget.item.formattedSize}';
+    }
+
     return Column(
       children: [
         // File telemetry bar
@@ -396,12 +427,15 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
                 color: widget.item.iconColor,
               ),
               const SizedBox(width: 8),
-              Text(
-                '$totalLines lines • ${widget.item.formattedSize}',
-                style: TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+              Expanded(
+                child: RunningText(
+                  text: telemetryText,
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  autoScroll: true,
                 ),
               ),
             ],

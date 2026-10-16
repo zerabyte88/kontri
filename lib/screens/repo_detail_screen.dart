@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -49,6 +48,15 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
   String? _contentsError;
   final ScrollController _breadcrumbsScrollController = ScrollController();
 
+  // Search State
+  bool _isSearching = false;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  bool _isLoadingTree = false;
+  List<GitHubContentItem> _allRepoFiles = [];
+  String? _treeError;
+
   @override
   void initState() {
     super.initState();
@@ -59,7 +67,57 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
   @override
   void dispose() {
     _breadcrumbsScrollController.dispose();
+    _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
+  }
+
+  void _startSearch() {
+    setState(() {
+      _isSearching = true;
+      _searchQuery = '';
+      _searchController.clear();
+    });
+    _searchFocusNode.requestFocus();
+    if (_allRepoFiles.isEmpty) {
+      _loadRepoTree();
+    }
+  }
+
+  void _exitSearch() {
+    setState(() {
+      _isSearching = false;
+      _searchQuery = '';
+      _searchController.clear();
+    });
+  }
+
+  Future<void> _loadRepoTree() async {
+    setState(() {
+      _isLoadingTree = true;
+      _treeError = null;
+    });
+
+    try {
+      final items = await _apiService.fetchRepositoryTree(
+        owner: _repoOwner,
+        repo: widget.repo.name,
+        ref: _defaultBranch,
+      );
+      if (mounted) {
+        setState(() {
+          _allRepoFiles = items;
+          _isLoadingTree = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _treeError = e.toString();
+          _isLoadingTree = false;
+        });
+      }
+    }
   }
 
   String get _repoOwner {
@@ -218,21 +276,6 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     }
   }
 
-  void _copyRepoUrl() {
-    final url = widget.repo.htmlUrl.isNotEmpty
-        ? widget.repo.htmlUrl
-        : 'https://github.com/$_repoOwner/${widget.repo.name}';
-    Clipboard.setData(ClipboardData(text: url));
-    final loc = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(loc.repoUrlCopied),
-        backgroundColor: AppTheme.surfaceElevated,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 
   /// Normalizes image URLs from markdown or HTML tags into raw direct URLs
   String _normalizeImageUrl(
@@ -365,74 +408,322 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
         ? widget.repo.htmlUrl
         : 'https://github.com/$_repoOwner/${widget.repo.name}';
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
+    return PopScope(
+      canPop: !_isSearching,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_isSearching) {
+          _exitSearch();
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        flexibleSpace: const AnimatedHeaderBackground(),
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        titleSpacing: 0,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RunningText(
-              text: widget.repo.name,
-              style: TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
-              autoScroll: true,
-            ),
-            if (_repoOwner.isNotEmpty)
-              Text(
-                _repoOwner,
-                style: TextStyle(
-                  color: AppTheme.textMuted,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w400,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          flexibleSpace: const AnimatedHeaderBackground(),
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          titleSpacing: _isSearching ? 8 : 0,
+          leading: _isSearching
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                  color: AppTheme.textSecondary,
+                  onPressed: _exitSearch,
+                )
+              : null,
+          title: _isSearching
+              ? TextField(
+                  controller: _searchController,
+                  focusNode: _searchFocusNode,
+                  style: TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  cursorColor: AppTheme.primaryCyan,
+                  decoration: InputDecoration(
+                    hintText: loc.searchRepoFiles,
+                    hintStyle: TextStyle(
+                      color: AppTheme.textMuted,
+                      fontSize: 14,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  ),
+                  onChanged: (val) {
+                    setState(() {
+                      _searchQuery = val.trim();
+                    });
+                  },
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RunningText(
+                      text: widget.repo.name,
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      autoScroll: true,
+                    ),
+                    if (_repoOwner.isNotEmpty)
+                      Text(
+                        _repoOwner,
+                        style: TextStyle(
+                          color: AppTheme.textMuted,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                  ],
+                ),
+          actions: _isSearching
+              ? [
+                  if (_searchQuery.isNotEmpty)
+                    IconButton(
+                      icon: const Icon(Icons.clear_rounded, size: 20),
+                      tooltip: loc.cancel,
+                      color: AppTheme.textMuted,
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() {
+                          _searchQuery = '';
+                        });
+                      },
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    tooltip: loc.close,
+                    color: AppTheme.textSecondary,
+                    onPressed: _exitSearch,
+                  ),
+                ]
+              : [
+                  IconButton(
+                    icon: const Icon(Icons.search_rounded, size: 20),
+                    tooltip: loc.searchRepoFiles,
+                    color: AppTheme.textSecondary,
+                    onPressed: _startSearch,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.open_in_new_rounded, size: 20),
+                    tooltip: loc.openInGithub,
+                    color: AppTheme.primaryCyan,
+                    onPressed: () => _openExternal(repoUrl),
+                  ),
+                ],
+        ),
+        body: _isSearching
+            ? _buildSearchResults(loc)
+            : SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 1. Repo Overview Card
+                    _buildOverviewCard(loc, repoUrl),
+                    const SizedBox(height: 16),
+
+                    // 2. Navigation Segments: README vs Files
+                    _buildSegmentedTabBar(loc),
+                    const SizedBox(height: 14),
+
+                    // 3. Active Tab Content
+                    if (_selectedTab == 0)
+                      _buildReadmeSection(loc, repoUrl)
+                    else
+                      _buildFilesSection(loc),
+                    const SizedBox(height: 32),
+                  ],
                 ),
               ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.copy_rounded, size: 20),
-            tooltip: loc.copyRepoUrl,
-            color: AppTheme.textSecondary,
-            onPressed: _copyRepoUrl,
-          ),
-          IconButton(
-            icon: const Icon(Icons.open_in_new_rounded, size: 20),
-            tooltip: loc.openInGithub,
-            color: AppTheme.primaryCyan,
-            onPressed: () => _openExternal(repoUrl),
-          ),
-        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
+
+  Widget _buildSearchResults(AppLocalizations loc) {
+    if (_isLoadingTree) {
+      return Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 1. Repo Overview Card
-            _buildOverviewCard(loc, repoUrl),
+            SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: AppTheme.primaryCyan,
+              ),
+            ),
             const SizedBox(height: 16),
-
-            // 2. Navigation Segments: README vs Files
-            _buildSegmentedTabBar(loc),
-            const SizedBox(height: 14),
-
-            // 3. Active Tab Content
-            if (_selectedTab == 0)
-              _buildReadmeSection(loc, repoUrl)
-            else
-              _buildFilesSection(loc),
-            const SizedBox(height: 32),
+            Text(
+              loc.loadingFiles,
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+            ),
           ],
         ),
-      ),
+      );
+    }
+
+    if (_treeError != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                size: 36,
+                color: AppTheme.accentRed,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _treeError!,
+                style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: _loadRepoTree,
+                icon: const Icon(Icons.refresh_rounded, size: 16),
+                label: Text(loc.retry),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final query = _searchQuery.toLowerCase();
+    final matches = query.isEmpty
+        ? _allRepoFiles
+        : _allRepoFiles.where((item) {
+            return item.name.toLowerCase().contains(query) ||
+                item.path.toLowerCase().contains(query);
+          }).toList();
+
+    if (matches.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.search_off_rounded,
+                size: 44,
+                color: AppTheme.textMuted.withValues(alpha: 0.5),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                loc.noFilesFound,
+                style: TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              if (_searchQuery.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text(
+                  '"$_searchQuery"',
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      itemCount: matches.length,
+      separatorBuilder: (_, _) => const SizedBox(height: 6),
+      itemBuilder: (context, index) {
+        final item = matches[index];
+        final dirPath = item.path.contains('/')
+            ? item.path.substring(0, item.path.lastIndexOf('/'))
+            : '';
+
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _openFile(item),
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: AppTheme.border.withValues(alpha: 0.5),
+                  width: 0.8,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: item.iconColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      item.iconData,
+                      size: 17,
+                      color: item.iconColor,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.name,
+                          style: TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (dirPath.isNotEmpty)
+                          Text(
+                            dirPath,
+                            style: TextStyle(
+                              color: AppTheme.textMuted,
+                              fontSize: 11,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    item.formattedSize,
+                    style: TextStyle(
+                      color: AppTheme.textMuted,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

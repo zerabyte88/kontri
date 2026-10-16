@@ -292,6 +292,9 @@ class AppLocalizations {
   String get defaultBranchLabel => _t('defaultBranchLabel');
   String get copyRepoUrl => _t('copyRepoUrl');
   String get repoUrlCopied => _t('repoUrlCopied');
+  String get searchRepoFiles => _t('searchRepoFiles');
+  String get noFilesFound => _t('noFilesFound');
+  String get loadingFiles => _t('loadingFiles');
   String get filesTab => _t('filesTab');
   String get loadingContents => _t('loadingContents');
   String get emptyDirectory => _t('emptyDirectory');

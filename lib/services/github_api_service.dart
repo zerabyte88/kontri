@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import '../models/contribution_stats.dart';
+import '../models/github_commit_info.dart';
 import '../models/github_content_item.dart';
 import '../models/github_rate_limit.dart';
 import '../models/github_repo.dart';
@@ -37,6 +38,8 @@ class GitHubApiService {
   final StorageService? storageService;
   GitHubRateLimit? _lastRateLimit;
   final Map<String, UserStats> _statsCache = {};
+  final Map<String, List<GitHubContentItem>> _treeCache = {};
+  final Map<String, GitHubCommitInfo> _commitCache = {};
   bool _isLastResponseNotModified = false;
 
   GitHubApiService({
@@ -48,7 +51,11 @@ class GitHubApiService {
   GitHubRateLimit? get lastRateLimit => _lastRateLimit;
   bool get isLastResponseNotModified => _isLastResponseNotModified;
 
-  void clearCache() => _statsCache.clear();
+  void clearCache() {
+    _statsCache.clear();
+    _treeCache.clear();
+    _commitCache.clear();
+  }
 
   Map<String, String> get _headers {
     final headers = <String, String>{
@@ -218,6 +225,130 @@ class GitHubApiService {
       return [];
     }
     return [];
+  }
+
+  Future<List<GitHubContentItem>> fetchRepositoryTree({
+    required String owner,
+    required String repo,
+    String? ref,
+  }) async {
+    final cleanOwner = owner.trim();
+    final cleanRepo = repo.trim();
+    if (cleanOwner.isEmpty || cleanRepo.isEmpty) return [];
+
+    final cacheKey = '$cleanOwner/$cleanRepo/${ref ?? 'default'}';
+    if (_treeCache.containsKey(cacheKey)) {
+      return _treeCache[cacheKey]!;
+    }
+
+    try {
+      final treeRef = (ref != null && ref.trim().isNotEmpty) ? ref.trim() : 'HEAD';
+      final uri = Uri.parse(
+        '$_baseUrl/repos/$cleanOwner/$cleanRepo/git/trees/$treeRef?recursive=1',
+      );
+      final res = await _client
+          .get(uri, headers: _headers)
+          .timeout(_timeoutDuration);
+      _updateRateLimitFromHeaders(res.headers);
+
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(res.body);
+        if (decoded is Map<String, dynamic> && decoded['tree'] is List) {
+          final List<GitHubContentItem> items = [];
+          for (final item in decoded['tree']) {
+            if (item is Map<String, dynamic> && item['type'] == 'blob') {
+              final path = item['path'] as String? ?? '';
+              final name = path.contains('/') ? path.split('/').last : path;
+              items.add(GitHubContentItem(
+                name: name,
+                path: path,
+                sha: item['sha'] as String? ?? '',
+                size: item['size'] as int? ?? 0,
+                type: 'file',
+                downloadUrl:
+                    'https://raw.githubusercontent.com/$cleanOwner/$cleanRepo/${ref ?? 'main'}/$path',
+                htmlUrl:
+                    'https://github.com/$cleanOwner/$cleanRepo/blob/${ref ?? 'main'}/$path',
+              ));
+            }
+          }
+          _treeCache[cacheKey] = items;
+          return items;
+        }
+      } else if (res.statusCode == 404) {
+        return [];
+      } else if (res.statusCode == 403 || res.statusCode == 429) {
+        throw GitHubApiException(
+          'Batas kuota token / API telah habis.',
+          statusCode: res.statusCode,
+          isRateLimit: true,
+        );
+      }
+    } on SocketException {
+      throw GitHubApiException('Tidak ada koneksi internet.');
+    } on TimeoutException {
+      throw GitHubApiException(
+        'Koneksi timeout saat memuat daftar file repositori.',
+      );
+    } catch (e) {
+      if (e is GitHubApiException) rethrow;
+      return [];
+    }
+    return [];
+  }
+
+  Future<GitHubCommitInfo?> fetchLatestCommitForPath({
+    required String owner,
+    required String repo,
+    required String path,
+    String? ref,
+  }) async {
+    final cleanOwner = owner.trim();
+    final cleanRepo = repo.trim();
+    final cleanPath = path.trim().replaceAll(RegExp(r'^/+|/+$'), '');
+    if (cleanOwner.isEmpty || cleanRepo.isEmpty || cleanPath.isEmpty) return null;
+
+    final cacheKey = '$cleanOwner/$cleanRepo/${ref ?? 'default'}/$cleanPath';
+    if (_commitCache.containsKey(cacheKey)) {
+      return _commitCache[cacheKey];
+    }
+
+    try {
+      final endpoint = '$_baseUrl/repos/$cleanOwner/$cleanRepo/commits';
+      final queryParams = <String, String>{
+        'path': cleanPath,
+        'page': '1',
+        'per_page': '1',
+      };
+      if (ref != null && ref.trim().isNotEmpty) {
+        queryParams['sha'] = ref.trim();
+      }
+      final uri = Uri.parse(endpoint).replace(queryParameters: queryParams);
+
+      final res = await _client
+          .get(uri, headers: _headers)
+          .timeout(_timeoutDuration);
+      _updateRateLimitFromHeaders(res.headers);
+
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(res.body);
+        if (decoded is List && decoded.isNotEmpty) {
+          final commitData = decoded.first;
+          if (commitData is Map<String, dynamic>) {
+            final commitInfo = GitHubCommitInfo.fromJson(commitData);
+            _commitCache[cacheKey] = commitInfo;
+            return commitInfo;
+          }
+        }
+      } else if (res.statusCode == 403 || res.statusCode == 429) {
+        _lastRateLimit = _lastRateLimit?.copyWith(remaining: 0);
+        return null;
+      }
+    } catch (_) {
+      // Graceful degradation: return null without throwing
+      return null;
+    }
+    return null;
   }
 
   Future<String?> fetchFileContent({

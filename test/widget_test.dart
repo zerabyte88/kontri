@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import 'package:kontri/localization/app_language.dart';
 import 'package:kontri/localization/app_localizations.dart';
 import 'package:kontri/models/bookmarked_user.dart';
 import 'package:kontri/models/contribution_stats.dart';
+import 'package:kontri/models/github_commit_info.dart';
 import 'package:kontri/models/github_content_item.dart';
 import 'package:kontri/models/github_rate_limit.dart';
 import 'package:kontri/models/github_repo.dart';
@@ -822,13 +823,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.0.0',
+      'AppConfig provides accurate release and version telemetry for v1.1.0',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.0.0');
-        expect(AppConfig.buildNumber, '1');
-        expect(AppConfig.fullVersion, 'v1.0.0 (Build 1)');
-        expect(AppConfig.releaseTag, 'v1.0.0');
+        expect(AppConfig.appVersion, 'v1.1.0');
+        expect(AppConfig.buildNumber, '2');
+        expect(AppConfig.fullVersion, 'v1.1.0 (Build 2)');
+        expect(AppConfig.releaseTag, 'v1.1.0');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1743,6 +1744,218 @@ void main() {
       // Should show directory contents
       expect(find.text('lib'), findsOneWidget);
       expect(find.text('pubspec.yaml'), findsOneWidget);
+    });
+
+    test('GitHubCommitInfo and API tree / commit fetch work correctly', () async {
+      final commitJson = {
+        'sha': '6dcb09b5b57875f334f61aebed695e2e4193db5e',
+        'commit': {
+          'message': 'feat: initial file search implementation\n\nDetailed body here',
+          'author': {
+            'name': 'Zerabyte',
+            'date': DateTime.now().subtract(const Duration(hours: 2)).toIso8601String(),
+          },
+        },
+      };
+
+      final commitInfo = GitHubCommitInfo.fromJson(commitJson);
+      expect(commitInfo.shortSha, '6dcb09b');
+      expect(commitInfo.firstLineMessage, 'feat: initial file search implementation');
+      expect(commitInfo.date, isNotNull);
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/git/trees/')) {
+          return http.Response(
+            jsonEncode({
+              'sha': 'treesha',
+              'tree': [
+                {'path': 'lib/main.dart', 'type': 'blob', 'size': 120, 'sha': 's1'},
+                {'path': 'lib/boolean.dart', 'type': 'blob', 'size': 91, 'sha': 's2'},
+                {'path': 'lib', 'type': 'tree', 'sha': 's3'},
+              ],
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        } else if (request.url.path.contains('/commits')) {
+          return http.Response(
+            jsonEncode([commitJson]),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final service = GitHubApiService(client: mockClient);
+      final tree = await service.fetchRepositoryTree(owner: 'zerabyte88', repo: 'gitpulse');
+      expect(tree.length, 2);
+      expect(tree.any((f) => f.name == 'boolean.dart'), isTrue);
+
+      final fetchedCommit = await service.fetchLatestCommitForPath(
+        owner: 'zerabyte88',
+        repo: 'gitpulse',
+        path: 'lib/boolean.dart',
+      );
+      expect(fetchedCommit, isNotNull);
+      expect(fetchedCommit!.shortSha, '6dcb09b');
+    });
+
+    testWidgets('FileViewerScreen renders commit info in telemetry bar when available', (
+      WidgetTester tester,
+    ) async {
+      final item = GitHubContentItem(
+        name: 'boolean.dart',
+        path: 'lib/boolean.dart',
+        sha: 'abc',
+        size: 91,
+        type: 'file',
+        downloadUrl: 'https://raw.githubusercontent.com/boolean.dart',
+      );
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/commits')) {
+          return http.Response(
+            jsonEncode([
+              {
+                'sha': 'a1b2c3d4e5',
+                'commit': {
+                  'message': 'fix: handle boolean flags',
+                  'committer': {
+                    'date': DateTime.now().subtract(const Duration(minutes: 5)).toIso8601String(),
+                  },
+                },
+              }
+            ]),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('bool flag = true;\nfinal check = false;', 200);
+      });
+
+      final apiService = GitHubApiService(client: mockClient);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          supportedLocales: AppLanguage.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: FileViewerScreen(
+            item: item,
+            repo: 'gitpulse',
+            owner: 'zerabyte88',
+            apiService: apiService,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('boolean.dart'), findsOneWidget);
+      expect(find.textContaining('2 lines'), findsOneWidget);
+      expect(find.textContaining('fix: handle boolean flags'), findsOneWidget);
+      expect(find.textContaining('commit a1b2c3d'), findsOneWidget);
+      expect(find.textContaining('91 B'), findsOneWidget);
+    });
+
+    testWidgets('RepoDetailScreen in-place search bar filters repository files', (
+      WidgetTester tester,
+    ) async {
+      final repo = GitHubRepo(
+        name: 'flutter_gitpulse',
+        description: 'Developer telemetry mobile app',
+        htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+        language: 'Dart',
+        stargazersCount: 11,
+        forksCount: 34,
+        openIssuesCount: 3,
+        isFork: false,
+        topics: ['flutter'],
+        defaultBranch: 'main',
+      );
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/git/trees/')) {
+          return http.Response(
+            jsonEncode({
+              'tree': [
+                {'path': 'lib/main.dart', 'type': 'blob', 'size': 1200},
+                {'path': 'lib/boolean.dart', 'type': 'blob', 'size': 91},
+                {'path': 'README.md', 'type': 'blob', 'size': 450},
+              ],
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        } else if (request.url.path.contains('/readme')) {
+          return http.Response(
+            jsonEncode({
+              'name': 'README.md',
+              'encoding': 'base64',
+              'content': base64Encode(utf8.encode('# Readme')),
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final apiService = GitHubApiService(client: mockClient);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          supportedLocales: AppLanguage.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: RepoDetailScreen(
+            repo: repo,
+            username: 'zerabyte88',
+            apiService: apiService,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Find search button and tap it
+      final searchButton = find.byIcon(Icons.search_rounded);
+      expect(searchButton, findsOneWidget);
+      await tester.tap(searchButton);
+      await tester.pumpAndSettle();
+
+      // Verify search input is shown
+      final textField = find.byType(TextField);
+      expect(textField, findsOneWidget);
+
+      // Verify all files in repo are loaded
+      expect(find.text('boolean.dart'), findsOneWidget);
+      expect(find.text('main.dart'), findsOneWidget);
+
+      // Type query 'bool'
+      await tester.enterText(textField, 'bool');
+      await tester.pumpAndSettle();
+
+      // Only boolean.dart should match
+      expect(find.text('boolean.dart'), findsOneWidget);
+      expect(find.text('main.dart'), findsNothing);
+
+      // Tap close button to exit search
+      final closeButton = find.byIcon(Icons.close_rounded);
+      expect(closeButton, findsOneWidget);
+      await tester.tap(closeButton);
+      await tester.pumpAndSettle();
+
+      // Should return to normal repo screen
+      expect(find.byType(TextField), findsNothing);
+      expect(find.byIcon(Icons.search_rounded), findsOneWidget);
     });
 
     testWidgets(

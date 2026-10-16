@@ -22,6 +22,7 @@ class RunningText extends StatefulWidget {
 
 class _RunningTextState extends State<RunningText> {
   ScrollController? _scrollController;
+  Timer? _activeTimer;
   bool _disposed = false;
   bool _isLoopRunning = false;
 
@@ -50,8 +51,18 @@ class _RunningTextState extends State<RunningText> {
   @override
   void dispose() {
     _disposed = true;
+    _activeTimer?.cancel();
     _scrollController?.dispose();
     super.dispose();
+  }
+
+  Future<bool> _delay(Duration duration) {
+    final completer = Completer<bool>();
+    _activeTimer?.cancel();
+    _activeTimer = Timer(duration, () {
+      if (!completer.isCompleted) completer.complete(!_disposed);
+    });
+    return completer.future;
   }
 
   Future<void> _startScrollLoop() async {
@@ -60,18 +71,18 @@ class _RunningTextState extends State<RunningText> {
 
     while (mounted && !_disposed && widget.autoScroll) {
       if (_scrollController == null || !_scrollController!.hasClients) {
-        await Future.delayed(const Duration(milliseconds: 150));
+        if (!await _delay(const Duration(milliseconds: 150))) break;
         continue;
       }
 
       final maxScroll = _scrollController!.position.maxScrollExtent;
       if (maxScroll <= 0) {
-        await Future.delayed(const Duration(milliseconds: 500));
+        if (!await _delay(const Duration(milliseconds: 500))) break;
         continue;
       }
 
       // Initial pause at start
-      await Future.delayed(widget.pauseDuration);
+      if (!await _delay(widget.pauseDuration)) break;
       if (!mounted || _disposed || !_scrollController!.hasClients) break;
 
       // Animate smoothly to end
@@ -90,7 +101,7 @@ class _RunningTextState extends State<RunningText> {
       }
 
       // Pause at end
-      await Future.delayed(widget.pauseDuration);
+      if (!await _delay(widget.pauseDuration)) break;
       if (!mounted || _disposed || !_scrollController!.hasClients) break;
 
       // Animate back to start
