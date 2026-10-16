@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'GitPulse';
-  static const String appVersion = 'v2.4.5';
-  static const String buildNumber = '26';
-  static const String fullVersion = 'v2.4.5 (Build 26)';
-  static const String releaseTag = 'v2.4.5';
+  static const String appVersion = 'v2.5.0';
+  static const String buildNumber = '27';
+  static const String fullVersion = 'v2.5.0 (Build 27)';
+  static const String releaseTag = 'v2.5.0';
   static const String githubRepoUrl =
       'https://github.com/zerabyte88/gitpulse-mobile';
   static const String developerUsername = 'zerabyte88';
@@ -16,32 +16,47 @@ class AppConfig {
 }
 
 enum AppThemeMode {
-  dark('dark'),
+  amoledSnowfall('oled_snowfall'),
   amoled('amoled'),
   amoledJapanese('amoled_japanese'),
-  light('light');
+  amoledPure('oled_pure'),
+  light('light'),
+  cleanLight('light_clean');
 
   final String key;
   const AppThemeMode(this.key);
 
+  static const AppThemeMode dark = amoledSnowfall;
+
   static AppThemeMode fromKey(String? key) {
+    if (key == 'dark' || key == 'oled_snowfall') {
+      return AppThemeMode.amoledSnowfall;
+    }
+    if (key == 'oled_pure' || key == 'pure_oled') {
+      return AppThemeMode.amoledPure;
+    }
+    if (key == 'light_clean' || key == 'clean_light') {
+      return AppThemeMode.cleanLight;
+    }
     return AppThemeMode.values.firstWhere(
       (m) => m.key == key,
-      orElse: () => AppThemeMode.dark,
+      orElse: () => AppThemeMode.amoledSnowfall,
     );
   }
 }
 
 class AppTheme {
-  static AppThemeMode currentMode = AppThemeMode.dark;
+  static AppThemeMode currentMode = AppThemeMode.amoledSnowfall;
   static double cardOpacity = 1.0;
 
-  // Dynamic Backgrounds & Surfaces (Phantek Slate Engine)
+  // Background and surface colors
   static Color get background => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFF000000),
     AppThemeMode.amoledJapanese => const Color(0xFF000000),
-    AppThemeMode.light => const Color(0xFFF8FAFC), // Slate 50
-    AppThemeMode.dark => const Color(0xFF0F172A), // Slate 900
+    AppThemeMode.light => const Color(0xFFF8FAFC),
+    AppThemeMode.amoledSnowfall => const Color(0xFF000000),
+    AppThemeMode.amoledPure => const Color(0xFF000000),
+    AppThemeMode.cleanLight => const Color(0xFFF8FAFC),
   };
 
   static Color get surface {
@@ -49,9 +64,9 @@ class AppTheme {
       AppThemeMode.amoled => const Color(0xFF101012),
       AppThemeMode.amoledJapanese => const Color(0xFF140D13),
       AppThemeMode.light => const Color(0xFFFFFFFF),
-      AppThemeMode.dark => const Color(
-        0xFF0B132B,
-      ), // Deep Midnight Slate (Snowfall)
+      AppThemeMode.amoledSnowfall => const Color(0xFF0C1322),
+      AppThemeMode.amoledPure => const Color(0xFF101012),
+      AppThemeMode.cleanLight => const Color(0xFFFFFFFF),
     };
     if (cardOpacity < 0.999) {
       final alpha = (255 * cardOpacity.clamp(0.50, 1.00)).round().clamp(0, 255);
@@ -64,8 +79,10 @@ class AppTheme {
     final base = switch (currentMode) {
       AppThemeMode.amoled => const Color(0xFF1A1A1E),
       AppThemeMode.amoledJapanese => const Color(0xFF251228),
-      AppThemeMode.light => const Color(0xFFF1F5F9), // Slate 100
-      AppThemeMode.dark => const Color(0xFF151D2F), // Slate Navy (Snowfall)
+      AppThemeMode.light => const Color(0xFFF1F5F9),
+      AppThemeMode.amoledSnowfall => const Color(0xFF141F36),
+      AppThemeMode.amoledPure => const Color(0xFF18181B),
+      AppThemeMode.cleanLight => const Color(0xFFF1F5F9),
     };
     if (cardOpacity < 0.999) {
       final alpha = (255 * cardOpacity.clamp(0.50, 1.00)).round().clamp(0, 255);
@@ -77,62 +94,74 @@ class AppTheme {
   static Color get border => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFF2B2B33),
     AppThemeMode.amoledJapanese => const Color(0xFF381525),
-    AppThemeMode.light => const Color(0xFFE2E8F0), // Slate 200
-    AppThemeMode.dark => const Color(0xFF1E293B), // Ice Slate (Snowfall)
+    AppThemeMode.light => const Color(0xFFE2E8F0),
+    AppThemeMode.amoledSnowfall => const Color(0xFF1E293B),
+    AppThemeMode.amoledPure => const Color(0xFF27272A),
+    AppThemeMode.cleanLight => const Color(0xFFE2E8F0),
   };
 
   static Color get borderSubtle => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFF1E1E24),
     AppThemeMode.amoledJapanese => const Color(0xFF220C17),
-    AppThemeMode.light => const Color(0xFFF1F5F9), // Slate 100
-    AppThemeMode.dark => const Color(0xFF131C2E), // Subtle Slate (Snowfall)
+    AppThemeMode.light => const Color(0xFFF1F5F9),
+    AppThemeMode.amoledSnowfall => const Color(0xFF151D2F),
+    AppThemeMode.amoledPure => const Color(0xFF18181B),
+    AppThemeMode.cleanLight => const Color(0xFFF1F5F9),
   };
 
-  // Semantic Accents (Modern Cobalt & Harmonious Accents)
+  // Semantic accents
   static Color get primaryCyan => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFF00E5FF),
-    AppThemeMode.amoledJapanese => const Color(
-      0xFFF472B6,
-    ), // Radiant Sakura Blossom
-    AppThemeMode.light => const Color(0xFF2563EB), // Modern Cobalt Blue
-    AppThemeMode.dark => const Color(0xFF38BDF8), // Frost Cyan (Snowfall)
+    AppThemeMode.amoledJapanese => const Color(0xFFF472B6),
+    AppThemeMode.light => const Color(0xFF2563EB),
+    AppThemeMode.amoledSnowfall => const Color(0xFF38BDF8),
+    AppThemeMode.amoledPure => const Color(0xFF60A5FA),
+    AppThemeMode.cleanLight => const Color(0xFF0EA5E9),
   };
 
   static Color get primaryViolet => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFFA855F7),
-    AppThemeMode.amoledJapanese => const Color(
-      0xFFFDA4AF,
-    ), // Rose Quartz Sakura Accent
-    AppThemeMode.light => const Color(0xFF0284C7), // Sky Accent
-    AppThemeMode.dark => const Color(0xFF0EA5E9), // Vivid Sky (Snowfall)
+    AppThemeMode.amoledJapanese => const Color(0xFFFDA4AF),
+    AppThemeMode.light => const Color(0xFF0284C7),
+    AppThemeMode.amoledSnowfall => const Color(0xFF0EA5E9),
+    AppThemeMode.amoledPure => const Color(0xFF3B82F6),
+    AppThemeMode.cleanLight => const Color(0xFF0284C7),
   };
 
   static Color get accentGreen => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFF00E676),
     AppThemeMode.amoledJapanese => const Color(0xFF34D399),
     AppThemeMode.light => const Color(0xFF16A34A),
-    AppThemeMode.dark => const Color(0xFF22C55E),
+    AppThemeMode.amoledSnowfall => const Color(0xFF22C55E),
+    AppThemeMode.amoledPure => const Color(0xFF22C55E),
+    AppThemeMode.cleanLight => const Color(0xFF16A34A),
   };
 
   static Color get accentAmber => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFFFFB300),
     AppThemeMode.amoledJapanese => const Color(0xFFFBBF24),
     AppThemeMode.light => const Color(0xFFD97706),
-    AppThemeMode.dark => const Color(0xFFF59E0B),
+    AppThemeMode.amoledSnowfall => const Color(0xFFF59E0B),
+    AppThemeMode.amoledPure => const Color(0xFFF59E0B),
+    AppThemeMode.cleanLight => const Color(0xFFD97706),
   };
 
   static Color get accentRed => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFFFF3366),
     AppThemeMode.amoledJapanese => const Color(0xFFFB7185),
     AppThemeMode.light => const Color(0xFFDC2626),
-    AppThemeMode.dark => const Color(0xFFEF4444),
+    AppThemeMode.amoledSnowfall => const Color(0xFFEF4444),
+    AppThemeMode.amoledPure => const Color(0xFFEF4444),
+    AppThemeMode.cleanLight => const Color(0xFFDC2626),
   };
 
   static Color get accentOrange => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFFFF6D00),
     AppThemeMode.amoledJapanese => const Color(0xFFFB923C),
     AppThemeMode.light => const Color(0xFFEA580C),
-    AppThemeMode.dark => const Color(0xFFF97316),
+    AppThemeMode.amoledSnowfall => const Color(0xFFF97316),
+    AppThemeMode.amoledPure => const Color(0xFFF97316),
+    AppThemeMode.cleanLight => const Color(0xFFEA580C),
   };
 
   // Typography Monochromatic Hierarchy
@@ -140,30 +169,39 @@ class AppTheme {
     AppThemeMode.amoled => const Color(0xFFFFFFFF),
     AppThemeMode.amoledJapanese => const Color(0xFFFFF1F2),
     AppThemeMode.light => const Color(0xFF0F172A), // Slate 900
-    AppThemeMode.dark => const Color(0xFFFFFFFF), // Pure Snow White (Snowfall)
+    AppThemeMode.amoledSnowfall => const Color(0xFFF8FAFC), // Pure Snow White (Snowfall)
+    AppThemeMode.amoledPure => const Color(0xFFF8FAFC),
+    AppThemeMode.cleanLight => const Color(0xFF0F172A), // Slate 900
   };
 
   static Color get textSecondary => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFFA1A1AA),
     AppThemeMode.amoledJapanese => const Color(0xFFD4A5B8),
     AppThemeMode.light => const Color(0xFF475569), // Slate 600
-    AppThemeMode.dark => const Color(0xFFE2E8F0), // Slate 200 (Snowfall)
+    AppThemeMode.amoledSnowfall => const Color(0xFF94A3B8), // Slate 400 (Snowfall)
+    AppThemeMode.amoledPure => const Color(0xFFA1A1AA),
+    AppThemeMode.cleanLight => const Color(0xFF475569), // Slate 600
   };
 
   static Color get textMuted => switch (currentMode) {
     AppThemeMode.amoled => const Color(0xFF71717A),
     AppThemeMode.amoledJapanese => const Color(0xFFA07FA8),
     AppThemeMode.light => const Color(0xFF94A3B8), // Slate 400
-    AppThemeMode.dark => const Color(0xFF94A3B8), // Slate 400 (Snowfall)
+    AppThemeMode.amoledSnowfall => const Color(0xFF94A3B8), // Slate 400 (Snowfall)
+    AppThemeMode.amoledPure => const Color(0xFF71717A),
+    AppThemeMode.cleanLight => const Color(0xFF94A3B8), // Slate 400
   };
 
-  static bool get isLight => currentMode == AppThemeMode.light;
+  static bool get isLight =>
+      currentMode == AppThemeMode.light ||
+      currentMode == AppThemeMode.cleanLight;
 
   static ThemeData get currentThemeData => getTheme(currentMode);
-  static ThemeData get darkTheme => getTheme(AppThemeMode.dark);
+  static ThemeData get darkTheme => getTheme(AppThemeMode.amoledSnowfall);
 
   static ThemeData getTheme(AppThemeMode mode) {
-    final isLightMode = mode == AppThemeMode.light;
+    final isLightMode =
+        mode == AppThemeMode.light || mode == AppThemeMode.cleanLight;
     final baseTextTheme = isLightMode
         ? ThemeData.light().textTheme
         : ThemeData.dark().textTheme;
@@ -172,7 +210,9 @@ class AppTheme {
       AppThemeMode.amoled => const Color(0xFF101012),
       AppThemeMode.amoledJapanese => const Color(0xFF140D13),
       AppThemeMode.light => const Color(0xFFFFFFFF),
-      AppThemeMode.dark => const Color(0xFF0B132B),
+      AppThemeMode.amoledSnowfall => const Color(0xFF0C1322),
+      AppThemeMode.amoledPure => const Color(0xFF101012),
+      AppThemeMode.cleanLight => const Color(0xFFFFFFFF),
     };
 
     final effectiveSurf = cardOpacity < 0.999
@@ -185,35 +225,45 @@ class AppTheme {
       AppThemeMode.amoled => const Color(0xFF2B2B33),
       AppThemeMode.amoledJapanese => const Color(0xFF381525),
       AppThemeMode.light => const Color(0xFFE2E8F0),
-      AppThemeMode.dark => const Color(0xFF1E293B),
+      AppThemeMode.amoledSnowfall => const Color(0xFF1E293B),
+      AppThemeMode.amoledPure => const Color(0xFF27272A),
+      AppThemeMode.cleanLight => const Color(0xFFE2E8F0),
     };
 
     final prim = switch (mode) {
       AppThemeMode.amoled => const Color(0xFF00E5FF),
       AppThemeMode.amoledJapanese => const Color(0xFFF472B6),
       AppThemeMode.light => const Color(0xFF2563EB),
-      AppThemeMode.dark => const Color(0xFF38BDF8),
+      AppThemeMode.amoledSnowfall => const Color(0xFF38BDF8),
+      AppThemeMode.amoledPure => const Color(0xFF60A5FA),
+      AppThemeMode.cleanLight => const Color(0xFF0EA5E9),
     };
 
     final sec = switch (mode) {
       AppThemeMode.amoled => const Color(0xFFA855F7),
       AppThemeMode.amoledJapanese => const Color(0xFFFDA4AF),
       AppThemeMode.light => const Color(0xFF0284C7),
-      AppThemeMode.dark => const Color(0xFF0EA5E9),
+      AppThemeMode.amoledSnowfall => const Color(0xFF0EA5E9),
+      AppThemeMode.amoledPure => const Color(0xFF3B82F6),
+      AppThemeMode.cleanLight => const Color(0xFF0284C7),
     };
 
     final txtPrim = switch (mode) {
       AppThemeMode.amoled => const Color(0xFFFFFFFF),
       AppThemeMode.amoledJapanese => const Color(0xFFFFF1F2),
       AppThemeMode.light => const Color(0xFF0F172A),
-      AppThemeMode.dark => const Color(0xFFFFFFFF),
+      AppThemeMode.amoledSnowfall => const Color(0xFFF8FAFC),
+      AppThemeMode.amoledPure => const Color(0xFFF8FAFC),
+      AppThemeMode.cleanLight => const Color(0xFF0F172A),
     };
 
     final txtMuted = switch (mode) {
       AppThemeMode.amoled => const Color(0xFF71717A),
       AppThemeMode.amoledJapanese => const Color(0xFFA07FA8),
       AppThemeMode.light => const Color(0xFF94A3B8),
-      AppThemeMode.dark => const Color(0xFF94A3B8),
+      AppThemeMode.amoledSnowfall => const Color(0xFF94A3B8),
+      AppThemeMode.amoledPure => const Color(0xFF71717A),
+      AppThemeMode.cleanLight => const Color(0xFF94A3B8),
     };
 
     final appTextTheme = baseTextTheme.apply(
@@ -291,7 +341,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: prim,
-          foregroundColor: mode == AppThemeMode.dark
+          foregroundColor: mode == AppThemeMode.amoledSnowfall
               ? const Color(0xFF0F172A)
               : Colors.white,
           elevation: 0,

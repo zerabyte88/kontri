@@ -399,7 +399,7 @@ class GitHubApiService {
     final cacheKey = cleanUsername.toLowerCase();
     _isLastResponseNotModified = false;
 
-    // 1. Cek in-memory cache jika masih dalam batas TTL 10 menit
+    // In-memory cache (10-minute TTL)
     if (!forceRefresh && _statsCache.containsKey(cacheKey)) {
       final cachedTime = storageService?.getHttpCacheTimestamp(
         'user_stats_$cacheKey',
@@ -410,7 +410,7 @@ class GitHubApiService {
       }
     }
 
-    // 2. Cek disk storage cache jika masih dalam batas TTL 10 menit
+    // Persistent disk cache (10-minute TTL)
     if (!forceRefresh &&
         storageService != null &&
         storageService!.isHttpCacheValid(
@@ -425,7 +425,7 @@ class GitHubApiService {
     }
 
     try {
-      // Kick off contributions fetch in background with local caching
+      // Background contributions fetch
       final contribFuture = _fetchContributionsWithCache(
         cleanUsername,
         cacheKey,
@@ -439,7 +439,7 @@ class GitHubApiService {
         '$_baseUrl/users/$cleanUsername/events/public?per_page=100',
       );
 
-      // Ambil ETag sebelumnya untuk conditional requests (304 Not Modified)
+      // Conditional request ETags (304 Not Modified)
       final userEtag = storageService?.getHttpCacheEtag('user_$cacheKey');
       final reposEtag = storageService?.getHttpCacheEtag('repos_$cacheKey');
       final eventsEtag = storageService?.getHttpCacheEtag('events_$cacheKey');
@@ -500,13 +500,13 @@ class GitHubApiService {
         );
       }
 
-      // Tandai jika seluruh respon adalah 304 Not Modified (0 kuota terpakai)
+      // Flag when all responses are 304 Not Modified (zero quota consumed)
       _isLastResponseNotModified =
           (userRes.statusCode == 304 &&
           reposRes.statusCode == 304 &&
           eventsRes.statusCode == 304);
 
-      // 1. Ekstrak Data User (200 OK atau 304 Not Modified)
+      // 1. User profile (200 OK or 304 Not Modified)
       Map<String, dynamic> userData;
       if (userRes.statusCode == 304) {
         final cached = storageService?.getHttpCacheBody('user_$cacheKey');
@@ -531,7 +531,7 @@ class GitHubApiService {
       }
       final user = GitHubUser.fromJson(userData);
 
-      // 2. Ekstrak Data Repositories (200 OK atau 304 Not Modified)
+      // 2. Repositories (200 OK or 304 Not Modified)
       final List<GitHubRepo> repos = [];
       bool reposUpdated = false;
       if (reposRes.statusCode == 304) {
@@ -561,7 +561,7 @@ class GitHubApiService {
       }
       repos.sort((a, b) => b.stargazersCount.compareTo(a.stargazersCount));
 
-      // 3. Ekstrak Data Public Events (200 OK atau 304 Not Modified)
+      // 3. Public events (200 OK or 304 Not Modified)
       final List<Map<String, dynamic>> events = [];
       if (eventsRes.statusCode == 304) {
         final cached = storageService?.getHttpCacheBody('events_$cacheKey');
@@ -588,7 +588,7 @@ class GitHubApiService {
         );
       }
 
-      // 4. Bahasa Pemrograman (Hemat 8 - 25 request jika repos 304 & cache bahasa tersedia)
+      // 4. Language distribution (reuse cached breakdown on 304)
       final nonForkRepos = repos.where((r) => !r.isFork).toList();
       Map<String, int> aggregatedLanguages = {};
       final cachedLang = storageService?.getHttpCacheBody(
@@ -641,7 +641,7 @@ class GitHubApiService {
         );
       }
 
-      // Ambil data kontribusi
+      // Resolve contributions
       final fetchedContributions = await contribFuture;
       final contributionStats =
           fetchedContributions ?? ContributionStats.fromEvents(events);
@@ -654,7 +654,7 @@ class GitHubApiService {
         aggregatedLanguages: aggregatedLanguages,
       );
 
-      // Simpan timestamp cache validitas 10 menit
+      // Persist cache timestamp (10-minute TTL)
       await storageService?.saveHttpCache(
         key: 'user_stats_$cacheKey',
         body: 'valid',

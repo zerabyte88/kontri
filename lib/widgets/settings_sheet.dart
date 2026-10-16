@@ -613,11 +613,16 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                   ),
                                   child: Text(
                                     switch (currentTheme) {
-                                      AppThemeMode.dark => loc.themeDark,
+                                      AppThemeMode.amoledSnowfall =>
+                                        loc.themeDark,
                                       AppThemeMode.amoled => loc.themeAmoled,
                                       AppThemeMode.amoledJapanese =>
                                         loc.themeAmoledJapanese,
+                                      AppThemeMode.amoledPure =>
+                                        loc.themeAmoledPure,
                                       AppThemeMode.light => loc.themeLight,
+                                      AppThemeMode.cleanLight =>
+                                        loc.themeCleanLight,
                                     },
                                     style: TextStyle(
                                       color: AppTheme.primaryCyan,
@@ -648,19 +653,22 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                       child: _buildOptionCard(
                                         title: loc.themeDark,
                                         subtitle: loc.themeDarkSubtitle,
+                                        badge: 'AMOLED',
                                         leading: Icon(
-                                          Icons.dark_mode_outlined,
+                                          Icons.ac_unit_rounded,
                                           size: 17,
                                           color:
-                                              currentTheme == AppThemeMode.dark
-                                              ? AppTheme.primaryCyan
-                                              : AppTheme.textMuted,
+                                              currentTheme ==
+                                                      AppThemeMode.amoledSnowfall
+                                                  ? AppTheme.primaryCyan
+                                                  : AppTheme.textMuted,
                                         ),
                                         isSelected:
-                                            currentTheme == AppThemeMode.dark,
+                                            currentTheme ==
+                                            AppThemeMode.amoledSnowfall,
                                         onTap: () async {
                                           await AppThemeService.changeTheme(
-                                            AppThemeMode.dark,
+                                            AppThemeMode.amoledSnowfall,
                                             widget.storageService,
                                           );
                                           widget.onSettingsChanged?.call();
@@ -675,6 +683,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                       child: _buildOptionCard(
                                         title: loc.themeAmoled,
                                         subtitle: loc.themeAmoledSubtitle,
+                                        badge: 'AMOLED',
                                         leading: Icon(
                                           Icons.brightness_2_rounded,
                                           size: 17,
@@ -697,8 +706,74 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                     // 3. Terang
                                     Expanded(
                                       child: _buildOptionCard(
+                                        title: loc.themeAmoledPure,
+                                        subtitle: loc.themeAmoledPureSubtitle,
+                                        badge: 'STATIC',
+                                        activeColor: const Color(0xFF60A5FA),
+                                        leading: Icon(
+                                          Icons.brightness_2_outlined,
+                                          size: 17,
+                                          color:
+                                              currentTheme ==
+                                                      AppThemeMode.amoledPure
+                                                  ? const Color(0xFF60A5FA)
+                                                  : AppTheme.textMuted,
+                                        ),
+                                        isSelected:
+                                            currentTheme ==
+                                            AppThemeMode.amoledPure,
+                                        onTap: () async {
+                                          await AppThemeService.changeTheme(
+                                            AppThemeMode.amoledPure,
+                                            widget.storageService,
+                                          );
+                                          widget.onSettingsChanged?.call();
+                                          if (mounted) setState(() {});
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+
+                                    // 4. Clean Light
+                                    Expanded(
+                                      child: _buildOptionCard(
+                                        title: loc.themeCleanLight,
+                                        subtitle: loc.themeCleanLightSubtitle,
+                                        badge: 'STATIC',
+                                        activeColor: const Color(0xFF0EA5E9),
+                                        leading: Icon(
+                                          Icons.wb_sunny_outlined,
+                                          size: 17,
+                                          color:
+                                              currentTheme ==
+                                                      AppThemeMode.cleanLight
+                                                  ? const Color(0xFF0EA5E9)
+                                                  : AppTheme.textMuted,
+                                        ),
+                                        isSelected:
+                                            currentTheme ==
+                                            AppThemeMode.cleanLight,
+                                        onTap: () async {
+                                          await AppThemeService.changeTheme(
+                                            AppThemeMode.cleanLight,
+                                            widget.storageService,
+                                          );
+                                          widget.onSettingsChanged?.call();
+                                          if (mounted) setState(() {});
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    // 5. Daylight
+                                    Expanded(
+                                      child: _buildOptionCard(
                                         title: loc.themeLight,
                                         subtitle: loc.themeLightSubtitle,
+                                        badge: 'LIGHT',
                                         leading: Icon(
                                           Icons.light_mode_outlined,
                                           size: 17,
@@ -721,7 +796,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                     ),
                                     const SizedBox(width: 8),
 
-                                    // 4. AMOLED Sakura (Shown if unlocked or currently active)
+                                    // 6. AMOLED Sakura (Shown if unlocked or currently active)
                                     if (isJapaneseUnlocked ||
                                         currentTheme ==
                                             AppThemeMode.amoledJapanese)
@@ -730,6 +805,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                           title: loc.themeAmoledJapanese,
                                           subtitle:
                                               loc.themeAmoledJapaneseSubtitle,
+                                          badge: 'AMOLED',
                                           leading: Icon(
                                             Icons.auto_awesome_rounded,
                                             size: 17,
@@ -2131,6 +2207,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
     required Widget leading,
     required String title,
     String? subtitle,
+    String? badge,
     required bool isSelected,
     required VoidCallback onTap,
     Color? activeColor,
@@ -2177,19 +2254,53 @@ class _SettingsSheetState extends State<SettingsSheet> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          title,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: isSelected ? accent : AppTheme.textPrimary,
-                            fontSize: 12.0,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w500,
-                            height: 1.15,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                title,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: isSelected ? accent : AppTheme.textPrimary,
+                                  fontSize: 12.0,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  height: 1.15,
+                                ),
+                              ),
+                            ),
+                            if (badge != null) ...[
+                              const SizedBox(width: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 1,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: accent.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(3),
+                                  border: Border.all(
+                                    color: accent.withValues(alpha: 0.5),
+                                    width: 0.7,
+                                  ),
+                                ),
+                                child: Text(
+                                  badge,
+                                  style: TextStyle(
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.w700,
+                                    color: accent,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         if (subtitle != null && subtitle.isNotEmpty) ...[
                           const SizedBox(height: 1.5),

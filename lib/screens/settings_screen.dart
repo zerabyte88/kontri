@@ -437,11 +437,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final themeOptions = [
       {
-        'id': AppThemeMode.dark,
+        'id': AppThemeMode.amoledSnowfall,
         'title': loc.themeDark,
         'icon': Icons.ac_unit_rounded,
         'accent': const Color(0xFF38BDF8),
-        'badge': 'DARK',
+        'badge': 'AMOLED',
       },
       {
         'id': AppThemeMode.amoled,
@@ -449,6 +449,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'icon': Icons.nightlight_round,
         'accent': const Color(0xFFA78BFA),
         'badge': 'AMOLED',
+      },
+      {
+        'id': AppThemeMode.amoledPure,
+        'title': loc.themeAmoledPure,
+        'icon': Icons.brightness_2_outlined,
+        'accent': const Color(0xFF60A5FA),
+        'badge': 'STATIC',
+      },
+      {
+        'id': AppThemeMode.cleanLight,
+        'title': loc.themeCleanLight,
+        'icon': Icons.wb_sunny_outlined,
+        'accent': const Color(0xFF0EA5E9),
+        'badge': 'STATIC',
       },
       if (isJapaneseUnlocked)
         {
@@ -458,13 +472,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           'accent': const Color(0xFFF472B6),
           'badge': 'AMOLED',
         },
-      {
-        'id': AppThemeMode.light,
-        'title': loc.themeLight,
-        'icon': Icons.light_mode_rounded,
-        'accent': const Color(0xFFFBBF24),
-        'badge': 'LIGHT',
-      },
     ];
 
     return Scaffold(
@@ -492,813 +499,898 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           children: [
-            // ───────────────── CARD 1: THEME SELECTOR (Phantek Symmetrical Alignment) ─────────────────
-            _buildModernCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionHeader(
-                    icon: Icons.palette_outlined,
-                    title: loc.themeSectionTitle,
-                    subtitle: loc.themeSectionSubtitle,
-                  ),
-                  const SizedBox(height: 14),
-                  GridView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          mainAxisExtent: 74,
-                        ),
-                    itemCount: themeOptions.length,
-                    itemBuilder: (context, index) {
-                      final item = themeOptions[index];
-                      final mode = item['id'] as AppThemeMode;
-                      final isSelected = currentTheme == mode;
-                      final accent = item['accent'] as Color;
-                      final badge = item['badge'] as String;
-                      final theme = Theme.of(context);
-
-                      return Material(
-                        color: isSelected
-                            ? accent.withAlpha(25)
-                            : theme.colorScheme.surfaceContainerHighest
-                                  .withAlpha(35),
-                        borderRadius: BorderRadius.circular(12),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            if (mode == AppThemeMode.amoled) {
-                              _onAmoledTapped(loc);
-                            } else {
-                              AppThemeService.changeTheme(
-                                mode,
-                                widget.storageService,
-                              );
-                              widget.onSettingsChanged?.call();
-                              if (mounted) setState(() {});
-                            }
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isSelected
-                                    ? accent
-                                    : theme.colorScheme.outline.withAlpha(30),
-                                width: isSelected ? 1.6 : 1.0,
-                              ),
-                            ),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 2),
-                                    child: Icon(
-                                      item['icon'] as IconData,
-                                      size: 18,
-                                      color: isSelected
-                                          ? accent
-                                          : theme.colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        item['title'] as String,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: isSelected
-                                              ? FontWeight.w700
-                                              : FontWeight.w600,
-                                          color: isSelected
-                                              ? accent
-                                              : theme.colorScheme.onSurface,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 7,
-                                          vertical: 1.5,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: accent.withAlpha(20),
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                          border: Border.all(
-                                            color: accent.withAlpha(120),
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          badge,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 9.5,
-                                            fontWeight: FontWeight.w700,
-                                            color: accent,
-                                            letterSpacing: 0.5,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
+            // Appearance and visual effects
+            _buildAppearanceCard(context, loc, currentTheme, themeOptions),
             const SizedBox(height: 12),
 
-            // ───────────────── CARD 2: CARD OPACITY & PERFORMANCE (60 FPS Optimized) ─────────────────
-            ValueListenableBuilder<double>(
-              valueListenable: AppThemeService.surfaceOpacityNotifier,
-              builder: (context, opacity, _) {
-                final pct = (opacity * 100).round();
-                final isMax = opacity >= 0.999;
-
-                return _buildModernCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionHeader(
-                        icon: Icons.blur_on_rounded,
-                        title: loc.themeOpacityTitle,
-                        subtitle: loc.themeOpacitySubtitle,
-                        trailing: TextButton(
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          onPressed: () {
-                            AppThemeService.changeSurfaceOpacity(
-                              1.0,
-                              widget.storageService,
-                            );
-                            widget.onSettingsChanged?.call();
-                            if (mounted) setState(() {});
-                          },
-                          child: Text(
-                            loc.resetLabel,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppTheme.primaryCyan,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                '$pct%',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppTheme.primaryCyan,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              if (isMax)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 7,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green.withAlpha(25),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(
-                                      color: Colors.green.withAlpha(100),
-                                      width: 0.8,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    loc.settingsBypassShaderNotice,
-                                    style: const TextStyle(
-                                      fontSize: 9.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SliderTheme(
-                        data: SliderTheme.of(context).copyWith(
-                          activeTrackColor: AppTheme.primaryCyan,
-                          inactiveTrackColor: AppTheme.border,
-                          thumbColor: AppTheme.primaryCyan,
-                          overlayColor: AppTheme.primaryCyan.withAlpha(30),
-                          trackHeight: 3.5,
-                          thumbShape: const RoundSliderThumbShape(
-                            enabledThumbRadius: 7,
-                          ),
-                        ),
-                        child: Slider(
-                          value: opacity,
-                          min: 0.50,
-                          max: 1.00,
-                          divisions: 10,
-                          onChanged: (val) {
-                            AppThemeService.changeSurfaceOpacity(
-                              val,
-                              widget.storageService,
-                            );
-                            widget.onSettingsChanged?.call();
-                            if (mounted) setState(() {});
-                          },
-                        ),
-                      ),
-                      const Divider(height: 16),
-                      // Background Animation Switch
-                      ValueListenableBuilder<bool>(
-                        valueListenable:
-                            AppThemeService.bgAnimationEnabledNotifier,
-                        builder: (context, animEnabled, _) {
-                          return Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      loc.bgAnimationTitle,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppTheme.textPrimary,
-                                      ),
-                                    ),
-                                    Text(
-                                      loc.bgAnimationSubtitle,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: AppTheme.textMuted,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Switch(
-                                value: animEnabled,
-                                activeThumbColor: AppTheme.primaryCyan,
-                                onChanged: (val) {
-                                  AppThemeService.setBackgroundAnimation(
-                                    val,
-                                    widget.storageService,
-                                  );
-                                  widget.onSettingsChanged?.call();
-                                  if (mounted) setState(() {});
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+            // Interface language
+            _buildLanguageCard(context, loc, currentLang),
             const SizedBox(height: 12),
 
-            // ───────────────── CARD 3: LANGUAGE SELECTOR (22 Global Languages) ─────────────────
-            _buildModernCard(
-              child: InkWell(
-                onTap: () => _showLanguagePicker(context, loc),
+            // GitHub token and rate limit
+            _buildTokenCard(context, loc, hasToken, rateLimit),
+            const SizedBox(height: 12),
+
+            // About, developer, and updates
+            _buildAboutCard(context, loc),
+            const SizedBox(height: 28),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Appearance card
+  Widget _buildAppearanceCard(
+    BuildContext context,
+    AppLocalizations loc,
+    AppThemeMode currentTheme,
+    List<Map<String, dynamic>> themeOptions,
+  ) {
+    final theme = Theme.of(context);
+
+    return _buildModernCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader(
+            icon: Icons.palette_outlined,
+            title: loc.themeSectionTitle,
+            subtitle: loc.themeSectionSubtitle,
+          ),
+          const SizedBox(height: 14),
+          GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              mainAxisExtent: 76,
+            ),
+            itemCount: themeOptions.length,
+            itemBuilder: (context, index) {
+              final item = themeOptions[index];
+              final mode = item['id'] as AppThemeMode;
+              final isSelected = currentTheme == mode;
+              final accent = item['accent'] as Color;
+              final badge = item['badge'] as String;
+
+              return Material(
+                color: isSelected
+                    ? accent.withAlpha(25)
+                    : theme.colorScheme.surfaceContainerHighest.withAlpha(35),
                 borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primaryCyan.withAlpha(25),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.language_rounded,
-                          color: AppTheme.primaryCyan,
-                          size: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              loc.languageSectionTitle,
-                              style: TextStyle(
-                                color: AppTheme.textPrimary,
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.2,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${currentLang.flag}  ${currentLang.nativeName} (${currentLang.name})',
-                              style: TextStyle(
-                                color: AppTheme.textMuted,
-                                fontSize: 11.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        color: AppTheme.textSecondary,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // ───────────────── CARD 4: GITHUB TOKEN & RATE LIMIT ─────────────────
-            _buildModernCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionHeader(
-                    icon: Icons.key_rounded,
-                    title: loc.githubTokenTitle,
-                    subtitle: loc.tokenSubtitle,
-                    trailing: IconButton(
-                      icon: _isLoadingRateLimit
-                          ? const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Icon(
-                              Icons.refresh_rounded,
-                              size: 18,
-                              color: AppTheme.primaryCyan,
-                            ),
-                      onPressed: _isLoadingRateLimit ? null : _refreshRateLimit,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Rate limit progress bar
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${loc.requestsUsed}: ${rateLimit.used} / ${rateLimit.limit}',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: AppTheme.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        '${loc.remainingQuota}: ${rateLimit.remaining}',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w700,
-                          color: rateLimit.remainingPercentage > 30
-                              ? AppTheme.accentGreen
-                              : AppTheme.accentAmber,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(3),
-                    child: LinearProgressIndicator(
-                      value: rateLimit.limit > 0
-                          ? (rateLimit.remaining / rateLimit.limit)
-                          : 0.0,
-                      backgroundColor: AppTheme.border,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        rateLimit.remainingPercentage > 30
-                            ? AppTheme.accentGreen
-                            : AppTheme.accentAmber,
-                      ),
-                      minHeight: 4,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  // Input field
-                  TextField(
-                    controller: _tokenController,
-                    obscureText: _obscureToken,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppTheme.textPrimary,
-                      fontFamily: 'monospace',
-                    ),
-                    decoration: InputDecoration(
-                      hintText: loc.tokenHint,
-                      prefixIcon: const Icon(
-                        Icons.lock_outline_rounded,
-                        size: 16,
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureToken
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                          size: 18,
-                        ),
-                        onPressed: () =>
-                            setState(() => _obscureToken = !_obscureToken),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      if (hasToken)
-                        TextButton(
-                          onPressed: () => _clearToken(loc),
-                          child: Text(
-                            loc.deleteToken,
-                            style: TextStyle(
-                              color: AppTheme.accentRed,
-                              fontSize: 12.5,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () => _saveToken(loc),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                        ),
-                        child: Text(
-                          loc.saveToken,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // ───────────────── CARD 5: ABOUT APP & UPDATES ─────────────────
-            _buildModernCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionHeader(
-                    icon: Icons.info_outline_rounded,
-                    title: loc.aboutApp,
-                    subtitle: loc.appDescriptionLabel,
-                  ),
-                  const SizedBox(height: 12),
-                  Divider(height: 1, color: AppTheme.border),
-                  const SizedBox(height: 10),
-                  _buildAboutRow(loc.appVersionLabel, AppConfig.appVersion),
-                  _buildAboutRow(
-                    loc.buildNumberLabel,
-                    '${AppConfig.buildNumber} (Release APK)',
-                  ),
-                  _buildAboutRow(loc.architectureLabel, loc.architectureValue),
-                  _buildAboutRow(loc.licenseLabel, AppConfig.license),
-                  const SizedBox(height: 10),
-                  Divider(height: 1, color: AppTheme.border),
-                  const SizedBox(height: 10),
-
-                  // Developer Item with Live Auto-Updating Profile Picture
-                  InkWell(
-                    onTap: () async {
-                      final uri = Uri.parse(AppConfig.developerGithubUrl);
-                      await launchUrl(
-                        uri,
-                        mode: LaunchMode.externalApplication,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    if (mode == AppThemeMode.amoled) {
+                      _onAmoledTapped(loc);
+                    } else {
+                      AppThemeService.changeTheme(
+                        mode,
+                        widget.storageService,
                       );
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 4,
-                        horizontal: 2,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(1.5),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppTheme.primaryCyan,
-                                width: 1.2,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: Image.network(
-                                AppConfig.developerAvatarUrl,
-                                width: 30,
-                                height: 30,
-                                cacheWidth: 80,
-                                cacheHeight: 80,
-                                headers: const {
-                                  'Accept': 'image/*,*/*;q=0.8',
-                                  'User-Agent': 'GitPulseMobile/1.0',
-                                },
-                                fit: BoxFit.cover,
-                                loadingBuilder: (context, child, progress) {
-                                  if (progress == null) {
-                                    return child;
-                                  }
-                                  return Container(
-                                    width: 30,
-                                    height: 30,
-                                    color: AppTheme.surface,
-                                    alignment: Alignment.center,
-                                    child: SizedBox(
-                                      width: 12,
-                                      height: 12,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 1.5,
-                                        color: AppTheme.primaryCyan,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                errorBuilder: (_, _, _) => Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        AppTheme.primaryCyan.withValues(
-                                          alpha: 0.25,
-                                        ),
-                                        AppTheme.primaryCyan.withValues(
-                                          alpha: 0.08,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    AppConfig.developerUsername.isNotEmpty
-                                        ? AppConfig.developerUsername[0]
-                                              .toUpperCase()
-                                        : 'Z',
-                                    style: TextStyle(
-                                      color: AppTheme.primaryCyan,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${loc.developerLabel}: ${AppConfig.developerUsername}',
-                                  style: TextStyle(
-                                    color: AppTheme.textPrimary,
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 1),
-                                Text(
-                                  loc.developerRole,
-                                  style: TextStyle(
-                                    color: AppTheme.textMuted,
-                                    fontSize: 10.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            Icons.open_in_new_rounded,
-                            size: 14,
-                            color: AppTheme.primaryCyan,
-                          ),
-                        ],
+                      widget.onSettingsChanged?.call();
+                      if (mounted) setState(() {});
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? accent
+                            : theme.colorScheme.outline.withAlpha(30),
+                        width: isSelected ? 1.6 : 1.0,
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 14),
-                  Divider(height: 1, color: AppTheme.border),
-                  const SizedBox(height: 14),
-
-                  // ───────────────── SUB-BAGIAN: APP UPDATES ─────────────────
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryCyan.withAlpha(25),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 2),
                             child: Icon(
-                              Icons.system_update_alt_rounded,
-                              color: AppTheme.primaryCyan,
-                              size: 14,
+                              item['icon'] as IconData,
+                              size: 18,
+                              color: isSelected
+                                  ? accent
+                                  : theme.colorScheme.onSurface,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 22),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                loc.updateSectionTitle,
+                                item['title'] as String,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.textPrimary,
+                                  fontSize: 12.5,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w600,
+                                  color: isSelected
+                                      ? accent
+                                      : theme.colorScheme.onSurface,
                                 ),
                               ),
-                              if (_updateInfo != null)
-                                Text(
-                                  _updateInfo!.hasUpdate
-                                      ? '${loc.updateAvailable}: ${_updateInfo!.latestVersion}'
-                                      : loc.alreadyLatestVersion,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: _updateInfo!.hasUpdate
-                                        ? AppTheme.accentGreen
-                                        : AppTheme.textMuted,
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 1.5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: accent.withAlpha(20),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: accent.withAlpha(120),
+                                    width: 1.0,
                                   ),
                                 ),
+                                child: Text(
+                                  badge,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: accent,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
                             ],
-                          ),
-                        ],
-                      ),
-                      _isCheckingUpdate
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : OutlinedButton(
-                              onPressed: () => _checkForUpdates(loc),
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                side: BorderSide(color: AppTheme.border),
-                              ),
-                              child: Text(
-                                loc.checkForUpdates,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppTheme.textPrimary,
-                                ),
-                              ),
-                            ),
-                    ],
-                  ),
-                  if (_updateInfo != null &&
-                      _updateInfo!.hasUpdate &&
-                      !_isDownloadingUpdate) ...[
-                    const SizedBox(height: 10),
-                    if (_updateInfo!.releaseNotes.trim().isNotEmpty) ...[
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surface.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: AppTheme.accentGreen.withValues(alpha: 0.25),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: Text(
-                          _updateInfo!.releaseNotes.trim(),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 11,
-                            height: 1.35,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.download_rounded, size: 15),
-                        onPressed: () =>
-                            _runOtaUpdate(_updateInfo!.apkDownloadUrl!, loc),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.accentGreen,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        label: Text(
-                          '${loc.updateNow} (${_updateInfo!.latestVersion})',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
-                  ],
-                  if (_isDownloadingUpdate) ...[
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          '${loc.downloadingUpdate} ${_downloadProgress ?? ""}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.primaryCyan,
                           ),
                         ),
                       ],
                     ),
-                  ],
-                  if (_updateError != null) ...[
-                    const SizedBox(height: 6),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          Divider(height: 1, color: AppTheme.border.withAlpha(40)),
+          const SizedBox(height: 14),
+
+          // Surface Opacity Slider
+          ValueListenableBuilder<double>(
+            valueListenable: AppThemeService.surfaceOpacityNotifier,
+            builder: (context, opacity, _) {
+              final pct = (opacity * 100).round();
+              final isMax = opacity >= 0.999;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.opacity_rounded,
+                            size: 15,
+                            color: AppTheme.primaryCyan,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            loc.themeOpacityTitle,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$pct%',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.primaryCyan,
+                            ),
+                          ),
+                          if (isMax) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withAlpha(25),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: Colors.green.withAlpha(100),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Text(
+                                loc.settingsBypassShaderNotice,
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        onPressed: () {
+                          AppThemeService.changeSurfaceOpacity(
+                            1.0,
+                            widget.storageService,
+                          );
+                          widget.onSettingsChanged?.call();
+                          if (mounted) setState(() {});
+                        },
+                        child: Text(
+                          loc.resetLabel,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: AppTheme.primaryCyan,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: AppTheme.primaryCyan,
+                      inactiveTrackColor: AppTheme.border,
+                      thumbColor: AppTheme.primaryCyan,
+                      overlayColor: AppTheme.primaryCyan.withAlpha(30),
+                      trackHeight: 3.5,
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 6,
+                      ),
+                    ),
+                    child: Slider(
+                      value: opacity,
+                      min: 0.50,
+                      max: 1.00,
+                      divisions: 10,
+                      onChanged: (val) {
+                        AppThemeService.changeSurfaceOpacity(
+                          val,
+                          widget.storageService,
+                        );
+                        widget.onSettingsChanged?.call();
+                        if (mounted) setState(() {});
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 6),
+          Divider(height: 1, color: AppTheme.border.withAlpha(40)),
+          const SizedBox(height: 12),
+
+          // Background Animation Switch
+          ValueListenableBuilder<bool>(
+            valueListenable: AppThemeService.bgAnimationEnabledNotifier,
+            builder: (context, animEnabled, _) {
+              return Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryCyan.withAlpha(20),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.animation_rounded,
+                      size: 15,
+                      color: AppTheme.primaryCyan,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.bgAnimationTitle,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 1),
+                        Text(
+                          loc.bgAnimationSubtitle,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Transform.scale(
+                    scale: 0.85,
+                    child: Switch(
+                      value: animEnabled,
+                      activeThumbColor: AppTheme.primaryCyan,
+                      onChanged: (val) {
+                        AppThemeService.setBackgroundAnimation(
+                          val,
+                          widget.storageService,
+                        );
+                        widget.onSettingsChanged?.call();
+                        if (mounted) setState(() {});
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Interface language card
+  Widget _buildLanguageCard(
+    BuildContext context,
+    AppLocalizations loc,
+    AppLanguage currentLang,
+  ) {
+    return _buildModernCard(
+      child: InkWell(
+        onTap: () => _showLanguagePicker(context, loc),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryCyan.withAlpha(25),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.language_rounded,
+                  color: AppTheme.primaryCyan,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      _updateError!,
+                      loc.languageSectionTitle,
                       style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${currentLang.flag}  ${currentLang.nativeName} (${currentLang.name})',
+                      style: TextStyle(
+                        color: AppTheme.textMuted,
                         fontSize: 11.5,
-                        color: AppTheme.accentRed,
                       ),
                     ),
                   ],
-                ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppTheme.textMuted,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // GitHub token card
+  Widget _buildTokenCard(
+    BuildContext context,
+    AppLocalizations loc,
+    bool hasToken,
+    GitHubRateLimit rateLimit,
+  ) {
+    final remainingPct = rateLimit.remainingPercentage;
+    final isGood = remainingPct > 30;
+
+    return _buildModernCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader(
+            icon: Icons.key_rounded,
+            title: loc.githubTokenTitle,
+            subtitle: loc.tokenSubtitle,
+            trailing: IconButton(
+              icon: _isLoadingRateLimit
+                  ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Icon(
+                      Icons.refresh_rounded,
+                      size: 18,
+                      color: AppTheme.primaryCyan,
+                    ),
+              onPressed: _isLoadingRateLimit ? null : _refreshRateLimit,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Slim Quota indicator
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${loc.requestsUsed}: ${rateLimit.used} / ${rateLimit.limit}',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  color: AppTheme.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                '${loc.remainingQuota}: ${rateLimit.remaining}',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: isGood ? AppTheme.accentGreen : AppTheme.accentAmber,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: rateLimit.limit > 0
+                  ? (rateLimit.remaining / rateLimit.limit)
+                  : 0.0,
+              backgroundColor: AppTheme.border,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isGood ? AppTheme.accentGreen : AppTheme.accentAmber,
+              ),
+              minHeight: 4,
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Token Input Field
+          TextField(
+            controller: _tokenController,
+            obscureText: _obscureToken,
+            style: TextStyle(
+              fontSize: 13,
+              color: AppTheme.textPrimary,
+              fontFamily: 'monospace',
+            ),
+            decoration: InputDecoration(
+              isDense: true,
+              hintText: loc.tokenHint,
+              prefixIcon: const Icon(
+                Icons.lock_outline_rounded,
+                size: 16,
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureToken
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  size: 18,
+                ),
+                onPressed: () =>
+                    setState(() => _obscureToken = !_obscureToken),
               ),
             ),
-            const SizedBox(height: 24),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (hasToken) ...[
+                TextButton(
+                  onPressed: () => _clearToken(loc),
+                  child: Text(
+                    loc.deleteToken,
+                    style: TextStyle(
+                      color: AppTheme.accentRed,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              ElevatedButton.icon(
+                onPressed: () => _saveToken(loc),
+                icon: const Icon(Icons.check_rounded, size: 14),
+                label: Text(
+                  loc.saveToken,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // About and updates card
+  Widget _buildAboutCard(
+    BuildContext context,
+    AppLocalizations loc,
+  ) {
+    return _buildModernCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader(
+            icon: Icons.info_outline_rounded,
+            title: loc.aboutApp,
+            subtitle: loc.appDescriptionLabel,
+          ),
+          const SizedBox(height: 12),
+          Divider(height: 1, color: AppTheme.border.withAlpha(40)),
+          const SizedBox(height: 8),
+
+          _buildAboutRow(loc.appVersionLabel, AppConfig.appVersion),
+          _buildAboutRow(
+            loc.buildNumberLabel,
+            '${AppConfig.buildNumber} (Release APK)',
+          ),
+          _buildAboutRow(loc.architectureLabel, loc.architectureValue),
+          _buildAboutRow(loc.licenseLabel, AppConfig.license),
+          _buildAboutRow(
+            loc.viewOnGitHub,
+            'zerabyte88/gitpulse-mobile',
+            onTap: () async {
+              final uri = Uri.parse(AppConfig.githubRepoUrl);
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            },
+          ),
+          const SizedBox(height: 10),
+          Divider(height: 1, color: AppTheme.border.withAlpha(40)),
+          const SizedBox(height: 14),
+
+          // Developer profile
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFF06B6D4),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF06B6D4).withAlpha(40),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.network(
+                    AppConfig.developerAvatarUrl,
+                    fit: BoxFit.cover,
+                    cacheWidth: 100,
+                    cacheHeight: 100,
+                    headers: const {
+                      'Accept': 'image/*,*/*;q=0.8',
+                      'User-Agent': 'GitPulseMobile/1.0',
+                    },
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+                      return Container(
+                        width: 44,
+                        height: 44,
+                        color: AppTheme.surface,
+                        alignment: Alignment.center,
+                        child: const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1.5,
+                            color: Color(0xFF06B6D4),
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (_, _, _) => const Icon(
+                      Icons.person_rounded,
+                      color: Color(0xFF06B6D4),
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${loc.developerLabel}: ${AppConfig.developerUsername}',
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      loc.developerRole,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () async {
+                    final uri = Uri.parse(AppConfig.developerGithubUrl);
+                    try {
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } catch (e) {
+                      debugPrint('Could not launch URL: $e');
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF06B6D4).withAlpha(20),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: const Color(0xFF06B6D4).withAlpha(60),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.code_rounded,
+                          size: 14,
+                          color: Color(0xFF06B6D4),
+                        ),
+                        SizedBox(width: 5),
+                        Text(
+                          'GitHub',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF06B6D4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Divider(height: 1, color: AppTheme.border.withAlpha(40)),
+          const SizedBox(height: 12),
+
+          // OTA updates
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryCyan.withAlpha(20),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.system_update_alt_rounded,
+                      color: AppTheme.primaryCyan,
+                      size: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.updateSectionTitle,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                      if (_updateInfo != null)
+                        Text(
+                          _updateInfo!.hasUpdate
+                              ? '${loc.updateAvailable}: ${_updateInfo!.latestVersion}'
+                              : loc.alreadyLatestVersion,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: _updateInfo!.hasUpdate
+                                ? AppTheme.accentGreen
+                                : AppTheme.textMuted,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+              _isCheckingUpdate
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : OutlinedButton(
+                      onPressed: () => _checkForUpdates(loc),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        side: BorderSide(color: AppTheme.border),
+                      ),
+                      child: Text(
+                        loc.checkForUpdates,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                    ),
+            ],
+          ),
+          if (_updateInfo != null &&
+              _updateInfo!.hasUpdate &&
+              !_isDownloadingUpdate) ...[
+            const SizedBox(height: 10),
+            if (_updateInfo!.releaseNotes.trim().isNotEmpty) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.surface.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: AppTheme.accentGreen.withValues(alpha: 0.25),
+                    width: 0.8,
+                  ),
+                ),
+                child: Text(
+                  _updateInfo!.releaseNotes.trim(),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 11,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.download_rounded, size: 15),
+                onPressed: () =>
+                    _runOtaUpdate(_updateInfo!.apkDownloadUrl!, loc),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.accentGreen,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                label: Text(
+                  '${loc.updateNow} (${_updateInfo!.latestVersion})',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
           ],
-        ),
+          if (_isDownloadingUpdate) ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  '${loc.downloadingUpdate} ${_downloadProgress ?? ""}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.primaryCyan,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (_updateError != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              _updateError!,
+              style: TextStyle(
+                fontSize: 11.5,
+                color: AppTheme.accentRed,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -1316,6 +1408,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           GestureDetector(
             onTap: onTap,
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   value,

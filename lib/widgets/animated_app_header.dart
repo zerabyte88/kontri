@@ -266,7 +266,11 @@ Color _getThemeAccentColor(AppThemeMode mode) {
       return const Color(0xFF00E5FF);
     case AppThemeMode.light:
       return const Color(0xFF0969DA);
-    case AppThemeMode.dark:
+    case AppThemeMode.amoledSnowfall:
       return const Color(0xFF58A6FF);
+    case AppThemeMode.amoledPure:
+      return const Color(0xFF60A5FA);
+    case AppThemeMode.cleanLight:
+      return const Color(0xFF0EA5E9);
   }
 }

@@ -834,7 +834,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     );
   }
 
-  // --- TAB 0: README SECTION ---
+  // Readme section
   Widget _buildReadmeSection(AppLocalizations loc, String repoUrl) {
     if (_isLoadingReadme) {
       return Container(
@@ -1105,7 +1105,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     );
   }
 
-  // --- TAB 1: REPOSITORY FILES & CONTENTS SECTION ---
+  // Repository file tree
   Widget _buildFilesSection(AppLocalizations loc) {
     if (_isLoadingContents) {
       return Container(

@@ -89,8 +89,12 @@ const Map<String, String> idTranslations = {
   'themeAmoledJapanese': 'Sakura',
   'themeAmoledJapaneseSubtitle':
       'Hitam Pekat AMOLED • Ranting & Bunga Sakura Mekar',
+  'themeAmoledPure': 'Pure AMOLED',
+  'themeAmoledPureSubtitle': 'Latar Hitam Pekat Statis Tanpa Animasi',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Sinar Mentari Hangat & Hembusan Angin Segar',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Latar Terang Minimalis Statis Tanpa Animasi',
   'settingsBypassShaderNotice': 'Bypass Shader 60 FPS',
   'activeLanguageBadge': 'Aktif',
   'resetLabel': 'Reset',
@@ -910,8 +914,14 @@ const Map<String, String> enTranslations = {
   'themeAmoledJapanese': 'Sakura',
   'themeAmoledJapaneseSubtitle':
       'True AMOLED black • Blooming branches & sakura blossoms',
+  'themeAmoledPure': 'Pure AMOLED',
+  'themeAmoledPureSubtitle':
+      'Static pitch-black background without animations',
   'themeLight': 'Daylight',
   'themeLightSubtitle': 'Warm golden sunrays & fresh daylight breeze',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle':
+      'Minimalist clean light background without animations',
   'settingsBypassShaderNotice': '60 FPS Shader Bypass',
   'activeLanguageBadge': 'Active',
   'resetLabel': 'Reset',

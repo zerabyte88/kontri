@@ -125,6 +125,10 @@ class AppLocalizations {
   String get themeAmoledJapaneseSubtitle => _t('themeAmoledJapaneseSubtitle');
   String get themeLight => _t('themeLight');
   String get themeLightSubtitle => _t('themeLightSubtitle');
+  String get themeAmoledPure => _t('themeAmoledPure');
+  String get themeAmoledPureSubtitle => _t('themeAmoledPureSubtitle');
+  String get themeCleanLight => _t('themeCleanLight');
+  String get themeCleanLightSubtitle => _t('themeCleanLightSubtitle');
   String get settingsBypassShaderNotice => _t('settingsBypassShaderNotice');
   String get activeLanguageBadge => _t('activeLanguageBadge');
   String get resetLabel => _t('resetLabel');
@@ -153,6 +157,10 @@ class AppLocalizations {
         return themeAmoledJapanese;
       case 'theme_light':
         return themeLight;
+      case 'theme_oled_pure':
+        return themeAmoledPure;
+      case 'theme_light_clean':
+        return themeCleanLight;
       default:
         return key;
     }

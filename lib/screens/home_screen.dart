@@ -31,7 +31,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   late final TechNewsService _newsService;
@@ -46,6 +46,17 @@ class _HomeScreenState extends State<HomeScreen> {
   late final PageController _newsPageController;
   final Map<String, List<TechNews>> _categoryNewsCache = {};
   final Map<String, bool> _categoryLoadingMap = {};
+
+  // Direct Capsule Glide State for Multi-Tab Jumps
+  late final AnimationController _capsuleJumpController;
+  Animation<double>? _capsuleJumpAnimation;
+  double _capsuleStartLeft = 0.0;
+  double _capsuleEndLeft = 0.0;
+  double _capsuleStartWidth = 0.0;
+  double _capsuleEndWidth = 0.0;
+  int _capsuleFromIndex = 0;
+  int _capsuleToIndex = 0;
+  bool _isCapsuleJumping = false;
 
   // Local Storage Cache
   List<BookmarkedUser> _bookmarkedUsers = [];
@@ -70,6 +81,23 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _newsPageController = PageController();
+    _capsuleJumpController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 280),
+    );
+    _capsuleJumpAnimation = CurvedAnimation(
+      parent: _capsuleJumpController,
+      curve: Curves.easeOutCubic,
+    );
+    _capsuleJumpController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        if (mounted) {
+          setState(() {
+            _isCapsuleJumping = false;
+          });
+        }
+      }
+    });
     _newsService = TechNewsService(storageService: widget.storageService);
     _refreshLocalData();
     _searchFocusNode.addListener(_onSearchFocusChanged);
@@ -88,6 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _newsPageController.dispose();
+    _capsuleJumpController.dispose();
     _searchFocusNode.removeListener(_onSearchFocusChanged);
     _searchFocusNode.dispose();
     _searchController.dispose();
@@ -166,19 +195,58 @@ class _HomeScreenState extends State<HomeScreen> {
     final targetCategory = categories[index]['id']!;
     if (targetCategory == _selectedCategory) return;
 
+    final currentIndex = categories.indexWhere(
+      (c) => c['id'] == _selectedCategory,
+    );
+    final safeCurrentIndex = currentIndex >= 0 ? currentIndex : 0;
+    final delta = (index - safeCurrentIndex).abs();
+
+    final (widths, offsets) = _calculateCategoryMetrics(categories, context);
+    final currentLeftPos = _isCapsuleJumping && _capsuleJumpAnimation != null
+        ? ui.lerpDouble(
+            _capsuleStartLeft,
+            _capsuleEndLeft,
+            _capsuleJumpAnimation!.value,
+          )!
+        : offsets[safeCurrentIndex];
+    final currentWidthPos = _isCapsuleJumping && _capsuleJumpAnimation != null
+        ? ui.lerpDouble(
+            _capsuleStartWidth,
+            _capsuleEndWidth,
+            _capsuleJumpAnimation!.value,
+          )!
+        : widths[safeCurrentIndex];
+
+    final endLeft = offsets[index];
+    final endWidth = widths[index];
+
     setState(() {
       _selectedCategory = targetCategory;
     });
 
     _animateCategoryChipToView(index, categories);
-    if (_newsPageController.hasClients) {
-      _newsPageController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOutCubic,
-      );
-    }
     _loadCategoryNews(targetCategory);
+
+    if (_newsPageController.hasClients) {
+      if (delta <= 1 && !_isCapsuleJumping) {
+        _newsPageController.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOutCubic,
+        );
+      } else {
+        _capsuleFromIndex = safeCurrentIndex;
+        _capsuleToIndex = index;
+        _capsuleStartLeft = currentLeftPos;
+        _capsuleEndLeft = endLeft;
+        _capsuleStartWidth = currentWidthPos;
+        _capsuleEndWidth = endWidth;
+        _isCapsuleJumping = true;
+
+        _capsuleJumpController.forward(from: 0.0);
+        _newsPageController.jumpToPage(index);
+      }
+    }
   }
 
   void _onPageChanged(int index, List<Map<String, String>> categories) {
@@ -187,6 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (targetCategory != _selectedCategory) {
       setState(() {
         _selectedCategory = targetCategory;
+        _isCapsuleJumping = false;
       });
       _animateCategoryChipToView(index, categories);
       _loadCategoryNews(targetCategory);
@@ -1309,7 +1378,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 10),
 
-        // Phantek Gallery Continuous Sliding Capsule Category Bar
+        // Category tab bar
         Builder(
           builder: (context) {
             final (widths, offsets) = _calculateCategoryMetrics(
@@ -1341,41 +1410,62 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 34,
                   child: Stack(
                     children: [
-                      // Continuous sliding capsule indicator (Interpolated from PageController)
+                      // Sliding capsule indicator
                       AnimatedBuilder(
-                        animation: _newsPageController,
+                        animation: Listenable.merge([
+                          _newsPageController,
+                          _capsuleJumpController,
+                        ]),
                         builder: (context, _) {
-                          double page = safeIndex.toDouble();
-                          if (_newsPageController.hasClients) {
-                            page =
-                                _newsPageController.page ??
-                                safeIndex.toDouble();
+                          double currentLeft;
+                          double currentWidth;
+
+                          if (_isCapsuleJumping &&
+                              _capsuleJumpAnimation != null) {
+                            final t = _capsuleJumpAnimation!.value;
+                            currentLeft = ui.lerpDouble(
+                              _capsuleStartLeft,
+                              _capsuleEndLeft,
+                              t,
+                            )!;
+                            currentWidth = ui.lerpDouble(
+                              _capsuleStartWidth,
+                              _capsuleEndWidth,
+                              t,
+                            )!;
+                          } else {
+                            double page = safeIndex.toDouble();
+                            if (_newsPageController.hasClients) {
+                              page =
+                                  _newsPageController.page ??
+                                  safeIndex.toDouble();
+                            }
+                            page = page.clamp(
+                              0.0,
+                              (categories.length - 1).toDouble(),
+                            );
+
+                            final int from = page.floor().clamp(
+                              0,
+                              categories.length - 1,
+                            );
+                            final int to = page.ceil().clamp(
+                              0,
+                              categories.length - 1,
+                            );
+                            final double progress = page - from;
+
+                            currentLeft = ui.lerpDouble(
+                              offsets[from],
+                              offsets[to],
+                              progress,
+                            )!;
+                            currentWidth = ui.lerpDouble(
+                              widths[from],
+                              widths[to],
+                              progress,
+                            )!;
                           }
-                          page = page.clamp(
-                            0.0,
-                            (categories.length - 1).toDouble(),
-                          );
-
-                          final int from = page.floor().clamp(
-                            0,
-                            categories.length - 1,
-                          );
-                          final int to = page.ceil().clamp(
-                            0,
-                            categories.length - 1,
-                          );
-                          final double progress = page - from;
-
-                          final double currentLeft = ui.lerpDouble(
-                            offsets[from],
-                            offsets[to],
-                            progress,
-                          )!;
-                          final double currentWidth = ui.lerpDouble(
-                            widths[from],
-                            widths[to],
-                            progress,
-                          )!;
 
                           return Positioned(
                             left: currentLeft,
@@ -1444,14 +1534,30 @@ class _HomeScreenState extends State<HomeScreen> {
     List<Map<String, String>> categories,
   ) {
     return AnimatedBuilder(
-      animation: _newsPageController,
+      animation: Listenable.merge([
+        _newsPageController,
+        _capsuleJumpController,
+      ]),
       builder: (context, _) {
-        double page = activeIndex.toDouble();
-        if (_newsPageController.hasClients) {
-          page = _newsPageController.page ?? activeIndex.toDouble();
+        double activeFactor;
+        if (_isCapsuleJumping && _capsuleJumpAnimation != null) {
+          final t = _capsuleJumpAnimation!.value;
+          if (index == _capsuleToIndex) {
+            activeFactor = t.clamp(0.0, 1.0);
+          } else if (index == _capsuleFromIndex) {
+            activeFactor = (1.0 - t).clamp(0.0, 1.0);
+          } else {
+            activeFactor = 0.0;
+          }
+        } else {
+          double page = activeIndex.toDouble();
+          if (_newsPageController.hasClients) {
+            page = _newsPageController.page ?? activeIndex.toDouble();
+          }
+          final double distance = (page - index).abs();
+          activeFactor = (1.0 - distance).clamp(0.0, 1.0);
         }
-        final double distance = (page - index).abs();
-        final double activeFactor = (1.0 - distance).clamp(0.0, 1.0);
+
         final color = Color.lerp(
           AppTheme.textSecondary,
           AppTheme.primaryCyan,
@@ -1567,7 +1673,7 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
 
     return TweenAnimationBuilder<double>(
       curve: Curves.easeOutCubic,
-      duration: const Duration(milliseconds: 320),
+      duration: const Duration(milliseconds: 280),
       tween: Tween<double>(begin: currentHeight, end: currentHeight),
       builder: (context, height, child) {
         return SizedBox(height: height, child: child);

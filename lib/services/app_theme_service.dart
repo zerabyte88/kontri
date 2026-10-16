@@ -6,7 +6,7 @@ import 'storage_service.dart';
 
 class AppThemeService {
   static final ValueNotifier<AppThemeMode> currentThemeNotifier =
-      ValueNotifier<AppThemeMode>(AppThemeMode.dark);
+      ValueNotifier<AppThemeMode>(AppThemeMode.amoledSnowfall);
   static final ValueNotifier<double> surfaceOpacityNotifier =
       ValueNotifier<double>(1.0);
   static final ValueNotifier<bool> bgAnimationEnabledNotifier =

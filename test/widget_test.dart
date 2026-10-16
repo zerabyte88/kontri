@@ -813,13 +813,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v2.4.5',
+      'AppConfig provides accurate release and version telemetry for v2.5.0',
       () {
         expect(AppConfig.appName, 'GitPulse');
-        expect(AppConfig.appVersion, 'v2.4.5');
-        expect(AppConfig.buildNumber, '26');
-        expect(AppConfig.fullVersion, 'v2.4.5 (Build 26)');
-        expect(AppConfig.releaseTag, 'v2.4.5');
+        expect(AppConfig.appVersion, 'v2.5.0');
+        expect(AppConfig.buildNumber, '27');
+        expect(AppConfig.fullVersion, 'v2.5.0 (Build 27)');
+        expect(AppConfig.releaseTag, 'v2.5.0');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1096,39 +1096,61 @@ void main() {
       },
     );
 
-    test('AppTheme generates distinct, harmonious palettes for dark, amoled, and sakura modes', () {
-      final darkTheme = AppTheme.getTheme(AppThemeMode.dark);
+    test('AppTheme generates distinct, harmonious palettes for all theme modes', () {
+      final darkTheme = AppTheme.getTheme(AppThemeMode.amoledSnowfall);
       final amoledTheme = AppTheme.getTheme(AppThemeMode.amoled);
       final sakuraTheme = AppTheme.getTheme(AppThemeMode.amoledJapanese);
+      final pureTheme = AppTheme.getTheme(AppThemeMode.amoledPure);
       final lightTheme = AppTheme.getTheme(AppThemeMode.light);
+      final cleanLightTheme = AppTheme.getTheme(AppThemeMode.cleanLight);
 
       // Verify scaffolds backgrounds are transparent for animated background canvas
       expect(darkTheme.scaffoldBackgroundColor, Colors.transparent);
       expect(amoledTheme.scaffoldBackgroundColor, Colors.transparent);
       expect(sakuraTheme.scaffoldBackgroundColor, Colors.transparent);
+      expect(pureTheme.scaffoldBackgroundColor, Colors.transparent);
       expect(lightTheme.scaffoldBackgroundColor, Colors.transparent);
+      expect(cleanLightTheme.scaffoldBackgroundColor, Colors.transparent);
 
-      // Verify theme mode background palette
-      AppTheme.currentMode = AppThemeMode.dark;
-      expect(AppTheme.background, const Color(0xFF0F172A));
+      // Verify theme mode background palette (Snowfall is now pure AMOLED black)
+      AppTheme.currentMode = AppThemeMode.amoledSnowfall;
+      expect(AppTheme.background, const Color(0xFF000000));
       AppTheme.currentMode = AppThemeMode.amoled;
       expect(AppTheme.background, const Color(0xFF000000));
       AppTheme.currentMode = AppThemeMode.amoledJapanese;
       expect(AppTheme.background, const Color(0xFF000000));
+      AppTheme.currentMode = AppThemeMode.amoledPure;
+      expect(AppTheme.background, const Color(0xFF000000));
+      expect(AppTheme.isLight, isFalse);
       AppTheme.currentMode = AppThemeMode.light;
       expect(AppTheme.background, const Color(0xFFF8FAFC));
-      AppTheme.currentMode = AppThemeMode.dark;
+      expect(AppTheme.isLight, isTrue);
+      AppTheme.currentMode = AppThemeMode.cleanLight;
+      expect(AppTheme.background, const Color(0xFFF8FAFC));
+      expect(AppTheme.isLight, isTrue);
+      AppTheme.currentMode = AppThemeMode.amoledSnowfall;
 
       // Verify distinct primary accents
       expect(darkTheme.primaryColor, const Color(0xFF38BDF8));
       expect(amoledTheme.primaryColor, const Color(0xFF00E5FF));
       expect(sakuraTheme.primaryColor, const Color(0xFFF472B6));
+      expect(pureTheme.primaryColor, const Color(0xFF60A5FA));
       expect(lightTheme.primaryColor, const Color(0xFF2563EB));
+      expect(cleanLightTheme.primaryColor, const Color(0xFF0EA5E9));
 
       // Verify card surfaces
-      expect(darkTheme.cardTheme.color, const Color(0xFF0B132B));
+      expect(darkTheme.cardTheme.color, const Color(0xFF0C1322));
       expect(amoledTheme.cardTheme.color, const Color(0xFF101012));
       expect(sakuraTheme.cardTheme.color, const Color(0xFF140D13));
+      expect(pureTheme.cardTheme.color, const Color(0xFF101012));
+      expect(lightTheme.cardTheme.color, const Color(0xFFFFFFFF));
+      expect(cleanLightTheme.cardTheme.color, const Color(0xFFFFFFFF));
+
+      // Verify fromKey mapping
+      expect(AppThemeMode.fromKey('oled_pure'), AppThemeMode.amoledPure);
+      expect(AppThemeMode.fromKey('pure_oled'), AppThemeMode.amoledPure);
+      expect(AppThemeMode.fromKey('light_clean'), AppThemeMode.cleanLight);
+      expect(AppThemeMode.fromKey('clean_light'), AppThemeMode.cleanLight);
 
       // Verify native system font typography is configured
       expect(darkTheme.textTheme.bodyMedium, isNotNull);
@@ -2156,13 +2178,25 @@ void main() {
     });
 
     testWidgets('renders without error in Snowfall mode', (tester) async {
-      await pumpBackground(tester, AppThemeMode.dark);
+      await pumpBackground(tester, AppThemeMode.amoledSnowfall);
       expect(find.byType(AnimatedAppBackground), findsOneWidget);
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
     testWidgets('renders without error in Light mode', (tester) async {
       await pumpBackground(tester, AppThemeMode.light);
+      expect(find.byType(AnimatedAppBackground), findsOneWidget);
+      expect(find.byType(CustomPaint), findsWidgets);
+    });
+
+    testWidgets('renders without error in AMOLED Pure mode', (tester) async {
+      await pumpBackground(tester, AppThemeMode.amoledPure);
+      expect(find.byType(AnimatedAppBackground), findsOneWidget);
+      expect(find.byType(CustomPaint), findsWidgets);
+    });
+
+    testWidgets('renders without error in Clean Light mode', (tester) async {
+      await pumpBackground(tester, AppThemeMode.cleanLight);
       expect(find.byType(AnimatedAppBackground), findsOneWidget);
       expect(find.byType(CustomPaint), findsWidgets);
     });

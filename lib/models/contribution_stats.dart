@@ -48,7 +48,7 @@ class ContributionStats {
     required int thisYearContributions,
     required int totalContributions,
   }) {
-    // Tier 1: Sangat Rajin Ekstrem (Mythic/Legendary)
+    // Tier 1: Mythic
     if (thisYearContributions >= 1000 &&
         (currentStreak >= 30 || longestStreak >= 60)) {
       return const CommitTitleInfo(
@@ -59,7 +59,7 @@ class ContributionStats {
         description: 'Kekuatan magis kode tak tertandingi! Konsistensi mutlak tanpa putus.',
       );
     }
-    // Tier 2: Rajin & Berkelanjutan (Diamond)
+    // Tier 2: Diamond
     else if (thisYearContributions >= 500 &&
         (currentStreak >= 21 || longestStreak >= 45)) {
       return const CommitTitleInfo(
@@ -70,7 +70,7 @@ class ContributionStats {
         description: 'Garda terdepan pengembangan perangkat lunak, aktif meluncurkan commit.',
       );
     }
-    // Tier 3: Rutin & Teratur (Platinum)
+    // Tier 3: Platinum
     else if (thisYearContributions >= 250 &&
         (currentStreak >= 7 || longestStreak >= 14)) {
       return const CommitTitleInfo(
@@ -82,7 +82,7 @@ class ContributionStats {
             'Mahir menempa karya kode dengan ritme yang konsisten dan stabil.',
       );
     }
-    // Tier 4: Terkadang / Sewaktu-waktu (Gold)
+    // Tier 4: Gold
     else if (thisYearContributions >= 125 ||
         currentStreak >= 14 ||
         longestStreak >= 21) {
@@ -94,7 +94,7 @@ class ContributionStats {
         description: 'Menjelajah berbagai proyek kode di sela petualangan dan waktu senggang.',
       );
     }
-    // Tier 5: Jarang Commit (Silver)
+    // Tier 5: Silver
     else if (thisYearContributions >= 20 || totalContributions >= 30) {
       return const CommitTitleInfo(
         title: 'Silver Explorer',
@@ -104,7 +104,7 @@ class ContributionStats {
         description: 'Penjelajah santai yang mencatat commit saat menemukan inspirasi baru.',
       );
     }
-    // Tier 6: Belum Aktif (Bronze)
+    // Tier 6: Bronze
     else {
       return const CommitTitleInfo(
         title: 'Bronze Novice',

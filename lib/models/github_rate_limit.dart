@@ -11,18 +11,18 @@ class GitHubRateLimit {
     required this.resetTime,
   });
 
-  /// Rasio sisa kuota (1.0 = 100% utuh, 0.0 = 0% habis)
+  /// Remaining quota ratio (0.0 to 1.0).
   double get remainingRatio =>
       limit > 0 ? (remaining / limit).clamp(0.0, 1.0) : 0.0;
 
-  /// Persentase sisa kuota (100% jika belum terpakai, 0% jika habis)
+  /// Remaining quota percentage (0-100%).
   double get remainingPercentage => remainingRatio * 100;
 
-  /// Persentase kuota yang telah digunakan
+  /// Used quota percentage (0-100%).
   double get usedPercentage =>
       limit > 0 ? ((used / limit).clamp(0.0, 1.0)) * 100 : 0.0;
 
-  /// Teks waktu relatif hingga reset kuota
+  /// Relative countdown text until rate limit reset.
   String get resetCountdown {
     final now = DateTime.now();
     final diff = resetTime.difference(now);

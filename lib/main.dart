@@ -22,9 +22,8 @@ void main() async {
     storageService: storageService,
   );
 
-  // Auto-clean any leftover APK update file to free internal storage
+  // Clean lingering APK files from prior updates
   UpdateService.cleanDownloadedApk();
-  // Auto-clean successfully installed backup APK from public downloads
   UpdateService.cleanInstalledBackupApk();
 
   runApp(GitPulseApp(storageService: storageService, apiService: apiService));
