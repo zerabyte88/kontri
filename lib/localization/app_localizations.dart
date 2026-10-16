@@ -36,7 +36,7 @@ class AppLocalizations {
   }
 
   // App & General
-  String get appTitle => 'GitPulse';
+  String get appTitle => 'Kontri';
   String get appSubtitle => _t('appSubtitle');
   String get close => _t('close');
   String get cancel => _t('cancel');

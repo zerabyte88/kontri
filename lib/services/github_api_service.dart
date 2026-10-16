@@ -381,7 +381,9 @@ class GitHubApiService {
           peakTitle: CommitTitleInfo.getInfoForTier(storedPeak),
         );
       } else if (contrib.peakTitle.tier < storedPeak) {
-        unawaited(storageService!.savePeakTier(user.login, contrib.peakTitle.tier));
+        unawaited(
+          storageService!.savePeakTier(user.login, contrib.peakTitle.tier),
+        );
       }
 
       return UserStats.calculate(

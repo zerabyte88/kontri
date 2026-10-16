@@ -128,7 +128,7 @@ class UpdateService {
       return OtaUpdate().execute(
         downloadUrl,
         destinationFilename: 'gitpulse-latest.apk',
-        androidProviderAuthority: 'com.phantek.orion.rigel.ota_update_provider',
+        androidProviderAuthority: 'com.kontri.orion.rigel.ota_update_provider',
       );
     } catch (e) {
       return Stream.error(e);
@@ -162,6 +162,8 @@ class UpdateService {
       } catch (_) {}
 
       // Standard Android internal data directory paths
+      candidates.add('/data/user/0/com.kontri.orion.rigel/files/ota_update');
+      candidates.add('/data/data/com.kontri.orion.rigel/files/ota_update');
       candidates.add('/data/user/0/com.phantek.orion.rigel/files/ota_update');
       candidates.add('/data/data/com.phantek.orion.rigel/files/ota_update');
       candidates.add(
@@ -189,8 +191,7 @@ class UpdateService {
     return deletedAny;
   }
 
-  /// Saves the downloaded update APK to standard Android public downloads directory
-  /// (/storage/emulated/0/Download/GitPulse) as the primary downloaded APK file for installation.
+  /// Copies the update APK to the public Downloads folder.
   static Future<String?> saveApkToDownloads({String? versionTag}) async {
     if (!Platform.isAndroid) return null;
     try {
@@ -200,6 +201,8 @@ class UpdateService {
         sourceCandidates.add('$parentDir/files/ota_update/gitpulse-latest.apk');
       } catch (_) {}
       sourceCandidates.addAll([
+        '/data/user/0/com.kontri.orion.rigel/files/ota_update/gitpulse-latest.apk',
+        '/data/data/com.kontri.orion.rigel/files/ota_update/gitpulse-latest.apk',
         '/data/user/0/com.phantek.orion.rigel/files/ota_update/gitpulse-latest.apk',
         '/data/data/com.phantek.orion.rigel/files/ota_update/gitpulse-latest.apk',
         '/data/user/0/com.gitpulse.gitpulse_mobile/files/ota_update/gitpulse-latest.apk',
@@ -286,15 +289,7 @@ class UpdateService {
     return null;
   }
 
-  /// Automatically removes GitPulse update APKs from the Android public downloads
-  /// directory (/storage/emulated/0/Download/GitPulse and /storage/emulated/0/Download)
-  /// once they have been successfully installed.
-  ///
-  /// STRICT SAFETY GUARD:
-  /// - Only targets files whose filename strictly starts with "gitpulse-" or "gitpulse_"
-  ///   and ends with ".apk".
-  /// - ONLY deletes the file if its version is <= the installed [currentVersion].
-  /// - NEVER deletes or modifies any user files, documents, pictures, or other APKs in the folder.
+  /// Deletes leftover update APK files if version is <= [currentVersion].
   static Future<bool> cleanInstalledBackupApk({
     String? currentVersion,
     String? customPath,

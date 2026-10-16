@@ -15,7 +15,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.phantek.orion.rigel"
+    namespace = "com.kontri.orion.rigel"
     compileSdk = flutter.compileSdkVersion
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
@@ -23,18 +23,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    val flutterBaseCode = flutter.versionCode ?: 27
+    val flutterBaseCode = flutter.versionCode ?: 1
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.phantek.orion.rigel"
+        applicationId = "com.kontri.orion.rigel"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        // Offset versionCode to 10000+ so universal APK and ABI splits are always strictly
-        // greater than any legacy APK (e.g. v1.0.5 arm64 was 2005), preventing downgrade errors.
-        versionCode = if (flutterBaseCode < 10000) 10000 + flutterBaseCode else flutterBaseCode
+        versionCode = flutterBaseCode
         versionName = flutter.versionName
     }
 

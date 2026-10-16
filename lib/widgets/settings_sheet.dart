@@ -88,7 +88,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
   static DateTime? _lastUpdateCheckTime;
   static AppUpdateInfo? _cachedUpdateInfo;
 
-
   @override
   void initState() {
     super.initState();
@@ -278,7 +277,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
     widget.onSettingsChanged?.call();
     await _refreshRateLimit();
   }
-
 
   Widget _buildAboutInfoRow(String label, String value) {
     return Row(
@@ -601,9 +599,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                           size: 17,
                                           color:
                                               currentTheme ==
-                                                      AppThemeMode.amoledSnowfall
-                                                  ? AppTheme.primaryCyan
-                                                  : AppTheme.textMuted,
+                                                  AppThemeMode.amoledSnowfall
+                                              ? AppTheme.primaryCyan
+                                              : AppTheme.textMuted,
                                         ),
                                         isSelected:
                                             currentTheme ==
@@ -696,9 +694,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                           size: 17,
                                           color:
                                               currentTheme ==
-                                                      AppThemeMode.amoledPure
-                                                  ? const Color(0xFF60A5FA)
-                                                  : AppTheme.textMuted,
+                                                  AppThemeMode.amoledPure
+                                              ? const Color(0xFF60A5FA)
+                                              : AppTheme.textMuted,
                                         ),
                                         isSelected:
                                             currentTheme ==
@@ -758,9 +756,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                           size: 17,
                                           color:
                                               currentTheme ==
-                                                      AppThemeMode.cleanLight
-                                                  ? const Color(0xFF0EA5E9)
-                                                  : AppTheme.textMuted,
+                                                  AppThemeMode.cleanLight
+                                              ? const Color(0xFF0EA5E9)
+                                              : AppTheme.textMuted,
                                         ),
                                         isSelected:
                                             currentTheme ==
@@ -1848,7 +1846,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                       ),
                       const SizedBox(height: 14),
 
-                      // CARD 6: About GitPulse & Build Version Info & Developer
+                      // About & App Version
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 350),
                         curve: Curves.easeInOut,
@@ -2070,8 +2068,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                           decoration: BoxDecoration(
                                             color: AppTheme.primaryCyan
                                                 .withValues(alpha: 0.10),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                             border: Border.all(
                                               color: AppTheme.primaryCyan
                                                   .withValues(alpha: 0.35),
@@ -2218,7 +2217,9 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  color: isSelected ? accent : AppTheme.textPrimary,
+                                  color: isSelected
+                                      ? accent
+                                      : AppTheme.textPrimary,
                                   fontSize: 12.0,
                                   fontWeight: isSelected
                                       ? FontWeight.w700

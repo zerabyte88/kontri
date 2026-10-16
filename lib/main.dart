@@ -48,7 +48,7 @@ class GitPulseApp extends StatelessWidget {
           valueListenable: AppThemeService.currentThemeNotifier,
           builder: (context, currentThemeMode, _) {
             return MaterialApp(
-              title: 'GitPulse',
+              title: 'Kontri',
               debugShowCheckedModeBanner: false,
               theme: AppTheme.getTheme(currentThemeMode),
               themeAnimationDuration: const Duration(milliseconds: 350),

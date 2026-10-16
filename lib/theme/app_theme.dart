@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppConfig {
-  static const String appName = 'GitPulse';
-  static const String appVersion = 'v2.5.1';
-  static const String buildNumber = '28';
-  static const String fullVersion = 'v2.5.1 (Build 28)';
-  static const String releaseTag = 'v2.5.1';
-  static const String githubRepoUrl =
-      'https://github.com/zerabyte88/gitpulse';
+  static const String appName = 'Kontri';
+  static const String appVersion = 'v1.0.0';
+  static const String buildNumber = '1';
+  static const String fullVersion = 'v1.0.0 (Build 1)';
+  static const String releaseTag = 'v1.0.0';
+  static const String githubRepoUrl = 'https://github.com/zerabyte88/gitpulse';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';
   static const String developerAvatarUrl =
@@ -169,7 +168,9 @@ class AppTheme {
     AppThemeMode.amoled => const Color(0xFFFFFFFF),
     AppThemeMode.amoledJapanese => const Color(0xFFFFF1F2),
     AppThemeMode.light => const Color(0xFF0F172A), // Slate 900
-    AppThemeMode.amoledSnowfall => const Color(0xFFF8FAFC), // Pure Snow White (Snowfall)
+    AppThemeMode.amoledSnowfall => const Color(
+      0xFFF8FAFC,
+    ), // Pure Snow White (Snowfall)
     AppThemeMode.amoledPure => const Color(0xFFF8FAFC),
     AppThemeMode.cleanLight => const Color(0xFF0F172A), // Slate 900
   };
@@ -178,7 +179,9 @@ class AppTheme {
     AppThemeMode.amoled => const Color(0xFFA1A1AA),
     AppThemeMode.amoledJapanese => const Color(0xFFD4A5B8),
     AppThemeMode.light => const Color(0xFF475569), // Slate 600
-    AppThemeMode.amoledSnowfall => const Color(0xFF94A3B8), // Slate 400 (Snowfall)
+    AppThemeMode.amoledSnowfall => const Color(
+      0xFF94A3B8,
+    ), // Slate 400 (Snowfall)
     AppThemeMode.amoledPure => const Color(0xFFA1A1AA),
     AppThemeMode.cleanLight => const Color(0xFF475569), // Slate 600
   };
@@ -187,7 +190,9 @@ class AppTheme {
     AppThemeMode.amoled => const Color(0xFF71717A),
     AppThemeMode.amoledJapanese => const Color(0xFFA07FA8),
     AppThemeMode.light => const Color(0xFF94A3B8), // Slate 400
-    AppThemeMode.amoledSnowfall => const Color(0xFF94A3B8), // Slate 400 (Snowfall)
+    AppThemeMode.amoledSnowfall => const Color(
+      0xFF94A3B8,
+    ), // Slate 400 (Snowfall)
     AppThemeMode.amoledPure => const Color(0xFF71717A),
     AppThemeMode.cleanLight => const Color(0xFF94A3B8), // Slate 400
   };
@@ -371,16 +376,7 @@ class AppTheme {
   }
 }
 
-/// Bespoke fluid page transitions builder for GitPulse.
-///
-/// Designed specifically for unified ambient background applications with
-/// translucent and transparent Scaffolds.
-///
-/// Eliminates rigid card collisions, visual tearing, and transparent ghosting:
-/// - Entering route: fades in smoothly (0.0 -> 1.0) with subtle forward glide (Offset(0.05, 0.0) -> Offset.zero)
-///   using [Curves.easeOutCubic].
-/// - Exiting route: fades out cleanly (1.0 -> 0.0) with subtle retreat (Offset.zero -> Offset(-0.03, 0.0))
-///   using [Curves.easeInCubic].
+/// Page transitions with subtle fade and horizontal glide.
 class GitPulsePageTransitionsBuilder extends PageTransitionsBuilder {
   const GitPulsePageTransitionsBuilder();
 

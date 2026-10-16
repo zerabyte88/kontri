@@ -26,8 +26,7 @@ class CommitTitleInfo {
           levelName: 'Sangat Rajin (Master)',
           badgeText: 'Tier: Mythic',
           tier: 1,
-          description:
-              'Kekuatan magis kode tak tertandingi! Konsistensi mutlak tanpa putus.',
+          description: 'Kekuatan magis kode tak tertandingi! Konsistensi mutlak tanpa putus.',
         );
       case 2:
         return const CommitTitleInfo(
@@ -35,8 +34,7 @@ class CommitTitleInfo {
           levelName: 'Sangat Rajin',
           badgeText: 'Tier: Diamond',
           tier: 2,
-          description:
-              'Garda terdepan pengembangan perangkat lunak, aktif meluncurkan commit.',
+          description: 'Garda terdepan pengembangan perangkat lunak, aktif meluncurkan commit.',
         );
       case 3:
         return const CommitTitleInfo(
@@ -44,8 +42,7 @@ class CommitTitleInfo {
           levelName: 'Rajin & Stabil',
           badgeText: 'Tier: Platinum',
           tier: 3,
-          description:
-              'Mahir menempa karya kode dengan ritme yang konsisten dan stabil.',
+          description: 'Mahir menempa karya kode dengan ritme yang konsisten dan stabil.',
         );
       case 4:
         return const CommitTitleInfo(
@@ -53,8 +50,7 @@ class CommitTitleInfo {
           levelName: 'Commit Terkadang',
           badgeText: 'Tier: Gold',
           tier: 4,
-          description:
-              'Menjelajah berbagai proyek kode di sela petualangan dan waktu senggang.',
+          description: 'Menjelajah berbagai proyek kode di sela petualangan dan waktu senggang.',
         );
       case 5:
         return const CommitTitleInfo(
@@ -62,8 +58,7 @@ class CommitTitleInfo {
           levelName: 'Jarang Commit',
           badgeText: 'Tier: Silver',
           tier: 5,
-          description:
-              'Penjelajah santai yang mencatat commit saat menemukan inspirasi baru.',
+          description: 'Penjelajah santai yang mencatat commit saat menemukan inspirasi baru.',
         );
       case 6:
       default:
@@ -163,7 +158,8 @@ class ContributionStats {
     int contribRequired,
     int activeRequired,
     String? nextTierName,
-  }) calculateNextTierProgress({
+  })
+  calculateNextTierProgress({
     required int currentTier,
     required int rollingContributions,
     required int rollingActiveDays,
@@ -212,12 +208,11 @@ class ContributionStats {
         break;
     }
 
-    final contribRatio =
-        (rollingContributions / targetContrib).clamp(0.0, 1.0);
-    final activeRatio =
-        (rollingActiveDays / targetActive).clamp(0.0, 1.0);
-    final double progress =
-        contribRatio < activeRatio ? contribRatio : activeRatio;
+    final contribRatio = (rollingContributions / targetContrib).clamp(0.0, 1.0);
+    final activeRatio = (rollingActiveDays / targetActive).clamp(0.0, 1.0);
+    final double progress = contribRatio < activeRatio
+        ? contribRatio
+        : activeRatio;
 
     String? lagging;
     if (progress < 1.0) {
@@ -250,18 +245,19 @@ class ContributionStats {
     int? rollingActiveDays,
   }) {
     final rContrib = rollingContributions ?? thisYearContributions;
-    final rActive = rollingActiveDays ??
+    final rActive =
+        rollingActiveDays ??
         (rContrib >= 1000 && (currentStreak >= 30 || longestStreak >= 60)
             ? 200
             : rContrib >= 500 && (currentStreak >= 21 || longestStreak >= 45)
-                ? 130
-                : rContrib >= 250 && (currentStreak >= 7 || longestStreak >= 14)
-                    ? 70
-                    : rContrib >= 125
-                        ? 35
-                        : rContrib >= 50
-                            ? 10
-                            : 0);
+            ? 130
+            : rContrib >= 250 && (currentStreak >= 7 || longestStreak >= 14)
+            ? 70
+            : rContrib >= 125
+            ? 35
+            : rContrib >= 50
+            ? 10
+            : 0);
 
     if (rContrib >= 1000 && rActive >= 200) {
       return CommitTitleInfo.getInfoForTier(1);

@@ -317,7 +317,7 @@ class TechNewsCard extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'GitPulse Tech Digest',
+                'Kontri Tech Digest',
                 style: TextStyle(
                   color: AppTheme.textMuted,
                   fontSize: 11,

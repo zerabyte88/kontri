@@ -1,4 +1,4 @@
-package com.phantek.orion.rigel
+package com.kontri.orion.rigel
 
 import android.os.Build
 import android.os.Bundle

@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,38 +7,38 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:gitpulse_mobile/localization/app_language.dart';
-import 'package:gitpulse_mobile/localization/app_localizations.dart';
-import 'package:gitpulse_mobile/models/bookmarked_user.dart';
-import 'package:gitpulse_mobile/models/contribution_stats.dart';
-import 'package:gitpulse_mobile/models/github_content_item.dart';
-import 'package:gitpulse_mobile/models/github_rate_limit.dart';
-import 'package:gitpulse_mobile/models/github_repo.dart';
-import 'package:gitpulse_mobile/models/github_user.dart';
-import 'package:gitpulse_mobile/models/tech_news.dart';
-import 'package:gitpulse_mobile/models/user_stats.dart';
-import 'package:gitpulse_mobile/screens/favorite_profiles_screen.dart';
-import 'package:gitpulse_mobile/screens/home_screen.dart';
-import 'package:gitpulse_mobile/screens/file_viewer_screen.dart';
-import 'package:gitpulse_mobile/screens/repo_detail_screen.dart';
-import 'package:gitpulse_mobile/screens/stats_detail_screen.dart';
-import 'package:gitpulse_mobile/services/github_api_service.dart';
-import 'package:gitpulse_mobile/services/storage_service.dart';
-import 'package:gitpulse_mobile/services/app_theme_service.dart';
-import 'package:gitpulse_mobile/services/app_language_service.dart';
-import 'package:gitpulse_mobile/services/tech_news_service.dart';
-import 'package:gitpulse_mobile/services/update_service.dart';
-import 'package:gitpulse_mobile/theme/app_theme.dart';
+import 'package:kontri/localization/app_language.dart';
+import 'package:kontri/localization/app_localizations.dart';
+import 'package:kontri/models/bookmarked_user.dart';
+import 'package:kontri/models/contribution_stats.dart';
+import 'package:kontri/models/github_content_item.dart';
+import 'package:kontri/models/github_rate_limit.dart';
+import 'package:kontri/models/github_repo.dart';
+import 'package:kontri/models/github_user.dart';
+import 'package:kontri/models/tech_news.dart';
+import 'package:kontri/models/user_stats.dart';
+import 'package:kontri/screens/favorite_profiles_screen.dart';
+import 'package:kontri/screens/home_screen.dart';
+import 'package:kontri/screens/file_viewer_screen.dart';
+import 'package:kontri/screens/repo_detail_screen.dart';
+import 'package:kontri/screens/stats_detail_screen.dart';
+import 'package:kontri/services/github_api_service.dart';
+import 'package:kontri/services/storage_service.dart';
+import 'package:kontri/services/app_theme_service.dart';
+import 'package:kontri/services/app_language_service.dart';
+import 'package:kontri/services/tech_news_service.dart';
+import 'package:kontri/services/update_service.dart';
+import 'package:kontri/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
-import 'package:gitpulse_mobile/widgets/animated_app_background.dart';
-import 'package:gitpulse_mobile/widgets/animated_app_header.dart';
-import 'package:gitpulse_mobile/widgets/animated_tier_title.dart';
-import 'package:gitpulse_mobile/widgets/language_chart.dart';
-import 'package:gitpulse_mobile/widgets/repo_tile.dart';
-import 'package:gitpulse_mobile/widgets/stat_card.dart';
-import 'package:gitpulse_mobile/widgets/running_text.dart';
-import 'package:gitpulse_mobile/widgets/glass_card.dart';
-import 'package:gitpulse_mobile/widgets/settings_sheet.dart';
+import 'package:kontri/widgets/animated_app_background.dart';
+import 'package:kontri/widgets/animated_app_header.dart';
+import 'package:kontri/widgets/animated_tier_title.dart';
+import 'package:kontri/widgets/language_chart.dart';
+import 'package:kontri/widgets/repo_tile.dart';
+import 'package:kontri/widgets/stat_card.dart';
+import 'package:kontri/widgets/running_text.dart';
+import 'package:kontri/widgets/glass_card.dart';
+import 'package:kontri/widgets/settings_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -500,14 +500,14 @@ void main() {
         expect(untouched.remainingPercentage, 100.0);
         expect(untouched.used, 0);
 
-        // 2. Partial usage: 28 used, 32 remaining of 60
+        // 2. Partial usage: 1 used, 32 remaining of 60
         final partial = GitHubRateLimit(
           limit: 60,
           remaining: 32,
-          used: 28,
+          used: 1,
           resetTime: DateTime.now().add(const Duration(minutes: 30)),
         );
-        expect(partial.used, 28);
+        expect(partial.used, 1);
         expect(partial.remaining, 32);
         expect(partial.remainingPercentage, closeTo(53.33, 0.1));
 
@@ -822,13 +822,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v2.5.1',
+      'AppConfig provides accurate release and version telemetry for v1.0.0',
       () {
-        expect(AppConfig.appName, 'GitPulse');
-        expect(AppConfig.appVersion, 'v2.5.1');
-        expect(AppConfig.buildNumber, '28');
-        expect(AppConfig.fullVersion, 'v2.5.1 (Build 28)');
-        expect(AppConfig.releaseTag, 'v2.5.1');
+        expect(AppConfig.appName, 'Kontri');
+        expect(AppConfig.appVersion, 'v1.0.0');
+        expect(AppConfig.buildNumber, '1');
+        expect(AppConfig.fullVersion, 'v1.0.0 (Build 1)');
+        expect(AppConfig.releaseTag, 'v1.0.0');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -838,8 +838,8 @@ void main() {
       final idLoc = AppLocalizations(AppLanguage.indonesian);
       final enLoc = AppLocalizations(AppLanguage.english);
 
-      expect(idLoc.aboutApp, 'Tentang GitPulse');
-      expect(enLoc.aboutApp, 'About GitPulse');
+      expect(idLoc.aboutApp, 'Tentang Kontri');
+      expect(enLoc.aboutApp, 'About Kontri');
       expect(idLoc.appVersionLabel, 'Versi Aplikasi');
       expect(enLoc.appVersionLabel, 'App Version');
       expect(idLoc.buildNumberLabel, 'Build');
@@ -1105,65 +1105,68 @@ void main() {
       },
     );
 
-    test('AppTheme generates distinct, harmonious palettes for all theme modes', () {
-      final darkTheme = AppTheme.getTheme(AppThemeMode.amoledSnowfall);
-      final amoledTheme = AppTheme.getTheme(AppThemeMode.amoled);
-      final sakuraTheme = AppTheme.getTheme(AppThemeMode.amoledJapanese);
-      final pureTheme = AppTheme.getTheme(AppThemeMode.amoledPure);
-      final lightTheme = AppTheme.getTheme(AppThemeMode.light);
-      final cleanLightTheme = AppTheme.getTheme(AppThemeMode.cleanLight);
+    test(
+      'AppTheme generates distinct, harmonious palettes for all theme modes',
+      () {
+        final darkTheme = AppTheme.getTheme(AppThemeMode.amoledSnowfall);
+        final amoledTheme = AppTheme.getTheme(AppThemeMode.amoled);
+        final sakuraTheme = AppTheme.getTheme(AppThemeMode.amoledJapanese);
+        final pureTheme = AppTheme.getTheme(AppThemeMode.amoledPure);
+        final lightTheme = AppTheme.getTheme(AppThemeMode.light);
+        final cleanLightTheme = AppTheme.getTheme(AppThemeMode.cleanLight);
 
-      // Verify scaffolds backgrounds are transparent for animated background canvas
-      expect(darkTheme.scaffoldBackgroundColor, Colors.transparent);
-      expect(amoledTheme.scaffoldBackgroundColor, Colors.transparent);
-      expect(sakuraTheme.scaffoldBackgroundColor, Colors.transparent);
-      expect(pureTheme.scaffoldBackgroundColor, Colors.transparent);
-      expect(lightTheme.scaffoldBackgroundColor, Colors.transparent);
-      expect(cleanLightTheme.scaffoldBackgroundColor, Colors.transparent);
+        // Verify scaffolds backgrounds are transparent for animated background canvas
+        expect(darkTheme.scaffoldBackgroundColor, Colors.transparent);
+        expect(amoledTheme.scaffoldBackgroundColor, Colors.transparent);
+        expect(sakuraTheme.scaffoldBackgroundColor, Colors.transparent);
+        expect(pureTheme.scaffoldBackgroundColor, Colors.transparent);
+        expect(lightTheme.scaffoldBackgroundColor, Colors.transparent);
+        expect(cleanLightTheme.scaffoldBackgroundColor, Colors.transparent);
 
-      // Verify theme mode background palette (Snowfall is now pure AMOLED black)
-      AppTheme.currentMode = AppThemeMode.amoledSnowfall;
-      expect(AppTheme.background, const Color(0xFF000000));
-      AppTheme.currentMode = AppThemeMode.amoled;
-      expect(AppTheme.background, const Color(0xFF000000));
-      AppTheme.currentMode = AppThemeMode.amoledJapanese;
-      expect(AppTheme.background, const Color(0xFF000000));
-      AppTheme.currentMode = AppThemeMode.amoledPure;
-      expect(AppTheme.background, const Color(0xFF000000));
-      expect(AppTheme.isLight, isFalse);
-      AppTheme.currentMode = AppThemeMode.light;
-      expect(AppTheme.background, const Color(0xFFF8FAFC));
-      expect(AppTheme.isLight, isTrue);
-      AppTheme.currentMode = AppThemeMode.cleanLight;
-      expect(AppTheme.background, const Color(0xFFF8FAFC));
-      expect(AppTheme.isLight, isTrue);
-      AppTheme.currentMode = AppThemeMode.amoledSnowfall;
+        // Verify theme mode background palette (Snowfall is now pure AMOLED black)
+        AppTheme.currentMode = AppThemeMode.amoledSnowfall;
+        expect(AppTheme.background, const Color(0xFF000000));
+        AppTheme.currentMode = AppThemeMode.amoled;
+        expect(AppTheme.background, const Color(0xFF000000));
+        AppTheme.currentMode = AppThemeMode.amoledJapanese;
+        expect(AppTheme.background, const Color(0xFF000000));
+        AppTheme.currentMode = AppThemeMode.amoledPure;
+        expect(AppTheme.background, const Color(0xFF000000));
+        expect(AppTheme.isLight, isFalse);
+        AppTheme.currentMode = AppThemeMode.light;
+        expect(AppTheme.background, const Color(0xFFF8FAFC));
+        expect(AppTheme.isLight, isTrue);
+        AppTheme.currentMode = AppThemeMode.cleanLight;
+        expect(AppTheme.background, const Color(0xFFF8FAFC));
+        expect(AppTheme.isLight, isTrue);
+        AppTheme.currentMode = AppThemeMode.amoledSnowfall;
 
-      // Verify distinct primary accents
-      expect(darkTheme.primaryColor, const Color(0xFF38BDF8));
-      expect(amoledTheme.primaryColor, const Color(0xFF00E5FF));
-      expect(sakuraTheme.primaryColor, const Color(0xFFF472B6));
-      expect(pureTheme.primaryColor, const Color(0xFF60A5FA));
-      expect(lightTheme.primaryColor, const Color(0xFF2563EB));
-      expect(cleanLightTheme.primaryColor, const Color(0xFF0EA5E9));
+        // Verify distinct primary accents
+        expect(darkTheme.primaryColor, const Color(0xFF38BDF8));
+        expect(amoledTheme.primaryColor, const Color(0xFF00E5FF));
+        expect(sakuraTheme.primaryColor, const Color(0xFFF472B6));
+        expect(pureTheme.primaryColor, const Color(0xFF60A5FA));
+        expect(lightTheme.primaryColor, const Color(0xFF2563EB));
+        expect(cleanLightTheme.primaryColor, const Color(0xFF0EA5E9));
 
-      // Verify card surfaces
-      expect(darkTheme.cardTheme.color, const Color(0xFF0C1322));
-      expect(amoledTheme.cardTheme.color, const Color(0xFF101012));
-      expect(sakuraTheme.cardTheme.color, const Color(0xFF140D13));
-      expect(pureTheme.cardTheme.color, const Color(0xFF101012));
-      expect(lightTheme.cardTheme.color, const Color(0xFFFFFFFF));
-      expect(cleanLightTheme.cardTheme.color, const Color(0xFFFFFFFF));
+        // Verify card surfaces
+        expect(darkTheme.cardTheme.color, const Color(0xFF0C1322));
+        expect(amoledTheme.cardTheme.color, const Color(0xFF101012));
+        expect(sakuraTheme.cardTheme.color, const Color(0xFF140D13));
+        expect(pureTheme.cardTheme.color, const Color(0xFF101012));
+        expect(lightTheme.cardTheme.color, const Color(0xFFFFFFFF));
+        expect(cleanLightTheme.cardTheme.color, const Color(0xFFFFFFFF));
 
-      // Verify fromKey mapping
-      expect(AppThemeMode.fromKey('oled_pure'), AppThemeMode.amoledPure);
-      expect(AppThemeMode.fromKey('pure_oled'), AppThemeMode.amoledPure);
-      expect(AppThemeMode.fromKey('light_clean'), AppThemeMode.cleanLight);
-      expect(AppThemeMode.fromKey('clean_light'), AppThemeMode.cleanLight);
+        // Verify fromKey mapping
+        expect(AppThemeMode.fromKey('oled_pure'), AppThemeMode.amoledPure);
+        expect(AppThemeMode.fromKey('pure_oled'), AppThemeMode.amoledPure);
+        expect(AppThemeMode.fromKey('light_clean'), AppThemeMode.cleanLight);
+        expect(AppThemeMode.fromKey('clean_light'), AppThemeMode.cleanLight);
 
-      // Verify native system font typography is configured
-      expect(darkTheme.textTheme.bodyMedium, isNotNull);
-    });
+        // Verify native system font typography is configured
+        expect(darkTheme.textTheme.bodyMedium, isNotNull);
+      },
+    );
 
     test('AppLocalizations renders beautiful copy profile and favorite toast messages', () {
       final idLoc = AppLocalizations(AppLanguage.indonesian);
@@ -1256,7 +1259,7 @@ void main() {
           'assets/icons/app_icon.png',
         );
         expect(find.byType(AnimatedHeaderBackground), findsOneWidget);
-        expect(find.text('GitPulse'), findsOneWidget);
+        expect(find.text('Kontri'), findsOneWidget);
         expect(find.text(AppConfig.appVersion), findsOneWidget);
         expect(
           find.descendant(
@@ -1269,15 +1272,15 @@ void main() {
         // Test theme mode toggling
         await AppThemeService.changeTheme(AppThemeMode.amoledJapanese, storage);
         await tester.pump(const Duration(milliseconds: 100));
-        expect(find.text('GitPulse'), findsOneWidget);
+        expect(find.text('Kontri'), findsOneWidget);
 
         await AppThemeService.changeTheme(AppThemeMode.amoled, storage);
         await tester.pump(const Duration(milliseconds: 100));
-        expect(find.text('GitPulse'), findsOneWidget);
+        expect(find.text('Kontri'), findsOneWidget);
 
         await AppThemeService.changeTheme(AppThemeMode.light, storage);
         await tester.pump(const Duration(milliseconds: 100));
-        expect(find.text('GitPulse'), findsOneWidget);
+        expect(find.text('Kontri'), findsOneWidget);
       },
     );
 
@@ -1670,7 +1673,7 @@ void main() {
         description: 'Developer telemetry mobile app',
         htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
         language: 'Dart',
-        stargazersCount: 128,
+        stargazersCount: 11,
         forksCount: 34,
         openIssuesCount: 3,
         isFork: false,

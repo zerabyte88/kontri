@@ -32,7 +32,8 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
       vsync: this,
       duration: const Duration(seconds: 12),
     );
-    if (!_isCurrentThemeStatic && !HeaderAnimationState.isPausedNotifier.value) {
+    if (!_isCurrentThemeStatic &&
+        !HeaderAnimationState.isPausedNotifier.value) {
       _controller.repeat();
     }
 
@@ -302,7 +303,7 @@ class _FullAppBgPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // 1. Ethereal Full Moon (Repositioned down & right to clear GitPulse header text)
+    // Full moon element
     final moonCenter = Offset(w * 0.36, h * 0.21);
     const moonR = 21.0;
     final moonGlow = 0.85 + 0.15 * math.sin(progress * 2 * math.pi);
@@ -1072,16 +1073,17 @@ class _FullAppBgPainter extends CustomPainter {
         : (90 + 35 * windowGlowPulse).toInt();
 
     final haloPaint = Paint()
-      ..shader = RadialGradient(
-        colors: [
-          const Color(0xFFFDE047).withAlpha(haloAlpha),
-          const Color(0xFFFEF08A).withAlpha(isDistant ? 12 : 25),
-          Colors.transparent,
-        ],
-        stops: const [0.0, 0.55, 1.0],
-      ).createShader(
-        Rect.fromCircle(center: winRect.center, radius: haloRadius),
-      );
+      ..shader =
+          RadialGradient(
+            colors: [
+              const Color(0xFFFDE047).withAlpha(haloAlpha),
+              const Color(0xFFFEF08A).withAlpha(isDistant ? 12 : 25),
+              Colors.transparent,
+            ],
+            stops: const [0.0, 0.55, 1.0],
+          ).createShader(
+            Rect.fromCircle(center: winRect.center, radius: haloRadius),
+          );
     canvas.drawCircle(winRect.center, haloRadius, haloPaint);
 
     canvas.drawRRect(

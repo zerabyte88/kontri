@@ -20,10 +20,7 @@ class HeaderAnimationState {
   }
 }
 
-/// Bespoke vector logo for GitPulse.
-///
-/// Combines Git branch topology (nodes and branches) with an active
-/// cardiac pulse rhythm (vital ECG waveform) and a dynamic traveling pulse spark.
+/// App logo widget.
 class GitPulseLogo extends StatelessWidget {
   final double size;
   final Color color;
@@ -181,9 +178,7 @@ class AnimatedHeaderBackground extends StatelessWidget {
   }
 }
 
-/// Header title widget for GitPulse.
-///
-/// Displays the custom [GitPulseLogo], title, and version badge.
+/// Header bar with app logo, title, and version.
 class AnimatedAppHeader extends StatelessWidget {
   const AnimatedAppHeader({super.key});
 
@@ -228,7 +223,7 @@ class AnimatedAppHeader extends StatelessWidget {
 
   Widget _buildTitle() {
     return Text(
-      'GitPulse',
+      'Kontri',
       style: TextStyle(
         color: AppTheme.textPrimary,
         fontWeight: FontWeight.w700,

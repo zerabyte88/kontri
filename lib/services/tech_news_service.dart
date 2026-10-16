@@ -282,7 +282,7 @@ class TechNewsService {
           description: 'Komunitas pengembang global beralih ke model dan tooling open-source dengan dukungan komunitas yang kuat.',
           url: 'https://github.com/trending',
           coverImage: null,
-          authorName: 'GitPulse Tech Digest',
+          authorName: 'Kontri Tech Digest',
           authorAvatar: null,
           publishedDate: 'Hari ini',
           readingTimeMinutes: 4,

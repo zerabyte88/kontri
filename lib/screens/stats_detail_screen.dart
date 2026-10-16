@@ -351,11 +351,7 @@ GitHub: https://github.com/${u.login}
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.workspace_premium_rounded,
-            size: 11,
-            color: badgeColor,
-          ),
+          Icon(Icons.workspace_premium_rounded, size: 11, color: badgeColor),
           const SizedBox(width: 3.5),
           Text(
             'Peak: $tierName',
@@ -398,8 +394,9 @@ GitHub: https://github.com/${u.login}
                           ? Icons.auto_awesome_rounded
                           : Icons.military_tech_outlined,
                       size: 16,
-                      color:
-                          isMax ? AppTheme.accentAmber : AppTheme.primaryCyan,
+                      color: isMax
+                          ? AppTheme.accentAmber
+                          : AppTheme.primaryCyan,
                     ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -536,8 +533,8 @@ GitHub: https://github.com/${u.login}
           isDone
               ? Icons.check_circle_outline_rounded
               : (isLagging
-                  ? Icons.warning_amber_rounded
-                  : Icons.radio_button_unchecked_rounded),
+                    ? Icons.warning_amber_rounded
+                    : Icons.radio_button_unchecked_rounded),
           size: 13,
           color: color,
         ),

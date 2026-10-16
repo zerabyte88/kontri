@@ -1,10 +1,10 @@
-name: GitPulse CI/CD Pipeline
+name: Kontri CI/CD Pipeline
 
 on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Release Tag (e.g., v2.0.0)'
+        description: 'Release Tag (e.g., v1.0.0)'
         required: false
         default: ''
       release_name:
@@ -93,9 +93,9 @@ jobs:
           elif [ -n "$PUBSPEC_VER" ]; then
             TAG="v$PUBSPEC_VER"
           else
-            TAG="v2.0.0"
+            TAG="v1.0.0"
           fi
-          APK_NAME="GitPulse-${TAG}-arm64-v8a.apk"
+          APK_NAME="Kontri-${TAG}-arm64-v8a.apk"
           cp build/app/outputs/flutter-apk/app-release.apk "${APK_NAME}"
           sha256sum "${APK_NAME}" > "${APK_NAME}.sha256"
           echo "tag_name=${TAG}" >> $GITHUB_OUTPUT
@@ -114,8 +114,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.prep.outputs.tag_name }}
-          name: ${{ inputs.release_name || format('GitPulse {0} (64-bit ARM)', steps.prep.outputs.tag_name) }}
-          body: ${{ inputs.release_notes || 'Official GitPulse Mobile release bundle compiled exclusively for 64-bit ARM architecture (arm64-v8a).' }}
+          name: ${{ inputs.release_name || format('Kontri {0} (64-bit ARM)', steps.prep.outputs.tag_name) }}
+          body: ${{ inputs.release_notes || 'Official Kontri release bundle compiled exclusively for 64-bit ARM architecture (arm64-v8a).' }}
           generate_release_notes: true
           make_latest: true
           files: |

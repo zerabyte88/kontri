@@ -46,7 +46,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _downloadProgress;
   String? _updateError;
 
-
   @override
   void initState() {
     super.initState();
@@ -116,7 +115,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     widget.onSettingsChanged?.call();
     await _refreshRateLimit();
   }
-
 
   Future<void> _checkForUpdates(AppLocalizations loc) async {
     setState(() {
@@ -514,10 +512,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
-                    AppThemeService.changeTheme(
-                      mode,
-                      widget.storageService,
-                    );
+                    AppThemeService.changeTheme(mode, widget.storageService);
                     widget.onSettingsChanged?.call();
                     if (mounted) setState(() {});
                   },
@@ -928,10 +923,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             decoration: InputDecoration(
               isDense: true,
               hintText: loc.tokenHint,
-              prefixIcon: const Icon(
-                Icons.lock_outline_rounded,
-                size: 16,
-              ),
+              prefixIcon: const Icon(Icons.lock_outline_rounded, size: 16),
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscureToken
@@ -939,8 +931,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       : Icons.visibility_off_outlined,
                   size: 18,
                 ),
-                onPressed: () =>
-                    setState(() => _obscureToken = !_obscureToken),
+                onPressed: () => setState(() => _obscureToken = !_obscureToken),
               ),
             ),
           ),
@@ -987,10 +978,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // About and updates card
-  Widget _buildAboutCard(
-    BuildContext context,
-    AppLocalizations loc,
-  ) {
+  Widget _buildAboutCard(BuildContext context, AppLocalizations loc) {
     return _buildModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1282,10 +1270,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(width: 10),
                 Text(
                   '${loc.downloadingUpdate} ${_downloadProgress ?? ""}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.primaryCyan,
-                  ),
+                  style: TextStyle(fontSize: 12, color: AppTheme.primaryCyan),
                 ),
               ],
             ),
@@ -1294,10 +1279,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 6),
             Text(
               _updateError!,
-              style: TextStyle(
-                fontSize: 11.5,
-                color: AppTheme.accentRed,
-              ),
+              style: TextStyle(fontSize: 11.5, color: AppTheme.accentRed),
             ),
           ],
         ],
