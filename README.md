@@ -5,12 +5,12 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/zerabyte88/gitpulse-mobile/releases"><img src="https://img.shields.io/badge/version-v2.5.0-00e5ff?style=flat&logo=github&logoColor=white&labelColor=0d1117" alt="Version" /></a>
-  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/flutter-%5E3.13-02569b?style=flat&logo=flutter&logoColor=white&labelColor=0d1117" alt="Flutter" /></a>
-  <a href="https://dart.dev"><img src="https://img.shields.io/badge/dart-%5E3.5-0175c2?style=flat&logo=dart&logoColor=white&labelColor=0d1117" alt="Dart" /></a>
-  <img src="https://img.shields.io/badge/platform-Android-3ddc84?style=flat&logo=android&logoColor=white&labelColor=0d1117" alt="Platform" />
-  <img src="https://img.shields.io/badge/arch-arm64--v8a-8b5cf6?style=flat&logo=arm&logoColor=white&labelColor=0d1117" alt="Architecture" />
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-64748b?style=flat&logo=open-source-initiative&logoColor=white&labelColor=0d1117" alt="License" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse-mobile/releases"><img src="https://img.shields.io/badge/version-v2.5.0-00e5ff?style=flat&logo=github&logoColor=white&labelColor=0d1117" alt="Version" height="26" /></a>
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/flutter-%5E3.13-02569b?style=flat&logo=flutter&logoColor=white&labelColor=0d1117" alt="Flutter" height="26" /></a>
+  <a href="https://dart.dev"><img src="https://img.shields.io/badge/dart-%5E3.5-0175c2?style=flat&logo=dart&logoColor=white&labelColor=0d1117" alt="Dart" height="26" /></a>
+  <img src="https://img.shields.io/badge/platform-Android-3ddc84?style=flat&logo=android&logoColor=white&labelColor=0d1117" alt="Platform" height="26" />
+  <img src="https://img.shields.io/badge/arch-arm64--v8a-8b5cf6?style=flat&logo=arm&logoColor=white&labelColor=0d1117" alt="Architecture" height="26" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-64748b?style=flat&logo=open-source-initiative&logoColor=white&labelColor=0d1117" alt="License" height="26" /></a>
 </p>
 
 <br/>
@@ -35,14 +35,27 @@
 
 ## Contribution Tiers
 
-| Tier | Badge Title | Criteria |
-| :--- | :--- | :--- |
-| **Tier 1** | Mythic Archmage | $\ge$ 1,000 contributions this year **and** (Streak $\ge$ 30d or Longest Streak $\ge$ 60d) |
-| **Tier 2** | Diamond Vanguard | $\ge$ 500 contributions this year **and** (Streak $\ge$ 21d or Longest Streak $\ge$ 45d) |
-| **Tier 3** | Platinum Artisan | $\ge$ 250 contributions this year **and** (Streak $\ge$ 7d or Longest Streak $\ge$ 14d) |
-| **Tier 4** | Gold Adventurer | $\ge$ 125 contributions this year **or** Streak $\ge$ 14d **or** Longest Streak $\ge$ 21d |
-| **Tier 5** | Silver Explorer | $\ge$ 20 contributions this year **or** $\ge$ 30 total contributions |
-| **Tier 6** | Bronze Novice | Default status / fewer contributions than Tier 5 |
+Tiers are calculated over a **rolling 365-day window**, so your rank never resets on January 1st. Tiers are checked from top to bottom, and the first tier whose criteria are **both** met is awarded.
+
+| Tier | Badge Title | Contributions (last 365 days) | Active days (last 365 days) |
+| :--- | :--- | ---: | ---: |
+| **Tier 1** | Mythic Archmage | ≥ 1,000 | ≥ 200 |
+| **Tier 2** | Diamond Vanguard | ≥ 500 | ≥ 130 |
+| **Tier 3** | Platinum Artisan | ≥ 250 | ≥ 70 |
+| **Tier 4** | Gold Adventurer | ≥ 125 | ≥ 35 |
+| **Tier 5** | Silver Explorer | ≥ 50 | ≥ 10 |
+| **Tier 6** | Bronze Novice | Default | Default |
+
+### Definitions
+
+- **Contribution**: any contribution counted in the GitHub contribution calendar (commits, pull requests, issues, code reviews).
+- **Active day**: a calendar day with at least one contribution.
+
+### Rules
+
+- Every tier requires **both** conditions, so a burst of contributions on a small number of days cannot skip tiers.
+- The window is strictly the last 365 calendar days relative to today; activity older than 365 days drops out of the calculation.
+- Streaks are still tracked and shown on the dashboard, but **do not affect tiers** (active days reward consistency without penalizing a single missed day).
 
 ---
 

@@ -17,6 +17,66 @@ class CommitTitleInfo {
   String get cleanTitle {
     return title.replaceAll(RegExp(r'^[^\w\s]+\s*'), '').trim();
   }
+
+  static CommitTitleInfo getInfoForTier(int tier) {
+    switch (tier) {
+      case 1:
+        return const CommitTitleInfo(
+          title: 'Mythic Archmage',
+          levelName: 'Sangat Rajin (Master)',
+          badgeText: 'Tier: Mythic',
+          tier: 1,
+          description:
+              'Kekuatan magis kode tak tertandingi! Konsistensi mutlak tanpa putus.',
+        );
+      case 2:
+        return const CommitTitleInfo(
+          title: 'Diamond Vanguard',
+          levelName: 'Sangat Rajin',
+          badgeText: 'Tier: Diamond',
+          tier: 2,
+          description:
+              'Garda terdepan pengembangan perangkat lunak, aktif meluncurkan commit.',
+        );
+      case 3:
+        return const CommitTitleInfo(
+          title: 'Platinum Artisan',
+          levelName: 'Rajin & Stabil',
+          badgeText: 'Tier: Platinum',
+          tier: 3,
+          description:
+              'Mahir menempa karya kode dengan ritme yang konsisten dan stabil.',
+        );
+      case 4:
+        return const CommitTitleInfo(
+          title: 'Gold Adventurer',
+          levelName: 'Commit Terkadang',
+          badgeText: 'Tier: Gold',
+          tier: 4,
+          description:
+              'Menjelajah berbagai proyek kode di sela petualangan dan waktu senggang.',
+        );
+      case 5:
+        return const CommitTitleInfo(
+          title: 'Silver Explorer',
+          levelName: 'Jarang Commit',
+          badgeText: 'Tier: Silver',
+          tier: 5,
+          description:
+              'Penjelajah santai yang mencatat commit saat menemukan inspirasi baru.',
+        );
+      case 6:
+      default:
+        return const CommitTitleInfo(
+          title: 'Bronze Novice',
+          levelName: 'Belum Aktif',
+          badgeText: 'Tier: Bronze',
+          tier: 6,
+          description:
+              'Petualang baru di dunia open source. Nyalakan streak pertamamu!',
+        );
+    }
+  }
 }
 
 class ContributionStats {
@@ -27,6 +87,14 @@ class ContributionStats {
   final int totalContributions;
   final CommitTitleInfo commitTitle;
   final Map<String, int> yearlyTotals;
+  final int rolling365Contributions;
+  final int rolling365ActiveDays;
+  final CommitTitleInfo peakTitle;
+  final double nextTierProgress;
+  final String? nextTierLaggingMetric;
+  final int nextTierContributionsRequired;
+  final int nextTierActiveDaysRequired;
+  final String? nextTierName;
 
   const ContributionStats({
     required this.thisYearContributions,
@@ -36,84 +104,177 @@ class ContributionStats {
     required this.totalContributions,
     required this.commitTitle,
     required this.yearlyTotals,
-  });
+    this.rolling365Contributions = 0,
+    this.rolling365ActiveDays = 0,
+    CommitTitleInfo? peakTitle,
+    this.nextTierProgress = 1.0,
+    this.nextTierLaggingMetric,
+    this.nextTierContributionsRequired = 0,
+    this.nextTierActiveDaysRequired = 0,
+    this.nextTierName,
+  }) : peakTitle = peakTitle ?? commitTitle;
 
-  /// Evaluates commit titles based on user's streak and contribution activity:
-  /// - Rajin Commit (Tier 1 & 2)
-  /// - Commit Terkadang (Tier 3 & 4)
-  /// - Jarang Commit / Belum Aktif (Tier 5 & 6)
-  static CommitTitleInfo determineTitle({
-    required int currentStreak,
-    required int longestStreak,
-    required int thisYearContributions,
-    required int totalContributions,
+  ContributionStats copyWith({
+    int? thisYearContributions,
+    int? lastYearContributions,
+    int? currentStreak,
+    int? longestStreak,
+    int? totalContributions,
+    CommitTitleInfo? commitTitle,
+    Map<String, int>? yearlyTotals,
+    int? rolling365Contributions,
+    int? rolling365ActiveDays,
+    CommitTitleInfo? peakTitle,
+    double? nextTierProgress,
+    String? nextTierLaggingMetric,
+    int? nextTierContributionsRequired,
+    int? nextTierActiveDaysRequired,
+    String? nextTierName,
   }) {
-    // Tier 1: Mythic
-    if (thisYearContributions >= 1000 &&
-        (currentStreak >= 30 || longestStreak >= 60)) {
-      return const CommitTitleInfo(
-        title: 'Mythic Archmage',
-        levelName: 'Sangat Rajin (Master)',
-        badgeText: 'Tier: Mythic',
-        tier: 1,
-        description: 'Kekuatan magis kode tak tertandingi! Konsistensi mutlak tanpa putus.',
+    return ContributionStats(
+      thisYearContributions:
+          thisYearContributions ?? this.thisYearContributions,
+      lastYearContributions:
+          lastYearContributions ?? this.lastYearContributions,
+      currentStreak: currentStreak ?? this.currentStreak,
+      longestStreak: longestStreak ?? this.longestStreak,
+      totalContributions: totalContributions ?? this.totalContributions,
+      commitTitle: commitTitle ?? this.commitTitle,
+      yearlyTotals: yearlyTotals ?? this.yearlyTotals,
+      rolling365Contributions:
+          rolling365Contributions ?? this.rolling365Contributions,
+      rolling365ActiveDays: rolling365ActiveDays ?? this.rolling365ActiveDays,
+      peakTitle: peakTitle ?? this.peakTitle,
+      nextTierProgress: nextTierProgress ?? this.nextTierProgress,
+      nextTierLaggingMetric:
+          nextTierLaggingMetric ?? this.nextTierLaggingMetric,
+      nextTierContributionsRequired:
+          nextTierContributionsRequired ?? this.nextTierContributionsRequired,
+      nextTierActiveDaysRequired:
+          nextTierActiveDaysRequired ?? this.nextTierActiveDaysRequired,
+      nextTierName: nextTierName ?? this.nextTierName,
+    );
+  }
+
+  /// Calculates progress towards next tier using dual conditions.
+  static ({
+    double progress,
+    String? laggingMetric,
+    int contribRequired,
+    int activeRequired,
+    String? nextTierName,
+  }) calculateNextTierProgress({
+    required int currentTier,
+    required int rollingContributions,
+    required int rollingActiveDays,
+  }) {
+    if (currentTier <= 1) {
+      return (
+        progress: 1.0,
+        laggingMetric: null,
+        contribRequired: 1000,
+        activeRequired: 200,
+        nextTierName: null,
       );
     }
-    // Tier 2: Diamond
-    else if (thisYearContributions >= 500 &&
-        (currentStreak >= 21 || longestStreak >= 45)) {
-      return const CommitTitleInfo(
-        title: 'Diamond Vanguard',
-        levelName: 'Sangat Rajin',
-        badgeText: 'Tier: Diamond',
-        tier: 2,
-        description: 'Garda terdepan pengembangan perangkat lunak, aktif meluncurkan commit.',
-      );
+
+    final targetTier = currentTier - 1;
+    final int targetContrib;
+    final int targetActive;
+    final String targetName;
+
+    switch (targetTier) {
+      case 1:
+        targetContrib = 1000;
+        targetActive = 200;
+        targetName = 'Mythic Archmage';
+        break;
+      case 2:
+        targetContrib = 500;
+        targetActive = 130;
+        targetName = 'Diamond Vanguard';
+        break;
+      case 3:
+        targetContrib = 250;
+        targetActive = 70;
+        targetName = 'Platinum Artisan';
+        break;
+      case 4:
+        targetContrib = 125;
+        targetActive = 35;
+        targetName = 'Gold Adventurer';
+        break;
+      case 5:
+      default:
+        targetContrib = 50;
+        targetActive = 10;
+        targetName = 'Silver Explorer';
+        break;
     }
-    // Tier 3: Platinum
-    else if (thisYearContributions >= 250 &&
-        (currentStreak >= 7 || longestStreak >= 14)) {
-      return const CommitTitleInfo(
-        title: 'Platinum Artisan',
-        levelName: 'Rajin & Stabil',
-        badgeText: 'Tier: Platinum',
-        tier: 3,
-        description:
-            'Mahir menempa karya kode dengan ritme yang konsisten dan stabil.',
-      );
+
+    final contribRatio =
+        (rollingContributions / targetContrib).clamp(0.0, 1.0);
+    final activeRatio =
+        (rollingActiveDays / targetActive).clamp(0.0, 1.0);
+    final double progress =
+        contribRatio < activeRatio ? contribRatio : activeRatio;
+
+    String? lagging;
+    if (progress < 1.0) {
+      if (contribRatio < activeRatio) {
+        lagging = 'contributions';
+      } else if (activeRatio < contribRatio) {
+        lagging = 'activeDays';
+      } else {
+        lagging = 'contributions';
+      }
     }
-    // Tier 4: Gold
-    else if (thisYearContributions >= 125 ||
-        currentStreak >= 14 ||
-        longestStreak >= 21) {
-      return const CommitTitleInfo(
-        title: 'Gold Adventurer',
-        levelName: 'Commit Terkadang',
-        badgeText: 'Tier: Gold',
-        tier: 4,
-        description: 'Menjelajah berbagai proyek kode di sela petualangan dan waktu senggang.',
-      );
-    }
-    // Tier 5: Silver
-    else if (thisYearContributions >= 20 || totalContributions >= 30) {
-      return const CommitTitleInfo(
-        title: 'Silver Explorer',
-        levelName: 'Jarang Commit',
-        badgeText: 'Tier: Silver',
-        tier: 5,
-        description: 'Penjelajah santai yang mencatat commit saat menemukan inspirasi baru.',
-      );
-    }
-    // Tier 6: Bronze
-    else {
-      return const CommitTitleInfo(
-        title: 'Bronze Novice',
-        levelName: 'Belum Aktif',
-        badgeText: 'Tier: Bronze',
-        tier: 6,
-        description:
-            'Petualang baru di dunia open source. Nyalakan streak pertamamu!',
-      );
+
+    return (
+      progress: progress,
+      laggingMetric: lagging,
+      contribRequired: targetContrib,
+      activeRequired: targetActive,
+      nextTierName: targetName,
+    );
+  }
+
+  /// Evaluates commit titles based on a rolling 365-day window:
+  /// Both contributions and active days criteria must be met.
+  static CommitTitleInfo determineTitle({
+    int currentStreak = 0,
+    int longestStreak = 0,
+    int thisYearContributions = 0,
+    int totalContributions = 0,
+    int? rollingContributions,
+    int? rollingActiveDays,
+  }) {
+    final rContrib = rollingContributions ?? thisYearContributions;
+    final rActive = rollingActiveDays ??
+        (rContrib >= 1000 && (currentStreak >= 30 || longestStreak >= 60)
+            ? 200
+            : rContrib >= 500 && (currentStreak >= 21 || longestStreak >= 45)
+                ? 130
+                : rContrib >= 250 && (currentStreak >= 7 || longestStreak >= 14)
+                    ? 70
+                    : rContrib >= 125
+                        ? 35
+                        : rContrib >= 50
+                            ? 10
+                            : 0);
+
+    if (rContrib >= 1000 && rActive >= 200) {
+      return CommitTitleInfo.getInfoForTier(1);
+    } else if (rContrib >= 500 && rActive >= 130) {
+      return CommitTitleInfo.getInfoForTier(2);
+    } else if (rContrib >= 250 && rActive >= 70) {
+      return CommitTitleInfo.getInfoForTier(3);
+    } else if (rContrib >= 125 && rActive >= 35) {
+      return CommitTitleInfo.getInfoForTier(4);
+    } else if (rContrib >= 50 && rActive >= 10) {
+      return CommitTitleInfo.getInfoForTier(5);
+    } else {
+      return CommitTitleInfo.getInfoForTier(6);
     }
   }
 
@@ -226,11 +387,57 @@ class ContributionStats {
     final current = streaks.current;
     final longest = streaks.longest;
 
+    final todayUtc = DateTime.utc(now.year, now.month, now.day);
+    final windowStart = todayUtc.subtract(const Duration(days: 364));
+
+    int rollingContrib = 0;
+    int rollingActive = 0;
+    final Map<int, ({int contrib, int active})> yearlyBreakdown = {};
+
+    for (final entry in dayCounts.entries) {
+      final date = entry.key;
+      final count = entry.value;
+
+      if (!date.isBefore(windowStart) && !date.isAfter(todayUtc)) {
+        rollingContrib += count;
+        if (count > 0) {
+          rollingActive++;
+        }
+      }
+
+      final y = date.year;
+      final existing = yearlyBreakdown[y] ?? (contrib: 0, active: 0);
+      yearlyBreakdown[y] = (
+        contrib: existing.contrib + count,
+        active: existing.active + (count > 0 ? 1 : 0),
+      );
+    }
+
     final title = determineTitle(
       currentStreak: current,
       longestStreak: longest,
       thisYearContributions: thisYear,
       totalContributions: total,
+      rollingContributions: rollingContrib,
+      rollingActiveDays: rollingActive,
+    );
+
+    int peakTierNum = title.tier;
+    for (final entry in yearlyBreakdown.entries) {
+      final yearTier = determineTitle(
+        rollingContributions: entry.value.contrib,
+        rollingActiveDays: entry.value.active,
+      );
+      if (yearTier.tier < peakTierNum) {
+        peakTierNum = yearTier.tier;
+      }
+    }
+    final peakTitle = CommitTitleInfo.getInfoForTier(peakTierNum);
+
+    final progressInfo = calculateNextTierProgress(
+      currentTier: title.tier,
+      rollingContributions: rollingContrib,
+      rollingActiveDays: rollingActive,
     );
 
     return ContributionStats(
@@ -241,6 +448,14 @@ class ContributionStats {
       totalContributions: total,
       commitTitle: title,
       yearlyTotals: yearly,
+      rolling365Contributions: rollingContrib,
+      rolling365ActiveDays: rollingActive,
+      peakTitle: peakTitle,
+      nextTierProgress: progressInfo.progress,
+      nextTierLaggingMetric: progressInfo.laggingMetric,
+      nextTierContributionsRequired: progressInfo.contribRequired,
+      nextTierActiveDaysRequired: progressInfo.activeRequired,
+      nextTierName: progressInfo.nextTierName,
     );
   }
 
@@ -288,11 +503,36 @@ class ContributionStats {
     final longestStreak = streaks.longest;
     final total = yearlyCounts.values.fold(0, (sum, count) => sum + count);
 
+    final todayUtc = DateTime.utc(now.year, now.month, now.day);
+    final windowStart = todayUtc.subtract(const Duration(days: 364));
+
+    int rollingContrib = 0;
+    int rollingActive = 0;
+    for (final entry in dayCounts.entries) {
+      if (!entry.key.isBefore(windowStart) && !entry.key.isAfter(todayUtc)) {
+        rollingContrib += entry.value;
+        if (entry.value > 0) rollingActive++;
+      }
+    }
+
+    if (rollingContrib == 0 && thisYearCount > 0) {
+      rollingContrib = thisYearCount;
+      rollingActive = (thisYearCount / 3).round().clamp(1, 365);
+    }
+
     final title = determineTitle(
       currentStreak: currentStreak,
       longestStreak: longestStreak,
       thisYearContributions: thisYearCount,
       totalContributions: total,
+      rollingContributions: rollingContrib,
+      rollingActiveDays: rollingActive,
+    );
+
+    final progressInfo = calculateNextTierProgress(
+      currentTier: title.tier,
+      rollingContributions: rollingContrib,
+      rollingActiveDays: rollingActive,
     );
 
     return ContributionStats(
@@ -308,6 +548,14 @@ class ContributionStats {
               currentYear.toString(): thisYearCount,
               lastYear.toString(): lastYearCount,
             },
+      rolling365Contributions: rollingContrib,
+      rolling365ActiveDays: rollingActive,
+      peakTitle: title,
+      nextTierProgress: progressInfo.progress,
+      nextTierLaggingMetric: progressInfo.laggingMetric,
+      nextTierContributionsRequired: progressInfo.contribRequired,
+      nextTierActiveDaysRequired: progressInfo.activeRequired,
+      nextTierName: progressInfo.nextTierName,
     );
   }
 }

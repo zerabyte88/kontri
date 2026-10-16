@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../localization/app_localizations.dart';
+import '../models/contribution_stats.dart';
 import '../models/github_repo.dart';
 import '../models/user_stats.dart';
 import '../services/github_api_service.dart';
@@ -328,6 +329,231 @@ GitHub: https://github.com/${u.login}
     );
   }
 
+  Widget _buildPeakTierBadge(
+    CommitTitleInfo peakTitle,
+    CommitTitleInfo currentTitle,
+    AppLocalizations loc,
+  ) {
+    final isHigher = peakTitle.tier < currentTitle.tier;
+    final tierName = loc.getCommitTierCleanTitle(peakTitle.tier);
+    final badgeColor = isHigher ? AppTheme.accentAmber : AppTheme.primaryViolet;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+      decoration: BoxDecoration(
+        color: badgeColor.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: badgeColor.withValues(alpha: 0.35),
+          width: 0.8,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.workspace_premium_rounded,
+            size: 11,
+            color: badgeColor,
+          ),
+          const SizedBox(width: 3.5),
+          Text(
+            'Peak: $tierName',
+            style: TextStyle(
+              color: badgeColor,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTierProgressCard(
+    ContributionStats cStats,
+    AppLocalizations loc,
+  ) {
+    final currentTier = cStats.commitTitle.tier;
+    final isMax = currentTier <= 1;
+    final targetTier = currentTier - 1;
+    final targetName = isMax ? '' : loc.getCommitTierCleanTitle(targetTier);
+    final percent = (cStats.nextTierProgress * 100).toInt();
+
+    return GlassCard(
+      enableBlur: false,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      isMax
+                          ? Icons.auto_awesome_rounded
+                          : Icons.military_tech_outlined,
+                      size: 16,
+                      color:
+                          isMax ? AppTheme.accentAmber : AppTheme.primaryCyan,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        isMax
+                            ? 'Highest Tier Achieved'
+                            : 'Next Rank: $targetName',
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: (isMax ? AppTheme.accentAmber : AppTheme.primaryCyan)
+                      .withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: (isMax ? AppTheme.accentAmber : AppTheme.primaryCyan)
+                        .withValues(alpha: 0.3),
+                    width: 0.8,
+                  ),
+                ),
+                child: Text(
+                  '$percent%',
+                  style: TextStyle(
+                    color: isMax ? AppTheme.accentAmber : AppTheme.primaryCyan,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: isMax ? 1.0 : cStats.nextTierProgress,
+              minHeight: 6,
+              backgroundColor: AppTheme.surfaceElevated,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isMax ? AppTheme.accentAmber : AppTheme.primaryCyan,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          if (isMax)
+            Text(
+              '${cStats.rolling365Contributions} contributions across ${cStats.rolling365ActiveDays} active days (last 365d)',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w500,
+              ),
+            )
+          else ...[
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 12,
+              runSpacing: 6,
+              children: [
+                _buildProgressMetricItem(
+                  label: 'Contributions',
+                  current: cStats.rolling365Contributions,
+                  targetRequired: cStats.nextTierContributionsRequired,
+                  isLagging: cStats.nextTierLaggingMetric == 'contributions',
+                ),
+                _buildProgressMetricItem(
+                  label: 'Active Days',
+                  current: cStats.rolling365ActiveDays,
+                  targetRequired: cStats.nextTierActiveDaysRequired,
+                  isLagging: cStats.nextTierLaggingMetric == 'activeDays',
+                  unit: 'd',
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  size: 12,
+                  color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    cStats.nextTierLaggingMetric == 'activeDays'
+                        ? 'Need ${(cStats.nextTierActiveDaysRequired - cStats.rolling365ActiveDays).clamp(0, 365)} more active days (last 365d) to rank up'
+                        : 'Need ${(cStats.nextTierContributionsRequired - cStats.rolling365Contributions).clamp(0, 10000)} more contributions (last 365d) to rank up',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressMetricItem({
+    required String label,
+    required int current,
+    required int targetRequired,
+    required bool isLagging,
+    String unit = '',
+  }) {
+    final isDone = current >= targetRequired;
+    final color = isDone
+        ? AppTheme.accentGreen
+        : (isLagging ? AppTheme.accentAmber : AppTheme.textPrimary);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          isDone
+              ? Icons.check_circle_outline_rounded
+              : (isLagging
+                  ? Icons.warning_amber_rounded
+                  : Icons.radio_button_unchecked_rounded),
+          size: 13,
+          color: color,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '$label: $current/$targetRequired$unit',
+          style: TextStyle(
+            color: color,
+            fontSize: 11.5,
+            fontWeight: isLagging ? FontWeight.w600 : FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
@@ -500,6 +726,12 @@ GitHub: https://github.com/${u.login}
                                           fontSize: 11,
                                           showBadgeContainer: true,
                                         ),
+                                        if (cStats.peakTitle.tier <= 5)
+                                          _buildPeakTierBadge(
+                                            cStats.peakTitle,
+                                            titleInfo,
+                                            loc,
+                                          ),
                                       ],
                                     ),
                                     const SizedBox(height: 4),
@@ -800,6 +1032,8 @@ GitHub: https://github.com/${u.login}
                         ],
                       ),
                     ),
+                    const SizedBox(height: 10),
+                    _buildTierProgressCard(cStats, loc),
                     const SizedBox(height: 20),
 
                     // Key Metrics Grid

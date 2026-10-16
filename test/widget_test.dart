@@ -63,89 +63,98 @@ void main() {
       expect(user.followers, 20);
     });
 
-    test('ContributionStats determines commit titles correctly for different frequencies', () {
-      // 1. Sangat Rajin Ekstrem (Mythic Archmage)
-      // Wajib: thisYear >= 1000 && (currentStreak >= 30 || longestStreak >= 60)
+    test('ContributionStats determines commit titles correctly for rolling 365-day dual conditions', () {
+      // 1. Mythic Archmage: rollingContributions >= 1000 AND rollingActiveDays >= 200
       final mythic = ContributionStats.determineTitle(
-        currentStreak: 32,
-        longestStreak: 65,
-        thisYearContributions: 1050,
-        totalContributions: 1500,
+        rollingContributions: 1050,
+        rollingActiveDays: 205,
       );
+      expect(mythic.tier, 1);
       expect(mythic.title, contains('Mythic Archmage'));
-      expect(mythic.levelName, contains('Sangat Rajin'));
 
-      // Gagal Mythic jika volume tinggi tapi streak tidak cukup -> turun ke Diamond
-      final notMythic = ContributionStats.determineTitle(
-        currentStreak: 20,
-        longestStreak: 25,
-        thisYearContributions: 1200,
-        totalContributions: 1500,
+      // Burst prevention: 1500 contributions on only 20 active days drops to Silver Explorer (Tier 5)
+      // because Tier 4 requires active days >= 35
+      final burstAttempt = ContributionStats.determineTitle(
+        rollingContributions: 1500,
+        rollingActiveDays: 20,
       );
-      expect(notMythic.title, isNot(contains('Mythic Archmage')));
+      expect(burstAttempt.tier, 5);
+      expect(burstAttempt.title, contains('Silver Explorer'));
 
-      // 2. Sangat Rajin (Diamond Vanguard)
-      // Wajib: thisYear >= 500 && (currentStreak >= 21 || longestStreak >= 45)
+      // 2. Diamond Vanguard: rollingContributions >= 500 AND rollingActiveDays >= 130
       final diamond = ContributionStats.determineTitle(
-        currentStreak: 22,
-        longestStreak: 48,
-        thisYearContributions: 520,
-        totalContributions: 700,
+        rollingContributions: 550,
+        rollingActiveDays: 140,
       );
+      expect(diamond.tier, 2);
       expect(diamond.title, contains('Diamond Vanguard'));
-      expect(diamond.levelName, contains('Sangat Rajin'));
 
-      // 3. Rajin & Stabil (Platinum Artisan)
-      // Wajib: thisYear >= 250 && (currentStreak >= 7 || longestStreak >= 14)
+      // 3. Platinum Artisan: rollingContributions >= 250 AND rollingActiveDays >= 70
       final platinum = ContributionStats.determineTitle(
-        currentStreak: 8,
-        longestStreak: 16,
-        thisYearContributions: 260,
-        totalContributions: 350,
+        rollingContributions: 260,
+        rollingActiveDays: 75,
       );
+      expect(platinum.tier, 3);
       expect(platinum.title, contains('Platinum Artisan'));
 
-      // 4. Terkadang Commit (Gold Adventurer)
-      // Wajib: thisYear >= 125 || currentStreak >= 14 || longestStreak >= 21
+      // 4. Gold Adventurer: rollingContributions >= 125 AND rollingActiveDays >= 35
       final gold = ContributionStats.determineTitle(
-        currentStreak: 15,
-        longestStreak: 22,
-        thisYearContributions: 130,
-        totalContributions: 180,
+        rollingContributions: 130,
+        rollingActiveDays: 40,
       );
+      expect(gold.tier, 4);
       expect(gold.title, contains('Gold Adventurer'));
-      expect(gold.levelName, contains('Commit Terkadang'));
 
-      // 5. Jarang Commit (Silver Explorer)
-      // Wajib: thisYear >= 20 || totalContributions >= 30
+      // 5. Silver Explorer: rollingContributions >= 50 AND rollingActiveDays >= 10
       final silver = ContributionStats.determineTitle(
-        currentStreak: 0,
-        longestStreak: 2,
-        thisYearContributions: 25,
-        totalContributions: 35,
+        rollingContributions: 60,
+        rollingActiveDays: 12,
       );
+      expect(silver.tier, 5);
       expect(silver.title, contains('Silver Explorer'));
-      expect(silver.levelName, contains('Jarang Commit'));
 
-      // 6. Belum Aktif (Bronze Novice)
-      // < 20 thisYear && < 30 total
+      // 6. Bronze Novice: Default (< 50 contributions or < 10 active days)
       final bronze = ContributionStats.determineTitle(
-        currentStreak: 0,
-        longestStreak: 0,
-        thisYearContributions: 0,
-        totalContributions: 0,
+        rollingContributions: 40,
+        rollingActiveDays: 8,
       );
+      expect(bronze.tier, 6);
       expect(bronze.title, contains('Bronze Novice'));
-      expect(bronze.levelName, contains('Belum Aktif'));
+    });
 
-      // Akun dengan 5 commit tahun ini & 10 total tetap berada di Bronze
-      final lowCommitBronze = ContributionStats.determineTitle(
-        currentStreak: 1,
-        longestStreak: 2,
-        thisYearContributions: 5,
-        totalContributions: 10,
+    test('ContributionStats calculates next tier progress and identifies lagging metric', () {
+      // User in Tier 4 (Gold Adventurer), target Tier 3 (Platinum Artisan: 250 contrib, 70 active days)
+      // Having 250 contrib (100%) but only 35 active days (50%) -> progress is 50%, lagging is activeDays
+      final progressActiveLag = ContributionStats.calculateNextTierProgress(
+        currentTier: 4,
+        rollingContributions: 250,
+        rollingActiveDays: 35,
       );
-      expect(lowCommitBronze.title, contains('Bronze Novice'));
+      expect(progressActiveLag.progress, 0.5);
+      expect(progressActiveLag.laggingMetric, 'activeDays');
+      expect(progressActiveLag.contribRequired, 250);
+      expect(progressActiveLag.activeRequired, 70);
+      expect(progressActiveLag.nextTierName, 'Platinum Artisan');
+
+      // User in Tier 5 (Silver Explorer), target Tier 4 (Gold Adventurer: 125 contrib, 35 active days)
+      // Having 50 contrib (40%) and 30 active days (85.7%) -> progress is 40%, lagging is contributions
+      final progressContribLag = ContributionStats.calculateNextTierProgress(
+        currentTier: 5,
+        rollingContributions: 50,
+        rollingActiveDays: 30,
+      );
+      expect(progressContribLag.progress, closeTo(0.4, 0.01));
+      expect(progressContribLag.laggingMetric, 'contributions');
+
+      // User in Tier 1 (Mythic Archmage) has max progress 1.0 and no next tier
+      final progressMax = ContributionStats.calculateNextTierProgress(
+        currentTier: 1,
+        rollingContributions: 1200,
+        rollingActiveDays: 220,
+      );
+      expect(progressMax.progress, 1.0);
+      expect(progressMax.laggingMetric, isNull);
+      expect(progressMax.nextTierName, isNull);
     });
 
     test('ContributionStats calculates active and longest streaks accurately across dates', () {

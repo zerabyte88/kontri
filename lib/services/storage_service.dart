@@ -372,4 +372,21 @@ class StorageService {
     await _prefs.remove('$_keyHttpEtagPrefix$cleanKey');
     await _prefs.remove('$_keyHttpTimePrefix$cleanKey');
   }
+
+  // Peak Contribution Tier Persistence
+  static const String _keyPeakTierPrefix = 'gitpulse_peak_tier_';
+
+  int getPeakTier(String username) {
+    final clean = username.trim().toLowerCase();
+    return _prefs.getInt('$_keyPeakTierPrefix$clean') ?? 6;
+  }
+
+  Future<void> savePeakTier(String username, int tier) async {
+    final clean = username.trim().toLowerCase();
+    final current = getPeakTier(clean);
+    if (tier < current) {
+      await _prefs.setInt('$_keyPeakTierPrefix$clean', tier);
+    }
+  }
 }
+
