@@ -6,7 +6,7 @@ class AppConfig {
   static const String buildNumber = '1';
   static const String fullVersion = 'v1.0.0 (Build 1)';
   static const String releaseTag = 'v1.0.0';
-  static const String githubRepoUrl = 'https://github.com/zerabyte88/gitpulse';
+  static const String githubRepoUrl = 'https://github.com/zerabyte88/kontri';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';
   static const String developerAvatarUrl =
