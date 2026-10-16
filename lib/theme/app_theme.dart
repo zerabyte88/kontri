@@ -7,7 +7,7 @@ class AppConfig {
   static const String fullVersion = 'v2.5.1 (Build 28)';
   static const String releaseTag = 'v2.5.1';
   static const String githubRepoUrl =
-      'https://github.com/zerabyte88/gitpulse-mobile';
+      'https://github.com/zerabyte88/gitpulse';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';
   static const String developerAvatarUrl =

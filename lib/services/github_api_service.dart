@@ -53,7 +53,7 @@ class GitHubApiService {
   Map<String, String> get _headers {
     final headers = <String, String>{
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'GitPulse-Mobile-App',
+      'User-Agent': 'GitPulse-App',
     };
     if (personalAccessToken != null && personalAccessToken!.trim().isNotEmpty) {
       headers['Authorization'] = 'Bearer ${personalAccessToken!.trim()}';

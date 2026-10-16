@@ -29,7 +29,7 @@ class AppUpdateInfo {
 
 class UpdateService {
   static const String _releasesUrl =
-      'https://api.github.com/repos/zerabyte88/gitpulse-mobile/releases/latest';
+      'https://api.github.com/repos/zerabyte88/gitpulse/releases/latest';
 
   final http.Client _client;
 
@@ -60,7 +60,7 @@ class UpdateService {
   Future<AppUpdateInfo> checkForUpdate({String? personalAccessToken}) async {
     final headers = <String, String>{
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'GitPulseMobile/${AppConfig.appVersion}',
+      'User-Agent': 'GitPulse/${AppConfig.appVersion}',
     };
     if (personalAccessToken != null && personalAccessToken.trim().isNotEmpty) {
       headers['Authorization'] = 'Bearer ${personalAccessToken.trim()}';

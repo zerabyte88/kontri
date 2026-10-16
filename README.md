@@ -1,11 +1,11 @@
-# GitPulse Mobile
+# GitPulse
 
 <p align="center">
   <img src="assets/icons/app_icon.jpg" alt="GitPulse Icon" width="100" style="border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/zerabyte88/gitpulse-mobile/releases"><img src="https://img.shields.io/badge/Release-v2.5.1-06b6d4?style=flat&logo=github&logoColor=white&labelColor=0d1117" alt="Release" height="24" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse/releases"><img src="https://img.shields.io/badge/Release-v2.5.1-06b6d4?style=flat&logo=github&logoColor=white&labelColor=0d1117" alt="Release" height="24" /></a>
   <img src="https://img.shields.io/badge/Platform-Android-10b981?style=flat&logo=android&logoColor=white&labelColor=0d1117" alt="Platform" height="24" />
   <img src="https://img.shields.io/badge/Arch-arm64--v8a-8b5cf6?style=flat&logo=arm&logoColor=white&labelColor=0d1117" alt="Architecture" height="24" />
   <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.13+-02569b?style=flat&logo=flutter&logoColor=white&labelColor=0d1117" alt="Flutter" height="24" /></a>
@@ -14,7 +14,7 @@
 
 <br/>
 
-**GitPulse Mobile** is an Android application built with Flutter that provides GitHub profile statistics, contribution analytics, and repository exploration directly from your mobile device.
+**GitPulse** is an Android application built with Flutter that provides GitHub profile statistics, contribution analytics, and repository exploration directly from your mobile device.
 
 ---
 
@@ -83,8 +83,8 @@ Tiers are calculated over a **rolling 365-day window**, so your rank never reset
 
 ```bash
 # Clone the repository
-git clone https://github.com/zerabyte88/gitpulse-mobile.git
-cd gitpulse-mobile
+git clone https://github.com/zerabyte88/gitpulse.git
+cd gitpulse
 
 # Fetch dependencies
 flutter pub get
