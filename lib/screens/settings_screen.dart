@@ -46,8 +46,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _downloadProgress;
   String? _updateError;
 
-  int _amoledTapCount = 0;
-  DateTime? _lastAmoledTap;
 
   @override
   void initState() {
@@ -119,57 +117,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _refreshRateLimit();
   }
 
-  void _onAmoledTapped(AppLocalizations loc) async {
-    final now = DateTime.now();
-    if (_lastAmoledTap == null ||
-        now.difference(_lastAmoledTap!) > const Duration(seconds: 4)) {
-      _amoledTapCount = 1;
-    } else {
-      _amoledTapCount++;
-    }
-    _lastAmoledTap = now;
-
-    if (AppThemeService.currentTheme != AppThemeMode.amoled) {
-      await AppThemeService.changeTheme(
-        AppThemeMode.amoled,
-        widget.storageService,
-      );
-      widget.onSettingsChanged?.call();
-      if (mounted) setState(() {});
-    }
-
-    // 10 Taps unlock AMOLED Sakura
-    if (_amoledTapCount >= 10) {
-      _amoledTapCount = 0;
-      await AppThemeService.unlockJapaneseTheme(widget.storageService);
-      await AppThemeService.changeTheme(
-        AppThemeMode.amoledJapanese,
-        widget.storageService,
-      );
-      widget.onSettingsChanged?.call();
-      if (!mounted) return;
-      setState(() {});
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Text('🌸 ', style: TextStyle(fontSize: 18)),
-              Expanded(
-                child: Text(
-                  loc.easterEggJapaneseToast,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: const Color(0xFF2D1838),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 4),
-        ),
-      );
-    }
-  }
 
   Future<void> _checkForUpdates(AppLocalizations loc) async {
     setState(() {
@@ -426,9 +373,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final loc = AppLocalizations.of(context);
     final currentLang = AppLanguageService.currentLanguage;
     final currentTheme = AppThemeService.currentTheme;
-    final isJapaneseUnlocked = AppThemeService.isJapaneseUnlocked(
-      widget.storageService,
-    );
     final hasToken =
         widget.storageService.getToken() != null &&
         widget.storageService.getToken()!.trim().isNotEmpty;
@@ -451,11 +395,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'badge': 'AMOLED',
       },
       {
+        'id': AppThemeMode.amoledJapanese,
+        'title': loc.themeAmoledJapanese,
+        'icon': Icons.local_florist_rounded,
+        'accent': const Color(0xFFF472B6),
+        'badge': 'AMOLED',
+      },
+      {
         'id': AppThemeMode.amoledPure,
         'title': loc.themeAmoledPure,
         'icon': Icons.brightness_2_outlined,
         'accent': const Color(0xFF60A5FA),
         'badge': 'STATIC',
+      },
+      {
+        'id': AppThemeMode.light,
+        'title': loc.themeLight,
+        'icon': Icons.light_mode_outlined,
+        'accent': const Color(0xFF0284C7),
+        'badge': 'LIGHT',
       },
       {
         'id': AppThemeMode.cleanLight,
@@ -464,14 +422,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'accent': const Color(0xFF0EA5E9),
         'badge': 'STATIC',
       },
-      if (isJapaneseUnlocked)
-        {
-          'id': AppThemeMode.amoledJapanese,
-          'title': loc.themeAmoledJapanese,
-          'icon': Icons.local_florist_rounded,
-          'accent': const Color(0xFFF472B6),
-          'badge': 'AMOLED',
-        },
     ];
 
     return Scaffold(
@@ -564,16 +514,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
-                    if (mode == AppThemeMode.amoled) {
-                      _onAmoledTapped(loc);
-                    } else {
-                      AppThemeService.changeTheme(
-                        mode,
-                        widget.storageService,
-                      );
-                      widget.onSettingsChanged?.call();
-                      if (mounted) setState(() {});
-                    }
+                    AppThemeService.changeTheme(
+                      mode,
+                      widget.storageService,
+                    );
+                    widget.onSettingsChanged?.call();
+                    if (mounted) setState(() {});
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -671,7 +617,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             valueListenable: AppThemeService.surfaceOpacityNotifier,
             builder: (context, opacity, _) {
               final pct = (opacity * 100).round();
-              final isMax = opacity >= 0.999;
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -704,31 +649,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               color: AppTheme.primaryCyan,
                             ),
                           ),
-                          if (isMax) ...[
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withAlpha(25),
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(
-                                  color: Colors.green.withAlpha(100),
-                                  width: 0.8,
-                                ),
-                              ),
-                              child: Text(
-                                loc.settingsBypassShaderNotice,
-                                style: const TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ),
-                          ],
                         ],
                       ),
                       TextButton(
@@ -1091,14 +1011,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           _buildAboutRow(loc.architectureLabel, loc.architectureValue),
           _buildAboutRow(loc.licenseLabel, AppConfig.license),
-          _buildAboutRow(
-            loc.viewOnGitHub,
-            'zerabyte88/gitpulse-mobile',
-            onTap: () async {
-              final uri = Uri.parse(AppConfig.githubRepoUrl);
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            },
-          ),
           const SizedBox(height: 10),
           Divider(height: 1, color: AppTheme.border.withAlpha(40)),
           const SizedBox(height: 14),
@@ -1194,9 +1106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         uri,
                         mode: LaunchMode.externalApplication,
                       );
-                    } catch (e) {
-                      debugPrint('Could not launch URL: $e');
-                    }
+                    } catch (_) {}
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -1204,28 +1114,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF06B6D4).withAlpha(20),
+                      color: AppTheme.primaryCyan.withValues(alpha: 0.10),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: const Color(0xFF06B6D4).withAlpha(60),
-                        width: 1,
+                        color: AppTheme.primaryCyan.withValues(alpha: 0.35),
+                        width: 0.9,
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.code_rounded,
-                          size: 14,
-                          color: Color(0xFF06B6D4),
+                          Icons.open_in_new_rounded,
+                          size: 13,
+                          color: AppTheme.primaryCyan,
                         ),
-                        SizedBox(width: 5),
+                        const SizedBox(width: 5),
                         Text(
                           'GitHub',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11.5,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF06B6D4),
+                            color: AppTheme.primaryCyan,
                           ),
                         ),
                       ],

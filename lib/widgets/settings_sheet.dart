@@ -88,9 +88,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
   static DateTime? _lastUpdateCheckTime;
   static AppUpdateInfo? _cachedUpdateInfo;
 
-  // Easter Egg State
-  int _amoledTapCount = 0;
-  DateTime? _lastAmoledTap;
 
   @override
   void initState() {
@@ -282,58 +279,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
     await _refreshRateLimit();
   }
 
-  void _onAmoledTapped(AppLocalizations loc) async {
-    final now = DateTime.now();
-    if (_lastAmoledTap == null ||
-        now.difference(_lastAmoledTap!) > const Duration(seconds: 4)) {
-      _amoledTapCount = 1;
-    } else {
-      _amoledTapCount++;
-    }
-    _lastAmoledTap = now;
-
-    // Normal theme switch to AMOLED if not already
-    if (AppThemeService.currentTheme != AppThemeMode.amoled) {
-      await AppThemeService.changeTheme(
-        AppThemeMode.amoled,
-        widget.storageService,
-      );
-      widget.onSettingsChanged?.call();
-      if (mounted) setState(() {});
-    }
-
-    // Easter Egg: 10 Taps unlock AMOLED Jejepangan
-    if (_amoledTapCount >= 10) {
-      _amoledTapCount = 0;
-      await AppThemeService.unlockJapaneseTheme(widget.storageService);
-      await AppThemeService.changeTheme(
-        AppThemeMode.amoledJapanese,
-        widget.storageService,
-      );
-      widget.onSettingsChanged?.call();
-      if (!mounted) return;
-      setState(() {});
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Text('🌸 ', style: TextStyle(fontSize: 18)),
-              Expanded(
-                child: Text(
-                  loc.easterEggJapaneseToast,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: const Color(0xFF2D1838),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 4),
-        ),
-      );
-    }
-  }
 
   Widget _buildAboutInfoRow(String label, String value) {
     return Row(
@@ -377,9 +322,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
 
     final currentLang = AppLanguageService.currentLanguage;
     final currentTheme = AppThemeService.currentTheme;
-    final isJapaneseUnlocked = AppThemeService.isJapaneseUnlocked(
-      widget.storageService,
-    );
 
     return RepaintBoundary(
       child: ValueListenableBuilder<double>(
@@ -643,12 +585,12 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             ),
                             const SizedBox(height: 12),
 
-                            // Theme Options Grid
+                            // Theme Options Grid (6 themes in 3 rows)
                             Column(
                               children: [
                                 Row(
                                   children: [
-                                    // 1. Gelap
+                                    // 1. Snowfall
                                     Expanded(
                                       child: _buildOptionCard(
                                         title: loc.themeDark,
@@ -678,7 +620,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                     ),
                                     const SizedBox(width: 8),
 
-                                    // 2. AMOLED (With Easter Egg tap listener)
+                                    // 2. Night
                                     Expanded(
                                       child: _buildOptionCard(
                                         title: loc.themeAmoled,
@@ -695,7 +637,14 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                         ),
                                         isSelected:
                                             currentTheme == AppThemeMode.amoled,
-                                        onTap: () => _onAmoledTapped(loc),
+                                        onTap: () async {
+                                          await AppThemeService.changeTheme(
+                                            AppThemeMode.amoled,
+                                            widget.storageService,
+                                          );
+                                          widget.onSettingsChanged?.call();
+                                          if (mounted) setState(() {});
+                                        },
                                       ),
                                     ),
                                   ],
@@ -703,7 +652,39 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    // 3. Terang
+                                    // 3. Sakura
+                                    Expanded(
+                                      child: _buildOptionCard(
+                                        title: loc.themeAmoledJapanese,
+                                        subtitle:
+                                            loc.themeAmoledJapaneseSubtitle,
+                                        badge: 'AMOLED',
+                                        leading: Icon(
+                                          Icons.auto_awesome_rounded,
+                                          size: 17,
+                                          color:
+                                              currentTheme ==
+                                                  AppThemeMode.amoledJapanese
+                                              ? const Color(0xFFFF5C8A)
+                                              : AppTheme.textMuted,
+                                        ),
+                                        isSelected:
+                                            currentTheme ==
+                                            AppThemeMode.amoledJapanese,
+                                        activeColor: const Color(0xFFFF5C8A),
+                                        onTap: () async {
+                                          await AppThemeService.changeTheme(
+                                            AppThemeMode.amoledJapanese,
+                                            widget.storageService,
+                                          );
+                                          widget.onSettingsChanged?.call();
+                                          if (mounted) setState(() {});
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+
+                                    // 4. Pure Black
                                     Expanded(
                                       child: _buildOptionCard(
                                         title: loc.themeAmoledPure,
@@ -725,37 +706,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                         onTap: () async {
                                           await AppThemeService.changeTheme(
                                             AppThemeMode.amoledPure,
-                                            widget.storageService,
-                                          );
-                                          widget.onSettingsChanged?.call();
-                                          if (mounted) setState(() {});
-                                        },
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-
-                                    // 4. Clean Light
-                                    Expanded(
-                                      child: _buildOptionCard(
-                                        title: loc.themeCleanLight,
-                                        subtitle: loc.themeCleanLightSubtitle,
-                                        badge: 'STATIC',
-                                        activeColor: const Color(0xFF0EA5E9),
-                                        leading: Icon(
-                                          Icons.wb_sunny_outlined,
-                                          size: 17,
-                                          color:
-                                              currentTheme ==
-                                                      AppThemeMode.cleanLight
-                                                  ? const Color(0xFF0EA5E9)
-                                                  : AppTheme.textMuted,
-                                        ),
-                                        isSelected:
-                                            currentTheme ==
-                                            AppThemeMode.cleanLight,
-                                        onTap: () async {
-                                          await AppThemeService.changeTheme(
-                                            AppThemeMode.cleanLight,
                                             widget.storageService,
                                           );
                                           widget.onSettingsChanged?.call();
@@ -796,41 +746,35 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                     ),
                                     const SizedBox(width: 8),
 
-                                    // 6. AMOLED Sakura (Shown if unlocked or currently active)
-                                    if (isJapaneseUnlocked ||
-                                        currentTheme ==
-                                            AppThemeMode.amoledJapanese)
-                                      Expanded(
-                                        child: _buildOptionCard(
-                                          title: loc.themeAmoledJapanese,
-                                          subtitle:
-                                              loc.themeAmoledJapaneseSubtitle,
-                                          badge: 'AMOLED',
-                                          leading: Icon(
-                                            Icons.auto_awesome_rounded,
-                                            size: 17,
-                                            color:
-                                                currentTheme ==
-                                                    AppThemeMode.amoledJapanese
-                                                ? const Color(0xFFFF5C8A)
-                                                : AppTheme.textMuted,
-                                          ),
-                                          isSelected:
+                                    // 6. Clean Light
+                                    Expanded(
+                                      child: _buildOptionCard(
+                                        title: loc.themeCleanLight,
+                                        subtitle: loc.themeCleanLightSubtitle,
+                                        badge: 'STATIC',
+                                        activeColor: const Color(0xFF0EA5E9),
+                                        leading: Icon(
+                                          Icons.wb_sunny_outlined,
+                                          size: 17,
+                                          color:
                                               currentTheme ==
-                                              AppThemeMode.amoledJapanese,
-                                          activeColor: const Color(0xFFFF5C8A),
-                                          onTap: () async {
-                                            await AppThemeService.changeTheme(
-                                              AppThemeMode.amoledJapanese,
-                                              widget.storageService,
-                                            );
-                                            widget.onSettingsChanged?.call();
-                                            if (mounted) setState(() {});
-                                          },
+                                                      AppThemeMode.cleanLight
+                                                  ? const Color(0xFF0EA5E9)
+                                                  : AppTheme.textMuted,
                                         ),
-                                      )
-                                    else
-                                      const Expanded(child: SizedBox()),
+                                        isSelected:
+                                            currentTheme ==
+                                            AppThemeMode.cleanLight,
+                                        onTap: () async {
+                                          await AppThemeService.changeTheme(
+                                            AppThemeMode.cleanLight,
+                                            widget.storageService,
+                                          );
+                                          widget.onSettingsChanged?.call();
+                                          if (mounted) setState(() {});
+                                        },
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -2102,53 +2046,62 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                         ],
                                       ),
                                     ),
-                                    Icon(
-                                      Icons.open_in_new_rounded,
-                                      size: 14,
-                                      color: AppTheme.primaryCyan,
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(10),
+                                        onTap: () async {
+                                          final uri = Uri.parse(
+                                            AppConfig.developerGithubUrl,
+                                          );
+                                          try {
+                                            await launchUrl(
+                                              uri,
+                                              mode: LaunchMode
+                                                  .externalApplication,
+                                            );
+                                          } catch (_) {}
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.primaryCyan
+                                                .withValues(alpha: 0.10),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: AppTheme.primaryCyan
+                                                  .withValues(alpha: 0.35),
+                                              width: 0.9,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.open_in_new_rounded,
+                                                size: 13,
+                                                color: AppTheme.primaryCyan,
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Text(
+                                                'GitHub',
+                                                style: TextStyle(
+                                                  fontSize: 11.5,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppTheme.primaryCyan,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: OutlinedButton.icon(
-                                icon: const Icon(
-                                  Icons.open_in_new_rounded,
-                                  size: 13,
-                                ),
-                                label: Text(
-                                  loc.viewOnGitHub,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppTheme.primaryCyan,
-                                  side: BorderSide(
-                                    color: AppTheme.border,
-                                    width: 0.8,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 9,
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  final uri = Uri.parse(
-                                    AppConfig.githubRepoUrl,
-                                  );
-                                  await launchUrl(
-                                    uri,
-                                    mode: LaunchMode.externalApplication,
-                                  );
-                                },
                               ),
                             ),
                           ],

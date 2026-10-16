@@ -5,12 +5,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/zerabyte88/gitpulse-mobile/releases"><img src="https://img.shields.io/badge/version-v2.5.0-00e5ff?style=flat&logo=github&logoColor=white&labelColor=0d1117" alt="Version" height="26" /></a>
-  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/flutter-%5E3.13-02569b?style=flat&logo=flutter&logoColor=white&labelColor=0d1117" alt="Flutter" height="26" /></a>
-  <a href="https://dart.dev"><img src="https://img.shields.io/badge/dart-%5E3.5-0175c2?style=flat&logo=dart&logoColor=white&labelColor=0d1117" alt="Dart" height="26" /></a>
-  <img src="https://img.shields.io/badge/platform-Android-3ddc84?style=flat&logo=android&logoColor=white&labelColor=0d1117" alt="Platform" height="26" />
-  <img src="https://img.shields.io/badge/arch-arm64--v8a-8b5cf6?style=flat&logo=arm&logoColor=white&labelColor=0d1117" alt="Architecture" height="26" />
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-64748b?style=flat&logo=open-source-initiative&logoColor=white&labelColor=0d1117" alt="License" height="26" /></a>
+  <a href="https://github.com/zerabyte88/gitpulse-mobile/releases"><img src="https://img.shields.io/badge/Release-v2.5.1-06b6d4?style=flat&logo=github&logoColor=white&labelColor=0d1117" alt="Release" height="24" /></a>
+  <img src="https://img.shields.io/badge/Platform-Android-10b981?style=flat&logo=android&logoColor=white&labelColor=0d1117" alt="Platform" height="24" />
+  <img src="https://img.shields.io/badge/Arch-arm64--v8a-8b5cf6?style=flat&logo=arm&logoColor=white&labelColor=0d1117" alt="Architecture" height="24" />
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.13+-02569b?style=flat&logo=flutter&logoColor=white&labelColor=0d1117" alt="Flutter" height="24" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-64748b?style=flat&logo=open-source-initiative&logoColor=white&labelColor=0d1117" alt="License" height="24" /></a>
 </p>
 
 <br/>
