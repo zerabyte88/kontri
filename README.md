@@ -1,28 +1,26 @@
-<div align="center">
-  <img src="assets/icons/app_icon.png" alt="Kontri Logo" width="130" height="130" />
+<img src="assets/icons/app_icon.png" alt="Kontri Logo" width="190" align="right" />
 
-  # Kontri
+# Kontri
 
-  <p>
-    <strong>Android application for GitHub analytics, contribution streaks, and repository exploration.</strong>
-  </p>
+**Android application for GitHub analytics, contribution streaks, and repository exploration.**
 
-  <p>
-    <a href="https://github.com/zerabyte88/kontri/releases/latest"><img src="https://img.shields.io/badge/Release-v1.2.0-06b6d4?style=flat-square&logo=github&logoColor=white" alt="Release" /></a>
-    <img src="https://img.shields.io/badge/Platform-Android-10b981?style=flat-square&logo=android&logoColor=white" alt="Platform" />
-    <img src="https://img.shields.io/badge/Arch-arm64--v8a-8b5cf6?style=flat-square&logo=arm&logoColor=white" alt="Architecture" />
-    <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.13+-02569b?style=flat-square&logo=flutter&logoColor=white" alt="Flutter" /></a>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-64748b?style=flat-square" alt="License" /></a>
-  </p>
+<p>
+  <a href="https://github.com/zerabyte88/kontri/releases/latest"><img src="https://img.shields.io/badge/Release-v1.2.0-06b6d4?style=flat-square&logo=github&logoColor=white" alt="Release" /></a>
+  <img src="https://img.shields.io/badge/Platform-Android-10b981?style=flat-square&logo=android&logoColor=white" alt="Platform" />
+  <img src="https://img.shields.io/badge/Arch-arm64--v8a-8b5cf6?style=flat-square&logo=arm&logoColor=white" alt="Architecture" />
+  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.13+-02569b?style=flat-square&logo=flutter&logoColor=white" alt="Flutter" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-64748b?style=flat-square" alt="License" /></a>
+</p>
 
-  <p>
-    <a href="https://github.com/zerabyte88/kontri/releases/latest"><b>Download APK</b></a> •
-    <a href="#key-features">Key Features</a> •
-    <a href="#contribution-tiers">Contribution Tiers</a> •
-    <a href="#architecture--stack">Architecture</a> •
-    <a href="#build-from-source">Build</a>
-  </p>
-</div>
+<p>
+  <a href="https://github.com/zerabyte88/kontri/releases/latest"><b>Download APK</b></a> •
+  <a href="#key-features">Key Features</a> •
+  <a href="#contribution-tiers">Contribution Tiers</a> •
+  <a href="#architecture--stack">Architecture</a> •
+  <a href="#build-from-source">Build</a>
+</p>
+
+<br clear="right" />
 
 ---
 
