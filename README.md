@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icons/app_icon.png" alt="Kontri Logo" width="100" height="100" />
+  <img src="assets/icons/app_icon.png" alt="Kontri Logo" width="140" height="140" />
 </p>
 
 <h1 align="center">Kontri</h1>
