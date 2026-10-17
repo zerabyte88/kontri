@@ -56,11 +56,11 @@ class UpdateService {
     return 0;
   }
 
-  /// Checks latest GitHub release for GitPulse
+  /// Checks latest GitHub release for Kontri
   Future<AppUpdateInfo> checkForUpdate({String? personalAccessToken}) async {
     final headers = <String, String>{
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'GitPulse/${AppConfig.appVersion}',
+      'User-Agent': '${AppConfig.appName}/${AppConfig.appVersion}',
     };
     if (personalAccessToken != null && personalAccessToken.trim().isNotEmpty) {
       headers['Authorization'] = 'Bearer ${personalAccessToken.trim()}';
@@ -127,7 +127,7 @@ class UpdateService {
     try {
       return OtaUpdate().execute(
         downloadUrl,
-        destinationFilename: 'gitpulse-latest.apk',
+        destinationFilename: 'kontri-latest.apk',
         androidProviderAuthority: 'com.kontri.orion.rigel.ota_update_provider',
       );
     } catch (e) {
@@ -166,12 +166,6 @@ class UpdateService {
       candidates.add('/data/data/com.kontri.orion.rigel/files/ota_update');
       candidates.add('/data/user/0/com.phantek.orion.rigel/files/ota_update');
       candidates.add('/data/data/com.phantek.orion.rigel/files/ota_update');
-      candidates.add(
-        '/data/user/0/com.gitpulse.gitpulse_mobile/files/ota_update',
-      );
-      candidates.add(
-        '/data/data/com.gitpulse.gitpulse_mobile/files/ota_update',
-      );
 
       for (final dirPath in candidates) {
         final dir = Directory(dirPath);
@@ -198,15 +192,13 @@ class UpdateService {
       final sourceCandidates = <String>[];
       try {
         final parentDir = Directory.systemTemp.parent.path;
-        sourceCandidates.add('$parentDir/files/ota_update/gitpulse-latest.apk');
+        sourceCandidates.add('$parentDir/files/ota_update/kontri-latest.apk');
       } catch (_) {}
       sourceCandidates.addAll([
-        '/data/user/0/com.kontri.orion.rigel/files/ota_update/gitpulse-latest.apk',
-        '/data/data/com.kontri.orion.rigel/files/ota_update/gitpulse-latest.apk',
-        '/data/user/0/com.phantek.orion.rigel/files/ota_update/gitpulse-latest.apk',
-        '/data/data/com.phantek.orion.rigel/files/ota_update/gitpulse-latest.apk',
-        '/data/user/0/com.gitpulse.gitpulse_mobile/files/ota_update/gitpulse-latest.apk',
-        '/data/data/com.gitpulse.gitpulse_mobile/files/ota_update/gitpulse-latest.apk',
+        '/data/user/0/com.kontri.orion.rigel/files/ota_update/kontri-latest.apk',
+        '/data/data/com.kontri.orion.rigel/files/ota_update/kontri-latest.apk',
+        '/data/user/0/com.phantek.orion.rigel/files/ota_update/kontri-latest.apk',
+        '/data/data/com.phantek.orion.rigel/files/ota_update/kontri-latest.apk',
       ]);
 
       File? sourceFile;
@@ -220,11 +212,11 @@ class UpdateService {
 
       if (sourceFile == null) return null;
 
-      final apkName = 'GitPulse-${versionTag ?? AppConfig.appVersion}.apk';
+      final apkName = 'Kontri-${versionTag ?? AppConfig.appVersion}.apk';
       final targetDirs = [
-        '/storage/emulated/0/Download/GitPulse',
-        '/storage/emulated/0/downloads/GitPulse',
-        '/sdcard/Download/GitPulse',
+        '/storage/emulated/0/Download/Kontri',
+        '/storage/emulated/0/downloads/Kontri',
+        '/sdcard/Download/Kontri',
       ];
 
       for (final dirPath in targetDirs) {
@@ -252,18 +244,18 @@ class UpdateService {
   static Future<String?> backupApkToDownloads({String? versionTag}) =>
       saveApkToDownloads(versionTag: versionTag);
 
-  /// Downloads the APK directly and saves a copy in /storage/emulated/0/Download/GitPulse
+  /// Downloads the APK directly and saves a copy in /storage/emulated/0/Download/Kontri
   static Future<String?> downloadApkToDownloads(
     String downloadUrl, {
     String? versionTag,
   }) async {
     if (!Platform.isAndroid) return null;
     try {
-      final apkName = 'GitPulse-${versionTag ?? AppConfig.appVersion}.apk';
+      final apkName = 'Kontri-${versionTag ?? AppConfig.appVersion}.apk';
       final targetDirs = [
-        '/storage/emulated/0/Download/GitPulse',
-        '/storage/emulated/0/downloads/GitPulse',
-        '/sdcard/Download/GitPulse',
+        '/storage/emulated/0/Download/Kontri',
+        '/storage/emulated/0/downloads/Kontri',
+        '/sdcard/Download/Kontri',
       ];
 
       final client = http.Client();
@@ -302,12 +294,12 @@ class UpdateService {
       final targetDirs = <String>[];
       if (customPath != null) {
         targetDirs.add(customPath);
-        targetDirs.add('$customPath/GitPulse');
+        targetDirs.add('$customPath/Kontri');
       } else {
         targetDirs.addAll([
-          '/storage/emulated/0/Download/GitPulse',
-          '/storage/emulated/0/downloads/GitPulse',
-          '/sdcard/Download/GitPulse',
+          '/storage/emulated/0/Download/Kontri',
+          '/storage/emulated/0/downloads/Kontri',
+          '/sdcard/Download/Kontri',
           '/storage/emulated/0/Download',
           '/storage/emulated/0/downloads',
           '/sdcard/Download',
@@ -333,15 +325,15 @@ class UpdateService {
               continue;
             }
 
-            // Strict safety check: must start with gitpulse- or gitpulse_
-            if (!lowerName.startsWith('gitpulse-') &&
-                !lowerName.startsWith('gitpulse_')) {
+            // Strict safety check: must start with kontri- or kontri_
+            if (!lowerName.startsWith('kontri-') &&
+                !lowerName.startsWith('kontri_')) {
               continue;
             }
 
-            // Extract version from filename: e.g. "GitPulse-v1.0.2.apk" -> "1.0.2"
+            // Extract version from filename: e.g. "Kontri-v1.0.2.apk" -> "1.0.2"
             final match = RegExp(
-              r'^gitpulse[-_]v?([0-9]+(?:\.[0-9]+)*).*\.apk$',
+              r'^kontri[-_]v?([0-9]+(?:\.[0-9]+)*).*\.apk$',
               caseSensitive: false,
             ).firstMatch(fileName);
 
@@ -355,14 +347,14 @@ class UpdateService {
                   deletedAny = true;
                 }
               }
-            } else if (lowerName == 'gitpulse-latest.apk') {
+            } else if (lowerName == 'kontri-latest.apk') {
               await entry.delete();
               deletedAny = true;
             }
           }
 
-          // If this is the dedicated GitPulse subfolder and now empty, delete it
-          if (dirPath.toLowerCase().endsWith('gitpulse')) {
+          // If this is the dedicated Kontri subfolder and now empty, delete it
+          if (dirPath.toLowerCase().endsWith('kontri')) {
             try {
               final remaining = await dir.list().toList();
               if (remaining.isEmpty) {

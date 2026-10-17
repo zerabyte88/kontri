@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'Kontri';
-  static const String appVersion = 'v1.1.0';
-  static const String buildNumber = '2';
-  static const String fullVersion = 'v1.1.0 (Build 2)';
-  static const String releaseTag = 'v1.1.0';
+  static const String appVersion = 'v1.1.1';
+  static const String buildNumber = '3';
+  static const String fullVersion = 'v1.1.1 (Build 3)';
+  static const String releaseTag = 'v1.1.1';
   static const String githubRepoUrl = 'https://github.com/zerabyte88/kontri';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';
@@ -364,12 +364,12 @@ class AppTheme {
       dividerTheme: DividerThemeData(color: brd, thickness: 1, space: 1),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: GitPulsePageTransitionsBuilder(),
-          TargetPlatform.iOS: GitPulsePageTransitionsBuilder(),
-          TargetPlatform.fuchsia: GitPulsePageTransitionsBuilder(),
-          TargetPlatform.linux: GitPulsePageTransitionsBuilder(),
-          TargetPlatform.macOS: GitPulsePageTransitionsBuilder(),
-          TargetPlatform.windows: GitPulsePageTransitionsBuilder(),
+          TargetPlatform.android: KontriPageTransitionsBuilder(),
+          TargetPlatform.iOS: KontriPageTransitionsBuilder(),
+          TargetPlatform.fuchsia: KontriPageTransitionsBuilder(),
+          TargetPlatform.linux: KontriPageTransitionsBuilder(),
+          TargetPlatform.macOS: KontriPageTransitionsBuilder(),
+          TargetPlatform.windows: KontriPageTransitionsBuilder(),
         },
       ),
     );
@@ -377,8 +377,8 @@ class AppTheme {
 }
 
 /// Page transitions with subtle fade and horizontal glide.
-class GitPulsePageTransitionsBuilder extends PageTransitionsBuilder {
-  const GitPulsePageTransitionsBuilder();
+class KontriPageTransitionsBuilder extends PageTransitionsBuilder {
+  const KontriPageTransitionsBuilder();
 
   @override
   Widget buildTransitions<T>(
@@ -388,7 +388,7 @@ class GitPulsePageTransitionsBuilder extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return _GitPulsePageTransition(
+    return _KontriPageTransition(
       primaryAnimation: animation,
       secondaryAnimation: secondaryAnimation,
       child: child,
@@ -396,12 +396,12 @@ class GitPulsePageTransitionsBuilder extends PageTransitionsBuilder {
   }
 }
 
-class _GitPulsePageTransition extends StatelessWidget {
+class _KontriPageTransition extends StatelessWidget {
   final Animation<double> primaryAnimation;
   final Animation<double> secondaryAnimation;
   final Widget child;
 
-  const _GitPulsePageTransition({
+  const _KontriPageTransition({
     required this.primaryAnimation,
     required this.secondaryAnimation,
     required this.child,

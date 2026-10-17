@@ -26,14 +26,14 @@ void main() async {
   UpdateService.cleanDownloadedApk();
   UpdateService.cleanInstalledBackupApk();
 
-  runApp(GitPulseApp(storageService: storageService, apiService: apiService));
+  runApp(KontriApp(storageService: storageService, apiService: apiService));
 }
 
-class GitPulseApp extends StatelessWidget {
+class KontriApp extends StatelessWidget {
   final StorageService storageService;
   final GitHubApiService apiService;
 
-  const GitPulseApp({
+  const KontriApp({
     super.key,
     required this.storageService,
     required this.apiService,

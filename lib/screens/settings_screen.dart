@@ -1031,7 +1031,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     cacheHeight: 100,
                     headers: const {
                       'Accept': 'image/*,*/*;q=0.8',
-                      'User-Agent': 'GitPulse/1.0',
+                      'User-Agent': 'Kontri/1.0',
                     },
                     loadingBuilder: (context, child, progress) {
                       if (progress == null) return child;

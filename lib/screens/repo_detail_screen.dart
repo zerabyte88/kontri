@@ -482,18 +482,6 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                 ),
           actions: _isSearching
               ? [
-                  if (_searchQuery.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.clear_rounded, size: 20),
-                      tooltip: loc.cancel,
-                      color: AppTheme.textMuted,
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() {
-                          _searchQuery = '';
-                        });
-                      },
-                    ),
                   IconButton(
                     icon: const Icon(Icons.close_rounded, size: 20),
                     tooltip: loc.close,

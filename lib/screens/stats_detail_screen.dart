@@ -208,13 +208,12 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
 
     final text =
         '''
---- GitPulse Profile Snapshot ---
+--- ${AppConfig.appName} Profile Snapshot ---
 Username: @${u.login} (${u.name ?? 'Developer'})
 Title: ${cStats.commitTitle.cleanTitle} (${loc.getCommitTierLevelName(cStats.commitTitle.tier)})
 Streak: ${cStats.currentStreak} ${loc.daysUnit} (Max: ${cStats.longestStreak} ${loc.daysUnit})
 ${loc.thisYearContributions}: ${cStats.thisYearContributions}
 ${loc.allYearsContributions}: ${cStats.totalContributions}
-Persona: ${_stats.developerPersona}
 ${loc.totalStars}: ${_stats.totalStars}
 ${loc.repositoriesTitle}: ${u.publicRepos} | ${loc.followers}: ${u.followers}
 ${loc.topLanguagesTitle}: $topLang

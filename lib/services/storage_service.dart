@@ -6,12 +6,12 @@ import '../models/bookmarked_user.dart';
 import '../models/tech_news.dart';
 
 class StorageService {
-  static const String _keyBookmarks = 'gitpulse_bookmarks';
-  static const String _keyBookmarkAvatars = 'gitpulse_bookmark_avatars';
-  static const String _keyBookmarkDetails = 'gitpulse_bookmark_details';
-  static const String _keyFavoriteGridColumns = 'gitpulse_fav_grid_columns';
-  static const String _keyHistory = 'gitpulse_recent_searches';
-  static const String _keyToken = 'gitpulse_github_token';
+  static const String _keyBookmarks = 'kontri_bookmarks';
+  static const String _keyBookmarkAvatars = 'kontri_bookmark_avatars';
+  static const String _keyBookmarkDetails = 'kontri_bookmark_details';
+  static const String _keyFavoriteGridColumns = 'kontri_fav_grid_columns';
+  static const String _keyHistory = 'kontri_recent_searches';
+  static const String _keyToken = 'kontri_github_token';
 
   final SharedPreferences _prefs;
 
@@ -219,7 +219,7 @@ class StorageService {
   }
 
   // Language
-  static const String _keyLanguage = 'gitpulse_app_language';
+  static const String _keyLanguage = 'kontri_app_language';
 
   String getLanguageCode() {
     return _prefs.getString(_keyLanguage) ?? 'en';
@@ -230,9 +230,9 @@ class StorageService {
   }
 
   // Theme Settings
-  static const String _keyThemeMode = 'gitpulse_theme_mode';
+  static const String _keyThemeMode = 'kontri_theme_mode';
   static const String _keyJapaneseEasterEgg =
-      'gitpulse_japanese_theme_unlocked';
+      'kontri_japanese_theme_unlocked';
 
   String getThemeMode() {
     return _prefs.getString(_keyThemeMode) ?? 'dark';
@@ -251,7 +251,7 @@ class StorageService {
   }
 
   // Surface Opacity & Glassmorphism Setting
-  static const String _keySurfaceOpacity = 'gitpulse_surface_opacity';
+  static const String _keySurfaceOpacity = 'kontri_surface_opacity';
 
   double getSurfaceOpacity() {
     return _prefs.getDouble(_keySurfaceOpacity) ?? 1.0;
@@ -262,7 +262,7 @@ class StorageService {
   }
 
   // Background Animation Performance Setting
-  static const String _keyBgAnimationEnabled = 'gitpulse_bg_animation_enabled';
+  static const String _keyBgAnimationEnabled = 'kontri_bg_animation_enabled';
 
   bool isBackgroundAnimationEnabled() {
     return _prefs.getBool(_keyBgAnimationEnabled) ?? true;
@@ -273,8 +273,8 @@ class StorageService {
   }
 
   // Cached Tech News & Trending Repos
-  static const String _keyCachedNewsPrefix = 'gitpulse_cached_news_';
-  static const String _keyCachedNewsTimePrefix = 'gitpulse_cached_news_time_';
+  static const String _keyCachedNewsPrefix = 'kontri_cached_news_';
+  static const String _keyCachedNewsTimePrefix = 'kontri_cached_news_time_';
 
   Future<void> saveCachedNews(String tag, List<TechNews> news) async {
     final rawJson = jsonEncode(news.map((n) => n.toJson()).toList());
@@ -305,9 +305,9 @@ class StorageService {
   }
 
   // HTTP & ETag Response Cache
-  static const String _keyHttpCachePrefix = 'gitpulse_http_cache_';
-  static const String _keyHttpEtagPrefix = 'gitpulse_http_etag_';
-  static const String _keyHttpTimePrefix = 'gitpulse_http_time_';
+  static const String _keyHttpCachePrefix = 'kontri_http_cache_';
+  static const String _keyHttpEtagPrefix = 'kontri_http_etag_';
+  static const String _keyHttpTimePrefix = 'kontri_http_time_';
 
   Future<void> saveHttpCache({
     required String key,
@@ -374,7 +374,7 @@ class StorageService {
   }
 
   // Peak Contribution Tier Persistence
-  static const String _keyPeakTierPrefix = 'gitpulse_peak_tier_';
+  static const String _keyPeakTierPrefix = 'kontri_peak_tier_';
 
   int getPeakTier(String username) {
     final clean = username.trim().toLowerCase();

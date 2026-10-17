@@ -1959,7 +1959,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                           cacheHeight: 80,
                                           headers: const {
                                             'Accept': 'image/*,*/*;q=0.8',
-                                            'User-Agent': 'GitPulse/1.0',
+                                            'User-Agent': 'Kontri/1.0',
                                           },
                                           fit: BoxFit.cover,
                                           loadingBuilder:

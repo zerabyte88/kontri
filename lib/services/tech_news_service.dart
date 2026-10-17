@@ -61,7 +61,7 @@ class TechNewsService {
           .get(
             url,
             headers: {
-              'User-Agent': 'GitPulse/1.0',
+              'User-Agent': 'Kontri/1.0',
               'Accept': 'application/json',
             },
           )
@@ -159,7 +159,7 @@ class TechNewsService {
     );
     final headers = <String, String>{
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'GitPulse/1.0',
+      'User-Agent': 'Kontri/1.0',
     };
     if (personalAccessToken != null && personalAccessToken!.trim().isNotEmpty) {
       headers['Authorization'] = 'Bearer ${personalAccessToken!.trim()}';

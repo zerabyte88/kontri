@@ -69,7 +69,7 @@ class GitHubRepo {
     );
   }
 
-  /// Extracts repository owner from htmlUrl (e.g., https://github.com/torvalds/linux -> torvalds)
+  /// Extracts repository owner from htmlUrl (e.g., https://github.com/zerabyte88/kontri -> zerabyte88)
   String? get owner {
     try {
       final uri = Uri.tryParse(htmlUrl);

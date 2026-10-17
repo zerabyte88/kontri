@@ -21,12 +21,12 @@ class HeaderAnimationState {
 }
 
 /// App logo widget.
-class GitPulseLogo extends StatelessWidget {
+class KontriLogo extends StatelessWidget {
   final double size;
   final Color color;
   final double progress;
 
-  const GitPulseLogo({
+  const KontriLogo({
     super.key,
     this.size = 20,
     required this.color,
@@ -46,7 +46,7 @@ class GitPulseLogo extends StatelessWidget {
           height: size,
           fit: BoxFit.cover,
           errorBuilder: (_, _, _) => CustomPaint(
-            painter: _GitPulseLogoPainter(color: color, progress: progress),
+            painter: _KontriLogoPainter(color: color, progress: progress),
           ),
         ),
       ),
@@ -54,7 +54,7 @@ class GitPulseLogo extends StatelessWidget {
   }
 }
 
-class _GitPulseLogoPainter extends CustomPainter {
+class _KontriLogoPainter extends CustomPainter {
   final Color color;
   final double progress;
 
@@ -70,7 +70,7 @@ class _GitPulseLogoPainter extends CustomPainter {
     ..color = Colors.white
     ..style = PaintingStyle.fill;
 
-  _GitPulseLogoPainter({required this.color, required this.progress});
+  _KontriLogoPainter({required this.color, required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -160,7 +160,7 @@ class _GitPulseLogoPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _GitPulseLogoPainter oldDelegate) {
+  bool shouldRepaint(covariant _KontriLogoPainter oldDelegate) {
     return oldDelegate.color != color || oldDelegate.progress != progress;
   }
 }
@@ -217,7 +217,7 @@ class AnimatedAppHeader extends StatelessWidget {
         border: isLight ? Border.all(color: AppTheme.border, width: 0.8) : null,
       ),
       clipBehavior: Clip.antiAlias,
-      child: GitPulseLogo(size: 28, color: accentColor),
+      child: KontriLogo(size: 28, color: accentColor),
     );
   }
 

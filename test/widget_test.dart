@@ -43,7 +43,7 @@ import 'package:kontri/widgets/settings_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  group('GitPulse Model Tests', () {
+  group('Kontri Model Tests', () {
     test('GitHubUser fromJson parses correctly', () {
       final json = {
         'login': 'octocat',
@@ -316,7 +316,6 @@ void main() {
       expect(stats.totalForks, 15);
       expect(stats.languageCounts['Dart'], 1);
       expect(stats.languageCounts['Python'], 1);
-      expect(stats.developerPersona, contains('Star Magnet'));
     });
 
     test('UserStats uses aggregatedLanguages bytes with high fidelity', () {
@@ -769,7 +768,7 @@ void main() {
           htmlUrl: 'https://github.com/zerabyte88',
           name: 'Nanda Alexander',
           location: 'Planet Earth, Solar System',
-          company: 'GitPulse Team',
+          company: 'Kontri Team',
           publicRepos: 10,
           followers: 50,
           following: 20,
@@ -782,8 +781,6 @@ void main() {
           totalForks: 12,
           languageCounts: {'Dart': 80, 'TypeScript': 20},
           hourlyActivity: {14: 10, 15: 15},
-          developerPersona: 'Fullstack Explorer',
-          personaDescription: 'Passionate developer',
           contributionStats: ContributionStats(
             thisYearContributions: 50,
             lastYearContributions: 100,
@@ -810,7 +807,7 @@ void main() {
         expect(find.text('Nanda Alexander'), findsOneWidget);
         expect(find.text('@zerabyte88'), findsAtLeastNWidgets(1));
         expect(find.text('Planet Earth, Solar System'), findsOneWidget);
-        expect(find.text('GitPulse Team'), findsOneWidget);
+        expect(find.text('Kontri Team'), findsOneWidget);
 
         // Verify that AnimatedTierTitle exists in the commit habit banner
         expect(find.byType(AnimatedTierTitle), findsOneWidget);
@@ -823,13 +820,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.1.0',
+      'AppConfig provides accurate release and version telemetry for v1.1.1',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.1.0');
-        expect(AppConfig.buildNumber, '2');
-        expect(AppConfig.fullVersion, 'v1.1.0 (Build 2)');
-        expect(AppConfig.releaseTag, 'v1.1.0');
+        expect(AppConfig.appVersion, 'v1.1.1');
+        expect(AppConfig.buildNumber, '3');
+        expect(AppConfig.fullVersion, 'v1.1.1 (Build 3)');
+        expect(AppConfig.releaseTag, 'v1.1.1');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -867,10 +864,10 @@ void main() {
 
     test('UpdateService cleanDownloadedApk removes leftover apk files successfully', () async {
       final tempDir = await Directory.systemTemp.createTemp(
-        'gitpulse_ota_test',
+        'kontri_ota_test',
       );
       try {
-        final apkFile = File('${tempDir.path}/gitpulse-test.apk');
+        final apkFile = File('${tempDir.path}/kontri-test.apk');
         await apkFile.writeAsString('dummy apk content');
         expect(await apkFile.exists(), true);
 
@@ -1019,13 +1016,13 @@ void main() {
       expect(result, isNull);
     });
 
-    test('UpdateService cleanInstalledBackupApk deletes only installed GitPulse APK and preserves user data', () async {
+    test('UpdateService cleanInstalledBackupApk deletes only installed Kontri APK and preserves user data', () async {
       final tempDir = await Directory.systemTemp.createTemp(
-        'gitpulse_download_test',
+        'kontri_download_test',
       );
       try {
-        final installedApk = File('${tempDir.path}/GitPulse-v1.0.3.apk');
-        final newerApk = File('${tempDir.path}/GitPulse-v1.0.4.apk');
+        final installedApk = File('${tempDir.path}/Kontri-v1.0.3.apk');
+        final newerApk = File('${tempDir.path}/Kontri-v1.0.4.apk');
         final otherApk = File('${tempDir.path}/OtherApp.apk');
         final userDocument = File('${tempDir.path}/important_document.pdf');
         final userPhoto = File('${tempDir.path}/family_photo.jpg');
@@ -1056,15 +1053,15 @@ void main() {
       }
     });
 
-    test('UpdateService cleanInstalledBackupApk cleans GitPulse subfolder and removes empty directory', () async {
+    test('UpdateService cleanInstalledBackupApk cleans Kontri subfolder and removes empty directory', () async {
       final tempDir = await Directory.systemTemp.createTemp(
-        'gitpulse_subfolder_test',
+        'kontri_subfolder_test',
       );
       try {
-        final subDir = Directory('${tempDir.path}/GitPulse');
+        final subDir = Directory('${tempDir.path}/Kontri');
         await subDir.create();
 
-        final installedSubApk = File('${subDir.path}/GitPulse-v1.0.3.apk');
+        final installedSubApk = File('${subDir.path}/Kontri-v1.0.3.apk');
         await installedSubApk.writeAsString('mock apk 1.0.3');
 
         final deleted = await UpdateService.cleanInstalledBackupApk(
@@ -1074,7 +1071,7 @@ void main() {
 
         expect(deleted, true);
         expect(await installedSubApk.exists(), false);
-        // The empty GitPulse subfolder should also be deleted
+        // The empty Kontri subfolder should also be deleted
         expect(await subDir.exists(), false);
       } finally {
         if (await tempDir.exists()) {
@@ -1229,7 +1226,7 @@ void main() {
     });
 
     testWidgets(
-      'AnimatedAppHeader renders terminal icon, GitPulse title, and version badge',
+      'AnimatedAppHeader renders terminal icon, Kontri title, and version badge',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
         final prefs = await SharedPreferences.getInstance();
@@ -1247,10 +1244,10 @@ void main() {
           ),
         );
 
-        // Verify GitPulse logo, background, title, and version are rendered
-        expect(find.byType(GitPulseLogo), findsOneWidget);
+        // Verify Kontri logo, background, title, and version are rendered
+        expect(find.byType(KontriLogo), findsOneWidget);
         final imageFinder = find.descendant(
-          of: find.byType(GitPulseLogo),
+          of: find.byType(KontriLogo),
           matching: find.byType(Image),
         );
         expect(imageFinder, findsOneWidget);
@@ -1372,9 +1369,9 @@ void main() {
       'RepoTile renders repo details, link icon, and handles tap to open',
       (tester) async {
         final repo = GitHubRepo(
-          name: 'flutter_gitpulse',
+          name: 'flutter_kontri',
           description: 'Developer telemetry mobile app',
-          htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+          htmlUrl: 'https://github.com/zerabyte88/flutter_kontri',
           language: 'Dart',
           stargazersCount: 42,
           forksCount: 7,
@@ -1387,7 +1384,7 @@ void main() {
           ),
         );
 
-        expect(find.text('flutter_gitpulse'), findsOneWidget);
+        expect(find.text('flutter_kontri'), findsOneWidget);
         expect(find.text('Dart'), findsOneWidget);
         expect(find.text('42'), findsOneWidget);
         expect(find.text('7'), findsOneWidget);
@@ -1401,9 +1398,9 @@ void main() {
 
     test('GitHubRepo parses extended fields, owner, and formattedSize', () {
       final json = {
-        'name': 'gitpulse_mobile',
+        'name': 'kontri_mobile',
         'description': 'Mobile telemetry',
-        'html_url': 'https://github.com/zerabyte88/gitpulse_mobile',
+        'html_url': 'https://github.com/zerabyte88/kontri_mobile',
         'language': 'Dart',
         'stargazers_count': 100,
         'forks_count': 15,
@@ -1416,7 +1413,7 @@ void main() {
       };
 
       final repo = GitHubRepo.fromJson(json);
-      expect(repo.name, 'gitpulse_mobile');
+      expect(repo.name, 'kontri_mobile');
       expect(repo.owner, 'zerabyte88');
       expect(repo.defaultBranch, 'main');
       expect(repo.openIssuesCount, 3);
@@ -1428,7 +1425,7 @@ void main() {
     test('GitHubApiService fetchRepositoryReadme decodes base64 markdown and handles 404', () async {
       final mockClient = MockClient((request) async {
         if (request.url.path == '/repos/testowner/testrepo/readme') {
-          const readmeMarkdown = '# Hello GitPulse\nThis is a test readme.';
+          const readmeMarkdown = '# Hello Kontri\nThis is a test readme.';
           final base64Content = base64Encode(utf8.encode(readmeMarkdown));
           return http.Response(
             jsonEncode({
@@ -1448,7 +1445,7 @@ void main() {
         owner: 'testowner',
         repo: 'testrepo',
       );
-      expect(readme, contains('# Hello GitPulse'));
+      expect(readme, contains('# Hello Kontri'));
       expect(readme, contains('This is a test readme.'));
 
       final missing = await api.fetchRepositoryReadme(
@@ -1462,9 +1459,9 @@ void main() {
       'RepoDetailScreen displays repository details and markdown README',
       (tester) async {
         final repo = GitHubRepo(
-          name: 'flutter_gitpulse',
+          name: 'flutter_kontri',
           description: 'Developer telemetry mobile app',
-          htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+          htmlUrl: 'https://github.com/zerabyte88/flutter_kontri',
           language: 'Dart',
           stargazersCount: 42,
           forksCount: 7,
@@ -1476,7 +1473,7 @@ void main() {
 
         final mockClient = MockClient((request) async {
           final content = base64Encode(
-            utf8.encode('### Welcome to GitPulse\n- Fast\n- Beautiful'),
+            utf8.encode('### Welcome to Kontri\n- Fast\n- Beautiful'),
           );
           return http.Response(
             jsonEncode({
@@ -1507,7 +1504,7 @@ void main() {
           ),
         );
 
-        expect(find.text('flutter_gitpulse'), findsAtLeastNWidgets(1));
+        expect(find.text('flutter_kontri'), findsAtLeastNWidgets(1));
         expect(find.text('zerabyte88'), findsAtLeastNWidgets(1));
         expect(find.text('Developer telemetry mobile app'), findsOneWidget);
         expect(find.text('flutter'), findsOneWidget);
@@ -1517,7 +1514,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(MarkdownBody), findsOneWidget);
-        expect(find.textContaining('Welcome to GitPulse'), findsOneWidget);
+        expect(find.textContaining('Welcome to Kontri'), findsOneWidget);
       },
     );
 
@@ -1528,7 +1525,7 @@ void main() {
         'sha': '123456',
         'size': 0,
         'type': 'dir',
-        'html_url': 'https://github.com/zerabyte88/gitpulse/tree/main/lib',
+        'html_url': 'https://github.com/zerabyte88/kontri/tree/main/lib',
       };
       final dirItem = GitHubContentItem.fromJson(dirJson);
       expect(dirItem.name, 'lib');
@@ -1543,7 +1540,7 @@ void main() {
         'type': 'file',
         'download_url': 'https://raw.githubusercontent.com/.../main.dart',
         'html_url':
-            'https://github.com/zerabyte88/gitpulse/blob/main/lib/main.dart',
+            'https://github.com/zerabyte88/kontri/blob/main/lib/main.dart',
       };
       final fileItem = GitHubContentItem.fromJson(fileJson);
       expect(fileItem.name, 'main.dart');
@@ -1603,7 +1600,7 @@ void main() {
       final service = GitHubApiService(client: mockClient);
       final items = await service.fetchRepositoryContents(
         owner: 'zerabyte88',
-        repo: 'gitpulse',
+        repo: 'kontri',
         path: 'lib',
       );
 
@@ -1616,7 +1613,7 @@ void main() {
 
       final fileContent = await service.fetchFileContent(
         owner: 'zerabyte88',
-        repo: 'gitpulse',
+        repo: 'kontri',
         path: 'lib/main.dart',
       );
       expect(fileContent, contains('void main()'));
@@ -1651,7 +1648,7 @@ void main() {
           ],
           home: FileViewerScreen(
             item: item,
-            repo: 'gitpulse',
+            repo: 'kontri',
             owner: 'zerabyte88',
             apiService: apiService,
           ),
@@ -1670,9 +1667,9 @@ void main() {
       WidgetTester tester,
     ) async {
       final repo = GitHubRepo(
-        name: 'flutter_gitpulse',
+        name: 'flutter_kontri',
         description: 'Developer telemetry mobile app',
-        htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+        htmlUrl: 'https://github.com/zerabyte88/flutter_kontri',
         language: 'Dart',
         stargazersCount: 11,
         forksCount: 34,
@@ -1788,13 +1785,13 @@ void main() {
       });
 
       final service = GitHubApiService(client: mockClient);
-      final tree = await service.fetchRepositoryTree(owner: 'zerabyte88', repo: 'gitpulse');
+      final tree = await service.fetchRepositoryTree(owner: 'zerabyte88', repo: 'kontri');
       expect(tree.length, 2);
       expect(tree.any((f) => f.name == 'boolean.dart'), isTrue);
 
       final fetchedCommit = await service.fetchLatestCommitForPath(
         owner: 'zerabyte88',
-        repo: 'gitpulse',
+        repo: 'kontri',
         path: 'lib/boolean.dart',
       );
       expect(fetchedCommit, isNotNull);
@@ -1846,7 +1843,7 @@ void main() {
           ],
           home: FileViewerScreen(
             item: item,
-            repo: 'gitpulse',
+            repo: 'kontri',
             owner: 'zerabyte88',
             apiService: apiService,
           ),
@@ -1866,9 +1863,9 @@ void main() {
       WidgetTester tester,
     ) async {
       final repo = GitHubRepo(
-        name: 'flutter_gitpulse',
+        name: 'flutter_kontri',
         description: 'Developer telemetry mobile app',
-        htmlUrl: 'https://github.com/zerabyte88/flutter_gitpulse',
+        htmlUrl: 'https://github.com/zerabyte88/flutter_kontri',
         language: 'Dart',
         stargazersCount: 11,
         forksCount: 34,
@@ -2900,14 +2897,14 @@ void main() {
     );
 
     testWidgets(
-      'GitPulsePageTransitionsBuilder executes smooth slide and fade transitions',
+      'KontriPageTransitionsBuilder executes smooth slide and fade transitions',
       (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             theme: ThemeData(
               pageTransitionsTheme: const PageTransitionsTheme(
                 builders: {
-                  TargetPlatform.android: GitPulsePageTransitionsBuilder(),
+                  TargetPlatform.android: KontriPageTransitionsBuilder(),
                 },
               ),
             ),
