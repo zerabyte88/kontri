@@ -1,8 +1,9 @@
-# Kontri
-
 <p align="center">
-  <img src="assets/icons/app_icon.png" alt="Kontri Logo" width="100" height="100" style="border-radius: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.2);" />
+  <img src="assets/icons/app_icon.png" alt="Kontri Logo" width="100" height="100" />
 </p>
+
+<h1 align="center">Kontri</h1>
+
 
 <p align="center">
   <strong>Android application for GitHub analytics, contribution streaks, and repository exploration.</strong>
