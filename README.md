@@ -34,7 +34,6 @@
 - **AMOLED Themes**: 6 distinct visual themes (Snowfall, Sakura, Midnight Slate, Light, AMOLED Pure, Clean Light) with adjustable surface translucency.
 - **Quota Saver**: Smart local persistence and HTTP `ETag` (304 Not Modified) conditional queries to preserve rate limits.
 - **In-App Releases (OTA)**: Automatic update check with direct APK installation from GitHub Releases.
-- **Full Localization**: Native support for 22 interface languages, including Indonesian and English.
 
 ---
 
