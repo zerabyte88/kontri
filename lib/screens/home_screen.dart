@@ -166,9 +166,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     BuildContext context,
   ) {
     const gap = 4.0;
+    const horizontalPadding = 3.0;
     final widths = <double>[];
     final offsets = <double>[];
-    double currentOffset = 0.0;
+    double currentOffset = horizontalPadding;
 
     for (int i = 0; i < categories.length; i++) {
       final label = categories[i]['label']!;
@@ -273,10 +274,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final (widths, offsets) = _calculateCategoryMetrics(categories, context);
       if (index >= widths.length || index >= offsets.length) return;
 
-      final screenWidth = MediaQuery.of(context).size.width;
+      final viewportWidth =
+          _categoryScrollController.position.viewportDimension;
       final tabCenter = offsets[index] + (widths[index] / 2);
       final maxScroll = _categoryScrollController.position.maxScrollExtent;
-      final targetOffset = (tabCenter - (screenWidth / 2)).clamp(
+      final targetOffset = (tabCenter - (viewportWidth / 2)).clamp(
         0.0,
         maxScroll,
       );
@@ -1386,7 +1388,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               context,
             );
             final totalWidth = offsets.isNotEmpty
-                ? offsets.last + widths.last
+                ? offsets.last + widths.last + 3.0
                 : 0.0;
             final selectedIndex = categories.indexWhere(
               (c) => c['id'] == _selectedCategory,
@@ -1400,14 +1402,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: AppTheme.border, width: 1.0),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
-              child: SingleChildScrollView(
-                controller: _categoryScrollController,
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: SizedBox(
-                  width: totalWidth,
-                  height: 34,
+              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                clipBehavior: Clip.antiAlias,
+                child: SingleChildScrollView(
+                  controller: _categoryScrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  clipBehavior: Clip.none,
+                  child: SizedBox(
+                    width: totalWidth,
+                    height: 34,
                   child: Stack(
                     children: [
                       // Sliding capsule indicator
@@ -1503,6 +1509,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          const SizedBox(width: 3),
                           for (int i = 0; i < categories.length; i++) ...[
                             if (i > 0) const SizedBox(width: 4),
                             _buildCategoryTabItem(
@@ -1513,13 +1520,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               categories,
                             ),
                           ],
+                          const SizedBox(width: 3),
                         ],
                       ),
                     ],
                   ),
                 ),
               ),
-            );
+            ),
+          );
           },
         ),
       ],

@@ -820,13 +820,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.1.1',
+      'AppConfig provides accurate release and version telemetry for v1.1.2',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.1.1');
-        expect(AppConfig.buildNumber, '3');
-        expect(AppConfig.fullVersion, 'v1.1.1 (Build 3)');
-        expect(AppConfig.releaseTag, 'v1.1.1');
+        expect(AppConfig.appVersion, 'v1.1.2');
+        expect(AppConfig.buildNumber, '4');
+        expect(AppConfig.fullVersion, 'v1.1.2 (Build 4)');
+        expect(AppConfig.releaseTag, 'v1.1.2');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },

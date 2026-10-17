@@ -719,6 +719,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     final langColor = _getLanguageColor(widget.repo.language);
 
     return GlassCard(
+      width: double.infinity,
       enableBlur: false,
       padding: const EdgeInsets.all(16),
       borderRadius: BorderRadius.circular(14),
@@ -1146,6 +1147,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
 
     if (_readmeError != null) {
       return GlassCard(
+        width: double.infinity,
         enableBlur: false,
         padding: const EdgeInsets.all(24),
         borderRadius: BorderRadius.circular(14),
@@ -1182,6 +1184,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
 
     if (_readmeContent == null || _readmeContent!.trim().isEmpty) {
       return GlassCard(
+        width: double.infinity,
         enableBlur: false,
         padding: const EdgeInsets.all(28),
         borderRadius: BorderRadius.circular(14),
@@ -1218,6 +1221,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
         : null;
 
     return GlassCard(
+      width: double.infinity,
       enableBlur: false,
       padding: const EdgeInsets.all(16),
       borderRadius: BorderRadius.circular(14),
@@ -1416,14 +1420,11 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     }
 
     if (_contentsError != null) {
-      return Container(
+      return GlassCard(
         width: double.infinity,
+        enableBlur: false,
         padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppTheme.border, width: 1),
-        ),
+        borderRadius: BorderRadius.circular(14),
         child: Column(
           children: [
             Icon(
@@ -1443,6 +1444,9 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.surfaceElevated,
                 foregroundColor: AppTheme.primaryCyan,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               icon: const Icon(Icons.refresh_rounded, size: 16),
               label: Text(loc.retry),
@@ -1453,6 +1457,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     }
 
     return GlassCard(
+      width: double.infinity,
       padding: EdgeInsets.zero,
       borderRadius: BorderRadius.circular(14),
       child: Column(

@@ -126,10 +126,12 @@ class _RunningTextState extends State<RunningText> {
         final effectiveStyle =
             widget.style ?? DefaultTextStyle.of(context).style;
         final direction = Directionality.maybeOf(context) ?? TextDirection.ltr;
+        final textScaler = MediaQuery.textScalerOf(context);
 
         final painter = TextPainter(
           text: TextSpan(text: widget.text, style: effectiveStyle),
           maxLines: 1,
+          textScaler: textScaler,
           textDirection: direction,
         )..layout(minWidth: 0, maxWidth: double.infinity);
 
@@ -142,7 +144,6 @@ class _RunningTextState extends State<RunningText> {
             widget.text,
             style: effectiveStyle,
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           );
         }
 

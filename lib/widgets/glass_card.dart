@@ -10,6 +10,8 @@ import '../theme/app_theme.dart';
 /// smooth 60/120 FPS rendering without GPU offscreen buffering overhead.
 class GlassCard extends StatelessWidget {
   final Widget child;
+  final double? width;
+  final double? height;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
   final BorderRadius? borderRadius;
@@ -21,6 +23,8 @@ class GlassCard extends StatelessWidget {
   const GlassCard({
     super.key,
     required this.child,
+    this.width,
+    this.height,
     this.padding,
     this.margin,
     this.borderRadius,
@@ -50,6 +54,8 @@ class GlassCard extends StatelessWidget {
             );
 
         Widget box = Container(
+          width: width,
+          height: height,
           padding: padding,
           decoration: BoxDecoration(
             color: effectiveColor,

@@ -10,7 +10,6 @@ import '../services/github_api_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/animated_app_header.dart';
 import '../widgets/glass_card.dart';
-import '../widgets/running_text.dart';
 
 class FileViewerScreen extends StatefulWidget {
   final GitHubContentItem item;
@@ -203,19 +202,27 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            RunningText(
-              text: widget.item.name,
-              style: TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 15.5,
-                fontWeight: FontWeight.w700,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Text(
+                widget.item.name,
+                style: TextStyle(
+                  color: AppTheme.textPrimary,
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w700,
+                ),
+                maxLines: 1,
               ),
-              autoScroll: true,
             ),
-            RunningText(
-              text: widget.item.path,
-              style: TextStyle(color: AppTheme.textMuted, fontSize: 11),
-              autoScroll: true,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Text(
+                widget.item.path,
+                style: TextStyle(color: AppTheme.textMuted, fontSize: 11),
+                maxLines: 1,
+              ),
             ),
           ],
         ),
@@ -428,14 +435,18 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: RunningText(
-                  text: telemetryText,
-                  style: TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Text(
+                    telemetryText,
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
                   ),
-                  autoScroll: true,
                 ),
               ),
             ],
