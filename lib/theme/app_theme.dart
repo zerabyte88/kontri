@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'Kontri';
-  static const String appVersion = 'v1.1.2';
-  static const String buildNumber = '4';
-  static const String fullVersion = 'v1.1.2 (Build 4)';
-  static const String releaseTag = 'v1.1.2';
+  static const String appVersion = 'v1.2.0';
+  static const String buildNumber = '5';
+  static const String fullVersion = 'v1.2.0 (Build 5)';
+  static const String releaseTag = 'v1.2.0';
   static const String githubRepoUrl = 'https://github.com/zerabyte88/kontri';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';
@@ -161,6 +161,25 @@ class AppTheme {
     AppThemeMode.amoledSnowfall => const Color(0xFFF97316),
     AppThemeMode.amoledPure => const Color(0xFFF97316),
     AppThemeMode.cleanLight => const Color(0xFFEA580C),
+  };
+
+  // Primary action button styling per theme mode
+  static Color get buttonPrimaryBackground => switch (currentMode) {
+    AppThemeMode.amoledSnowfall => const Color(0xFF0284C7),
+    AppThemeMode.amoled => const Color(0xFF00E5FF),
+    AppThemeMode.amoledJapanese => const Color(0xFFF472B6),
+    AppThemeMode.amoledPure => const Color(0xFF60A5FA),
+    AppThemeMode.light => const Color(0xFF2563EB),
+    AppThemeMode.cleanLight => const Color(0xFF0EA5E9),
+  };
+
+  static Color get buttonPrimaryForeground => switch (currentMode) {
+    AppThemeMode.amoled => const Color(0xFF0A0F1D),
+    AppThemeMode.amoledJapanese => const Color(0xFF1E0A14),
+    AppThemeMode.amoledPure => const Color(0xFF0A0F1D),
+    AppThemeMode.amoledSnowfall => Colors.white,
+    AppThemeMode.light => Colors.white,
+    AppThemeMode.cleanLight => Colors.white,
   };
 
   // Typography Monochromatic Hierarchy
@@ -345,10 +364,22 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: prim,
-          foregroundColor: mode == AppThemeMode.amoledSnowfall
-              ? const Color(0xFF0F172A)
-              : Colors.white,
+          backgroundColor: switch (mode) {
+            AppThemeMode.amoledSnowfall => const Color(0xFF0284C7),
+            AppThemeMode.amoled => const Color(0xFF00E5FF),
+            AppThemeMode.amoledJapanese => const Color(0xFFF472B6),
+            AppThemeMode.amoledPure => const Color(0xFF60A5FA),
+            AppThemeMode.light => const Color(0xFF2563EB),
+            AppThemeMode.cleanLight => const Color(0xFF0EA5E9),
+          },
+          foregroundColor: switch (mode) {
+            AppThemeMode.amoled => const Color(0xFF0A0F1D),
+            AppThemeMode.amoledJapanese => const Color(0xFF1E0A14),
+            AppThemeMode.amoledPure => const Color(0xFF0A0F1D),
+            AppThemeMode.amoledSnowfall => Colors.white,
+            AppThemeMode.light => Colors.white,
+            AppThemeMode.cleanLight => Colors.white,
+          },
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(

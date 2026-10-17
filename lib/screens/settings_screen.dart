@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:ota_update/ota_update.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../localization/app_language.dart';
@@ -11,7 +8,6 @@ import '../services/app_language_service.dart';
 import '../services/app_theme_service.dart';
 import '../services/github_api_service.dart';
 import '../services/storage_service.dart';
-import '../services/update_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_card.dart';
 
@@ -33,32 +29,22 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   late final TextEditingController _tokenController;
-  late final UpdateService _updateService;
-  StreamSubscription<OtaEvent>? _otaSubscription;
 
   bool _obscureToken = true;
   bool _isLoadingRateLimit = false;
   GitHubRateLimit? _rateLimit;
-
-  bool _isCheckingUpdate = false;
-  AppUpdateInfo? _updateInfo;
-  bool _isDownloadingUpdate = false;
-  String? _downloadProgress;
-  String? _updateError;
 
   @override
   void initState() {
     super.initState();
     final savedToken = widget.storageService.getToken() ?? '';
     _tokenController = TextEditingController(text: savedToken);
-    _updateService = UpdateService();
     _rateLimit = widget.apiService.lastRateLimit;
     _refreshRateLimit();
   }
 
   @override
   void dispose() {
-    _otaSubscription?.cancel();
     _tokenController.dispose();
     super.dispose();
   }
@@ -114,73 +100,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     widget.onSettingsChanged?.call();
     await _refreshRateLimit();
-  }
-
-  Future<void> _checkForUpdates(AppLocalizations loc) async {
-    setState(() {
-      _isCheckingUpdate = true;
-      _updateError = null;
-    });
-
-    final info = await _updateService.checkForUpdate(
-      personalAccessToken: widget.storageService.getToken(),
-    );
-
-    if (mounted) {
-      setState(() {
-        _updateInfo = info;
-        _isCheckingUpdate = false;
-      });
-      if (!info.hasUpdate) {
-        UpdateService.cleanDownloadedApk();
-        UpdateService.cleanInstalledBackupApk();
-      }
-    }
-  }
-
-  void _runOtaUpdate(String apkUrl, AppLocalizations loc) {
-    setState(() {
-      _isDownloadingUpdate = true;
-      _downloadProgress = '0%';
-      _updateError = null;
-    });
-
-    _otaSubscription?.cancel();
-    _otaSubscription = _updateService
-        .startOtaUpdate(apkUrl)
-        .listen(
-          (OtaEvent event) {
-            if (!mounted) return;
-            setState(() {
-              if (event.status == OtaStatus.DOWNLOADING) {
-                _downloadProgress = '${event.value}%';
-              } else if (event.status == OtaStatus.INSTALLING) {
-                _downloadProgress = loc.installingUpdate;
-                _isDownloadingUpdate = false;
-                UpdateService.saveApkToDownloads(
-                  versionTag: _updateInfo?.latestVersion,
-                );
-              } else if (event.status == OtaStatus.INSTALLATION_DONE) {
-                _downloadProgress = loc.alreadyLatestVersion;
-                _isDownloadingUpdate = false;
-                UpdateService.cleanDownloadedApk();
-                UpdateService.cleanInstalledBackupApk();
-              } else {
-                _isDownloadingUpdate = false;
-                _updateError = loc.updateFailed;
-                UpdateService.cleanDownloadedApk();
-              }
-            });
-          },
-          onError: (err) {
-            if (!mounted) return;
-            setState(() {
-              _isDownloadingUpdate = false;
-              _updateError = loc.updateFailed;
-            });
-            UpdateService.cleanDownloadedApk();
-          },
-        );
   }
 
   Widget _buildModernCard({
@@ -964,6 +883,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.buttonPrimaryBackground,
+                  foregroundColor: AppTheme.buttonPrimaryForeground,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 8,
@@ -1133,155 +1054,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Divider(height: 1, color: AppTheme.border.withAlpha(40)),
-          const SizedBox(height: 12),
 
-          // OTA updates
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryCyan.withAlpha(20),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.system_update_alt_rounded,
-                      color: AppTheme.primaryCyan,
-                      size: 14,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.updateSectionTitle,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      if (_updateInfo != null)
-                        Text(
-                          _updateInfo!.hasUpdate
-                              ? '${loc.updateAvailable}: ${_updateInfo!.latestVersion}'
-                              : loc.alreadyLatestVersion,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: _updateInfo!.hasUpdate
-                                ? AppTheme.accentGreen
-                                : AppTheme.textMuted,
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-              _isCheckingUpdate
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : OutlinedButton(
-                      onPressed: () => _checkForUpdates(loc),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        side: BorderSide(color: AppTheme.border),
-                      ),
-                      child: Text(
-                        loc.checkForUpdates,
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                    ),
-            ],
-          ),
-          if (_updateInfo != null &&
-              _updateInfo!.hasUpdate &&
-              !_isDownloadingUpdate) ...[
-            const SizedBox(height: 10),
-            if (_updateInfo!.releaseNotes.trim().isNotEmpty) ...[
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.surface.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: AppTheme.accentGreen.withValues(alpha: 0.25),
-                    width: 0.8,
-                  ),
-                ),
-                child: Text(
-                  _updateInfo!.releaseNotes.trim(),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 11,
-                    height: 1.35,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-            ],
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.download_rounded, size: 15),
-                onPressed: () =>
-                    _runOtaUpdate(_updateInfo!.apkDownloadUrl!, loc),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accentGreen,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                label: Text(
-                  '${loc.updateNow} (${_updateInfo!.latestVersion})',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-          ],
-          if (_isDownloadingUpdate) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  '${loc.downloadingUpdate} ${_downloadProgress ?? ""}',
-                  style: TextStyle(fontSize: 12, color: AppTheme.primaryCyan),
-                ),
-              ],
-            ),
-          ],
-          if (_updateError != null) ...[
-            const SizedBox(height: 6),
-            Text(
-              _updateError!,
-              style: TextStyle(fontSize: 11.5, color: AppTheme.accentRed),
-            ),
-          ],
         ],
       ),
     );

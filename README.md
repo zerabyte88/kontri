@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/zerabyte88/kontri/releases"><img src="https://img.shields.io/badge/Release-v1.1.2-06b6d4?style=flat&logo=github&logoColor=white&labelColor=0d1117" alt="Release" height="22" /></a>
+  <a href="https://github.com/zerabyte88/kontri/releases"><img src="https://img.shields.io/badge/Release-v1.2.0-06b6d4?style=flat&logo=github&logoColor=white&labelColor=0d1117" alt="Release" height="22" /></a>
   <img src="https://img.shields.io/badge/Platform-Android-10b981?style=flat&logo=android&logoColor=white&labelColor=0d1117" alt="Platform" height="22" />
   <img src="https://img.shields.io/badge/Arch-arm64--v8a-8b5cf6?style=flat&logo=arm&logoColor=white&labelColor=0d1117" alt="Architecture" height="22" />
   <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.13+-02569b?style=flat&logo=flutter&logoColor=white&labelColor=0d1117" alt="Flutter" height="22" /></a>
@@ -33,7 +33,6 @@
 - **Curated Tech Feed**: Trending repositories and industry news curated from GitHub and Dev.to.
 - **AMOLED Themes**: 6 distinct visual themes (Snowfall, Sakura, Midnight Slate, Light, AMOLED Pure, Clean Light) with adjustable surface translucency.
 - **Quota Saver**: Smart local persistence and HTTP `ETag` (304 Not Modified) conditional queries to preserve rate limits.
-- **In-App Releases (OTA)**: Automatic update check with direct APK installation from GitHub Releases.
 
 ---
 
@@ -63,7 +62,6 @@ Tiers evaluate your commitment over the past **365 calendar days**. Both metrics
 | **Document Parser** | `flutter_markdown` | In-app Markdown rendering |
 | **Networking** | `http` | REST v3 communication & Dev.to API |
 | **Storage** | `shared_preferences` | Key-value settings and telemetry cache |
-| **OTA Delivery** | `ota_update` | In-app package installer |
 | **Assets** | `flutter_svg` | Vector icons and brand assets |
 
 ---

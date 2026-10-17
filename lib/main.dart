@@ -8,7 +8,6 @@ import 'services/app_language_service.dart';
 import 'services/app_theme_service.dart';
 import 'services/github_api_service.dart';
 import 'services/storage_service.dart';
-import 'services/update_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/animated_app_background.dart';
 
@@ -21,10 +20,6 @@ void main() async {
     personalAccessToken: storageService.getToken(),
     storageService: storageService,
   );
-
-  // Clean lingering APK files from prior updates
-  UpdateService.cleanDownloadedApk();
-  UpdateService.cleanInstalledBackupApk();
 
   runApp(KontriApp(storageService: storageService, apiService: apiService));
 }

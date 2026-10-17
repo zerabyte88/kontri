@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -28,7 +27,6 @@ import 'package:kontri/services/storage_service.dart';
 import 'package:kontri/services/app_theme_service.dart';
 import 'package:kontri/services/app_language_service.dart';
 import 'package:kontri/services/tech_news_service.dart';
-import 'package:kontri/services/update_service.dart';
 import 'package:kontri/theme/app_theme.dart';
 import 'package:flutter/rendering.dart';
 import 'package:kontri/widgets/animated_app_background.dart';
@@ -820,13 +818,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.1.2',
+      'AppConfig provides accurate release and version telemetry for v1.2.0',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.1.2');
-        expect(AppConfig.buildNumber, '4');
-        expect(AppConfig.fullVersion, 'v1.1.2 (Build 4)');
-        expect(AppConfig.releaseTag, 'v1.1.2');
+        expect(AppConfig.appVersion, 'v1.2.0');
+        expect(AppConfig.buildNumber, '5');
+        expect(AppConfig.fullVersion, 'v1.2.0 (Build 5)');
+        expect(AppConfig.releaseTag, 'v1.2.0');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -851,40 +849,6 @@ void main() {
       expect(enLoc.viewOnGitHub, 'View Repository on GitHub');
     });
 
-    test(
-      'UpdateService compareVersions handles semantic versions correctly',
-      () {
-        expect(UpdateService.compareVersions('v1.0.2', 'v1.0.1'), 1);
-        expect(UpdateService.compareVersions('1.0.1', 'v1.0.1'), 0);
-        expect(UpdateService.compareVersions('v1.0.1', 'v1.0.2'), -1);
-        expect(UpdateService.compareVersions('v1.0.10', 'v1.0.2'), 1);
-        expect(UpdateService.compareVersions('v2.1.0', 'v2.0.0'), 1);
-      },
-    );
-
-    test('UpdateService cleanDownloadedApk removes leftover apk files successfully', () async {
-      final tempDir = await Directory.systemTemp.createTemp(
-        'kontri_ota_test',
-      );
-      try {
-        final apkFile = File('${tempDir.path}/kontri-test.apk');
-        await apkFile.writeAsString('dummy apk content');
-        expect(await apkFile.exists(), true);
-
-        final nonApkFile = File('${tempDir.path}/important_notes.txt');
-        await nonApkFile.writeAsString('keep me');
-        expect(await nonApkFile.exists(), true);
-
-        final deleted = await UpdateService.cleanDownloadedApk(
-          customPath: tempDir.path,
-        );
-        expect(deleted, true);
-        expect(await apkFile.exists(), false);
-        expect(await nonApkFile.exists(), true);
-      } finally {
-        await tempDir.delete(recursive: true);
-      }
-    });
 
     test('TechNewsService caches results in-memory to prevent duplicate network calls', () async {
       final service = TechNewsService();
@@ -1008,77 +972,6 @@ void main() {
       expect(service.isTagCachedOrOffline('trending'), true);
     });
 
-    test('UpdateService backupApkToDownloads handles missing files safely without throwing', () async {
-      final result = await UpdateService.backupApkToDownloads(
-        versionTag: 'v1.0.3',
-      );
-      // In unit test environment (not Android or source file not present), should safely return null
-      expect(result, isNull);
-    });
-
-    test('UpdateService cleanInstalledBackupApk deletes only installed Kontri APK and preserves user data', () async {
-      final tempDir = await Directory.systemTemp.createTemp(
-        'kontri_download_test',
-      );
-      try {
-        final installedApk = File('${tempDir.path}/Kontri-v1.0.3.apk');
-        final newerApk = File('${tempDir.path}/Kontri-v1.0.4.apk');
-        final otherApk = File('${tempDir.path}/OtherApp.apk');
-        final userDocument = File('${tempDir.path}/important_document.pdf');
-        final userPhoto = File('${tempDir.path}/family_photo.jpg');
-
-        await installedApk.writeAsString('mock apk 1.0.3');
-        await newerApk.writeAsString('mock apk 1.0.4');
-        await otherApk.writeAsString('mock other apk');
-        await userDocument.writeAsString('mock user pdf document');
-        await userPhoto.writeAsString('mock user photo');
-
-        final deleted = await UpdateService.cleanInstalledBackupApk(
-          currentVersion: '1.0.3',
-          customPath: tempDir.path,
-        );
-
-        expect(deleted, true);
-        // The installed APK must be deleted
-        expect(await installedApk.exists(), false);
-        // Newer APK (not yet installed) must be preserved
-        expect(await newerApk.exists(), true);
-        // Other app APK must NEVER be touched
-        expect(await otherApk.exists(), true);
-        // User personal documents and photos must NEVER be touched
-        expect(await userDocument.exists(), true);
-        expect(await userPhoto.exists(), true);
-      } finally {
-        await tempDir.delete(recursive: true);
-      }
-    });
-
-    test('UpdateService cleanInstalledBackupApk cleans Kontri subfolder and removes empty directory', () async {
-      final tempDir = await Directory.systemTemp.createTemp(
-        'kontri_subfolder_test',
-      );
-      try {
-        final subDir = Directory('${tempDir.path}/Kontri');
-        await subDir.create();
-
-        final installedSubApk = File('${subDir.path}/Kontri-v1.0.3.apk');
-        await installedSubApk.writeAsString('mock apk 1.0.3');
-
-        final deleted = await UpdateService.cleanInstalledBackupApk(
-          currentVersion: '1.0.3',
-          customPath: tempDir.path,
-        );
-
-        expect(deleted, true);
-        expect(await installedSubApk.exists(), false);
-        // The empty Kontri subfolder should also be deleted
-        expect(await subDir.exists(), false);
-      } finally {
-        if (await tempDir.exists()) {
-          await tempDir.delete(recursive: true);
-        }
-      }
-    });
 
     testWidgets(
       'LanguageChart renders percentage without KB bytes and aligns in 2-column layout',
@@ -2944,6 +2837,33 @@ void main() {
         await tester.pump(const Duration(milliseconds: 150));
         await tester.pumpAndSettle();
         expect(find.text('Go to Destination'), findsOneWidget);
+      },
+    );
+
+    test(
+      'AppTheme primary action button colors conform to readability specifications',
+      () {
+        AppTheme.currentMode = AppThemeMode.amoled;
+        expect(AppTheme.buttonPrimaryForeground, const Color(0xFF0A0F1D));
+        expect(AppTheme.buttonPrimaryBackground, const Color(0xFF00E5FF));
+
+        AppTheme.currentMode = AppThemeMode.amoledJapanese;
+        expect(AppTheme.buttonPrimaryForeground, const Color(0xFF1E0A14));
+        expect(AppTheme.buttonPrimaryBackground, const Color(0xFFF472B6));
+
+        AppTheme.currentMode = AppThemeMode.amoledPure;
+        expect(AppTheme.buttonPrimaryForeground, const Color(0xFF0A0F1D));
+        expect(AppTheme.buttonPrimaryBackground, const Color(0xFF60A5FA));
+
+        AppTheme.currentMode = AppThemeMode.amoledSnowfall;
+        expect(AppTheme.buttonPrimaryForeground, Colors.white);
+        expect(AppTheme.buttonPrimaryBackground, const Color(0xFF0284C7));
+
+        AppTheme.currentMode = AppThemeMode.light;
+        expect(AppTheme.buttonPrimaryForeground, Colors.white);
+
+        AppTheme.currentMode = AppThemeMode.cleanLight;
+        expect(AppTheme.buttonPrimaryForeground, Colors.white);
       },
     );
   });
