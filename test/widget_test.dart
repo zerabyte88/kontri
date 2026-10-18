@@ -818,13 +818,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.2.0',
+      'AppConfig provides accurate release and version telemetry for v1.2.1',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.2.0');
-        expect(AppConfig.buildNumber, '5');
-        expect(AppConfig.fullVersion, 'v1.2.0 (Build 5)');
-        expect(AppConfig.releaseTag, 'v1.2.0');
+        expect(AppConfig.appVersion, 'v1.2.1');
+        expect(AppConfig.buildNumber, '6');
+        expect(AppConfig.fullVersion, 'v1.2.1 (Build 6)');
+        expect(AppConfig.releaseTag, 'v1.2.1');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1054,6 +1054,14 @@ void main() {
         expect(AppThemeMode.fromKey('light_clean'), AppThemeMode.cleanLight);
         expect(AppThemeMode.fromKey('clean_light'), AppThemeMode.cleanLight);
 
+        // Verify isLight property on AppThemeMode
+        expect(AppThemeMode.light.isLight, isTrue);
+        expect(AppThemeMode.cleanLight.isLight, isTrue);
+        expect(AppThemeMode.amoledSnowfall.isLight, isFalse);
+        expect(AppThemeMode.amoled.isLight, isFalse);
+        expect(AppThemeMode.amoledJapanese.isLight, isFalse);
+        expect(AppThemeMode.amoledPure.isLight, isFalse);
+
         // Verify native system font typography is configured
         expect(darkTheme.textTheme.bodyMedium, isNotNull);
       },
@@ -1172,6 +1180,20 @@ void main() {
         await AppThemeService.changeTheme(AppThemeMode.light, storage);
         await tester.pump(const Duration(milliseconds: 100));
         expect(find.text('Kontri'), findsOneWidget);
+
+        await AppThemeService.changeTheme(AppThemeMode.cleanLight, storage);
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(find.text('Kontri'), findsOneWidget);
+
+        // Verify logo container in cleanLight theme uses light elevated surface instead of black
+        final containerFinder = find.ancestor(
+          of: find.byType(KontriLogo),
+          matching: find.byType(Container),
+        );
+        final containerWidget = tester.widget<Container>(containerFinder.first);
+        final decoration = containerWidget.decoration as BoxDecoration;
+        expect(decoration.color, AppTheme.surfaceElevated);
+        expect(decoration.border, isNotNull);
       },
     );
 

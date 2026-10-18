@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'Kontri';
-  static const String appVersion = 'v1.2.0';
-  static const String buildNumber = '5';
-  static const String fullVersion = 'v1.2.0 (Build 5)';
-  static const String releaseTag = 'v1.2.0';
+  static const String appVersion = 'v1.2.1';
+  static const String buildNumber = '6';
+  static const String fullVersion = 'v1.2.1 (Build 6)';
+  static const String releaseTag = 'v1.2.1';
   static const String githubRepoUrl = 'https://github.com/zerabyte88/kontri';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';
@@ -24,6 +24,9 @@ enum AppThemeMode {
 
   final String key;
   const AppThemeMode(this.key);
+
+  bool get isLight =>
+      this == AppThemeMode.light || this == AppThemeMode.cleanLight;
 
   static const AppThemeMode dark = amoledSnowfall;
 
@@ -216,16 +219,13 @@ class AppTheme {
     AppThemeMode.cleanLight => const Color(0xFF94A3B8), // Slate 400
   };
 
-  static bool get isLight =>
-      currentMode == AppThemeMode.light ||
-      currentMode == AppThemeMode.cleanLight;
+  static bool get isLight => currentMode.isLight;
 
   static ThemeData get currentThemeData => getTheme(currentMode);
   static ThemeData get darkTheme => getTheme(AppThemeMode.amoledSnowfall);
 
   static ThemeData getTheme(AppThemeMode mode) {
-    final isLightMode =
-        mode == AppThemeMode.light || mode == AppThemeMode.cleanLight;
+    final isLightMode = mode.isLight;
     final baseTextTheme = isLightMode
         ? ThemeData.light().textTheme
         : ThemeData.dark().textTheme;

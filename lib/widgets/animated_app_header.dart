@@ -196,7 +196,7 @@ class AnimatedAppHeader extends StatelessWidget {
             children: [
               _buildLogoContainer(
                 accentColor,
-                isLight: currentTheme == AppThemeMode.light,
+                isLight: currentTheme.isLight,
               ),
               const SizedBox(width: 9),
               _buildTitle(),
