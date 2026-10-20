@@ -110,7 +110,7 @@ const Map<String, String> idTranslations = {
   'updateFailed': 'Pembaruan otomatis gagal. Buka di browser?',
   'openInBrowser': 'Unduh via Browser',
   'developerLabel': 'Pengembang',
-  'developerRole': 'Creator',
+  'developerRole': 'Pencipta',
   'madeWithLove': 'Dikembangkan oleh zerabyte88',
   'rateLimitStatus': 'Status Kuota API GitHub',
   'personalTokenActive': 'Personal Token Aktif (Maks 5.000 req/jam)',
@@ -446,7 +446,8 @@ const Map<String, String> msTranslations = {
   'themeAmoledPure': 'Pure AMOLED',
   'themeAmoledPureSubtitle': 'Latar belakang hitam pekat statik tanpa animasi',
   'themeCleanLight': 'Clean Light',
-  'themeCleanLightSubtitle': 'Latar belakang cerah minimalis statik tanpa animasi',
+  'themeCleanLightSubtitle':
+      'Latar belakang cerah minimalis statik tanpa animasi',
   'searchRepoFiles': 'Cari fail dalam repositori...',
   'noFilesFound': 'Tiada fail yang sepadan ditemui.',
   'loadingFiles': 'Memuatkan senarai fail...',
@@ -867,9 +868,11 @@ const Map<String, String> deTranslations = {
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
   'themeAmoledPure': 'Pure AMOLED',
-  'themeAmoledPureSubtitle': 'Statischer tiefschwarzer Hintergrund ohne Animationen',
+  'themeAmoledPureSubtitle':
+      'Statischer tiefschwarzer Hintergrund ohne Animationen',
   'themeCleanLight': 'Clean Light',
-  'themeCleanLightSubtitle': 'Minimalistischer heller Hintergrund ohne Animationen',
+  'themeCleanLightSubtitle':
+      'Minimalistischer heller Hintergrund ohne Animationen',
   'searchRepoFiles': 'Dateien im Repository suchen...',
   'noFilesFound': 'Keine passenden Dateien gefunden.',
   'loadingFiles': 'Dateien werden geladen...',
@@ -1724,7 +1727,8 @@ const Map<String, String> itTranslations = {
   'themeAmoledPure': 'AMOLED Puro',
   'themeAmoledPureSubtitle': 'Sfondo nero assoluto statico senza animazioni',
   'themeCleanLight': 'Clean Light',
-  'themeCleanLightSubtitle': 'Sfondo chiaro minimalista statico senza animazioni',
+  'themeCleanLightSubtitle':
+      'Sfondo chiaro minimalista statico senza animazioni',
   'searchRepoFiles': 'Cerca file nel repository...',
   'noFilesFound': 'Nessun file corrispondente trovato.',
   'loadingFiles': 'Caricamento file...',
@@ -1935,7 +1939,8 @@ const Map<String, String> nlTranslations = {
   'themeAmoledPure': 'Puur AMOLED',
   'themeAmoledPureSubtitle': 'Statische pikzwarte achtergrond zonder animaties',
   'themeCleanLight': 'Clean Light',
-  'themeCleanLightSubtitle': 'Minimalistische lichte achtergrond zonder animaties',
+  'themeCleanLightSubtitle':
+      'Minimalistische lichte achtergrond zonder animaties',
   'searchRepoFiles': 'Zoek bestanden in repository...',
   'noFilesFound': 'Geen overeenkomende bestanden gevonden.',
   'loadingFiles': 'Bestanden laden...',
@@ -2996,7 +3001,8 @@ const Map<String, String> viTranslations = {
   'themeAmoledPure': 'AMOLED Thuần túy',
   'themeAmoledPureSubtitle': 'Nền đen tuyền tĩnh không có hiệu ứng chuyển động',
   'themeCleanLight': 'Clean Light',
-  'themeCleanLightSubtitle': 'Nền sáng tối giản tĩnh không có hiệu ứng chuyển động',
+  'themeCleanLightSubtitle':
+      'Nền sáng tối giản tĩnh không có hiệu ứng chuyển động',
   'searchRepoFiles': 'Tìm kiếm tệp dalam kho lưu trữ...',
   'noFilesFound': 'Không tìm thấy tệp phù hợp.',
   'loadingFiles': 'Đang tải danh sách tệp...',
