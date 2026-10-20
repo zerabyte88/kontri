@@ -856,22 +856,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 10),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (hasToken) ...[
-                TextButton(
-                  onPressed: () => _clearToken(loc),
-                  child: Text(
-                    loc.deleteToken,
-                    style: TextStyle(
-                      color: AppTheme.accentRed,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
               ElevatedButton.icon(
                 onPressed: () => _saveToken(loc),
                 icon: const Icon(Icons.check_rounded, size: 14),
@@ -891,6 +877,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
+              if (hasToken)
+                TextButton(
+                  onPressed: () => _clearToken(loc),
+                  child: Text(
+                    loc.deleteToken,
+                    style: TextStyle(
+                      color: AppTheme.accentRed,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
             ],
           ),
         ],

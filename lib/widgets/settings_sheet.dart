@@ -1348,25 +1348,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                if (hasToken) ...[
-                                  TextButton.icon(
-                                    icon: const Icon(
-                                      Icons.delete_outline_rounded,
-                                      size: 15,
-                                    ),
-                                    label: Text(loc.deleteToken),
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: AppTheme.accentRed,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 8,
-                                      ),
-                                      visualDensity: VisualDensity.compact,
-                                    ),
-                                    onPressed: () => _clearToken(loc),
-                                  ),
-                                  const SizedBox(width: 12),
-                                ],
                                 ElevatedButton(
                                   onPressed: () => _saveToken(loc),
                                   style: ElevatedButton.styleFrom(
@@ -1388,6 +1369,25 @@ class _SettingsSheetState extends State<SettingsSheet> {
                                     ),
                                   ),
                                 ),
+                                if (hasToken) ...[
+                                  const SizedBox(width: 12),
+                                  TextButton.icon(
+                                    icon: const Icon(
+                                      Icons.delete_outline_rounded,
+                                      size: 15,
+                                    ),
+                                    label: Text(loc.deleteToken),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: AppTheme.accentRed,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 8,
+                                      ),
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                    onPressed: () => _clearToken(loc),
+                                  ),
+                                ],
                               ],
                             ),
                           ],
