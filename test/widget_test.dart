@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:kontri/localization/app_language.dart';
 import 'package:kontri/localization/app_localizations.dart';
+import 'package:kontri/localization/app_translations_data.dart';
 import 'package:kontri/models/bookmarked_user.dart';
 import 'package:kontri/models/contribution_stats.dart';
 import 'package:kontri/models/github_commit_info.dart';
@@ -818,14 +819,15 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.2.1',
+      'AppConfig provides accurate release and version telemetry for v1.2.2',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.2.1');
-        expect(AppConfig.buildNumber, '6');
-        expect(AppConfig.fullVersion, 'v1.2.1 (Build 6)');
-        expect(AppConfig.releaseTag, 'v1.2.1');
+        expect(AppConfig.appVersion, 'v1.2.2');
+        expect(AppConfig.buildNumber, '10220');
+        expect(AppConfig.fullVersion, 'v1.2.2 (Build 10220)');
+        expect(AppConfig.releaseTag, 'v1.2.2');
         expect(AppConfig.license, 'MIT License');
+        expect(AppConfig.architecture, 'ARM64-v8a');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
     );
@@ -847,6 +849,26 @@ void main() {
       expect(enLoc.licenseLabel, 'License');
       expect(idLoc.viewOnGitHub, 'Lihat Repositori di GitHub');
       expect(enLoc.viewOnGitHub, 'View Repository on GitHub');
+      expect(idLoc.developerRole, 'Creator');
+      expect(enLoc.developerRole, 'Creator');
+    });
+
+    test('All 22 languages have complete key parity and developerRole is localized without maintainer', () {
+      final baseKeys = appTranslations[AppLanguage.english]!.keys.toSet();
+      for (final lang in AppLanguage.values) {
+        final langMap = appTranslations[lang]!;
+        final missing = baseKeys.difference(langMap.keys.toSet());
+        expect(missing, isEmpty, reason: '${lang.name} is missing keys: $missing');
+        final extra = langMap.keys.toSet().difference(baseKeys);
+        expect(extra, isEmpty, reason: '${lang.name} has extra keys: $extra');
+
+        final role = langMap['developerRole']!;
+        expect(role.isNotEmpty, true);
+        expect(role.contains('Maintainer'), false);
+        expect(role.contains('メンテナー'), false);
+        expect(role.contains('维护者'), false);
+        expect(role.contains('유지관리자'), false);
+      }
     });
 
 

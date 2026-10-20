@@ -110,7 +110,7 @@ const Map<String, String> idTranslations = {
   'updateFailed': 'Pembaruan otomatis gagal. Buka di browser?',
   'openInBrowser': 'Unduh via Browser',
   'developerLabel': 'Pengembang',
-  'developerRole': 'Creator & Maintainer',
+  'developerRole': 'Creator',
   'madeWithLove': 'Dikembangkan oleh zerabyte88',
   'rateLimitStatus': 'Status Kuota API GitHub',
   'personalTokenActive': 'Personal Token Aktif (Maks 5.000 req/jam)',
@@ -319,7 +319,7 @@ const Map<String, String> msTranslations = {
   'updateFailed': 'Kemas kini aplikasi gagal',
   'openInBrowser': 'Buka dalam Pelayar',
   'developerLabel': 'Pembangun',
-  'developerRole': 'Jurutera Mudah Alih & Penuh',
+  'developerRole': 'Pencipta',
   'madeWithLove': 'Dicipta dengan dedikasi untuk komuniti sumber terbuka',
   'rateLimitStatus': 'Status Had Kadar API',
   'personalTokenActive': 'Token Peribadi Aktif (5,000 req/jam)',
@@ -443,6 +443,13 @@ const Map<String, String> msTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'Pure AMOLED',
+  'themeAmoledPureSubtitle': 'Latar belakang hitam pekat statik tanpa animasi',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Latar belakang cerah minimalis statik tanpa animasi',
+  'searchRepoFiles': 'Cari fail dalam repositori...',
+  'noFilesFound': 'Tiada fail yang sepadan ditemui.',
+  'loadingFiles': 'Memuatkan senarai fail...',
 };
 
 const Map<String, String> daTranslations = {
@@ -522,7 +529,7 @@ const Map<String, String> daTranslations = {
   'updateFailed': 'Opdatering mislykkedes',
   'openInBrowser': 'Åbn i browser',
   'developerLabel': 'Udvikler',
-  'developerRole': 'Mobil & Full-stack Ingeniør',
+  'developerRole': 'Skaber',
   'madeWithLove': 'Skabt med passion for open-source-fællesskabet',
   'rateLimitStatus': 'API-hastighedsbegrænsning status',
   'personalTokenActive': 'Personlig token aktiv (5.000 req/t)',
@@ -646,6 +653,13 @@ const Map<String, String> daTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'Ren AMOLED',
+  'themeAmoledPureSubtitle': 'Statisk kulsort baggrund uden animationer',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Minimalistisk lys baggrund uden animationer',
+  'searchRepoFiles': 'Søg filer i repository...',
+  'noFilesFound': 'Ingen matchende filer fundet.',
+  'loadingFiles': 'Indlæser filer...',
 };
 
 const Map<String, String> deTranslations = {
@@ -727,7 +741,7 @@ const Map<String, String> deTranslations = {
   'updateFailed': 'App-Update fehlgeschlagen',
   'openInBrowser': 'Im Browser öffnen',
   'developerLabel': 'Entwickler',
-  'developerRole': 'Mobile & Full-Stack Entwickler',
+  'developerRole': 'Schöpfer',
   'madeWithLove': 'Mit Hingabe für die Open-Source-Community entwickelt',
   'rateLimitStatus': 'API-Rate-Limit-Status',
   'personalTokenActive': 'Persönliches Token aktiv (5.000 Anfr./Std.)',
@@ -852,6 +866,13 @@ const Map<String, String> deTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'Pure AMOLED',
+  'themeAmoledPureSubtitle': 'Statischer tiefschwarzer Hintergrund ohne Animationen',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Minimalistischer heller Hintergrund ohne Animationen',
+  'searchRepoFiles': 'Dateien im Repository suchen...',
+  'noFilesFound': 'Keine passenden Dateien gefunden.',
+  'loadingFiles': 'Dateien werden geladen...',
 };
 
 const Map<String, String> enTranslations = {
@@ -939,7 +960,7 @@ const Map<String, String> enTranslations = {
   'updateFailed': 'Automatic update failed. Open in browser?',
   'openInBrowser': 'Download via Browser',
   'developerLabel': 'Developer',
-  'developerRole': 'Creator & Maintainer',
+  'developerRole': 'Creator',
   'madeWithLove': 'Developed by zerabyte88',
   'rateLimitStatus': 'GitHub API Quota Status',
   'personalTokenActive': 'Personal Token Active (Max 5,000 req/hr)',
@@ -1146,7 +1167,7 @@ const Map<String, String> esTranslations = {
   'updateFailed': 'Error al actualizar la app',
   'openInBrowser': 'Abrir en el navegador',
   'developerLabel': 'Desarrollador',
-  'developerRole': 'Ingeniero Mobile & Full-stack',
+  'developerRole': 'Creador',
   'madeWithLove': 'Creado con dedicación para la comunidad de código abierto',
   'rateLimitStatus': 'Estado del límite de API',
   'personalTokenActive': 'Token personal activo (5.000 sol/h)',
@@ -1272,6 +1293,13 @@ const Map<String, String> esTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'AMOLED Puro',
+  'themeAmoledPureSubtitle': 'Fondo negro azabache estático sin animaciones',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Fondo claro minimalista estático sin animaciones',
+  'searchRepoFiles': 'Buscar archivos en el repositorio...',
+  'noFilesFound': 'No se encontraron archivos coincidentes.',
+  'loadingFiles': 'Cargando archivos...',
 };
 
 const Map<String, String> frTranslations = {
@@ -1353,7 +1381,7 @@ const Map<String, String> frTranslations = {
   'updateFailed': 'Échec de la mise à jour',
   'openInBrowser': 'Ouvrir dans le navigateur',
   'developerLabel': 'Développeur',
-  'developerRole': 'Ingénieur Mobile & Full-stack',
+  'developerRole': 'Créateur',
   'madeWithLove': 'Créé avec passion pour la communauté open source',
   'rateLimitStatus': 'Statut de limite d\'API',
   'personalTokenActive': 'Jeton personnel actif (5 000 req/h)',
@@ -1479,6 +1507,13 @@ const Map<String, String> frTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'AMOLED Pur',
+  'themeAmoledPureSubtitle': 'Fond noir absolu statique sans animation',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Fond clair minimaliste statique sans animation',
+  'searchRepoFiles': 'Rechercher des fichiers dans le dépôt...',
+  'noFilesFound': 'Aucun fichier correspondant trouvé.',
+  'loadingFiles': 'Chargement des fichiers...',
 };
 
 const Map<String, String> itTranslations = {
@@ -1560,7 +1595,7 @@ const Map<String, String> itTranslations = {
   'updateFailed': 'Aggiornamento non riuscito',
   'openInBrowser': 'Apri nel browser',
   'developerLabel': 'Sviluppatore',
-  'developerRole': 'Ingegnere Mobile & Full-stack',
+  'developerRole': 'Creatore',
   'madeWithLove': 'Creato con dedizione per la comunità open source',
   'rateLimitStatus': 'Stato limite richieste API',
   'personalTokenActive': 'Token personale attivo (5.000 rich/ora)',
@@ -1686,6 +1721,13 @@ const Map<String, String> itTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'AMOLED Puro',
+  'themeAmoledPureSubtitle': 'Sfondo nero assoluto statico senza animazioni',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Sfondo chiaro minimalista statico senza animazioni',
+  'searchRepoFiles': 'Cerca file nel repository...',
+  'noFilesFound': 'Nessun file corrispondente trovato.',
+  'loadingFiles': 'Caricamento file...',
 };
 
 const Map<String, String> nlTranslations = {
@@ -1767,7 +1809,7 @@ const Map<String, String> nlTranslations = {
   'updateFailed': 'Update van app mislukt',
   'openInBrowser': 'Openen in browser',
   'developerLabel': 'Ontwikkelaar',
-  'developerRole': 'Mobiel & Full-stack Engineer',
+  'developerRole': 'Maker',
   'madeWithLove': 'Gemaakt met passie voor de open-sourcegemeenschap',
   'rateLimitStatus': 'API Rate Limit Status',
   'personalTokenActive': 'Persoonlijk token actief (5.000 verzoeken/uur)',
@@ -1890,6 +1932,13 @@ const Map<String, String> nlTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'Puur AMOLED',
+  'themeAmoledPureSubtitle': 'Statische pikzwarte achtergrond zonder animaties',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Minimalistische lichte achtergrond zonder animaties',
+  'searchRepoFiles': 'Zoek bestanden in repository...',
+  'noFilesFound': 'Geen overeenkomende bestanden gevonden.',
+  'loadingFiles': 'Bestanden laden...',
 };
 
 const Map<String, String> noTranslations = {
@@ -1970,7 +2019,7 @@ const Map<String, String> noTranslations = {
   'updateFailed': 'Oppdatering mislyktes',
   'openInBrowser': 'Åpne i nettleser',
   'developerLabel': 'Utvikler',
-  'developerRole': 'Mobil og Full-stack Utvikler',
+  'developerRole': 'Skaper',
   'madeWithLove': 'Laget med lidenskap for åpen kildekode-fellesskapet',
   'rateLimitStatus': 'Status for API-grense',
   'personalTokenActive': 'Personlig token aktiv (5 000 foresp./t)',
@@ -2093,6 +2142,13 @@ const Map<String, String> noTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'Ren AMOLED',
+  'themeAmoledPureSubtitle': 'Statisk bekmørk bakgrunn uten animasjoner',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Minimalistisk lys bakgrunn uten animasjoner',
+  'searchRepoFiles': 'Søk filer i depotet...',
+  'noFilesFound': 'Ingen matchende filer funnet.',
+  'loadingFiles': 'Laster inn filer...',
 };
 
 const Map<String, String> ptTranslations = {
@@ -2174,7 +2230,7 @@ const Map<String, String> ptTranslations = {
   'updateFailed': 'Falha ao atualizar o aplicativo',
   'openInBrowser': 'Abrir no navegador',
   'developerLabel': 'Desenvolvedor',
-  'developerRole': 'Engenheiro Mobile & Full-stack',
+  'developerRole': 'Criador',
   'madeWithLove': 'Criado com dedicação para a comunidade open source',
   'rateLimitStatus': 'Status do limite de API',
   'personalTokenActive': 'Token pessoal ativo (5.000 req/h)',
@@ -2300,6 +2356,13 @@ const Map<String, String> ptTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'AMOLED Puro',
+  'themeAmoledPureSubtitle': 'Fundo preto puro estático sem animações',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Fondo claro minimalista estático sem animações',
+  'searchRepoFiles': 'Pesquisar arquivos no repositório...',
+  'noFilesFound': 'Nenhum arquivo correspondente encontrado.',
+  'loadingFiles': 'Carregando arquivos...',
 };
 
 const Map<String, String> fiTranslations = {
@@ -2381,7 +2444,7 @@ const Map<String, String> fiTranslations = {
   'updateFailed': 'Sovelluksen päivitys epäonnistui',
   'openInBrowser': 'Avaa selaimessa',
   'developerLabel': 'Kehittäjä',
-  'developerRole': 'Mobiili- ja Full-stack -kehittäjä',
+  'developerRole': 'Luoja',
   'madeWithLove': 'Tehty omistautumisella avoimen lähdekoodin yhteisölle',
   'rateLimitStatus': 'API-rajapinnan tilarajoitus',
   'personalTokenActive':
@@ -2505,6 +2568,13 @@ const Map<String, String> fiTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'Puhdas AMOLED',
+  'themeAmoledPureSubtitle': 'Staattinen pikimusta tausta ilman animaatioita',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Minimalistinen vaalea tausta ilman animaatioita',
+  'searchRepoFiles': 'Etsi tiedostoja repositoriosta...',
+  'noFilesFound': 'Vastaavia tiedostoja ei löytynyt.',
+  'loadingFiles': 'Ladataan tiedostoja...',
 };
 
 const Map<String, String> svTranslations = {
@@ -2586,7 +2656,7 @@ const Map<String, String> svTranslations = {
   'updateFailed': 'Uppdateringen misslyckades',
   'openInBrowser': 'Öppna i webbläsare',
   'developerLabel': 'Utvecklare',
-  'developerRole': 'Mobil- och Fullstack-utvecklare',
+  'developerRole': 'Skapare',
   'madeWithLove': 'Skapad med passion för öppen källkod-gemenskapen',
   'rateLimitStatus': 'Status för API-hastighetsgräns',
   'personalTokenActive': 'Personlig token aktiv (5 000 förfr./tim)',
@@ -2710,6 +2780,13 @@ const Map<String, String> svTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'Ren AMOLED',
+  'themeAmoledPureSubtitle': 'Statisk kolsvart bakgrund utan animationer',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Minimalistisk ljus bakgrund utan animationer',
+  'searchRepoFiles': 'Sök filer i arkivet...',
+  'noFilesFound': 'Inga matchande filer hittades.',
+  'loadingFiles': 'Laddar filer...',
 };
 
 const Map<String, String> viTranslations = {
@@ -2792,7 +2869,7 @@ const Map<String, String> viTranslations = {
   'updateFailed': 'Cập nhật ứng dụng thất bại',
   'openInBrowser': 'Mở trong trình duyệt',
   'developerLabel': 'Nhà phát triển',
-  'developerRole': 'Kỹ sư Di động & Full-stack',
+  'developerRole': 'Người sáng tạo',
   'madeWithLove': 'Được tạo ra với đam mê dành cho cộng đồng mã nguồn mở',
   'rateLimitStatus': 'Trạng thái giới hạn API',
   'personalTokenActive': 'Token cá nhân đang hoạt động (5.000 yêu cầu/giờ)',
@@ -2916,6 +2993,13 @@ const Map<String, String> viTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'AMOLED Thuần túy',
+  'themeAmoledPureSubtitle': 'Nền đen tuyền tĩnh không có hiệu ứng chuyển động',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Nền sáng tối giản tĩnh không có hiệu ứng chuyển động',
+  'searchRepoFiles': 'Tìm kiếm tệp dalam kho lưu trữ...',
+  'noFilesFound': 'Không tìm thấy tệp phù hợp.',
+  'loadingFiles': 'Đang tải danh sách tệp...',
 };
 
 const Map<String, String> ruTranslations = {
@@ -2998,7 +3082,7 @@ const Map<String, String> ruTranslations = {
   'updateFailed': 'Не удалось обновить приложение',
   'openInBrowser': 'Открыть в браузере',
   'developerLabel': 'Разработчик',
-  'developerRole': 'Мобильный и Full-stack инженер',
+  'developerRole': 'Создатель',
   'madeWithLove':
       'Создано с любовью для сообщества разработчиков открытого исходного кода',
   'rateLimitStatus': 'Статус лимита вызовов API',
@@ -3122,6 +3206,13 @@ const Map<String, String> ruTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'Чистый AMOLED',
+  'themeAmoledPureSubtitle': 'Статичный глубокий черный фон без анимаций',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'Минималистичный светлый фон без анимаций',
+  'searchRepoFiles': 'Поиск файлов в репозитории...',
+  'noFilesFound': 'Подходящие файлы не найдены.',
+  'loadingFiles': 'Загрузка файлов...',
 };
 
 const Map<String, String> arTranslations = {
@@ -3202,7 +3293,7 @@ const Map<String, String> arTranslations = {
   'updateFailed': 'فشل تحديث التطبيق',
   'openInBrowser': 'فتح في المتصفح',
   'developerLabel': 'المطور',
-  'developerRole': 'مهندس تطبيقات الهاتف وFull-stack',
+  'developerRole': 'المبتكر',
   'madeWithLove': 'صُنع بشغف لمجتمع البرمجيات مفتوحة المصدر',
   'rateLimitStatus': 'حالة الحد الأقصى لمعدل API',
   'personalTokenActive': 'الرمز الشخصي نشط (5,000 طلب/ساعة)',
@@ -3325,6 +3416,13 @@ const Map<String, String> arTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'AMOLED نقي',
+  'themeAmoledPureSubtitle': 'خلفية سوداء حالكة وثابتة بدون رسوم متحركة',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'خلفية مضيئة وبسيطة ثابتة بدون رسوم متحركة',
+  'searchRepoFiles': 'البحث عن ملفات في المستودع...',
+  'noFilesFound': 'لم يتم العثور على ملفات مطابقة.',
+  'loadingFiles': 'جارٍ تحميل الملفات...',
 };
 
 const Map<String, String> hiTranslations = {
@@ -3405,7 +3503,7 @@ const Map<String, String> hiTranslations = {
   'updateFailed': 'ऐप अपडेट करने में विफल',
   'openInBrowser': 'ब्राउज़र में खोलें',
   'developerLabel': 'डेवलपर',
-  'developerRole': 'मोबाइल और फुल-स्टैक इंजीनियर',
+  'developerRole': 'निर्माता',
   'madeWithLove': 'ओपन-सोर्स समुदाय के लिए समर्पण के साथ तैयार किया गया',
   'rateLimitStatus': 'API दर सीमा स्थिति',
   'personalTokenActive': 'व्यक्तिगत टोकन सक्रिय (5,000 अनुरोध/घंटा)',
@@ -3528,6 +3626,13 @@ const Map<String, String> hiTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'प्योर AMOLED',
+  'themeAmoledPureSubtitle': 'बिना एनिमेशन वाली स्थिर गहरी काली पृष्ठभूमि',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'बिना एनिमेशन वाली स्थिर साफ और हल्की पृष्ठभूमि',
+  'searchRepoFiles': 'रिपॉजिटरी में फ़ाइलें खोजें...',
+  'noFilesFound': 'कोई मेल खाती फ़ाइल नहीं मिली।',
+  'loadingFiles': 'फ़ाइलें लोड हो रही हैं...',
 };
 
 const Map<String, String> thTranslations = {
@@ -3610,7 +3715,7 @@ const Map<String, String> thTranslations = {
   'updateFailed': 'อัปเดตแอปไม่สำเร็จ',
   'openInBrowser': 'เปิดในเบราว์เซอร์',
   'developerLabel': 'ผู้พัฒนา',
-  'developerRole': 'วิศวกรซอฟต์แวร์มือถือและฟูลสแตก',
+  'developerRole': 'ผู้สร้าง',
   'madeWithLove': 'สร้างขึ้นด้วยความมุ่งมั่นสำหรับชุมชนโอเพนซอร์ส',
   'rateLimitStatus': 'สถานะการจำกัดอัตรา API',
   'personalTokenActive': 'โทเค็นส่วนตัวเปิดใช้งาน (5,000 คำขอ/ชม.)',
@@ -3733,6 +3838,13 @@ const Map<String, String> thTranslations = {
   'tierClean4': 'Gold Adventurer',
   'tierClean5': 'Silver Explorer',
   'tierClean6': 'Bronze Novice',
+  'themeAmoledPure': 'Pure AMOLED',
+  'themeAmoledPureSubtitle': 'พื้นหลังสีดำสนิทแบบคงที่ไม่มีภาพเคลื่อนไหว',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'พื้นหลังสว่างแบบมินิมอลคงที่ไม่มีภาพเคลื่อนไหว',
+  'searchRepoFiles': 'ค้นหาไฟล์ในคลังข้อมูล...',
+  'noFilesFound': 'ไม่พบไฟล์ที่ตรงกัน',
+  'loadingFiles': 'กำลังโหลดไฟล์...',
 };
 
 const Map<String, String> jaTranslations = {
@@ -3811,7 +3923,7 @@ const Map<String, String> jaTranslations = {
   'updateFailed': '自動更新に失敗しました。ブラウザで開きますか？',
   'openInBrowser': 'ブラウザでダウンロード',
   'developerLabel': '開発者',
-  'developerRole': '作成者・メンテナー',
+  'developerRole': '作成者',
   'madeWithLove': 'Developed by zerabyte88',
   'rateLimitStatus': 'GitHub API クォータ状態',
   'personalTokenActive': '個人トークン有効 (最大 5,000 req/時)',
@@ -3935,6 +4047,13 @@ const Map<String, String> jaTranslations = {
   'tierClean4': 'ゴールド・アドベンチャラー',
   'tierClean5': 'シルバー・エクスプローラー',
   'tierClean6': 'ブロンズ・ノービス',
+  'themeAmoledPure': 'Pure AMOLED',
+  'themeAmoledPureSubtitle': 'アニメーションなしの静的な完全な黒背景',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': 'アニメーションなしのミニマルな明るい背景',
+  'searchRepoFiles': 'リポジトリ内のファイルを検索...',
+  'noFilesFound': '一致するファイルが見つかりません。',
+  'loadingFiles': 'ファイルを読み込み中...',
 };
 
 const Map<String, String> zhHansTranslations = {
@@ -4013,7 +4132,7 @@ const Map<String, String> zhHansTranslations = {
   'updateFailed': '自动更新失败，是否在浏览器中打开？',
   'openInBrowser': '在浏览器中下载',
   'developerLabel': '开发者',
-  'developerRole': '创建者与维护者',
+  'developerRole': '创建者',
   'madeWithLove': '由 zerabyte88 开发',
   'rateLimitStatus': 'GitHub API 配额状态',
   'personalTokenActive': 'Personal Token 已激活 (最高 5,000 请求/小时)',
@@ -4136,6 +4255,13 @@ const Map<String, String> zhHansTranslations = {
   'tierClean4': '黄金冒险家',
   'tierClean5': '白银探索者',
   'tierClean6': '青铜见习者',
+  'themeAmoledPure': '纯粹 AMOLED',
+  'themeAmoledPureSubtitle': '无动画的静态纯黑背景',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': '无动画的极简浅色背景',
+  'searchRepoFiles': '在仓库中搜索文件...',
+  'noFilesFound': '未找到匹配的文件。',
+  'loadingFiles': '正在加载文件...',
 };
 
 const Map<String, String> zhHantTranslations = {
@@ -4214,7 +4340,7 @@ const Map<String, String> zhHantTranslations = {
   'updateFailed': '自動更新失敗，是否在瀏覽器中開啟？',
   'openInBrowser': '在瀏覽器中下載',
   'developerLabel': '開發者',
-  'developerRole': '創建者與維護者',
+  'developerRole': '創建者',
   'madeWithLove': '由 zerabyte88 開發',
   'rateLimitStatus': 'GitHub API 配額狀態',
   'personalTokenActive': 'Personal Token 已啟用 (最高 5,000 請求/小時)',
@@ -4337,6 +4463,13 @@ const Map<String, String> zhHantTranslations = {
   'tierClean4': '黃金冒險家',
   'tierClean5': '白銀探索者',
   'tierClean6': '青銅見習者',
+  'themeAmoledPure': '純粹 AMOLED',
+  'themeAmoledPureSubtitle': '無動畫的靜態純黑背景',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': '無動畫的極簡淺色背景',
+  'searchRepoFiles': '在倉庫中搜尋檔案...',
+  'noFilesFound': '未找到相符的檔案。',
+  'loadingFiles': '正在載入檔案...',
 };
 
 const Map<String, String> koTranslations = {
@@ -4416,7 +4549,7 @@ const Map<String, String> koTranslations = {
   'updateFailed': '자동 업데이트에 실패했습니다. 브라우저에서 여시겠습니까?',
   'openInBrowser': '브라우저에서 다운로드',
   'developerLabel': '개발자',
-  'developerRole': '제작자 및 유지관리자',
+  'developerRole': '제작자',
   'madeWithLove': 'zerabyte88 개발',
   'rateLimitStatus': 'GitHub API 할당량 상태',
   'personalTokenActive': '개인 토큰 활성화 (최대 5,000회/시간)',
@@ -4540,4 +4673,11 @@ const Map<String, String> koTranslations = {
   'tierClean4': '골드 모험가',
   'tierClean5': '실버 탐험가',
   'tierClean6': '브론즈 노비스',
+  'themeAmoledPure': 'Pure AMOLED',
+  'themeAmoledPureSubtitle': '애니메이션이 없는 정적인 딥 블랙 배경',
+  'themeCleanLight': 'Clean Light',
+  'themeCleanLightSubtitle': '애니메이션이 없는 미니멀하고 밝은 정적 배경',
+  'searchRepoFiles': '저장소에서 파일 검색...',
+  'noFilesFound': '일치하는 파일을 찾을 수 없습니다.',
+  'loadingFiles': '파일 목록을 불러오는 중...',
 };

@@ -155,21 +155,48 @@ class _SettingsSheetState extends State<SettingsSheet> {
     await _refreshRateLimit();
   }
 
-  Widget _buildAboutInfoRow(String label, String value) {
-    return Row(
+  Widget _buildAboutInfoRow(String label, String value, {VoidCallback? onTap}) {
+    final rowContent = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-        Text(
-          value,
-          style: TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                color: onTap != null
+                    ? AppTheme.primaryCyan
+                    : AppTheme.textPrimary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            if (onTap != null) ...[
+              const SizedBox(width: 4),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 14,
+                color: AppTheme.primaryCyan,
+              ),
+            ],
+          ],
         ),
       ],
     );
+
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: rowContent,
+        ),
+      );
+    }
+    return rowContent;
   }
 
   @override
@@ -1429,17 +1456,37 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             const SizedBox(height: 6),
                             _buildAboutInfoRow(
                               loc.buildNumberLabel,
-                              '${AppConfig.buildNumber} (Release APK)',
+                              AppConfig.buildNumber,
                             ),
                             const SizedBox(height: 6),
                             _buildAboutInfoRow(
                               loc.architectureLabel,
-                              loc.architectureValue,
+                              AppConfig.architecture,
                             ),
                             const SizedBox(height: 6),
                             _buildAboutInfoRow(
                               loc.licenseLabel,
                               AppConfig.license,
+                              onTap: () {
+                                showLicensePage(
+                                  context: context,
+                                  applicationName: AppConfig.appName,
+                                  applicationVersion:
+                                      '${AppConfig.appVersion} Build ${AppConfig.buildNumber}',
+                                  applicationIcon: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                    ),
+                                    child: Image.asset(
+                                      'assets/icons/app_icon.png',
+                                      width: 48,
+                                      height: 48,
+                                    ),
+                                  ),
+                                  applicationLegalese:
+                                      'Copyright © 2026 ${AppConfig.developerUsername}\nLicensed under the ${AppConfig.license}',
+                                );
+                              },
                             ),
                             const SizedBox(height: 12),
                             Divider(height: 1, color: AppTheme.border),
