@@ -37,7 +37,6 @@ class AppLocalizations {
 
   // App & General
   String get appTitle => 'Kontri';
-  String get appSubtitle => _t('appSubtitle');
   String get close => _t('close');
   String get cancel => _t('cancel');
   String get save => _t('save');
@@ -49,9 +48,7 @@ class AppLocalizations {
   String get buildNumberLabel => _t('buildNumberLabel');
   String get appDescriptionLabel => _t('appDescriptionLabel');
   String get architectureLabel => _t('architectureLabel');
-  String get architectureValue => _t('architectureValue');
   String get licenseLabel => _t('licenseLabel');
-  String get viewOnGitHub => _t('viewOnGitHub');
 
   String cannotOpenLink(String url) {
     final template = _t('cannotOpenLink');
@@ -84,7 +81,6 @@ class AppLocalizations {
         : '@$username $template';
   }
 
-  String get saved => _t('saved');
   String get emptyBookmarks => _t('emptyBookmarks');
   String get userNotFound => _t('userNotFound');
   String get networkError => _t('networkError');
@@ -92,17 +88,14 @@ class AppLocalizations {
 
   // Tech News
   String get techNewsTitle => _t('techNewsTitle');
-  String get techNewsSubtitle => _t('techNewsSubtitle');
   String get categoryAi => _t('categoryAi');
   String get categoryTech => _t('categoryTech');
   String get categoryOpenSource => _t('categoryOpenSource');
   String get categoryTrending => _t('categoryTrending');
   String get categoryGithub => _t('categoryGithub');
   String get categoryWebDev => _t('categoryWebDev');
-  String get loadingNews => _t('loadingNews');
   String get noNewsFound => _t('noNewsFound');
   String get offlineCached => _t('offlineCached');
-  String get readMore => _t('readMore');
   String get minRead => _t('minRead');
 
   // Settings & Theme
@@ -166,22 +159,11 @@ class AppLocalizations {
     }
   }
 
-  String get easterEggJapaneseToast => _t('easterEggJapaneseToast');
 
   // Updates & About
-  String get updateSectionTitle => _t('updateSectionTitle');
-  String get checkForUpdates => _t('checkForUpdates');
-  String get checkingForUpdates => _t('checkingForUpdates');
-  String get updateAvailable => _t('updateAvailable');
-  String get alreadyLatestVersion => _t('alreadyLatestVersion');
-  String get updateNow => _t('updateNow');
-  String get downloadingUpdate => _t('downloadingUpdate');
-  String get installingUpdate => _t('installingUpdate');
-  String get updateFailed => _t('updateFailed');
   String get openInBrowser => _t('openInBrowser');
   String get developerLabel => _t('developerLabel');
   String get developerRole => _t('developerRole');
-  String get madeWithLove => _t('madeWithLove');
 
   // Rate Limit Status
   String get rateLimitStatus => _t('rateLimitStatus');
@@ -227,16 +209,11 @@ class AppLocalizations {
   String get tokenDeletedToast => _t('tokenDeletedToast');
 
   // Developer Profile & Stats Detail
-  String get statsDetailTitle => _t('statsDetailTitle');
-  String get joinedSince => _t('joinedSince');
   String get noBio => _t('noBio');
   String get noLocation => _t('noLocation');
-  String get totalRepos => _t('totalRepos');
   String get publicRepos => _t('publicRepos');
   String get totalStars => _t('totalStars');
-  String get starsEarned => _t('starsEarned');
   String get totalForks => _t('totalForks');
-  String get forksInRepos => _t('forksInRepos');
   String get followers => _t('followers');
   String get following => _t('following');
 
@@ -245,7 +222,6 @@ class AppLocalizations {
   String get activityRhythmSubtitle => _t('activityRhythmSubtitle');
   String get peakLabel => _t('peakLabel');
   String get eventsUnit => _t('eventsUnit');
-  String get commitHabitTitle => _t('commitHabitTitle');
   String get streakStatsTitle => _t('streakStatsTitle');
   String get currentStreak => _t('currentStreak');
   String get longestStreak => _t('longestStreak');
@@ -253,11 +229,9 @@ class AppLocalizations {
   String get totalContributions => _t('totalContributions');
   String get allYearsContributions => _t('allYearsContributions');
   String get daysUnit => _t('daysUnit');
-  String get contributionsUnit => _t('contributionsUnit');
 
   // Top Languages
   String get topLanguagesTitle => _t('topLanguagesTitle');
-  String get topLanguagesSubtitle => _t('topLanguagesSubtitle');
   String get languageDistribution => _t('languageDistribution');
   String get otherLanguages => _t('otherLanguages');
   String get noLanguageData => _t('noLanguageData');
@@ -284,21 +258,15 @@ class AppLocalizations {
   String get showFewerRepos => _t('showFewerRepos');
 
   // Repository Details Page
-  String get repositoryDetails => _t('repositoryDetails');
-  String get repositoryOverview => _t('repositoryOverview');
   String get readmeTitle => _t('readmeTitle');
   String get loadingReadme => _t('loadingReadme');
   String get noReadmeFound => _t('noReadmeFound');
-  String get defaultBranchLabel => _t('defaultBranchLabel');
-  String get copyRepoUrl => _t('copyRepoUrl');
-  String get repoUrlCopied => _t('repoUrlCopied');
   String get searchRepoFiles => _t('searchRepoFiles');
   String get noFilesFound => _t('noFilesFound');
   String get loadingFiles => _t('loadingFiles');
   String get filesTab => _t('filesTab');
   String get loadingContents => _t('loadingContents');
   String get emptyDirectory => _t('emptyDirectory');
-  String get fileContent => _t('fileContent');
   String get loadingFile => _t('loadingFile');
   String get cannotPreviewBinary => _t('cannotPreviewBinary');
   String get copyCode => _t('copyCode');
@@ -308,7 +276,6 @@ class AppLocalizations {
   String get shareProfile => _t('shareProfile');
   String get saveFavorite => _t('saveFavorite');
   String get removeFavorite => _t('removeFavorite');
-  String get profileLinkCopied => _t('profileLinkCopied');
 
   String profileSavedToFavorites(String username) {
     final template = _t('profileSavedToFavorites');
@@ -328,7 +295,6 @@ class AppLocalizations {
   String get notActiveYetBadge => _t('notActiveYetBadge');
   String get consistencyRecord => _t('consistencyRecord');
   String get thisYearSubtitle => _t('thisYearSubtitle');
-  String get lastYearSubtitle => _t('lastYearSubtitle');
   String get allTimeSubtitle => _t('allTimeSubtitle');
   String get accountOverviewTitle => _t('accountOverviewTitle');
   String get acrossAllRepos => _t('acrossAllRepos');
@@ -357,7 +323,6 @@ class AppLocalizations {
     }
   }
 
-  String get updatedPrefix => _t('updatedPrefix');
 
   String getCommitTierLevelName(int tier) {
     switch (tier) {

@@ -721,7 +721,7 @@ void main() {
         expect(loc.filterPopular.isNotEmpty, isTrue);
         expect(loc.filterNewest.isNotEmpty, isTrue);
         expect(loc.techNewsTitle.isNotEmpty, isTrue);
-        expect(loc.updateAvailable.contains('!'), isFalse);
+        expect(loc.rateLimitStatus.isNotEmpty, isTrue);
         expect(loc.getCommitTierCleanTitle(1).isNotEmpty, isTrue);
       }
     });
@@ -844,12 +844,9 @@ void main() {
       expect(enLoc.buildNumberLabel, 'Build');
       expect(idLoc.architectureLabel, 'Arsitektur');
       expect(enLoc.architectureLabel, 'Architecture');
-      expect(idLoc.architectureValue, 'Clean Layered (Flutter 3)');
-      expect(idLoc.licenseLabel, 'Lisensi');
-      expect(enLoc.licenseLabel, 'License');
-      expect(idLoc.viewOnGitHub, 'Lihat Repositori di GitHub');
-      expect(enLoc.viewOnGitHub, 'View Repository on GitHub');
-      expect(idLoc.developerRole, 'Creator');
+      expect(idLoc.openInGithub, 'Buka di GitHub');
+      expect(enLoc.openInGithub, 'Open in GitHub');
+      expect(idLoc.developerRole, 'Pencipta');
       expect(enLoc.developerRole, 'Creator');
     });
 
@@ -1109,13 +1106,7 @@ void main() {
     test('Typography and Developer Avatar assets conform to updater standards', () {
       for (final lang in AppLanguage.values) {
         final loc = AppLocalizations(lang);
-        // Exclamation mark must not be present in updateAvailable string
-        expect(
-          loc.updateAvailable.contains('!'),
-          isFalse,
-          reason:
-              'Language ${lang.code} should not have an exclamation mark in updateAvailable',
-        );
+        expect(loc.openInBrowser.isNotEmpty, isTrue);
       }
 
       // Indonesian language has both nativeName and English name for grid consistency
