@@ -47,7 +47,6 @@ class AppLocalizations {
   String get appVersionLabel => _t('appVersionLabel');
   String get buildNumberLabel => _t('buildNumberLabel');
   String get appDescriptionLabel => _t('appDescriptionLabel');
-  String get architectureLabel => _t('architectureLabel');
   String get licenseLabel => _t('licenseLabel');
 
   String cannotOpenLink(String url) {

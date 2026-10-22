@@ -916,7 +916,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             loc.buildNumberLabel,
             AppConfig.buildNumber,
           ),
-          _buildAboutRow(loc.architectureLabel, AppConfig.architecture),
           _buildAboutRow(
             loc.licenseLabel,
             AppConfig.license,
@@ -1079,7 +1078,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildAboutRow(String label, String value, {VoidCallback? onTap}) {
+  Widget _buildAboutRow(
+    String label,
+    String value, {
+    VoidCallback? onTap,
+    bool showChevron = false,
+  }) {
     final rowContent = Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -1102,7 +1106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              if (onTap != null) ...[
+              if (showChevron && onTap != null) ...[
                 const SizedBox(width: 4),
                 Icon(
                   Icons.chevron_right_rounded,

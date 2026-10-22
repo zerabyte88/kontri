@@ -155,7 +155,12 @@ class _SettingsSheetState extends State<SettingsSheet> {
     await _refreshRateLimit();
   }
 
-  Widget _buildAboutInfoRow(String label, String value, {VoidCallback? onTap}) {
+  Widget _buildAboutInfoRow(
+    String label,
+    String value, {
+    VoidCallback? onTap,
+    bool showChevron = false,
+  }) {
     final rowContent = Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -173,7 +178,7 @@ class _SettingsSheetState extends State<SettingsSheet> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            if (onTap != null) ...[
+            if (showChevron && onTap != null) ...[
               const SizedBox(width: 4),
               Icon(
                 Icons.chevron_right_rounded,
@@ -1457,11 +1462,6 @@ class _SettingsSheetState extends State<SettingsSheet> {
                             _buildAboutInfoRow(
                               loc.buildNumberLabel,
                               AppConfig.buildNumber,
-                            ),
-                            const SizedBox(height: 6),
-                            _buildAboutInfoRow(
-                              loc.architectureLabel,
-                              AppConfig.architecture,
                             ),
                             const SizedBox(height: 6),
                             _buildAboutInfoRow(

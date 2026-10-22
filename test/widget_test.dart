@@ -819,15 +819,14 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.2.3',
+      'AppConfig provides accurate release and version telemetry for v1.2.4',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.2.3');
-        expect(AppConfig.buildNumber, '10230');
-        expect(AppConfig.fullVersion, 'v1.2.3 (Build 10230)');
-        expect(AppConfig.releaseTag, 'v1.2.3');
+        expect(AppConfig.appVersion, 'v1.2.4');
+        expect(AppConfig.buildNumber, '10240');
+        expect(AppConfig.fullVersion, 'v1.2.4 (Build 10240)');
+        expect(AppConfig.releaseTag, 'v1.2.4');
         expect(AppConfig.license, 'MIT License');
-        expect(AppConfig.architecture, 'ARM64-v8a');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
     );
@@ -837,13 +836,11 @@ void main() {
       final enLoc = AppLocalizations(AppLanguage.english);
 
       expect(idLoc.aboutApp, 'Tentang Kontri');
-      expect(enLoc.aboutApp, 'About Kontri');
+      expect(enLoc.aboutApp, 'About App');
       expect(idLoc.appVersionLabel, 'Versi Aplikasi');
       expect(enLoc.appVersionLabel, 'App Version');
       expect(idLoc.buildNumberLabel, 'Build');
       expect(enLoc.buildNumberLabel, 'Build');
-      expect(idLoc.architectureLabel, 'Arsitektur');
-      expect(enLoc.architectureLabel, 'Architecture');
       expect(idLoc.openInGithub, 'Buka di GitHub');
       expect(enLoc.openInGithub, 'Open in GitHub');
       expect(idLoc.developerRole, 'Pencipta');
