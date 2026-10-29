@@ -5,11 +5,11 @@
 
   **Minimalist GitHub analytics, contribution streaks, and repository explorer for Android.**
 
-  [![Release](https://img.shields.io/badge/Release-v1.2.4-24292f?style=flat-square&logo=github)](https://github.com/zerabyte88/kontri/releases/latest)
-  [![Platform](https://img.shields.io/badge/Platform-Android-24292f?style=flat-square&logo=android)](https://github.com/zerabyte88/kontri/releases/latest)
-  [![Architecture](https://img.shields.io/badge/Arch-arm64--v8a-24292f?style=flat-square&logo=arm)](https://github.com/zerabyte88/kontri/releases/latest)
-  [![Flutter](https://img.shields.io/badge/Flutter-3.13+-24292f?style=flat-square&logo=flutter)](https://flutter.dev)
-  [![License](https://img.shields.io/badge/License-MIT-24292f?style=flat-square)](LICENSE)
+  [![Release](https://img.shields.io/badge/Release-v1.2.4-06b6d4?style=flat-square&logo=github&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
+  [![Platform](https://img.shields.io/badge/Platform-Android-10b981?style=flat-square&logo=android&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
+  [![Architecture](https://img.shields.io/badge/Arch-arm64--v8a-8b5cf6?style=flat-square&logo=arm&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
+  [![Flutter](https://img.shields.io/badge/Flutter-3.13+-02569b?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
+  [![License](https://img.shields.io/badge/License-MIT-f59e0b?style=flat-square&logo=open-source-initiative&logoColor=white)](LICENSE)
 
   [Download APK](https://github.com/zerabyte88/kontri/releases/latest) • [Features](#features) • [Contribution Tiers](#contribution-tiers) • [Tech Stack](#tech-stack) • [Build](#build-from-source)
 </div>
@@ -31,9 +31,9 @@
 
 ## Contribution Tiers
 
-Evaluated across a rolling **365-day window**. Both thresholds must be met to unlock a tier:
-
 <div align="center">
+
+Evaluated across a rolling **365-day window**. Both thresholds must be met to unlock a tier :
 
 | Tier | Title | Contributions | Active Days |
 | :---: | :---: | :---: | :---: |
@@ -87,7 +87,7 @@ flutter pub get
 flutter build apk --release --split-per-abi --target-platform android-arm64
 ```
 
-Compiled binary: `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`
+Compiled binary : `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`
 
 ---
 
