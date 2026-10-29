@@ -18,14 +18,14 @@
 
 ## Features
 
-- **Activity Telemetry** — Track total contributions, streak counters, language breakdown, and 24-hour activity distribution.
-- **Repository Browser** — Inspect repositories, switch branches, browse directory trees, and view source code or Markdown files.
-- **Commit Timeline** — View commit history with author info, timestamps, and commit hashes.
-- **Contribution Tiers** — 6 badges evaluated over a rolling 365-day active window.
-- **Multi-Profile Dashboard** — Pin multiple GitHub user profiles.
-- **Tech Feed** — Trending repositories and developer articles from GitHub and Dev.to.
-- **AMOLED Themes** — 6 visual themes (*AMOLED Pure*, *Midnight*, *Snowfall*, *Sakura*, *Light*, *Clean Light*) with adjustable glassmorphism translucency.
-- **Efficient Caching** — Conditional HTTP querying (`ETag` / 304 Not Modified) with optional Personal Access Token (PAT) support to increase rate limits to 5,000 req/hr.
+- **Activity Telemetry** : Track total contributions, streak counters, language breakdown, and 24-hour activity distribution.
+- **Repository Browser** : Inspect repositories, switch branches, browse directory trees, and view source code or Markdown files.
+- **Commit Timeline** : View commit history with author info, timestamps, and commit hashes.
+- **Contribution Tiers** : 6 badges evaluated over a rolling 365-day active window.
+- **Multi-Profile Dashboard** : Pin multiple GitHub user profiles.
+- **Tech Feed** : Trending repositories and developer articles from GitHub and Dev.to.
+- **AMOLED Themes** : 6 visual themes (*AMOLED Pure*, *Midnight*, *Snowfall*, *Sakura*, *Light*, *Clean Light*) with adjustable glassmorphism translucency.
+- **Efficient Caching** : Conditional HTTP querying (`ETag` / 304 Not Modified) with optional Personal Access Token (PAT) support to increase rate limits to 5,000 req/hr.
 
 ---
 
@@ -33,8 +33,10 @@
 
 Evaluated across a rolling **365-day window**. Both thresholds must be met to unlock a tier:
 
+<div align="center">
+
 | Tier | Title | Contributions | Active Days |
-| :--- | :--- | :---: | :---: |
+| :---: | :---: | :---: | :---: |
 | **Tier 1** | Mythic Archmage | ≥ 1,000 | ≥ 200 |
 | **Tier 2** | Diamond Vanguard | ≥ 500 | ≥ 130 |
 | **Tier 3** | Platinum Artisan | ≥ 250 | ≥ 70 |
@@ -42,12 +44,16 @@ Evaluated across a rolling **365-day window**. Both thresholds must be met to un
 | **Tier 5** | Silver Explorer | ≥ 50 | ≥ 10 |
 | **Tier 6** | Bronze Novice | Default | Default |
 
+</div>
+
 ---
 
 ## Tech Stack
 
+<div align="center">
+
 | Layer | Package / Tool | Role |
-| :--- | :--- | :--- |
+| :---: | :---: | :---: |
 | **Framework** | Flutter (Dart SDK `^3.13`) | Core mobile framework |
 | **Charts** | `fl_chart` | Activity charts and language distribution |
 | **Markdown** | `flutter_markdown` | In-app document and README rendering |
@@ -55,6 +61,8 @@ Evaluated across a rolling **365-day window**. Both thresholds must be met to un
 | **Storage** | `shared_preferences` | Local persistence and query caching |
 | **Localization** | `intl`, `flutter_localizations` | Multi-language translation engine |
 | **Graphics** | `flutter_svg` | SVG vector icon rendering |
+
+</div>
 
 ---
 
