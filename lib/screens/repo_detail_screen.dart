@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../localization/app_localizations.dart';
+import '../models/github_commit_info.dart';
 import '../models/github_content_item.dart';
 import '../models/github_repo.dart';
 import '../services/github_api_service.dart';
@@ -10,6 +11,7 @@ import '../widgets/animated_app_header.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/readme_markdown_view.dart';
 import '../widgets/running_text.dart';
+import 'commit_detail_screen.dart';
 import 'file_viewer_screen.dart';
 
 class RepoDetailScreen extends StatefulWidget {
@@ -31,8 +33,13 @@ class RepoDetailScreen extends StatefulWidget {
 class _RepoDetailScreenState extends State<RepoDetailScreen> {
   late final GitHubApiService _apiService;
 
-  // Tab State: 0 = README, 1 = Files
+  // Tab State: 0 = README, 1 = Files, 2 = Commits
   int _selectedTab = 0;
+
+  // Commits State
+  bool _isLoadingCommits = false;
+  String? _commitsError;
+  List<GitHubCommitInfo> _commits = [];
 
   // README State
   bool _isLoadingReadme = true;
@@ -125,6 +132,43 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
 
   String get _defaultBranch {
     return widget.repo.defaultBranch ?? 'main';
+  }
+
+  Future<void> _fetchCommits() async {
+    setState(() {
+      _isLoadingCommits = true;
+      _commitsError = null;
+    });
+
+    final owner = _repoOwner;
+    if (owner.isEmpty) {
+      setState(() {
+        _isLoadingCommits = false;
+        _commits = [];
+      });
+      return;
+    }
+
+    try {
+      final commits = await _apiService.fetchRepositoryCommits(
+        owner,
+        widget.repo.name,
+        branch: widget.repo.defaultBranch,
+      );
+      if (mounted) {
+        setState(() {
+          _commits = commits;
+          _isLoadingCommits = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _commitsError = e.toString();
+          _isLoadingCommits = false;
+        });
+      }
+    }
   }
 
   Future<void> _fetchReadme() async {
@@ -442,8 +486,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                     // 3. Active Tab Content
                     if (_selectedTab == 0)
                       _buildReadmeSection(loc, repoUrl)
+                    else if (_selectedTab == 1)
+                      _buildFilesSection(loc)
                     else
-                      _buildFilesSection(loc),
+                      _buildCommitsSection(loc),
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -972,6 +1018,18 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
               },
             ),
           ),
+          Expanded(
+            child: _buildTabButton(
+              index: 2,
+              icon: Icons.commit_rounded,
+              label: loc.commitsTab,
+              onTapAdditional: () {
+                if (_commits.isEmpty && !_isLoadingCommits) {
+                  _fetchCommits();
+                }
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -1397,6 +1455,277 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCommitsSection(AppLocalizations loc) {
+    if (_isLoadingCommits) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppTheme.border, width: 1),
+        ),
+        child: Column(
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: AppTheme.primaryCyan,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              loc.loadingCommits,
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_commitsError != null) {
+      return GlassCard(
+        width: double.infinity,
+        enableBlur: false,
+        padding: const EdgeInsets.all(24),
+        borderRadius: BorderRadius.circular(14),
+        child: Column(
+          children: [
+            Icon(
+              Icons.warning_amber_rounded,
+              size: 32,
+              color: AppTheme.accentOrange,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _commitsError!,
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 14),
+            ElevatedButton.icon(
+              onPressed: _fetchCommits,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.surfaceElevated,
+                foregroundColor: AppTheme.primaryCyan,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              icon: const Icon(Icons.refresh_rounded, size: 16),
+              label: Text(loc.retry),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_commits.isEmpty) {
+      return GlassCard(
+        width: double.infinity,
+        enableBlur: false,
+        padding: const EdgeInsets.all(28),
+        borderRadius: BorderRadius.circular(14),
+        child: Column(
+          children: [
+            Icon(Icons.commit_rounded, size: 36, color: AppTheme.textMuted),
+            const SizedBox(height: 12),
+            Text(
+              loc.noCommitsFound,
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13.5),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header with count & branch chip
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '${_commits.length} ${loc.totalCommits}',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceElevated,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: AppTheme.border, width: 0.8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.fork_right_rounded,
+                    size: 13,
+                    color: AppTheme.textMuted,
+                  ),
+                  const SizedBox(width: 3),
+                  Text(
+                    _defaultBranch,
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // Commits List
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _commits.length,
+          separatorBuilder: (_, _) => const SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final commit = _commits[index];
+
+            return Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CommitDetailScreen(
+                        repo: widget.repo,
+                        sha: commit.sha,
+                        initialCommitInfo: commit,
+                        apiService: _apiService,
+                      ),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceElevated.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppTheme.border.withValues(alpha: 0.5),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              commit.firstLineMessage,
+                              style: TextStyle(
+                                color: AppTheme.textPrimary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                height: 1.3,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryCyan.withValues(
+                                alpha: 0.1,
+                              ),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '#${commit.shortSha}',
+                              style: TextStyle(
+                                color: AppTheme.primaryCyan,
+                                fontFamily: 'monospace',
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          if (commit.authorAvatarUrl != null &&
+                              commit.authorAvatarUrl!.isNotEmpty)
+                            ClipOval(
+                              child: Image.network(
+                                commit.authorAvatarUrl!,
+                                width: 18,
+                                height: 18,
+                                errorBuilder: (_, _, _) => Icon(
+                                  Icons.person,
+                                  size: 14,
+                                  color: AppTheme.textMuted,
+                                ),
+                              ),
+                            )
+                          else
+                            Icon(
+                              Icons.person,
+                              size: 14,
+                              color: AppTheme.textMuted,
+                            ),
+                          const SizedBox(width: 6),
+                          Text(
+                            commit.authorName ?? commit.authorLogin ?? 'Author',
+                            style: TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            ' • ',
+                            style: TextStyle(
+                              color: AppTheme.textMuted,
+                              fontSize: 11,
+                            ),
+                          ),
+                          Text(
+                            commit.relativeTimeAgo,
+                            style: TextStyle(
+                              color: AppTheme.textMuted,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

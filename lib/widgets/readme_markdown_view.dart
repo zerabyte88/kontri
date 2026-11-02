@@ -58,6 +58,24 @@ class ReadmeMarkdownView extends StatelessWidget {
     return cleanUrl;
   }
 
+  /// Extracts width and height from HTML attributes and returns a markdown fragment (e.g. `#120x120`).
+  static String _extractDimensions(String attrs) {
+    final widthMatch = RegExp(
+      r"""width=["']?(\d+)["']?""",
+      caseSensitive: false,
+    ).firstMatch(attrs);
+    final heightMatch = RegExp(
+      r"""height=["']?(\d+)["']?""",
+      caseSensitive: false,
+    ).firstMatch(attrs);
+    final w = widthMatch?.group(1);
+    final h = heightMatch?.group(1);
+    if (w != null && h != null) return '#${w}x$h';
+    if (w != null) return '#${w}x$w';
+    if (h != null) return '#${h}x$h';
+    return '';
+  }
+
   /// Preprocesses markdown string: converts HTML <a><img/></a> badges and standalone <img>
   /// tags to Markdown format, strips HTML div/p align wrappers, and normalizes image paths.
   static String preprocessMarkdown(
@@ -92,7 +110,11 @@ class ReadmeMarkdownView extends StatelessWidget {
       ).firstMatch(imgAttrs);
       final alt = altMatch?.group(1) ?? '';
 
-      final normalizedSrc = normalizeImageUrl(src, owner, repo, branch);
+      var normalizedSrc = normalizeImageUrl(src, owner, repo, branch);
+      final dims = _extractDimensions(imgAttrs);
+      if (dims.isNotEmpty && !normalizedSrc.contains('#')) {
+        normalizedSrc = '$normalizedSrc$dims';
+      }
       return '[![$alt]($normalizedSrc)]($href)';
     });
 
@@ -117,7 +139,11 @@ class ReadmeMarkdownView extends StatelessWidget {
       ).firstMatch(imgAttrs);
       final alt = altMatch?.group(1) ?? '';
 
-      final normalizedSrc = normalizeImageUrl(src, owner, repo, branch);
+      var normalizedSrc = normalizeImageUrl(src, owner, repo, branch);
+      final dims = _extractDimensions(imgAttrs);
+      if (dims.isNotEmpty && !normalizedSrc.contains('#')) {
+        normalizedSrc = '$normalizedSrc$dims';
+      }
       return '![$alt]($normalizedSrc)';
     });
 
@@ -170,15 +196,33 @@ class ReadmeMarkdownView extends StatelessWidget {
     return false;
   }
 
+  /// Determines whether the given image URL is a badge from known services or endpoints.
+  static bool isBadgeUrl(String url) {
+    final lower = url.toLowerCase();
+    return lower.contains('shields.io') ||
+        lower.contains('badgen.net') ||
+        lower.contains('badge.fury.io') ||
+        lower.contains('/badge') ||
+        lower.contains('badge.svg') ||
+        lower.contains('komarev.com/ghpvc') ||
+        lower.contains('codecov.io') ||
+        lower.contains('codacy.com') ||
+        lower.contains('travis-ci') ||
+        lower.contains('circleci.com') ||
+        lower.contains('style=flat') ||
+        lower.contains('style=shield');
+  }
+
   Widget _buildPlaceholder(double? width, double? height) {
+    final isCompact = height != null && height <= 24;
     return Container(
       width: width ?? 80,
       height: height ?? 20,
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(isCompact ? 2 : 4),
       child: Center(
         child: SizedBox(
-          width: 14,
-          height: 14,
+          width: isCompact ? 10 : 14,
+          height: isCompact ? 10 : 14,
           child: CircularProgressIndicator(
             strokeWidth: 1.5,
             color: AppTheme.primaryCyan,
@@ -253,25 +297,78 @@ class ReadmeMarkdownView extends StatelessWidget {
       imageDirectory: imageBaseUrl,
       onTapLink: (text, href, title) => _handleLinkTap(href),
       sizedImageBuilder: (config) {
-        final url = config.uri.toString();
+        final rawUrl = config.uri.toString();
+        final url = rawUrl.split('#').first;
         final isSvg = isSvgOrBadgeUrl(url);
+        final isBadge = isBadgeUrl(url);
+        final isIconOrLogo =
+            !isBadge &&
+            ((config.alt?.toLowerCase().contains('logo') ?? false) ||
+                (config.alt?.toLowerCase().contains('icon') ?? false) ||
+                url.toLowerCase().contains('icon') ||
+                url.toLowerCase().contains('logo'));
 
+        final double? targetWidth =
+            config.width ?? (isIconOrLogo ? 96.0 : null);
+        final double? targetHeight =
+            config.height ?? (isBadge ? 20.0 : (isIconOrLogo ? 96.0 : null));
+
+        final BoxConstraints constraints = isBadge
+            ? BoxConstraints(
+                maxHeight: config.height ?? 22.0,
+                maxWidth: config.width ?? 240.0,
+              )
+            : isIconOrLogo
+            ? BoxConstraints(
+                maxHeight: config.height != null ? config.height! + 10 : 120.0,
+                maxWidth: config.width != null ? config.width! + 10 : 120.0,
+              )
+            : BoxConstraints(
+                maxHeight: config.height ?? 320.0,
+                maxWidth: config.width ?? double.infinity,
+              );
+
+        final EdgeInsets padding = isBadge
+            ? const EdgeInsets.symmetric(vertical: 2, horizontal: 2)
+            : const EdgeInsets.symmetric(vertical: 6);
+
+        final Widget imageWidget;
         if (isSvg) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: SvgPicture.network(
+          imageWidget = SvgPicture.network(
+            url,
+            width: targetWidth,
+            height: targetHeight,
+            fit: BoxFit.contain,
+            headers: const {'User-Agent': 'Kontri-App'},
+            placeholderBuilder: (_) =>
+                _buildPlaceholder(targetWidth, targetHeight),
+            errorBuilder: (context, error, stackTrace) {
+              return Image.network(
+                url,
+                width: targetWidth,
+                height: targetHeight,
+                fit: BoxFit.contain,
+                errorBuilder: (ctx, err, st) => _buildErrorWidget(),
+              );
+            },
+          );
+        } else {
+          imageWidget = ClipRRect(
+            borderRadius: BorderRadius.circular(isBadge ? 2 : 8),
+            child: Image.network(
               url,
-              width: config.width,
-              height: config.height,
-              headers: const {'User-Agent': 'Kontri-App'},
-              placeholderBuilder: (_) =>
-                  _buildPlaceholder(config.width, config.height),
+              width: targetWidth,
+              height: targetHeight,
+              fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
-                return Image.network(
+                return SvgPicture.network(
                   url,
-                  width: config.width,
-                  height: config.height,
+                  width: targetWidth,
+                  height: targetHeight,
                   fit: BoxFit.contain,
+                  headers: const {'User-Agent': 'Kontri-App'},
+                  placeholderBuilder: (_) =>
+                      _buildPlaceholder(targetWidth, targetHeight),
                   errorBuilder: (ctx, err, st) => _buildErrorWidget(),
                 );
               },
@@ -280,27 +377,8 @@ class ReadmeMarkdownView extends StatelessWidget {
         }
 
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              url,
-              width: config.width,
-              height: config.height,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
-                return SvgPicture.network(
-                  url,
-                  width: config.width,
-                  height: config.height,
-                  headers: const {'User-Agent': 'Kontri-App'},
-                  placeholderBuilder: (_) =>
-                      _buildPlaceholder(config.width, config.height),
-                  errorBuilder: (ctx, err, st) => _buildErrorWidget(),
-                );
-              },
-            ),
-          ),
+          padding: padding,
+          child: ConstrainedBox(constraints: constraints, child: imageWidget),
         );
       },
       styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(

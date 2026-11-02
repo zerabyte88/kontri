@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import '../models/contribution_stats.dart';
+import '../models/github_commit_detail.dart';
 import '../models/github_commit_info.dart';
 import '../models/github_content_item.dart';
 import '../models/github_rate_limit.dart';
@@ -356,6 +357,107 @@ class GitHubApiService {
       }
     } catch (_) {
       // Graceful degradation: return null without throwing
+      return null;
+    }
+    return null;
+  }
+
+  Future<List<GitHubCommitInfo>> fetchRepositoryCommits(
+    String owner,
+    String repo, {
+    String? branch,
+    int page = 1,
+    int perPage = 50,
+  }) async {
+    final cleanOwner = owner.trim();
+    final cleanRepo = repo.trim();
+    if (cleanOwner.isEmpty || cleanRepo.isEmpty) return [];
+
+    try {
+      final queryParams = <String, String>{
+        'page': '$page',
+        'per_page': '$perPage',
+      };
+      if (branch != null && branch.trim().isNotEmpty) {
+        queryParams['sha'] = branch.trim();
+      }
+
+      final endpoint = '$_baseUrl/repos/$cleanOwner/$cleanRepo/commits';
+      final uri = Uri.parse(endpoint).replace(queryParameters: queryParams);
+
+      final res = await _client
+          .get(uri, headers: _headers)
+          .timeout(_timeoutDuration);
+      _updateRateLimitFromHeaders(res.headers);
+
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(res.body);
+        if (decoded is List) {
+          return decoded
+              .whereType<Map<String, dynamic>>()
+              .map((c) => GitHubCommitInfo.fromJson(c))
+              .toList();
+        }
+      } else if (res.statusCode == 404) {
+        return [];
+      } else if (res.statusCode == 403 || res.statusCode == 429) {
+        _lastRateLimit = _lastRateLimit?.copyWith(remaining: 0);
+        throw GitHubApiException(
+          'Batas panggilan API tercapai. Harap tunggu sebentar.',
+          isRateLimit: true,
+          statusCode: res.statusCode,
+        );
+      }
+    } catch (e) {
+      if (e is GitHubApiException) {
+        rethrow;
+      }
+      return [];
+    }
+    return [];
+  }
+
+  Future<GitHubCommitDetail?> fetchCommitDetail(
+    String owner,
+    String repo,
+    String sha,
+  ) async {
+    final cleanOwner = owner.trim();
+    final cleanRepo = repo.trim();
+    final cleanSha = sha.trim();
+    if (cleanOwner.isEmpty || cleanRepo.isEmpty || cleanSha.isEmpty) {
+      return null;
+    }
+
+    try {
+      final endpoint =
+          '$_baseUrl/repos/$cleanOwner/$cleanRepo/commits/$cleanSha';
+      final uri = Uri.parse(endpoint);
+
+      final res = await _client
+          .get(uri, headers: _headers)
+          .timeout(_timeoutDuration);
+      _updateRateLimitFromHeaders(res.headers);
+
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(res.body);
+        if (decoded is Map<String, dynamic>) {
+          return GitHubCommitDetail.fromJson(decoded);
+        }
+      } else if (res.statusCode == 404) {
+        return null;
+      } else if (res.statusCode == 403 || res.statusCode == 429) {
+        _lastRateLimit = _lastRateLimit?.copyWith(remaining: 0);
+        throw GitHubApiException(
+          'Batas panggilan API tercapai. Harap tunggu sebentar.',
+          isRateLimit: true,
+          statusCode: res.statusCode,
+        );
+      }
+    } catch (e) {
+      if (e is GitHubApiException) {
+        rethrow;
+      }
       return null;
     }
     return null;

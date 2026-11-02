@@ -11,6 +11,7 @@ import 'package:kontri/localization/app_localizations.dart';
 import 'package:kontri/localization/app_translations_data.dart';
 import 'package:kontri/models/bookmarked_user.dart';
 import 'package:kontri/models/contribution_stats.dart';
+import 'package:kontri/models/github_commit_detail.dart';
 import 'package:kontri/models/github_commit_info.dart';
 import 'package:kontri/models/github_content_item.dart';
 import 'package:kontri/models/github_rate_limit.dart';
@@ -18,6 +19,7 @@ import 'package:kontri/models/github_repo.dart';
 import 'package:kontri/models/github_user.dart';
 import 'package:kontri/models/tech_news.dart';
 import 'package:kontri/models/user_stats.dart';
+import 'package:kontri/screens/commit_detail_screen.dart';
 import 'package:kontri/screens/favorite_profiles_screen.dart';
 import 'package:kontri/screens/home_screen.dart';
 import 'package:kontri/screens/file_viewer_screen.dart';
@@ -820,13 +822,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.2.5',
+      'AppConfig provides accurate release and version telemetry for v1.2.6',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.2.5');
-        expect(AppConfig.buildNumber, '10250');
-        expect(AppConfig.fullVersion, 'v1.2.5 (Build 10250)');
-        expect(AppConfig.releaseTag, 'v1.2.5');
+        expect(AppConfig.appVersion, 'v1.2.6');
+        expect(AppConfig.buildNumber, '10260');
+        expect(AppConfig.fullVersion, 'v1.2.6 (Build 10260)');
+        expect(AppConfig.releaseTag, 'v1.2.6');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1519,6 +1521,46 @@ void main() {
         ),
         isFalse,
       );
+
+      // 7. isBadgeUrl detection
+      expect(
+        ReadmeMarkdownView.isBadgeUrl(
+          'https://img.shields.io/badge/license-MIT-blue.svg',
+        ),
+        isTrue,
+      );
+      expect(
+        ReadmeMarkdownView.isBadgeUrl(
+          'https://badgen.net/badge/coverage/98%/green',
+        ),
+        isTrue,
+      );
+      expect(
+        ReadmeMarkdownView.isBadgeUrl(
+          'https://github.com/zerabyte88/kontri/actions/workflows/test.yml/badge.svg',
+        ),
+        isTrue,
+      );
+      expect(
+        ReadmeMarkdownView.isBadgeUrl(
+          'https://raw.githubusercontent.com/dev/repo/main/demo.png',
+        ),
+        isFalse,
+      );
+
+      // 8. Standalone HTML img with width attribute preserves dimension fragment #120x120
+      const logoHtml =
+          '<img src="assets/icons/app_icon.png" alt="Kontri Logo" width="120" />';
+      final processedLogo = ReadmeMarkdownView.preprocessMarkdown(
+        logoHtml,
+        owner,
+        repo,
+        branch,
+      );
+      expect(
+        processedLogo,
+        '![Kontri Logo](https://raw.githubusercontent.com/developer/awesome-project/main/assets/icons/app_icon.png#120x120)',
+      );
     });
 
     testWidgets(
@@ -1552,7 +1594,7 @@ void main() {
     );
 
     testWidgets(
-      'StatsDetailScreen renders profile README GlassCard and allows toggling expand/collapse',
+      'StatsDetailScreen renders user profile without inline README card',
       (WidgetTester tester) async {
         final user = GitHubUser(
           login: 'octocat',
@@ -1592,19 +1634,6 @@ void main() {
         final storage = await StorageService.init();
 
         final mockClient = MockClient((request) async {
-          if (request.url.path.contains('/repos/octocat/octocat/readme')) {
-            return http.Response(
-              jsonEncode({
-                'name': 'README.md',
-                'encoding': 'base64',
-                'content': base64Encode(
-                  utf8.encode('### Hello from octocat profile readme!'),
-                ),
-              }),
-              200,
-              headers: {'content-type': 'application/json'},
-            );
-          }
           return http.Response('Not Found', 404);
         });
 
@@ -1630,29 +1659,9 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 200));
 
-        // Profile README header is rendered
-        expect(find.text('octocat/README.md'), findsOneWidget);
-        expect(find.text('Hello from octocat profile readme!'), findsOneWidget);
-
-        // Tap expand/collapse icon to collapse
-        final collapseButton = find.byIcon(Icons.keyboard_arrow_up_rounded);
-        expect(collapseButton, findsOneWidget);
-        await tester.tap(collapseButton);
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 200));
-
-        // Content should be hidden
-        expect(find.text('Hello from octocat profile readme!'), findsNothing);
-        expect(find.byIcon(Icons.keyboard_arrow_up_rounded), findsNothing);
-        expect(
-          find.byWidgetPredicate(
-            (w) =>
-                w is Icon &&
-                w.icon == Icons.keyboard_arrow_down_rounded &&
-                w.size == 20,
-          ),
-          findsOneWidget,
-        );
+        // Profile README card is not rendered
+        expect(find.text('octocat/README.md'), findsNothing);
+        expect(find.text('The Octocat'), findsOneWidget);
       },
     );
 
@@ -1718,6 +1727,277 @@ void main() {
         expect(find.textContaining('Welcome to Kontri'), findsOneWidget);
       },
     );
+
+    test('GitHubCommitDetail and GitHubCommitFile parse JSON correctly', () {
+      final json = {
+        'sha': '6dcb09b5b57875f334f61aebed695e2e4193db5e',
+        'commit': {
+          'message': 'feat: add commit diff viewer\n\nSupports GitHub mobile unified diff view',
+          'author': {'name': 'Zerabyte Dev', 'date': '2026-11-02T15:00:00Z'},
+        },
+        'author': {
+          'login': 'zerabyte88',
+          'avatar_url': 'https://avatars.githubusercontent.com/u/12345?v=4',
+        },
+        'stats': {'total': 16, 'additions': 12, 'deletions': 4},
+        'files': [
+          {
+            'filename': 'lib/screens/commit_detail_screen.dart',
+            'status': 'added',
+            'additions': 12,
+            'deletions': 4,
+            'changes': 16,
+            'patch':
+                '@@ -0,0 +1,5 @@\n+import flutter;\n-old code;\n normal code;',
+          },
+        ],
+      };
+
+      final detail = GitHubCommitDetail.fromJson(json);
+
+      expect(detail.sha, '6dcb09b5b57875f334f61aebed695e2e4193db5e');
+      expect(detail.shortSha, '6dcb09b');
+      expect(detail.firstLineMessage, 'feat: add commit diff viewer');
+      expect(detail.bodyMessage, 'Supports GitHub mobile unified diff view');
+      expect(detail.authorName, 'Zerabyte Dev');
+      expect(detail.authorLogin, 'zerabyte88');
+      expect(detail.authorAvatarUrl, contains('12345'));
+      expect(detail.additions, 12);
+      expect(detail.deletions, 4);
+      expect(detail.totalChanges, 16);
+      expect(detail.files.length, 1);
+
+      final file = detail.files.first;
+      expect(file.filename, 'lib/screens/commit_detail_screen.dart');
+      expect(file.status, 'added');
+      expect(file.additions, 12);
+      expect(file.deletions, 4);
+      expect(file.patch, contains('+import flutter;'));
+    });
+
+    test('GitHubApiService fetchRepositoryCommits and fetchCommitDetail query scoped repo correctly', () async {
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/repos/zerabyte88/kontri/commits') {
+          expect(request.url.queryParameters['sha'], 'main');
+          return http.Response(
+            jsonEncode([
+              {
+                'sha': 'c0ffee1234567890',
+                'commit': {
+                  'message': 'fix: correct query string',
+                  'author': {
+                    'name': 'Developer',
+                    'date': '2026-11-01T12:00:00Z',
+                  },
+                },
+                'author': {
+                  'login': 'zerabyte88',
+                  'avatar_url': 'https://avatar.url',
+                },
+              },
+            ]),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        } else if (request.url.path ==
+            '/repos/zerabyte88/kontri/commits/c0ffee1234567890') {
+          return http.Response(
+            jsonEncode({
+              'sha': 'c0ffee1234567890',
+              'commit': {
+                'message': 'fix: correct query string',
+                'author': {'name': 'Developer', 'date': '2026-11-01T12:00:00Z'},
+              },
+              'author': {
+                'login': 'zerabyte88',
+                'avatar_url': 'https://avatar.url',
+              },
+              'stats': {'total': 5, 'additions': 4, 'deletions': 1},
+              'files': [
+                {
+                  'filename': 'lib/api.dart',
+                  'status': 'modified',
+                  'additions': 4,
+                  'deletions': 1,
+                  'changes': 5,
+                  'patch': '@@ -1,2 +1,3 @@\n-old;\n+new;',
+                },
+              ],
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final api = GitHubApiService(client: mockClient);
+
+      final commits = await api.fetchRepositoryCommits(
+        'zerabyte88',
+        'kontri',
+        branch: 'main',
+      );
+      expect(commits.length, 1);
+      expect(commits.first.sha, 'c0ffee1234567890');
+      expect(commits.first.firstLineMessage, 'fix: correct query string');
+
+      final detail = await api.fetchCommitDetail(
+        'zerabyte88',
+        'kontri',
+        'c0ffee1234567890',
+      );
+      expect(detail, isNotNull);
+      expect(detail!.sha, 'c0ffee1234567890');
+      expect(detail.files.first.filename, 'lib/api.dart');
+    });
+
+    testWidgets(
+      'RepoDetailScreen commits tab switches and renders commits list scoped to repo',
+      (WidgetTester tester) async {
+        final repo = GitHubRepo(
+          name: 'kontri',
+          description: 'GitHub analytics app',
+          htmlUrl: 'https://github.com/zerabyte88/kontri',
+          stargazersCount: 42,
+          forksCount: 5,
+          isFork: false,
+          language: 'Dart',
+          updatedAt: DateTime.now(),
+          defaultBranch: 'main',
+        );
+
+        final mockClient = MockClient((request) async {
+          if (request.url.path == '/repos/zerabyte88/kontri/readme') {
+            return http.Response(
+              jsonEncode({
+                'name': 'README.md',
+                'encoding': 'base64',
+                'content': base64Encode(utf8.encode('# Readme')),
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          } else if (request.url.path == '/repos/zerabyte88/kontri/commits') {
+            return http.Response(
+              jsonEncode([
+                {
+                  'sha': 'a1b2c3d4e5f67890',
+                  'commit': {
+                    'message': 'feat: initial release commit',
+                    'author': {
+                      'name': 'Zerabyte',
+                      'date': '2026-11-01T10:00:00Z',
+                    },
+                  },
+                  'author': {'login': 'zerabyte88'},
+                },
+              ]),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+          return http.Response('Not Found', 404);
+        });
+
+        final apiService = GitHubApiService(client: mockClient);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            supportedLocales: AppLanguage.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            home: RepoDetailScreen(repo: repo, apiService: apiService),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        expect(find.text('Commits'), findsOneWidget);
+
+        // Tap Commits tab
+        await tester.tap(find.text('Commits'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('feat: initial release commit'), findsOneWidget);
+        expect(find.text('#a1b2c3d'), findsOneWidget);
+      },
+    );
+
+    testWidgets('CommitDetailScreen renders summary and diff boxes correctly', (
+      WidgetTester tester,
+    ) async {
+      final repo = GitHubRepo(
+        name: 'kontri',
+        htmlUrl: 'https://github.com/zerabyte88/kontri',
+        stargazersCount: 42,
+        forksCount: 5,
+        isFork: false,
+        updatedAt: DateTime.now(),
+      );
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path ==
+            '/repos/zerabyte88/kontri/commits/a1b2c3d4e5f67890') {
+          return http.Response(
+            jsonEncode({
+              'sha': 'a1b2c3d4e5f67890',
+              'commit': {
+                'message': 'fix: solve layout overflow\n\nDetails about fix',
+                'author': {'name': 'Zerabyte', 'date': '2026-11-01T10:00:00Z'},
+              },
+              'author': {'login': 'zerabyte88'},
+              'stats': {'total': 8, 'additions': 6, 'deletions': 2},
+              'files': [
+                {
+                  'filename': 'lib/screens/stats.dart',
+                  'status': 'modified',
+                  'additions': 6,
+                  'deletions': 2,
+                  'changes': 8,
+                  'patch': '@@ -10,3 +10,4 @@\n-oldLine();\n+newLine();\n contextLine();',
+                },
+              ],
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final apiService = GitHubApiService(client: mockClient);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          supportedLocales: AppLanguage.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: CommitDetailScreen(
+            repo: repo,
+            sha: 'a1b2c3d4e5f67890',
+            apiService: apiService,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('fix: solve layout overflow'), findsOneWidget);
+      expect(find.text('Details about fix'), findsOneWidget);
+      expect(find.text('+6'), findsOneWidget);
+      expect(find.text('-2'), findsOneWidget);
+      expect(find.text('lib/screens/stats.dart'), findsOneWidget);
+      expect(find.textContaining('+newLine();'), findsOneWidget);
+      expect(find.textContaining('-oldLine();'), findsOneWidget);
+    });
 
     test('GitHubContentItem parses directory and file correctly', () {
       final dirJson = {

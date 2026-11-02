@@ -267,6 +267,39 @@ class AppLocalizations {
   String get copyCode => _t('copyCode');
   String get codeCopied => _t('codeCopied');
 
+  // Repository Commits & Diff
+  String get commitsTab =>
+      (language == AppLanguage.indonesian || language == AppLanguage.malay)
+      ? 'Commit'
+      : 'Commits';
+  String get totalCommits =>
+      (language == AppLanguage.indonesian || language == AppLanguage.malay)
+      ? 'Commit'
+      : 'Commits';
+  String get commitDetailsTitle =>
+      (language == AppLanguage.indonesian || language == AppLanguage.malay)
+      ? 'Detail Commit'
+      : 'Commit Details';
+  String get noCommitsFound =>
+      (language == AppLanguage.indonesian || language == AppLanguage.malay)
+      ? 'Tidak ada riwayat commit ditemukan.'
+      : 'No commits found.';
+  String get shaCopied =>
+      (language == AppLanguage.indonesian || language == AppLanguage.malay)
+      ? 'SHA commit disalin ke papan klip.'
+      : 'Commit SHA copied to clipboard.';
+  String get loadingCommits =>
+      (language == AppLanguage.indonesian || language == AppLanguage.malay)
+      ? 'Memuat riwayat commit...'
+      : 'Loading commit history...';
+
+  String filesChanged(int count) {
+    if (language == AppLanguage.indonesian || language == AppLanguage.malay) {
+      return '$count file diubah';
+    }
+    return '$count files changed';
+  }
+
   // Profile Action Toast
   String get shareProfile => _t('shareProfile');
   String get saveFavorite => _t('saveFavorite');
