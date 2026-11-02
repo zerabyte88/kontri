@@ -814,6 +814,29 @@ void main() {
         // Verify that AnimatedTierTitle exists in the commit habit banner
         expect(find.byType(AnimatedTierTitle), findsOneWidget);
 
+        // Verify vertical order: Title -> Name -> Username -> Location
+        final tierTitleTop = tester
+            .getTopLeft(find.byType(AnimatedTierTitle))
+            .dy;
+        final nameTop = tester.getTopLeft(find.text('Nanda Alexander')).dy;
+        final usernameTop = tester
+            .getTopLeft(
+              find.byWidgetPredicate(
+                (w) =>
+                    w is Text &&
+                    w.data == '@zerabyte88' &&
+                    w.style?.fontSize == 12,
+              ),
+            )
+            .dy;
+        final locationTop = tester
+            .getTopLeft(find.text('Planet Earth, Solar System'))
+            .dy;
+
+        expect(tierTitleTop < nameTop, true);
+        expect(nameTop < usernameTop, true);
+        expect(usernameTop < locationTop, true);
+
         // Verify all years total contributions card is rendered (in default English)
         expect(find.text('Total Contributions (All Years)'), findsOneWidget);
         expect(find.text('All time'), findsOneWidget);
@@ -822,13 +845,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.2.6',
+      'AppConfig provides accurate release and version telemetry for v1.2.7',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.2.6');
-        expect(AppConfig.buildNumber, '10260');
-        expect(AppConfig.fullVersion, 'v1.2.6 (Build 10260)');
-        expect(AppConfig.releaseTag, 'v1.2.6');
+        expect(AppConfig.appVersion, 'v1.2.7');
+        expect(AppConfig.buildNumber, '10270');
+        expect(AppConfig.fullVersion, 'v1.2.7 (Build 10270)');
+        expect(AppConfig.releaseTag, 'v1.2.7');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },

@@ -700,36 +700,31 @@ GitHub: https://github.com/${u.login}
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Wrap(
-                                      crossAxisAlignment:
-                                          WrapCrossAlignment.center,
-                                      spacing: 8,
-                                      runSpacing: 5,
-                                      children: [
-                                        Text(
-                                          (user.name != null &&
-                                                  user.name!.trim().isNotEmpty)
-                                              ? user.name!
-                                              : user.login,
-                                          style: TextStyle(
-                                            color: AppTheme.textPrimary,
-                                            fontSize: 17.5,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: -0.3,
-                                          ),
-                                        ),
-                                        AnimatedTierTitle(
-                                          titleInfo: titleInfo,
-                                          fontSize: 11,
-                                          showBadgeContainer: true,
-                                        ),
-                                        if (cStats.peakTitle.tier <= 5)
-                                          _buildPeakTierBadge(
-                                            cStats.peakTitle,
-                                            titleInfo,
-                                            loc,
-                                          ),
-                                      ],
+                                    AnimatedTierTitle(
+                                      titleInfo: titleInfo,
+                                      fontSize: 11,
+                                      showBadgeContainer: true,
+                                    ),
+                                    if (cStats.peakTitle.tier <= 5) ...[
+                                      const SizedBox(height: 4),
+                                      _buildPeakTierBadge(
+                                        cStats.peakTitle,
+                                        titleInfo,
+                                        loc,
+                                      ),
+                                    ],
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      (user.name != null &&
+                                              user.name!.trim().isNotEmpty)
+                                          ? user.name!
+                                          : user.login,
+                                      style: TextStyle(
+                                        color: AppTheme.textPrimary,
+                                        fontSize: 17.5,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: -0.3,
+                                      ),
                                     ),
                                     const SizedBox(height: 4),
                                     InkWell(
