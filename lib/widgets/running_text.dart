@@ -140,11 +140,7 @@ class _RunningTextState extends State<RunningText> {
 
         // If text comfortably fits within available space, render standard Text
         if (!availableWidth.isFinite || textWidth <= availableWidth) {
-          return Text(
-            widget.text,
-            style: effectiveStyle,
-            maxLines: 1,
-          );
+          return Text(widget.text, style: effectiveStyle, maxLines: 1);
         }
 
         // When text overflows:

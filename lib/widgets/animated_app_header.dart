@@ -194,10 +194,7 @@ class AnimatedAppHeader extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildLogoContainer(
-                accentColor,
-                isLight: currentTheme.isLight,
-              ),
+              _buildLogoContainer(accentColor, isLight: currentTheme.isLight),
               const SizedBox(width: 9),
               _buildTitle(),
               const SizedBox(width: 8),

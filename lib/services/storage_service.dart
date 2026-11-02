@@ -231,8 +231,7 @@ class StorageService {
 
   // Theme Settings
   static const String _keyThemeMode = 'kontri_theme_mode';
-  static const String _keyJapaneseEasterEgg =
-      'kontri_japanese_theme_unlocked';
+  static const String _keyJapaneseEasterEgg = 'kontri_japanese_theme_unlocked';
 
   String getThemeMode() {
     return _prefs.getString(_keyThemeMode) ?? 'dark';

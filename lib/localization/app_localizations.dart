@@ -36,7 +36,6 @@ class AppLocalizations {
   }
 
   // App & General
-  String get appTitle => 'Kontri';
   String get close => _t('close');
   String get cancel => _t('cancel');
   String get save => _t('save');
@@ -46,7 +45,6 @@ class AppLocalizations {
   String get aboutApp => _t('aboutApp');
   String get appVersionLabel => _t('appVersionLabel');
   String get buildNumberLabel => _t('buildNumberLabel');
-  String get appDescriptionLabel => _t('appDescriptionLabel');
   String get licenseLabel => _t('licenseLabel');
 
   String cannotOpenLink(String url) {
@@ -68,7 +66,6 @@ class AppLocalizations {
   String get clearAll => _t('clearAll');
   String get noRecentSearches => _t('noRecentSearches');
   String get favoriteProfiles => _t('favoriteProfiles');
-  String get favoriteProfile => favoriteProfiles;
   String get viewAllFavorites => _t('viewAllFavorites');
   String get gridColumnsLabel => _t('gridColumnsLabel');
   String get undo => _t('undo');
@@ -158,10 +155,8 @@ class AppLocalizations {
     }
   }
 
-
   // Updates & About
   String get openInBrowser => _t('openInBrowser');
-  String get developerLabel => _t('developerLabel');
   String get developerRole => _t('developerRole');
 
   // Rate Limit Status
@@ -208,6 +203,7 @@ class AppLocalizations {
   String get tokenDeletedToast => _t('tokenDeletedToast');
 
   // Developer Profile & Stats Detail
+  String get profileReadmeTitle => _t('profileReadmeTitle');
   String get noBio => _t('noBio');
   String get noLocation => _t('noLocation');
   String get publicRepos => _t('publicRepos');
@@ -321,7 +317,6 @@ class AppLocalizations {
       return _t('timeYearAgo').replaceAll('{year}', '$years');
     }
   }
-
 
   String getCommitTierLevelName(int tier) {
     switch (tier) {

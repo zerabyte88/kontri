@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     BuildContext context,
   ) {
     const gap = 4.0;
-    const horizontalPadding = 3.0;
+    const horizontalPadding = 4.0;
     final widths = <double>[];
     final offsets = <double>[];
     double currentOffset = horizontalPadding;
@@ -183,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         textScaler: MediaQuery.textScalerOf(context),
       )..layout();
 
-      final w = math.max(76.0, textPainter.width + 26.0);
+      final w = math.max(76.0, textPainter.width + 24.0);
       widths.add(w);
       offsets.add(currentOffset);
       currentOffset += w + gap;
@@ -418,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  void _openSettingsSheet() async {
+  void _openSettingsScreen() async {
     HeaderAnimationState.pauseAnimation();
     await Navigator.push(
       context,
@@ -462,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           actions: [
             if (rateLimit != null)
               GestureDetector(
-                onTap: _openSettingsSheet,
+                onTap: _openSettingsScreen,
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -504,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 size: 20,
                 color: AppTheme.textSecondary,
               ),
-              onPressed: _openSettingsSheet,
+              onPressed: _openSettingsScreen,
             ),
           ],
         ),
@@ -602,7 +602,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                       ],
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
 
                       // Bookmarks Section
                       _buildBookmarksSection(loc, bookmarkedUsers),
@@ -612,7 +612,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       // Latest Tech & AI News Header
                       _buildTechNewsHeader(loc, categories),
 
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -717,12 +717,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         children: [
           // Header
           Padding(
-            padding: const EdgeInsets.only(
-              left: 14,
-              right: 8,
-              top: 10,
-              bottom: 6,
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 12, 12, 8),
             child: Row(
               children: [
                 Icon(
@@ -839,7 +834,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ListTile(
                     dense: true,
                     visualDensity: VisualDensity.compact,
-                    contentPadding: const EdgeInsets.only(left: 14, right: 6),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     leading: Icon(
                       Icons.history_rounded,
                       size: 16,
@@ -924,7 +922,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           if (mounted) setState(() {});
         },
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppTheme.surface,
             borderRadius: BorderRadius.circular(12),
@@ -954,17 +952,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       loc.favoriteProfiles,
                       style: TextStyle(
                         color: AppTheme.textPrimary,
-                        fontSize: 13.5,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       loc.emptyBookmarks,
-                      style: TextStyle(
-                        color: AppTheme.textMuted,
-                        fontSize: 11.5,
-                      ),
+                      style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
                     ),
                   ],
                 ),
@@ -1031,7 +1026,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     '${bookmarks.length}',
                     style: TextStyle(
                       color: AppTheme.textSecondary,
-                      fontSize: 10.5,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1056,7 +1051,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         SizedBox(
           height: 64,
           child: ListView.separated(
@@ -1092,7 +1087,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         : () => _openFavoriteProfile(user.username),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
+                        horizontal: 12,
                         vertical: 8,
                       ),
                       child: Row(
@@ -1203,7 +1198,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   'github.com',
                                   style: TextStyle(
                                     color: AppTheme.textMuted,
-                                    fontSize: 10.5,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
@@ -1354,7 +1349,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             loc.offlineCached,
                             style: TextStyle(
                               color: AppTheme.accentAmber,
-                              fontSize: 10,
+                              fontSize: 11,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -1378,7 +1373,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
 
         // Category tab bar
         Builder(
@@ -1388,7 +1383,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               context,
             );
             final totalWidth = offsets.isNotEmpty
-                ? offsets.last + widths.last + 3.0
+                ? offsets.last + widths.last + 4.0
                 : 0.0;
             final selectedIndex = categories.indexWhere(
               (c) => c['id'] == _selectedCategory,
@@ -1396,15 +1391,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             final safeIndex = selectedIndex >= 0 ? selectedIndex : 0;
 
             return Container(
-              height: 42,
+              height: 40,
               decoration: BoxDecoration(
                 color: AppTheme.surfaceElevated,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: AppTheme.border, width: 1.0),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(16),
                 clipBehavior: Clip.antiAlias,
                 child: SingleChildScrollView(
                   controller: _categoryScrollController,
@@ -1413,122 +1408,113 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   clipBehavior: Clip.none,
                   child: SizedBox(
                     width: totalWidth,
-                    height: 34,
-                  child: Stack(
-                    children: [
-                      // Sliding capsule indicator
-                      AnimatedBuilder(
-                        animation: Listenable.merge([
-                          _newsPageController,
-                          _capsuleJumpController,
-                        ]),
-                        builder: (context, _) {
-                          double currentLeft;
-                          double currentWidth;
+                    height: 32,
+                    child: Stack(
+                      children: [
+                        // Sliding capsule indicator
+                        AnimatedBuilder(
+                          animation: Listenable.merge([
+                            _newsPageController,
+                            _capsuleJumpController,
+                          ]),
+                          builder: (context, _) {
+                            double currentLeft;
+                            double currentWidth;
 
-                          if (_isCapsuleJumping &&
-                              _capsuleJumpAnimation != null) {
-                            final t = _capsuleJumpAnimation!.value;
-                            currentLeft = ui.lerpDouble(
-                              _capsuleStartLeft,
-                              _capsuleEndLeft,
-                              t,
-                            )!;
-                            currentWidth = ui.lerpDouble(
-                              _capsuleStartWidth,
-                              _capsuleEndWidth,
-                              t,
-                            )!;
-                          } else {
-                            double page = safeIndex.toDouble();
-                            if (_newsPageController.hasClients) {
-                              page =
-                                  _newsPageController.page ??
-                                  safeIndex.toDouble();
+                            if (_isCapsuleJumping &&
+                                _capsuleJumpAnimation != null) {
+                              final t = _capsuleJumpAnimation!.value;
+                              currentLeft = ui.lerpDouble(
+                                _capsuleStartLeft,
+                                _capsuleEndLeft,
+                                t,
+                              )!;
+                              currentWidth = ui.lerpDouble(
+                                _capsuleStartWidth,
+                                _capsuleEndWidth,
+                                t,
+                              )!;
+                            } else {
+                              double page = safeIndex.toDouble();
+                              if (_newsPageController.hasClients) {
+                                page =
+                                    _newsPageController.page ??
+                                    safeIndex.toDouble();
+                              }
+                              page = page.clamp(
+                                0.0,
+                                (categories.length - 1).toDouble(),
+                              );
+
+                              final int from = page.floor().clamp(
+                                0,
+                                categories.length - 1,
+                              );
+                              final int to = page.ceil().clamp(
+                                0,
+                                categories.length - 1,
+                              );
+                              final double progress = page - from;
+
+                              currentLeft = ui.lerpDouble(
+                                offsets[from],
+                                offsets[to],
+                                progress,
+                              )!;
+                              currentWidth = ui.lerpDouble(
+                                widths[from],
+                                widths[to],
+                                progress,
+                              )!;
                             }
-                            page = page.clamp(
-                              0.0,
-                              (categories.length - 1).toDouble(),
-                            );
 
-                            final int from = page.floor().clamp(
-                              0,
-                              categories.length - 1,
-                            );
-                            final int to = page.ceil().clamp(
-                              0,
-                              categories.length - 1,
-                            );
-                            final double progress = page - from;
-
-                            currentLeft = ui.lerpDouble(
-                              offsets[from],
-                              offsets[to],
-                              progress,
-                            )!;
-                            currentWidth = ui.lerpDouble(
-                              widths[from],
-                              widths[to],
-                              progress,
-                            )!;
-                          }
-
-                          return Positioned(
-                            left: currentLeft,
-                            top: 0,
-                            bottom: 0,
-                            width: currentWidth,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: AppTheme.primaryCyan.withValues(
-                                  alpha: 0.16,
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
+                            return Positioned(
+                              left: currentLeft,
+                              top: 0,
+                              bottom: 0,
+                              width: currentWidth,
+                              child: Container(
+                                decoration: BoxDecoration(
                                   color: AppTheme.primaryCyan.withValues(
-                                    alpha: 0.70,
+                                    alpha: 0.14,
                                   ),
-                                  width: 1.2,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
                                     color: AppTheme.primaryCyan.withValues(
-                                      alpha: 0.22,
+                                      alpha: 0.65,
                                     ),
-                                    blurRadius: 8.0,
-                                    spreadRadius: 0.5,
+                                    width: 1.0,
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                            );
+                          },
+                        ),
 
-                      // Category tab labels
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(width: 3),
-                          for (int i = 0; i < categories.length; i++) ...[
-                            if (i > 0) const SizedBox(width: 4),
-                            _buildCategoryTabItem(
-                              i,
-                              categories[i],
-                              widths[i],
-                              safeIndex,
-                              categories,
-                            ),
+                        // Category tab labels
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(width: 4),
+                            for (int i = 0; i < categories.length; i++) ...[
+                              if (i > 0) const SizedBox(width: 4),
+                              _buildCategoryTabItem(
+                                i,
+                                categories[i],
+                                widths[i],
+                                safeIndex,
+                                categories,
+                              ),
+                            ],
+                            const SizedBox(width: 4),
                           ],
-                          const SizedBox(width: 3),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
+            );
           },
         ),
       ],
@@ -1578,11 +1564,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
         return SizedBox(
           width: width,
-          height: 34,
+          height: 32,
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               splashColor: AppTheme.primaryCyan.withValues(alpha: 0.12),
               highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
               onTap: () => _onCategoryChipTapped(index, categories),
@@ -1595,7 +1581,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     color: color,
                     fontSize: 12,
                     fontWeight: fontWeight,
-                    letterSpacing: 0.1,
                   ),
                 ),
               ),

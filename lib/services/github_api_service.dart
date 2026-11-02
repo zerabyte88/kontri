@@ -164,6 +164,10 @@ class GitHubApiService {
     return null;
   }
 
+  Future<String?> fetchProfileReadme(String username) async {
+    return fetchRepositoryReadme(owner: username, repo: username);
+  }
+
   Future<List<GitHubContentItem>> fetchRepositoryContents({
     required String owner,
     required String repo,
@@ -242,7 +246,9 @@ class GitHubApiService {
     }
 
     try {
-      final treeRef = (ref != null && ref.trim().isNotEmpty) ? ref.trim() : 'HEAD';
+      final treeRef = (ref != null && ref.trim().isNotEmpty)
+          ? ref.trim()
+          : 'HEAD';
       final uri = Uri.parse(
         '$_baseUrl/repos/$cleanOwner/$cleanRepo/git/trees/$treeRef?recursive=1',
       );
@@ -259,17 +265,19 @@ class GitHubApiService {
             if (item is Map<String, dynamic> && item['type'] == 'blob') {
               final path = item['path'] as String? ?? '';
               final name = path.contains('/') ? path.split('/').last : path;
-              items.add(GitHubContentItem(
-                name: name,
-                path: path,
-                sha: item['sha'] as String? ?? '',
-                size: item['size'] as int? ?? 0,
-                type: 'file',
-                downloadUrl:
-                    'https://raw.githubusercontent.com/$cleanOwner/$cleanRepo/${ref ?? 'main'}/$path',
-                htmlUrl:
-                    'https://github.com/$cleanOwner/$cleanRepo/blob/${ref ?? 'main'}/$path',
-              ));
+              items.add(
+                GitHubContentItem(
+                  name: name,
+                  path: path,
+                  sha: item['sha'] as String? ?? '',
+                  size: item['size'] as int? ?? 0,
+                  type: 'file',
+                  downloadUrl:
+                      'https://raw.githubusercontent.com/$cleanOwner/$cleanRepo/${ref ?? 'main'}/$path',
+                  htmlUrl:
+                      'https://github.com/$cleanOwner/$cleanRepo/blob/${ref ?? 'main'}/$path',
+                ),
+              );
             }
           }
           _treeCache[cacheKey] = items;
@@ -306,7 +314,9 @@ class GitHubApiService {
     final cleanOwner = owner.trim();
     final cleanRepo = repo.trim();
     final cleanPath = path.trim().replaceAll(RegExp(r'^/+|/+$'), '');
-    if (cleanOwner.isEmpty || cleanRepo.isEmpty || cleanPath.isEmpty) return null;
+    if (cleanOwner.isEmpty || cleanRepo.isEmpty || cleanPath.isEmpty) {
+      return null;
+    }
 
     final cacheKey = '$cleanOwner/$cleanRepo/${ref ?? 'default'}/$cleanPath';
     if (_commitCache.containsKey(cacheKey)) {

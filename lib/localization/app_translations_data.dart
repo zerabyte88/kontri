@@ -27,6 +27,7 @@ const Map<AppLanguage, Map<String, String>> appTranslations = {
 };
 
 const Map<String, String> idTranslations = {
+  'profileReadmeTitle': 'README Profil',
   'close': 'Tutup',
   'cancel': 'Batal',
   'save': 'Simpan',
@@ -205,6 +206,7 @@ const Map<String, String> idTranslations = {
 };
 
 const Map<String, String> msTranslations = {
+  'profileReadmeTitle': 'README Profil',
   'close': 'Tutup',
   'cancel': 'Batal',
   'save': 'Simpan',
@@ -380,6 +382,7 @@ const Map<String, String> msTranslations = {
 };
 
 const Map<String, String> daTranslations = {
+  'profileReadmeTitle': 'Profil README',
   'close': 'Luk',
   'cancel': 'Annuller',
   'save': 'Gem',
@@ -553,6 +556,7 @@ const Map<String, String> daTranslations = {
 };
 
 const Map<String, String> deTranslations = {
+  'profileReadmeTitle': 'Profil-README',
   'close': 'Schließen',
   'cancel': 'Abbrechen',
   'save': 'Speichern',
@@ -731,6 +735,7 @@ const Map<String, String> deTranslations = {
 };
 
 const Map<String, String> enTranslations = {
+  'profileReadmeTitle': 'Profile README',
   'close': 'Close',
   'cancel': 'Cancel',
   'save': 'Save',
@@ -909,6 +914,7 @@ const Map<String, String> enTranslations = {
 };
 
 const Map<String, String> esTranslations = {
+  'profileReadmeTitle': 'README del perfil',
   'close': 'Cerrar',
   'cancel': 'Cancelar',
   'save': 'Guardar',
@@ -1085,6 +1091,7 @@ const Map<String, String> esTranslations = {
 };
 
 const Map<String, String> frTranslations = {
+  'profileReadmeTitle': 'README du profil',
   'close': 'Fermer',
   'cancel': 'Annuler',
   'save': 'Enregistrer',
@@ -1262,6 +1269,7 @@ const Map<String, String> frTranslations = {
 };
 
 const Map<String, String> itTranslations = {
+  'profileReadmeTitle': 'README del profilo',
   'close': 'Chiudi',
   'cancel': 'Annulla',
   'save': 'Salva',
@@ -1440,6 +1448,7 @@ const Map<String, String> itTranslations = {
 };
 
 const Map<String, String> nlTranslations = {
+  'profileReadmeTitle': 'Profiel-README',
   'close': 'Sluiten',
   'cancel': 'Annuleren',
   'save': 'Opslaan',
@@ -1616,6 +1625,7 @@ const Map<String, String> nlTranslations = {
 };
 
 const Map<String, String> noTranslations = {
+  'profileReadmeTitle': 'Profil-README',
   'close': 'Lukk',
   'cancel': 'Avbryt',
   'save': 'Lagre',
@@ -1790,6 +1800,7 @@ const Map<String, String> noTranslations = {
 };
 
 const Map<String, String> ptTranslations = {
+  'profileReadmeTitle': 'README do perfil',
   'close': 'Fechar',
   'cancel': 'Cancelar',
   'save': 'Salvar',
@@ -1967,6 +1978,7 @@ const Map<String, String> ptTranslations = {
 };
 
 const Map<String, String> fiTranslations = {
+  'profileReadmeTitle': 'Profiilin README',
   'close': 'Sulje',
   'cancel': 'Peruuta',
   'save': 'Tallenna',
@@ -2143,6 +2155,7 @@ const Map<String, String> fiTranslations = {
 };
 
 const Map<String, String> svTranslations = {
+  'profileReadmeTitle': 'Profil-README',
   'close': 'Stäng',
   'cancel': 'Avbryt',
   'save': 'Spara',
@@ -2318,6 +2331,7 @@ const Map<String, String> svTranslations = {
 };
 
 const Map<String, String> viTranslations = {
+  'profileReadmeTitle': 'README hồ sơ',
   'close': 'Đóng',
   'cancel': 'Hủy',
   'save': 'Lưu',
@@ -2495,6 +2509,7 @@ const Map<String, String> viTranslations = {
 };
 
 const Map<String, String> ruTranslations = {
+  'profileReadmeTitle': 'README профиля',
   'close': 'Закрыть',
   'cancel': 'Отмена',
   'save': 'Сохранить',
@@ -2671,6 +2686,7 @@ const Map<String, String> ruTranslations = {
 };
 
 const Map<String, String> arTranslations = {
+  'profileReadmeTitle': 'ملف تعريف README',
   'close': 'إغلاق',
   'cancel': 'إلغاء',
   'save': 'حفظ',
@@ -2845,6 +2861,7 @@ const Map<String, String> arTranslations = {
 };
 
 const Map<String, String> hiTranslations = {
+  'profileReadmeTitle': 'प्रोफ़ाइल README',
   'close': 'बंद करें',
   'cancel': 'रद्द करें',
   'save': 'सहेजें',
@@ -3019,6 +3036,7 @@ const Map<String, String> hiTranslations = {
 };
 
 const Map<String, String> thTranslations = {
+  'profileReadmeTitle': 'README โปรไฟล์',
   'close': 'ปิด',
   'cancel': 'ยกเลิก',
   'save': 'บันทึก',
@@ -3195,6 +3213,7 @@ const Map<String, String> thTranslations = {
 };
 
 const Map<String, String> jaTranslations = {
+  'profileReadmeTitle': 'プロフィール README',
   'close': '閉じる',
   'cancel': 'キャンセル',
   'save': '保存',
@@ -3368,6 +3387,7 @@ const Map<String, String> jaTranslations = {
 };
 
 const Map<String, String> zhHansTranslations = {
+  'profileReadmeTitle': '个人资料 README',
   'close': '关闭',
   'cancel': '取消',
   'save': '保存',
@@ -3540,6 +3560,7 @@ const Map<String, String> zhHansTranslations = {
 };
 
 const Map<String, String> zhHantTranslations = {
+  'profileReadmeTitle': '個人檔案 README',
   'close': '關閉',
   'cancel': '取消',
   'save': '儲存',
@@ -3712,6 +3733,7 @@ const Map<String, String> zhHantTranslations = {
 };
 
 const Map<String, String> koTranslations = {
+  'profileReadmeTitle': '프로필 README',
   'close': '닫기',
   'cancel': '취소',
   'save': '저장',

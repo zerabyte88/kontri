@@ -32,13 +32,9 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
       vsync: this,
       duration: const Duration(seconds: 12),
     );
-    if (!_isCurrentThemeStatic &&
-        !HeaderAnimationState.isPausedNotifier.value) {
-      _controller.repeat();
-    }
-
-    HeaderAnimationState.isPausedNotifier.addListener(_onPauseStateChanged);
-    AppThemeService.currentThemeNotifier.addListener(_onThemeChanged);
+    _syncAnimationState();
+    HeaderAnimationState.isPausedNotifier.addListener(_syncAnimationState);
+    AppThemeService.currentThemeNotifier.addListener(_syncAnimationState);
   }
 
   @override
@@ -48,37 +44,26 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
         state == AppLifecycleState.hidden) {
       if (_controller.isAnimating) _controller.stop();
     } else if (state == AppLifecycleState.resumed) {
-      if (!_isCurrentThemeStatic &&
-          !HeaderAnimationState.isPausedNotifier.value &&
-          !_controller.isAnimating) {
-        _controller.repeat();
-      }
+      _syncAnimationState();
     }
   }
 
-  void _onThemeChanged() {
+  void _syncAnimationState() {
     if (!mounted) return;
-    if (_isCurrentThemeStatic || HeaderAnimationState.isPausedNotifier.value) {
-      if (_controller.isAnimating) _controller.stop();
-    } else {
+    final shouldAnimate =
+        !_isCurrentThemeStatic && !HeaderAnimationState.isPausedNotifier.value;
+    if (shouldAnimate) {
       if (!_controller.isAnimating) _controller.repeat();
-    }
-  }
-
-  void _onPauseStateChanged() {
-    if (!mounted) return;
-    if (_isCurrentThemeStatic || HeaderAnimationState.isPausedNotifier.value) {
-      if (_controller.isAnimating) _controller.stop();
     } else {
-      if (!_controller.isAnimating) _controller.repeat();
+      if (_controller.isAnimating) _controller.stop();
     }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    HeaderAnimationState.isPausedNotifier.removeListener(_onPauseStateChanged);
-    AppThemeService.currentThemeNotifier.removeListener(_onThemeChanged);
+    HeaderAnimationState.isPausedNotifier.removeListener(_syncAnimationState);
+    AppThemeService.currentThemeNotifier.removeListener(_syncAnimationState);
     _controller.dispose();
     super.dispose();
   }
@@ -412,13 +397,10 @@ class _FullAppBgPainter extends CustomPainter {
     final h = size.height;
     final sway = math.sin(progress * 2 * math.pi) * 2.5;
 
-    // 1. Sumi-e Main Trunk & Curved Boughs
+    // Bough & branches
     _stroke
       ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    // Main bough from top-right corner sweeping downward
-    _stroke
+      ..strokeJoin = StrokeJoin.round
       ..color = const Color(0xFF260D1B).withValues(alpha: 0.90)
       ..strokeWidth = 9.0;
     final mainBranch = Path()
@@ -433,7 +415,6 @@ class _FullAppBgPainter extends CustomPainter {
       );
     canvas.drawPath(mainBranch, _stroke);
 
-    // Inner bark highlight
     _stroke
       ..color = const Color(0xFF451832).withValues(alpha: 0.55)
       ..strokeWidth = 3.0;
@@ -449,7 +430,6 @@ class _FullAppBgPainter extends CustomPainter {
       );
     canvas.drawPath(barkDetail, _stroke);
 
-    // Sub-branch A: Reaching upward toward top
     _stroke
       ..color = const Color(0xFF2E1020).withValues(alpha: 0.85)
       ..strokeWidth = 4.5;
@@ -467,7 +447,6 @@ class _FullAppBgPainter extends CustomPainter {
       _stroke,
     );
 
-    // Sub-branch B: Arching downward
     _stroke.strokeWidth = 4.0;
     canvas.drawPath(
       Path()
@@ -483,7 +462,6 @@ class _FullAppBgPainter extends CustomPainter {
       _stroke,
     );
 
-    // Sub-branch C: Reaching center-left tip
     _stroke.strokeWidth = 3.2;
     canvas.drawPath(
       Path()
@@ -499,7 +477,6 @@ class _FullAppBgPainter extends CustomPainter {
       _stroke,
     );
 
-    // Sub-branch D: Minor twig
     _stroke.strokeWidth = 2.4;
     canvas.drawPath(
       Path()
@@ -515,13 +492,12 @@ class _FullAppBgPainter extends CustomPainter {
       _stroke,
     );
 
-    // 2. Sakura Blooming Flowers (5 petals with golden stamen)
+    // Flowers
     void drawFlower(Offset center, double radius, double rot) {
       canvas.save();
       canvas.translate(center.dx, center.dy);
       canvas.rotate(rot);
 
-      // Draw 5 petals
       for (int i = 0; i < 5; i++) {
         final angle = i * (2 * math.pi / 5);
         final petalDist = radius * 0.60;
@@ -534,7 +510,6 @@ class _FullAppBgPainter extends CustomPainter {
         canvas.translate(petalCenter.dx, petalCenter.dy);
         canvas.rotate(angle);
 
-        // Petal base
         _fill.color = const Color(0xFFFF6097).withValues(alpha: 0.85);
         canvas.drawOval(
           Rect.fromCenter(
@@ -545,7 +520,6 @@ class _FullAppBgPainter extends CustomPainter {
           _fill,
         );
 
-        // Petal tip highlight
         _fill.color = const Color(0xFFFFD4E8).withValues(alpha: 0.90);
         canvas.drawOval(
           Rect.fromCenter(
@@ -559,15 +533,12 @@ class _FullAppBgPainter extends CustomPainter {
         canvas.restore();
       }
 
-      // Center disc
       _fill.color = const Color(0xFFFF4081).withValues(alpha: 0.90);
       canvas.drawCircle(Offset.zero, radius * 0.28, _fill);
 
-      // Golden Stamen & Pistil
       _fill.color = const Color(0xFFFFE485);
       canvas.drawCircle(Offset.zero, radius * 0.18, _fill);
 
-      // 5 Tiny Golden Pollen Dots
       for (int i = 0; i < 5; i++) {
         final a = i * (2 * math.pi / 5) + 0.3;
         final px = math.cos(a) * (radius * 0.26);
@@ -579,13 +550,12 @@ class _FullAppBgPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // 3. Cherry Buds
+    // Buds
     void drawBud(Offset center, double radius, double rot) {
       canvas.save();
       canvas.translate(center.dx, center.dy);
       canvas.rotate(rot);
 
-      // Sepal green/wine
       _fill.color = const Color(0xFF381024).withValues(alpha: 0.85);
       canvas.drawOval(
         Rect.fromCenter(
@@ -596,7 +566,6 @@ class _FullAppBgPainter extends CustomPainter {
         _fill,
       );
 
-      // Rosy bud petal
       _fill.color = const Color(0xFFFF528F).withValues(alpha: 0.95);
       canvas.drawOval(
         Rect.fromCenter(
@@ -855,7 +824,6 @@ class _FullAppBgPainter extends CustomPainter {
     _drawSnowyPine(canvas, Offset(size.width * 0.95, hillBaseY - 2), 24, 38);
 
     // Village cabins
-    // Cabin 1
     _drawSnowyCabin(
       canvas,
       Offset(size.width * 0.16, hillBaseY + 6),
@@ -864,8 +832,6 @@ class _FullAppBgPainter extends CustomPainter {
       chimneyXOffset: -7,
       hasChimney: true,
     );
-
-    // Cabin 2
     _drawSnowyCabin(
       canvas,
       Offset(size.width * 0.25, hillBaseY + 12),
@@ -874,8 +840,6 @@ class _FullAppBgPainter extends CustomPainter {
       chimneyXOffset: 5,
       hasChimney: true,
     );
-
-    // Cabin 3
     _drawSnowyCabin(
       canvas,
       Offset(size.width * 0.46, hillBaseY + 22),
@@ -884,8 +848,6 @@ class _FullAppBgPainter extends CustomPainter {
       chimneyXOffset: 6,
       hasChimney: true,
     );
-
-    // Cabin 4
     _drawSnowyCabin(
       canvas,
       Offset(size.width * 0.74, hillBaseY - 18),
@@ -894,8 +856,6 @@ class _FullAppBgPainter extends CustomPainter {
       chimneyXOffset: -10,
       hasChimney: true,
     );
-
-    // Cabin 5
     _drawSnowyCabin(
       canvas,
       Offset(size.width * 0.84, hillBaseY - 10),

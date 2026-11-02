@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../localization/app_localizations.dart';
@@ -10,6 +8,7 @@ import '../services/github_api_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/animated_app_header.dart';
 import '../widgets/glass_card.dart';
+import '../widgets/readme_markdown_view.dart';
 import '../widgets/running_text.dart';
 import 'file_viewer_screen.dart';
 
@@ -276,88 +275,6 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     }
   }
 
-
-  /// Normalizes image URLs from markdown or HTML tags into raw direct URLs
-  String _normalizeImageUrl(
-    String url,
-    String owner,
-    String repo,
-    String branch,
-  ) {
-    var cleanUrl = url.trim();
-    if (cleanUrl.startsWith('./')) {
-      cleanUrl = cleanUrl.substring(2);
-    }
-    if (cleanUrl.startsWith('/') && !cleanUrl.startsWith('//')) {
-      cleanUrl = cleanUrl.substring(1);
-    }
-
-    // Relative path: resolve against raw.githubusercontent.com
-    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
-      return 'https://raw.githubusercontent.com/$owner/$repo/$branch/$cleanUrl';
-    }
-
-    // GitHub webpage blob: convert to raw content URL
-    if (cleanUrl.contains('github.com') && cleanUrl.contains('/blob/')) {
-      cleanUrl = cleanUrl
-          .replaceFirst('github.com', 'raw.githubusercontent.com')
-          .replaceFirst('/blob/', '/');
-    }
-
-    return cleanUrl;
-  }
-
-  /// Preprocesses raw README markdown: converts HTML <img> tags and normalizes relative image paths
-  String _preprocessReadme(
-    String rawMarkdown,
-    String owner,
-    String repo,
-    String branch,
-  ) {
-    var text = rawMarkdown;
-
-    // 1. Convert HTML <img ... src="..." alt="..."> to Markdown ![alt](src)
-    final imgRegex = RegExp(
-      r'<img\s+[^>]*src=["'
-      ']([^"'
-      ']+)["'
-      '][^>]*>',
-      caseSensitive: false,
-    );
-    text = text.replaceAllMapped(imgRegex, (match) {
-      final src = match.group(1) ?? '';
-      final altMatch = RegExp(
-        r'alt=["'
-        ']([^"'
-        ']*)["'
-        ']',
-        caseSensitive: false,
-      ).firstMatch(match.group(0) ?? '');
-      final alt = altMatch?.group(1) ?? '';
-      final normalizedSrc = _normalizeImageUrl(src, owner, repo, branch);
-      return '![$alt]($normalizedSrc)';
-    });
-
-    // 2. Normalize standard Markdown images ![alt](src)
-    final mdImgRegex = RegExp(r'!\[(.*?)\]\((.*?)\)');
-    text = text.replaceAllMapped(mdImgRegex, (match) {
-      final alt = match.group(1) ?? '';
-      var src = (match.group(2) ?? '').trim();
-
-      String? title;
-      if (src.contains(' "')) {
-        final parts = src.split(' "');
-        src = parts[0];
-        title = parts.sublist(1).join(' "').replaceAll('"', '');
-      }
-
-      src = _normalizeImageUrl(src, owner, repo, branch);
-      return title != null ? '![$alt]($src "$title")' : '![$alt]($src)';
-    });
-
-    return text;
-  }
-
   Color _getLanguageColor(String? language) {
     switch (language?.toLowerCase()) {
       case 'dart':
@@ -507,7 +424,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
         body: _isSearching
             ? _buildSearchResults(loc)
             : SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -664,11 +584,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                       color: item.iconColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
-                      item.iconData,
-                      size: 17,
-                      color: item.iconColor,
-                    ),
+                    child: Icon(item.iconData, size: 17, color: item.iconColor),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -701,10 +617,7 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                   const SizedBox(width: 8),
                   Text(
                     item.formattedSize,
-                    style: TextStyle(
-                      color: AppTheme.textMuted,
-                      fontSize: 11,
-                    ),
+                    style: TextStyle(color: AppTheme.textMuted, fontSize: 11),
                   ),
                 ],
               ),
@@ -1210,180 +1123,18 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
 
     final branch = _defaultBranch;
     final owner = _repoOwner;
-    final processedMarkdown = _preprocessReadme(
-      _readmeContent!,
-      owner,
-      widget.repo.name,
-      branch,
-    );
-    final imageBaseUrl = owner.isNotEmpty
-        ? 'https://raw.githubusercontent.com/$owner/${widget.repo.name}/$branch/'
-        : null;
 
     return GlassCard(
       width: double.infinity,
       enableBlur: false,
       padding: const EdgeInsets.all(16),
       borderRadius: BorderRadius.circular(14),
-      child: MarkdownBody(
-        data: processedMarkdown,
-        selectable: true,
-        imageDirectory: imageBaseUrl,
-        onTapLink: (text, href, title) {
-          if (href != null && href.isNotEmpty) {
-            if (href.startsWith('#')) return;
-            if (href.startsWith('http://') || href.startsWith('https://')) {
-              _openExternal(href);
-            } else if (owner.isNotEmpty) {
-              final resolved =
-                  'https://github.com/$owner/${widget.repo.name}/blob/$branch/$href';
-              _openExternal(resolved);
-            }
-          }
-        },
-        sizedImageBuilder: (config) {
-          final url = config.uri.toString();
-          final isSvg =
-              url.toLowerCase().contains('.svg') ||
-              url.contains('img.shields.io');
-
-          if (isSvg) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: SvgPicture.network(
-                url,
-                width: config.width,
-                height: config.height,
-                placeholderBuilder: (_) => Container(
-                  width: config.width ?? 80,
-                  height: config.height ?? 20,
-                  padding: const EdgeInsets.all(4),
-                  child: Center(
-                    child: SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.5,
-                        color: AppTheme.primaryCyan,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                url,
-                width: config.width,
-                height: config.height,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceElevated,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppTheme.border, width: 0.8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.broken_image_outlined,
-                          size: 14,
-                          color: AppTheme.textMuted,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Image',
-                          style: TextStyle(
-                            color: AppTheme.textMuted,
-                            fontSize: 11,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        },
-        styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-          p: TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 13.5,
-            height: 1.5,
-          ),
-          h1: TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.3,
-          ),
-          h2: TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.2,
-          ),
-          h3: TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
-          h4: TextStyle(
-            color: AppTheme.textPrimary,
-            fontSize: 13.5,
-            fontWeight: FontWeight.w600,
-          ),
-          code: TextStyle(
-            color: AppTheme.primaryCyan,
-            backgroundColor: AppTheme.surfaceElevated,
-            fontFamily: 'monospace',
-            fontSize: 12,
-          ),
-          codeblockDecoration: BoxDecoration(
-            color: AppTheme.background,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppTheme.border, width: 0.8),
-          ),
-          codeblockPadding: const EdgeInsets.all(12),
-          blockquote: TextStyle(
-            color: AppTheme.textMuted,
-            fontStyle: FontStyle.italic,
-            fontSize: 13,
-          ),
-          blockquoteDecoration: BoxDecoration(
-            border: Border(
-              left: BorderSide(color: AppTheme.primaryCyan, width: 3),
-            ),
-          ),
-          a: TextStyle(
-            color: AppTheme.primaryCyan,
-            decoration: TextDecoration.underline,
-            decorationColor: AppTheme.primaryCyan.withValues(alpha: 0.5),
-          ),
-          tableBorder: TableBorder.all(color: AppTheme.border, width: 0.8),
-          tableHead: TextStyle(
-            color: AppTheme.textPrimary,
-            fontWeight: FontWeight.w600,
-            fontSize: 12.5,
-          ),
-          tableBody: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
-          horizontalRuleDecoration: BoxDecoration(
-            border: Border(top: BorderSide(color: AppTheme.border, width: 0.8)),
-          ),
-        ),
+      child: ReadmeMarkdownView(
+        markdown: _readmeContent!,
+        owner: owner,
+        repo: widget.repo.name,
+        branch: branch,
+        onOpenUrl: _openExternal,
       ),
     );
   }

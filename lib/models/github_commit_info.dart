@@ -3,11 +3,7 @@ class GitHubCommitInfo {
   final String message;
   final DateTime? date;
 
-  const GitHubCommitInfo({
-    required this.sha,
-    required this.message,
-    this.date,
-  });
+  const GitHubCommitInfo({required this.sha, required this.message, this.date});
 
   String get shortSha => sha.length > 7 ? sha.substring(0, 7) : sha;
 

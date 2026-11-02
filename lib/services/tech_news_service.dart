@@ -60,10 +60,7 @@ class TechNewsService {
       final response = await _client
           .get(
             url,
-            headers: {
-              'User-Agent': 'Kontri/1.0',
-              'Accept': 'application/json',
-            },
+            headers: {'User-Agent': 'Kontri/1.0', 'Accept': 'application/json'},
           )
           .timeout(const Duration(seconds: 8));
 

@@ -38,7 +38,8 @@ import 'package:kontri/widgets/repo_tile.dart';
 import 'package:kontri/widgets/stat_card.dart';
 import 'package:kontri/widgets/running_text.dart';
 import 'package:kontri/widgets/glass_card.dart';
-import 'package:kontri/widgets/settings_sheet.dart';
+import 'package:kontri/widgets/readme_markdown_view.dart';
+import 'package:kontri/screens/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -819,13 +820,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.2.4',
+      'AppConfig provides accurate release and version telemetry for v1.2.5',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.2.4');
-        expect(AppConfig.buildNumber, '10240');
-        expect(AppConfig.fullVersion, 'v1.2.4 (Build 10240)');
-        expect(AppConfig.releaseTag, 'v1.2.4');
+        expect(AppConfig.appVersion, 'v1.2.5');
+        expect(AppConfig.buildNumber, '10250');
+        expect(AppConfig.fullVersion, 'v1.2.5 (Build 10250)');
+        expect(AppConfig.releaseTag, 'v1.2.5');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -852,7 +853,11 @@ void main() {
       for (final lang in AppLanguage.values) {
         final langMap = appTranslations[lang]!;
         final missing = baseKeys.difference(langMap.keys.toSet());
-        expect(missing, isEmpty, reason: '${lang.name} is missing keys: $missing');
+        expect(
+          missing,
+          isEmpty,
+          reason: '${lang.name} is missing keys: $missing',
+        );
         final extra = langMap.keys.toSet().difference(baseKeys);
         expect(extra, isEmpty, reason: '${lang.name} has extra keys: $extra');
 
@@ -864,7 +869,6 @@ void main() {
         expect(role.contains('유지관리자'), false);
       }
     });
-
 
     test('TechNewsService caches results in-memory to prevent duplicate network calls', () async {
       final service = TechNewsService();
@@ -988,7 +992,6 @@ void main() {
       expect(service.isTagCachedOrOffline('trending'), true);
     });
 
-
     testWidgets(
       'LanguageChart renders percentage without KB bytes and aligns in 2-column layout',
       (tester) async {
@@ -1100,22 +1103,25 @@ void main() {
       );
     });
 
-    test('Typography and Developer Avatar assets conform to updater standards', () {
-      for (final lang in AppLanguage.values) {
-        final loc = AppLocalizations(lang);
-        expect(loc.openInBrowser.isNotEmpty, isTrue);
-      }
+    test(
+      'Typography and Developer Avatar assets conform to updater standards',
+      () {
+        for (final lang in AppLanguage.values) {
+          final loc = AppLocalizations(lang);
+          expect(loc.openInBrowser.isNotEmpty, isTrue);
+        }
 
-      // Indonesian language has both nativeName and English name for grid consistency
-      expect(AppLanguage.indonesian.nativeName, 'Bahasa Indonesia');
-      expect(AppLanguage.indonesian.name, 'Indonesian');
+        // Indonesian language has both nativeName and English name for grid consistency
+        expect(AppLanguage.indonesian.nativeName, 'Bahasa Indonesia');
+        expect(AppLanguage.indonesian.name, 'Indonesian');
 
-      // Developer avatar URL points to avatars.githubusercontent.com for reliable CDN delivery
-      expect(
-        AppConfig.developerAvatarUrl,
-        'https://avatars.githubusercontent.com/zerabyte88',
-      );
-    });
+        // Developer avatar URL points to avatars.githubusercontent.com for reliable CDN delivery
+        expect(
+          AppConfig.developerAvatarUrl,
+          'https://avatars.githubusercontent.com/zerabyte88',
+        );
+      },
+    );
 
     test('TechNews.sanitizeImageUrl unwraps Dev.to proxy URLs to direct AWS S3 URLs', () {
       const proxyUrl =
@@ -1379,6 +1385,276 @@ void main() {
       );
       expect(missing, isNull);
     });
+
+    test(
+      'GitHubApiService fetchProfileReadme fetches username/username readme',
+      () async {
+        final mockClient = MockClient((request) async {
+          if (request.url.path.contains('/repos/testuser/testuser/readme')) {
+            return http.Response(
+              jsonEncode({
+                'name': 'README.md',
+                'encoding': 'base64',
+                'content': base64Encode(utf8.encode('# Hi, I am testuser!')),
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          } else if (request.url.path.contains('/repos/nobody/nobody/readme')) {
+            return http.Response('Not Found', 404);
+          }
+          return http.Response('Not Found', 404);
+        });
+
+        final service = GitHubApiService(client: mockClient);
+        final readme = await service.fetchProfileReadme('testuser');
+        expect(readme, '# Hi, I am testuser!');
+
+        final missing = await service.fetchProfileReadme('nobody');
+        expect(missing, isNull);
+      },
+    );
+
+    test('ReadmeMarkdownView preprocessMarkdown handles badges, images, and HTML wrappers', () {
+      const owner = 'developer';
+      const repo = 'awesome-project';
+      const branch = 'main';
+
+      // 1. Linked badge with alt attribute
+      const linkedBadgeHtml =
+          '<a href="https://github.com/developer"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build Status"/></a>';
+      final processedLinked = ReadmeMarkdownView.preprocessMarkdown(
+        linkedBadgeHtml,
+        owner,
+        repo,
+        branch,
+      );
+      expect(
+        processedLinked,
+        '[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/developer)',
+      );
+
+      // 2. Linked badge with alt attribute first
+      const altFirstHtml =
+          '<a href="https://example.com"><img alt="Version" src="https://badge.fury.io/js/package.svg"></a>';
+      final processedAltFirst = ReadmeMarkdownView.preprocessMarkdown(
+        altFirstHtml,
+        owner,
+        repo,
+        branch,
+      );
+      expect(
+        processedAltFirst,
+        '[![Version](https://badge.fury.io/js/package.svg)](https://example.com)',
+      );
+
+      // 3. Standalone HTML img with relative path
+      const standaloneHtml =
+          '<img src="./screenshots/demo.png" alt="Demo Preview">';
+      final processedStandalone = ReadmeMarkdownView.preprocessMarkdown(
+        standaloneHtml,
+        owner,
+        repo,
+        branch,
+      );
+      expect(
+        processedStandalone,
+        '![Demo Preview](https://raw.githubusercontent.com/developer/awesome-project/main/screenshots/demo.png)',
+      );
+
+      // 4. Paragraph and Div align wrappers stripped
+      const wrappedHtml =
+          '<p align="center">\n<a href="https://shields.io"><img src="https://shields.io/badge/test-ok-blue.svg" alt="Shield"/></a>\n</p>';
+      final processedWrapped = ReadmeMarkdownView.preprocessMarkdown(
+        wrappedHtml,
+        owner,
+        repo,
+        branch,
+      );
+      expect(processedWrapped.contains('<p'), isFalse);
+      expect(processedWrapped.contains('</p>'), isFalse);
+      expect(
+        processedWrapped,
+        contains(
+          '[![Shield](https://shields.io/badge/test-ok-blue.svg)](https://shields.io)',
+        ),
+      );
+
+      // 5. GitHub blob URL normalized in standard markdown
+      const blobMd =
+          '![Diagram](https://github.com/developer/awesome-project/blob/main/diagram.png)';
+      final processedBlob = ReadmeMarkdownView.preprocessMarkdown(
+        blobMd,
+        owner,
+        repo,
+        branch,
+      );
+      expect(
+        processedBlob,
+        '![Diagram](https://raw.githubusercontent.com/developer/awesome-project/main/diagram.png)',
+      );
+
+      // 6. SVG and Badge URL detection
+      expect(
+        ReadmeMarkdownView.isSvgOrBadgeUrl(
+          'https://img.shields.io/badge/test-pass.svg',
+        ),
+        isTrue,
+      );
+      expect(
+        ReadmeMarkdownView.isSvgOrBadgeUrl(
+          'https://github-readme-stats.vercel.app/api?username=dev',
+        ),
+        isTrue,
+      );
+      expect(
+        ReadmeMarkdownView.isSvgOrBadgeUrl(
+          'https://komarev.com/ghpvc/?username=dev',
+        ),
+        isTrue,
+      );
+      expect(
+        ReadmeMarkdownView.isSvgOrBadgeUrl(
+          'https://raw.githubusercontent.com/dev/repo/main/logo.png',
+        ),
+        isFalse,
+      );
+    });
+
+    testWidgets(
+      'ReadmeMarkdownView renders markdown content and handles link taps',
+      (WidgetTester tester) async {
+        String? tappedUrl;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ReadmeMarkdownView(
+                markdown: '# Welcome\n[Click Here](https://kontri.app)',
+                owner: 'developer',
+                repo: 'awesome-project',
+                onOpenUrl: (url) {
+                  tappedUrl = url;
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        expect(find.text('Welcome'), findsOneWidget);
+        expect(find.text('Click Here'), findsOneWidget);
+
+        await tester.tap(find.text('Click Here'));
+        await tester.pump();
+        expect(tappedUrl, 'https://kontri.app');
+      },
+    );
+
+    testWidgets(
+      'StatsDetailScreen renders profile README GlassCard and allows toggling expand/collapse',
+      (WidgetTester tester) async {
+        final user = GitHubUser(
+          login: 'octocat',
+          id: 1,
+          avatarUrl: 'https://github.com/images/error/octocat_happy.gif',
+          htmlUrl: 'https://github.com/octocat',
+          name: 'The Octocat',
+          publicRepos: 8,
+          followers: 20,
+          following: 0,
+        );
+
+        final stats = UserStats(
+          user: user,
+          repos: [],
+          totalStars: 10,
+          totalForks: 2,
+          languageCounts: {'Dart': 5},
+          hourlyActivity: {14: 10},
+          contributionStats: ContributionStats(
+            thisYearContributions: 150,
+            lastYearContributions: 350,
+            currentStreak: 5,
+            longestStreak: 12,
+            totalContributions: 500,
+            commitTitle: ContributionStats.determineTitle(
+              currentStreak: 5,
+              longestStreak: 12,
+              thisYearContributions: 150,
+              totalContributions: 500,
+            ),
+            yearlyTotals: {'2026': 150, '2025': 350},
+          ),
+        );
+
+        SharedPreferences.setMockInitialValues({});
+        final storage = await StorageService.init();
+
+        final mockClient = MockClient((request) async {
+          if (request.url.path.contains('/repos/octocat/octocat/readme')) {
+            return http.Response(
+              jsonEncode({
+                'name': 'README.md',
+                'encoding': 'base64',
+                'content': base64Encode(
+                  utf8.encode('### Hello from octocat profile readme!'),
+                ),
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+          return http.Response('Not Found', 404);
+        });
+
+        final apiService = GitHubApiService(client: mockClient);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            supportedLocales: AppLanguage.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            home: StatsDetailScreen(
+              stats: stats,
+              storageService: storage,
+              apiService: apiService,
+            ),
+          ),
+        );
+
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 200));
+
+        // Profile README header is rendered
+        expect(find.text('octocat/README.md'), findsOneWidget);
+        expect(find.text('Hello from octocat profile readme!'), findsOneWidget);
+
+        // Tap expand/collapse icon to collapse
+        final collapseButton = find.byIcon(Icons.keyboard_arrow_up_rounded);
+        expect(collapseButton, findsOneWidget);
+        await tester.tap(collapseButton);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 200));
+
+        // Content should be hidden
+        expect(find.text('Hello from octocat profile readme!'), findsNothing);
+        expect(find.byIcon(Icons.keyboard_arrow_up_rounded), findsNothing);
+        expect(
+          find.byWidgetPredicate(
+            (w) =>
+                w is Icon &&
+                w.icon == Icons.keyboard_arrow_down_rounded &&
+                w.size == 20,
+          ),
+          findsOneWidget,
+        );
+      },
+    );
 
     testWidgets(
       'RepoDetailScreen displays repository details and markdown README',
@@ -1672,17 +1948,23 @@ void main() {
       final commitJson = {
         'sha': '6dcb09b5b57875f334f61aebed695e2e4193db5e',
         'commit': {
-          'message': 'feat: initial file search implementation\n\nDetailed body here',
+          'message':
+              'feat: initial file search implementation\n\nDetailed body here',
           'author': {
             'name': 'Zerabyte',
-            'date': DateTime.now().subtract(const Duration(hours: 2)).toIso8601String(),
+            'date': DateTime.now()
+                .subtract(const Duration(hours: 2))
+                .toIso8601String(),
           },
         },
       };
 
       final commitInfo = GitHubCommitInfo.fromJson(commitJson);
       expect(commitInfo.shortSha, '6dcb09b');
-      expect(commitInfo.firstLineMessage, 'feat: initial file search implementation');
+      expect(
+        commitInfo.firstLineMessage,
+        'feat: initial file search implementation',
+      );
       expect(commitInfo.date, isNotNull);
 
       final mockClient = MockClient((request) async {
@@ -1691,8 +1973,18 @@ void main() {
             jsonEncode({
               'sha': 'treesha',
               'tree': [
-                {'path': 'lib/main.dart', 'type': 'blob', 'size': 120, 'sha': 's1'},
-                {'path': 'lib/boolean.dart', 'type': 'blob', 'size': 91, 'sha': 's2'},
+                {
+                  'path': 'lib/main.dart',
+                  'type': 'blob',
+                  'size': 120,
+                  'sha': 's1',
+                },
+                {
+                  'path': 'lib/boolean.dart',
+                  'type': 'blob',
+                  'size': 91,
+                  'sha': 's2',
+                },
                 {'path': 'lib', 'type': 'tree', 'sha': 's3'},
               ],
             }),
@@ -1710,7 +2002,10 @@ void main() {
       });
 
       final service = GitHubApiService(client: mockClient);
-      final tree = await service.fetchRepositoryTree(owner: 'zerabyte88', repo: 'kontri');
+      final tree = await service.fetchRepositoryTree(
+        owner: 'zerabyte88',
+        repo: 'kontri',
+      );
       expect(tree.length, 2);
       expect(tree.any((f) => f.name == 'boolean.dart'), isTrue);
 
@@ -1723,162 +2018,169 @@ void main() {
       expect(fetchedCommit!.shortSha, '6dcb09b');
     });
 
-    testWidgets('FileViewerScreen renders commit info in telemetry bar when available', (
-      WidgetTester tester,
-    ) async {
-      final item = GitHubContentItem(
-        name: 'boolean.dart',
-        path: 'lib/boolean.dart',
-        sha: 'abc',
-        size: 91,
-        type: 'file',
-        downloadUrl: 'https://raw.githubusercontent.com/boolean.dart',
-      );
+    testWidgets(
+      'FileViewerScreen renders commit info in telemetry bar when available',
+      (WidgetTester tester) async {
+        final item = GitHubContentItem(
+          name: 'boolean.dart',
+          path: 'lib/boolean.dart',
+          sha: 'abc',
+          size: 91,
+          type: 'file',
+          downloadUrl: 'https://raw.githubusercontent.com/boolean.dart',
+        );
 
-      final mockClient = MockClient((request) async {
-        if (request.url.path.contains('/commits')) {
-          return http.Response(
-            jsonEncode([
-              {
-                'sha': 'a1b2c3d4e5',
-                'commit': {
-                  'message': 'fix: handle boolean flags',
-                  'committer': {
-                    'date': DateTime.now().subtract(const Duration(minutes: 5)).toIso8601String(),
+        final mockClient = MockClient((request) async {
+          if (request.url.path.contains('/commits')) {
+            return http.Response(
+              jsonEncode([
+                {
+                  'sha': 'a1b2c3d4e5',
+                  'commit': {
+                    'message': 'fix: handle boolean flags',
+                    'committer': {
+                      'date': DateTime.now()
+                          .subtract(const Duration(minutes: 5))
+                          .toIso8601String(),
+                    },
                   },
                 },
-              }
-            ]),
-            200,
-            headers: {'content-type': 'application/json'},
-          );
-        }
-        return http.Response('bool flag = true;\nfinal check = false;', 200);
-      });
+              ]),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+          return http.Response('bool flag = true;\nfinal check = false;', 200);
+        });
 
-      final apiService = GitHubApiService(client: mockClient);
+        final apiService = GitHubApiService(client: mockClient);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          supportedLocales: AppLanguage.supportedLocales,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          home: FileViewerScreen(
-            item: item,
-            repo: 'kontri',
-            owner: 'zerabyte88',
-            apiService: apiService,
+        await tester.pumpWidget(
+          MaterialApp(
+            supportedLocales: AppLanguage.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            home: FileViewerScreen(
+              item: item,
+              repo: 'kontri',
+              owner: 'zerabyte88',
+              apiService: apiService,
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      expect(find.text('boolean.dart'), findsOneWidget);
-      expect(find.textContaining('2 lines'), findsOneWidget);
-      expect(find.textContaining('fix: handle boolean flags'), findsOneWidget);
-      expect(find.textContaining('commit a1b2c3d'), findsOneWidget);
-      expect(find.textContaining('91 B'), findsOneWidget);
-    });
+        expect(find.text('boolean.dart'), findsOneWidget);
+        expect(find.textContaining('2 lines'), findsOneWidget);
+        expect(
+          find.textContaining('fix: handle boolean flags'),
+          findsOneWidget,
+        );
+        expect(find.textContaining('commit a1b2c3d'), findsOneWidget);
+        expect(find.textContaining('91 B'), findsOneWidget);
+      },
+    );
 
-    testWidgets('RepoDetailScreen in-place search bar filters repository files', (
-      WidgetTester tester,
-    ) async {
-      final repo = GitHubRepo(
-        name: 'flutter_kontri',
-        description: 'Developer telemetry mobile app',
-        htmlUrl: 'https://github.com/zerabyte88/flutter_kontri',
-        language: 'Dart',
-        stargazersCount: 11,
-        forksCount: 34,
-        openIssuesCount: 3,
-        isFork: false,
-        topics: ['flutter'],
-        defaultBranch: 'main',
-      );
+    testWidgets(
+      'RepoDetailScreen in-place search bar filters repository files',
+      (WidgetTester tester) async {
+        final repo = GitHubRepo(
+          name: 'flutter_kontri',
+          description: 'Developer telemetry mobile app',
+          htmlUrl: 'https://github.com/zerabyte88/flutter_kontri',
+          language: 'Dart',
+          stargazersCount: 11,
+          forksCount: 34,
+          openIssuesCount: 3,
+          isFork: false,
+          topics: ['flutter'],
+          defaultBranch: 'main',
+        );
 
-      final mockClient = MockClient((request) async {
-        if (request.url.path.contains('/git/trees/')) {
-          return http.Response(
-            jsonEncode({
-              'tree': [
-                {'path': 'lib/main.dart', 'type': 'blob', 'size': 1200},
-                {'path': 'lib/boolean.dart', 'type': 'blob', 'size': 91},
-                {'path': 'README.md', 'type': 'blob', 'size': 450},
-              ],
-            }),
-            200,
-            headers: {'content-type': 'application/json'},
-          );
-        } else if (request.url.path.contains('/readme')) {
-          return http.Response(
-            jsonEncode({
-              'name': 'README.md',
-              'encoding': 'base64',
-              'content': base64Encode(utf8.encode('# Readme')),
-            }),
-            200,
-            headers: {'content-type': 'application/json'},
-          );
-        }
-        return http.Response('Not Found', 404);
-      });
+        final mockClient = MockClient((request) async {
+          if (request.url.path.contains('/git/trees/')) {
+            return http.Response(
+              jsonEncode({
+                'tree': [
+                  {'path': 'lib/main.dart', 'type': 'blob', 'size': 1200},
+                  {'path': 'lib/boolean.dart', 'type': 'blob', 'size': 91},
+                  {'path': 'README.md', 'type': 'blob', 'size': 450},
+                ],
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          } else if (request.url.path.contains('/readme')) {
+            return http.Response(
+              jsonEncode({
+                'name': 'README.md',
+                'encoding': 'base64',
+                'content': base64Encode(utf8.encode('# Readme')),
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+          return http.Response('Not Found', 404);
+        });
 
-      final apiService = GitHubApiService(client: mockClient);
+        final apiService = GitHubApiService(client: mockClient);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          supportedLocales: AppLanguage.supportedLocales,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          home: RepoDetailScreen(
-            repo: repo,
-            username: 'zerabyte88',
-            apiService: apiService,
+        await tester.pumpWidget(
+          MaterialApp(
+            supportedLocales: AppLanguage.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            home: RepoDetailScreen(
+              repo: repo,
+              username: 'zerabyte88',
+              apiService: apiService,
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      // Find search button and tap it
-      final searchButton = find.byIcon(Icons.search_rounded);
-      expect(searchButton, findsOneWidget);
-      await tester.tap(searchButton);
-      await tester.pumpAndSettle();
+        // Find search button and tap it
+        final searchButton = find.byIcon(Icons.search_rounded);
+        expect(searchButton, findsOneWidget);
+        await tester.tap(searchButton);
+        await tester.pumpAndSettle();
 
-      // Verify search input is shown
-      final textField = find.byType(TextField);
-      expect(textField, findsOneWidget);
+        // Verify search input is shown
+        final textField = find.byType(TextField);
+        expect(textField, findsOneWidget);
 
-      // Verify all files in repo are loaded
-      expect(find.text('boolean.dart'), findsOneWidget);
-      expect(find.text('main.dart'), findsOneWidget);
+        // Verify all files in repo are loaded
+        expect(find.text('boolean.dart'), findsOneWidget);
+        expect(find.text('main.dart'), findsOneWidget);
 
-      // Type query 'bool'
-      await tester.enterText(textField, 'bool');
-      await tester.pumpAndSettle();
+        // Type query 'bool'
+        await tester.enterText(textField, 'bool');
+        await tester.pumpAndSettle();
 
-      // Only boolean.dart should match
-      expect(find.text('boolean.dart'), findsOneWidget);
-      expect(find.text('main.dart'), findsNothing);
+        // Only boolean.dart should match
+        expect(find.text('boolean.dart'), findsOneWidget);
+        expect(find.text('main.dart'), findsNothing);
 
-      // Tap close button to exit search
-      final closeButton = find.byIcon(Icons.close_rounded);
-      expect(closeButton, findsOneWidget);
-      await tester.tap(closeButton);
-      await tester.pumpAndSettle();
+        // Tap close button to exit search
+        final closeButton = find.byIcon(Icons.close_rounded);
+        expect(closeButton, findsOneWidget);
+        await tester.tap(closeButton);
+        await tester.pumpAndSettle();
 
-      // Should return to normal repo screen
-      expect(find.byType(TextField), findsNothing);
-      expect(find.byIcon(Icons.search_rounded), findsOneWidget);
-    });
+        // Should return to normal repo screen
+        expect(find.byType(TextField), findsNothing);
+        expect(find.byIcon(Icons.search_rounded), findsOneWidget);
+      },
+    );
 
     testWidgets(
       'FavoriteProfilesScreen renders grid with 1 to 4 columns and displays user details',
@@ -2015,152 +2317,6 @@ void main() {
           ),
           findsOneWidget,
         );
-      },
-    );
-
-    testWidgets(
-      'SettingsSheet can be dismissed by swiping down from top to bottom',
-      (tester) async {
-        SharedPreferences.setMockInitialValues({});
-        final storage = await StorageService.init();
-        AppLanguageService.init(storage);
-        AppThemeService.init(storage);
-        final client = MockClient((request) async => http.Response('{}', 200));
-        final api = GitHubApiService(client: client);
-
-        await tester.pumpWidget(
-          MaterialApp(
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: AppLanguage.supportedLocales,
-            home: Scaffold(
-              body: Builder(
-                builder: (context) => ElevatedButton(
-                  onPressed: () => SettingsSheet.show(
-                    context,
-                    storageService: storage,
-                    apiService: api,
-                  ),
-                  child: const Text('Open Settings'),
-                ),
-              ),
-            ),
-          ),
-        );
-
-        await tester.tap(find.text('Open Settings'));
-        await tester.pumpAndSettle();
-
-        expect(find.byType(SettingsSheet), findsOneWidget);
-
-        // Drag down from top area
-        await tester.drag(find.byType(SettingsSheet), const Offset(0, 400));
-        await tester.pumpAndSettle();
-
-        expect(find.byType(SettingsSheet), findsNothing);
-      },
-    );
-
-    testWidgets('SettingsSheet can be closed using the X button', (
-      tester,
-    ) async {
-      SharedPreferences.setMockInitialValues({});
-      final storage = await StorageService.init();
-      AppLanguageService.init(storage);
-      AppThemeService.init(storage);
-      final client = MockClient((request) async => http.Response('{}', 200));
-      final api = GitHubApiService(client: client);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: AppLanguage.supportedLocales,
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
-                onPressed: () => SettingsSheet.show(
-                  context,
-                  storageService: storage,
-                  apiService: api,
-                ),
-                child: const Text('Open Settings'),
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.text('Open Settings'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SettingsSheet), findsOneWidget);
-
-      // Verify the close button exists and tap it
-      final closeButtonFinder = find.byIcon(Icons.close_rounded);
-      expect(closeButtonFinder, findsOneWidget);
-      await tester.tap(closeButtonFinder);
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SettingsSheet), findsNothing);
-    });
-
-    testWidgets(
-      'SettingsSheet dragging down from top drag indicator dismisses sheet',
-      (tester) async {
-        SharedPreferences.setMockInitialValues({});
-        final storage = await StorageService.init();
-        AppLanguageService.init(storage);
-        AppThemeService.init(storage);
-        final client = MockClient((request) async => http.Response('{}', 200));
-        final api = GitHubApiService(client: client);
-
-        await tester.pumpWidget(
-          MaterialApp(
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: AppLanguage.supportedLocales,
-            home: Scaffold(
-              body: Builder(
-                builder: (context) => ElevatedButton(
-                  onPressed: () => SettingsSheet.show(
-                    context,
-                    storageService: storage,
-                    apiService: api,
-                  ),
-                  child: const Text('Open Settings'),
-                ),
-              ),
-            ),
-          ),
-        );
-
-        await tester.tap(find.text('Open Settings'));
-        await tester.pumpAndSettle();
-
-        expect(find.byType(SettingsSheet), findsOneWidget);
-
-        // Find top of SettingsSheet and drag down from near the top
-        final sheetTopLeft = tester.getTopLeft(find.byType(SettingsSheet));
-        await tester.dragFrom(
-          sheetTopLeft + const Offset(100, 20),
-          const Offset(0, 350),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.byType(SettingsSheet), findsNothing);
       },
     );
 
@@ -2422,7 +2578,7 @@ void main() {
     );
 
     testWidgets(
-      'SettingsSheet displays surface opacity slider and percentage badge',
+      'SettingsScreen displays surface opacity slider and percentage badge',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
         final prefs = await SharedPreferences.getInstance();
@@ -2438,7 +2594,7 @@ void main() {
             ],
             supportedLocales: const [Locale('en')],
             home: Scaffold(
-              body: SettingsSheet(
+              body: SettingsScreen(
                 storageService: storage,
                 apiService: GitHubApiService(),
               ),
@@ -2560,7 +2716,7 @@ void main() {
     });
 
     testWidgets(
-      'SettingsSheet renders background animation switch and responds to toggle',
+      'SettingsScreen renders background animation switch and responds to toggle',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
         final prefs = await SharedPreferences.getInstance();
@@ -2577,7 +2733,7 @@ void main() {
             ],
             supportedLocales: AppLanguage.supportedLocales,
             home: Scaffold(
-              body: SettingsSheet(
+              body: SettingsScreen(
                 storageService: storage,
                 apiService: GitHubApiService(),
               ),
@@ -2872,31 +3028,28 @@ void main() {
       },
     );
 
-    test(
-      'AppTheme primary action button colors conform to readability specifications',
-      () {
-        AppTheme.currentMode = AppThemeMode.amoled;
-        expect(AppTheme.buttonPrimaryForeground, const Color(0xFF0A0F1D));
-        expect(AppTheme.buttonPrimaryBackground, const Color(0xFF00E5FF));
+    test('AppTheme primary action button colors conform to readability specifications', () {
+      AppTheme.currentMode = AppThemeMode.amoled;
+      expect(AppTheme.buttonPrimaryForeground, const Color(0xFF0A0F1D));
+      expect(AppTheme.buttonPrimaryBackground, const Color(0xFF00E5FF));
 
-        AppTheme.currentMode = AppThemeMode.amoledJapanese;
-        expect(AppTheme.buttonPrimaryForeground, const Color(0xFF1E0A14));
-        expect(AppTheme.buttonPrimaryBackground, const Color(0xFFF472B6));
+      AppTheme.currentMode = AppThemeMode.amoledJapanese;
+      expect(AppTheme.buttonPrimaryForeground, const Color(0xFF1E0A14));
+      expect(AppTheme.buttonPrimaryBackground, const Color(0xFFF472B6));
 
-        AppTheme.currentMode = AppThemeMode.amoledPure;
-        expect(AppTheme.buttonPrimaryForeground, const Color(0xFF0A0F1D));
-        expect(AppTheme.buttonPrimaryBackground, const Color(0xFF60A5FA));
+      AppTheme.currentMode = AppThemeMode.amoledPure;
+      expect(AppTheme.buttonPrimaryForeground, const Color(0xFF0A0F1D));
+      expect(AppTheme.buttonPrimaryBackground, const Color(0xFF60A5FA));
 
-        AppTheme.currentMode = AppThemeMode.amoledSnowfall;
-        expect(AppTheme.buttonPrimaryForeground, Colors.white);
-        expect(AppTheme.buttonPrimaryBackground, const Color(0xFF0284C7));
+      AppTheme.currentMode = AppThemeMode.amoledSnowfall;
+      expect(AppTheme.buttonPrimaryForeground, Colors.white);
+      expect(AppTheme.buttonPrimaryBackground, const Color(0xFF0284C7));
 
-        AppTheme.currentMode = AppThemeMode.light;
-        expect(AppTheme.buttonPrimaryForeground, Colors.white);
+      AppTheme.currentMode = AppThemeMode.light;
+      expect(AppTheme.buttonPrimaryForeground, Colors.white);
 
-        AppTheme.currentMode = AppThemeMode.cleanLight;
-        expect(AppTheme.buttonPrimaryForeground, Colors.white);
-      },
-    );
+      AppTheme.currentMode = AppThemeMode.cleanLight;
+      expect(AppTheme.buttonPrimaryForeground, Colors.white);
+    });
   });
 }

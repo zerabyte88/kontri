@@ -896,214 +896,329 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // About and updates card
+  // About & developer card
   Widget _buildAboutCard(BuildContext context, AppLocalizations loc) {
+    final theme = Theme.of(context);
+
     return _buildModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionHeader(
-            icon: Icons.info_outline_rounded,
-            title: loc.aboutApp,
-            subtitle: loc.appDescriptionLabel,
-          ),
-          const SizedBox(height: 12),
-          Divider(height: 1, color: AppTheme.border.withAlpha(40)),
-          const SizedBox(height: 8),
-
-          _buildAboutRow(loc.appVersionLabel, AppConfig.appVersion),
-          _buildAboutRow(
-            loc.buildNumberLabel,
-            AppConfig.buildNumber,
-          ),
-          _buildAboutRow(
-            loc.licenseLabel,
-            AppConfig.license,
-            onTap: () {
-              showLicensePage(
-                context: context,
-                applicationName: AppConfig.appName,
-                applicationVersion:
-                    '${AppConfig.appVersion} Build ${AppConfig.buildNumber}',
-                applicationIcon: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Image.asset(
-                    'assets/icons/app_icon.png',
-                    width: 48,
-                    height: 48,
-                  ),
-                ),
-                applicationLegalese:
-                    'Copyright © 2026 ${AppConfig.developerUsername}\nLicensed under the ${AppConfig.license}',
-              );
-            },
-          ),
-          const SizedBox(height: 10),
-          Divider(height: 1, color: AppTheme.border.withAlpha(40)),
-          const SizedBox(height: 14),
-
-          // Developer profile
           Row(
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF06B6D4),
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF06B6D4).withAlpha(40),
-                      blurRadius: 8,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.network(
-                    AppConfig.developerAvatarUrl,
-                    fit: BoxFit.cover,
-                    cacheWidth: 100,
-                    cacheHeight: 100,
-                    headers: const {
-                      'Accept': 'image/*,*/*;q=0.8',
-                      'User-Agent': 'Kontri/1.0',
-                    },
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
-                      return Container(
-                        width: 44,
-                        height: 44,
-                        color: AppTheme.surface,
-                        alignment: Alignment.center,
-                        child: const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.5,
-                            color: Color(0xFF06B6D4),
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (_, _, _) => const Icon(
-                      Icons.person_rounded,
-                      color: Color(0xFF06B6D4),
-                      size: 24,
-                    ),
-                  ),
-                ),
+              const Icon(
+                Icons.info_outline_rounded,
+                size: 18,
+                color: Color(0xFF06B6D4),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${loc.developerLabel}: ${AppConfig.developerUsername}',
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      loc.developerRole,
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () async {
-                    final uri = Uri.parse(AppConfig.developerGithubUrl);
-                    try {
-                      await launchUrl(
-                        uri,
-                        mode: LaunchMode.externalApplication,
-                      );
-                    } catch (_) {}
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryCyan.withValues(alpha: 0.10),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: AppTheme.primaryCyan.withValues(alpha: 0.35),
-                        width: 0.9,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.open_in_new_rounded,
-                          size: 13,
-                          color: AppTheme.primaryCyan,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'GitHub',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.primaryCyan,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+              const SizedBox(width: 8),
+              Text(
+                loc.aboutApp,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 12),
 
+          // Detail rows
+          _buildDetailRow(theme, loc.appVersionLabel, AppConfig.appVersion),
+          const SizedBox(height: 6),
+          _buildDetailRow(theme, loc.buildNumberLabel, AppConfig.buildNumber),
+          const SizedBox(height: 6),
+          _buildDetailRow(
+            theme,
+            loc.licenseLabel,
+            AppConfig.license,
+            onTap: () => _showAppLicensePage(context, theme),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Developer profile
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withAlpha(12),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: theme.colorScheme.primary.withAlpha(35),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withAlpha(50),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.8),
+                    child: Image.asset(
+                      'assets/icons/developer_avatar.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: theme.colorScheme.primary.withAlpha(22),
+                        child: Icon(
+                          Icons.person_rounded,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Developer: ${AppConfig.developerUsername}',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'github.com/${AppConfig.developerUsername}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: theme.colorScheme.onSurface.withAlpha(130),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () async {
+                      final uri = Uri.parse(AppConfig.developerGithubUrl);
+                      try {
+                        await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } catch (_) {}
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withAlpha(22),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.colorScheme.primary.withAlpha(70),
+                          width: 0.9,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.open_in_new_rounded,
+                            size: 13,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'GitHub',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildAboutRow(
+  void _showAppLicensePage(BuildContext context, ThemeData theme) {
+    showLicensePage(
+      context: context,
+      applicationName: AppConfig.appName,
+      applicationVersion: '',
+      applicationLegalese: '',
+      applicationIcon: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 8, bottom: 8),
+            child: Image.asset(
+              'assets/icons/app_icon.png',
+              width: 56,
+              height: 56,
+              fit: BoxFit.contain,
+            ),
+          ),
+          Text(
+            '${AppConfig.appVersion} (${AppConfig.buildNumber})',
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w500,
+              color: theme.colorScheme.onSurface.withAlpha(140),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: Text(
+              'Copyright © 2026 ${AppConfig.developerUsername}\n'
+              'Licensed under the ${AppConfig.license}.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.45,
+                color: theme.colorScheme.onSurface.withAlpha(160),
+              ),
+            ),
+          ),
+          _buildLicenseLinkTile(
+            theme: theme,
+            icon: Icons.code_rounded,
+            label: 'Source code',
+            url: AppConfig.githubRepoUrl,
+          ),
+
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLicenseLinkTile({
+    required ThemeData theme,
+    required IconData icon,
+    required String label,
+    required String url,
+  }) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 420),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () async {
+            try {
+              await launchUrl(
+                Uri.parse(url),
+                mode: LaunchMode.externalApplication,
+              );
+            } catch (_) {}
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.onSurface.withAlpha(12),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: theme.colorScheme.outline.withAlpha(35),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, size: 16, color: const Color(0xFF06B6D4)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        url,
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          color: const Color(0xFF06B6D4),
+                          decoration: TextDecoration.underline,
+                          decorationColor: const Color(0xFF06B6D4)
+                              .withAlpha(120),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.open_in_new_rounded,
+                  size: 13,
+                  color: theme.colorScheme.onSurface.withAlpha(130),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(
+    ThemeData theme,
     String label,
     String value, {
     VoidCallback? onTap,
     bool showChevron = false,
   }) {
     final rowContent = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(color: AppTheme.textMuted, fontSize: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurface.withAlpha(140),
+              ),
+            ),
           ),
+          const SizedBox(width: 8),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 value,
                 style: TextStyle(
-                  color: onTap != null
-                      ? AppTheme.primaryCyan
-                      : AppTheme.textPrimary,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
+                  color: onTap != null
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
                 ),
               ),
               if (showChevron && onTap != null) ...[
@@ -1111,7 +1226,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Icon(
                   Icons.chevron_right_rounded,
                   size: 14,
-                  color: AppTheme.primaryCyan,
+                  color: theme.colorScheme.primary,
                 ),
               ],
             ],

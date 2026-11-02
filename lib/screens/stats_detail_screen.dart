@@ -14,6 +14,7 @@ import '../widgets/animated_app_header.dart';
 import '../widgets/animated_tier_title.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/language_chart.dart';
+import '../widgets/readme_markdown_view.dart';
 import '../widgets/repo_tile.dart';
 import '../widgets/stat_card.dart';
 
@@ -42,6 +43,8 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
   bool _showAllRepos = false;
   bool _isRefreshing = false;
   late List<GitHubRepo> _sortedRepos;
+  String? _profileReadme;
+  bool _isProfileReadmeExpanded = false;
 
   @override
   void initState() {
@@ -49,6 +52,24 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
     _stats = widget.stats;
     _isBookmarked = widget.storageService.isBookmarked(_stats.user.login);
     _sortRepos();
+    _loadProfileReadme();
+  }
+
+  Future<void> _loadProfileReadme() async {
+    final api =
+        widget.apiService ??
+        GitHubApiService(storageService: widget.storageService);
+    try {
+      final readme = await api.fetchProfileReadme(_stats.user.login);
+      if (mounted) {
+        setState(() {
+          _profileReadme = readme;
+          if (readme != null && readme.trim().length <= 500) {
+            _isProfileReadmeExpanded = true;
+          }
+        });
+      }
+    } catch (_) {}
   }
 
   void _sortRepos() {
@@ -138,13 +159,22 @@ class _StatsDetailScreenState extends State<StatsDetailScreen> {
     final loc = AppLocalizations.of(context);
 
     try {
-      final updated = await api.fetchUserStats(
+      final updatedFuture = api.fetchUserStats(
         _stats.user.login,
         forceRefresh: true,
       );
+      final readmeFuture = api.fetchProfileReadme(_stats.user.login);
+
+      final updated = await updatedFuture;
+      final readme = await readmeFuture;
+
       if (mounted) {
         setState(() {
           _stats = updated;
+          _profileReadme = readme;
+          if (readme != null && readme.trim().length <= 500) {
+            _isProfileReadmeExpanded = true;
+          }
           _isBookmarked = widget.storageService.isBookmarked(_stats.user.login);
           _sortRepos();
           _isRefreshing = false;
@@ -225,6 +255,85 @@ GitHub: https://github.com/${u.login}
       icon: Icons.check_circle_rounded,
       iconColor: AppTheme.primaryCyan,
       message: loc.summaryCopiedToast,
+    );
+  }
+
+  Widget _buildProfileReadmeCard(AppLocalizations loc, String username) {
+    return GlassCard(
+      width: double.infinity,
+      enableBlur: false,
+      padding: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () {
+              setState(() {
+                _isProfileReadmeExpanded = !_isProfileReadmeExpanded;
+              });
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryCyan.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Icon(
+                    Icons.terminal_rounded,
+                    size: 16,
+                    color: AppTheme.primaryCyan,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    '$username/README.md',
+                    style: TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'monospace',
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    _isProfileReadmeExpanded
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.keyboard_arrow_down_rounded,
+                    color: AppTheme.textSecondary,
+                    size: 20,
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () {
+                    setState(() {
+                      _isProfileReadmeExpanded = !_isProfileReadmeExpanded;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          if (_isProfileReadmeExpanded) ...[
+            const SizedBox(height: 12),
+            Divider(height: 1, color: AppTheme.border.withValues(alpha: 0.5)),
+            const SizedBox(height: 12),
+            ReadmeMarkdownView(
+              markdown: _profileReadme!,
+              owner: username,
+              repo: username,
+              branch: 'main',
+              onOpenUrl: _openUrl,
+            ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -947,6 +1056,11 @@ GitHub: https://github.com/${u.login}
                       ),
                     ),
                     const SizedBox(height: 16),
+                    if (_profileReadme != null &&
+                        _profileReadme!.trim().isNotEmpty) ...[
+                      _buildProfileReadmeCard(loc, user.login),
+                      const SizedBox(height: 16),
+                    ],
 
                     // Section: GitHub Contributions & Streak Statistics
                     Row(
