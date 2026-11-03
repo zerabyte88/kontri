@@ -147,13 +147,88 @@ class ReadmeMarkdownView extends StatelessWidget {
       return '![$alt]($normalizedSrc)';
     });
 
-    // 3. Strip <p align="...">, </p>, <div align="...">, </div> wrappers surrounding badge/image lines
+    // 3. Convert remaining inline HTML tags to Markdown
+    // 3a. <strong> and <b> to **text**
+    text = text.replaceAllMapped(
+      RegExp(
+        r'<(?:strong|b)\b[^>]*>(.*?)<\/(?:strong|b)>',
+        caseSensitive: false,
+        dotAll: true,
+      ),
+      (m) => '**${m.group(1)}**',
+    );
+
+    // 3b. <em> and <i> to *text*
+    text = text.replaceAllMapped(
+      RegExp(
+        r'<(?:em|i)\b[^>]*>(.*?)<\/(?:em|i)>',
+        caseSensitive: false,
+        dotAll: true,
+      ),
+      (m) => '*${m.group(1)}*',
+    );
+
+    // 3c. <code> to `code`
+    text = text.replaceAllMapped(
+      RegExp(r'<code\b[^>]*>(.*?)<\/code>', caseSensitive: false, dotAll: true),
+      (m) => '`${m.group(1)}`',
+    );
+
+    // 3d. <a href="url">text</a> to [text](url)
+    text = text.replaceAllMapped(
+      RegExp(
+        r"""<a\s+[^>]*href=["']([^"']*)["'][^>]*>(.*?)<\/a>""",
+        caseSensitive: false,
+        dotAll: true,
+      ),
+      (m) => '[${m.group(2)}](${m.group(1)})',
+    );
+
+    // 3e. <br> to markdown line break
+    text = text.replaceAll(RegExp(r'<br\s*\/?>', caseSensitive: false), '  \n');
+
+    // 3f. GitHub Alert callouts: [!NOTE], [!WARNING], [!TIP], [!IMPORTANT], [!CAUTION]
+    text = text.replaceAllMapped(
+      RegExp(r'\[!(WARNING|CAUTION)\]', caseSensitive: false),
+      (m) => '**⚠️ ${m.group(1)?.toUpperCase()}:**',
+    );
+    text = text.replaceAllMapped(
+      RegExp(r'\[!(NOTE|INFO)\]', caseSensitive: false),
+      (m) => '**ℹ️ ${m.group(1)?.toUpperCase()}:**',
+    );
+    text = text.replaceAllMapped(
+      RegExp(r'\[!(TIP)\]', caseSensitive: false),
+      (m) => '**💡 ${m.group(1)?.toUpperCase()}:**',
+    );
+    text = text.replaceAllMapped(
+      RegExp(r'\[!(IMPORTANT)\]', caseSensitive: false),
+      (m) => '**❗ ${m.group(1)?.toUpperCase()}:**',
+    );
+
+    // 4. Strip <p align="...">, </p>, <div align="...">, </div>, <center>, </center> wrappers
     text = text.replaceAll(
-      RegExp(r'<\/?(p|div)(\s+[^>]*)?>', caseSensitive: false),
+      RegExp(r'<\/?(p|div|center)(\s+[^>]*)?>', caseSensitive: false),
       '',
     );
 
-    // 4. Normalize standard Markdown images ![alt](src)
+    // 5. Clean up leading spaces that would trigger accidental markdown codeblocks
+    final lines = text.split('\n');
+    final cleanedLines = lines.map((line) {
+      final trimmed = line.trim();
+      if (trimmed.startsWith('#') ||
+          trimmed.startsWith('![') ||
+          trimmed.startsWith('[') ||
+          trimmed.startsWith('**') ||
+          trimmed.startsWith('*') ||
+          trimmed.startsWith('>') ||
+          trimmed.startsWith('<')) {
+        return trimmed;
+      }
+      return line;
+    }).toList();
+    text = cleanedLines.join('\n');
+
+    // 6. Normalize standard Markdown images ![alt](src)
     final mdImgRegex = RegExp(r'!\[(.*?)\]\((.*?)\)');
     text = text.replaceAllMapped(mdImgRegex, (match) {
       final alt = match.group(1) ?? '';
@@ -176,6 +251,12 @@ class ReadmeMarkdownView extends StatelessWidget {
   /// Determines whether the given image URL points to an SVG, badge, or shields service.
   static bool isSvgOrBadgeUrl(String url) {
     final lower = url.toLowerCase();
+    if (lower.contains('.png') ||
+        lower.contains('.jpg') ||
+        lower.contains('.jpeg') ||
+        lower.contains('.webp')) {
+      return false;
+    }
     const badgeDomains = [
       '.svg',
       'img.shields.io',
@@ -298,30 +379,50 @@ class ReadmeMarkdownView extends StatelessWidget {
       onTapLink: (text, href, title) => _handleLinkTap(href),
       sizedImageBuilder: (config) {
         final rawUrl = config.uri.toString();
-        final url = rawUrl.split('#').first;
+        var url = rawUrl.split('#').first;
+
+        // Shields.io SVG workaround: convert shields.io URLs to .png format
+        // shields.io natively serves crisp pixel-perfect PNG badges, bypassing the flutter_svg text-scaling bug.
+        if (url.contains('img.shields.io') ||
+            url.contains('shields.io/badge/')) {
+          if (url.contains('.svg')) {
+            url = url.replaceFirst('.svg', '.png');
+          } else if (!url.contains('.png')) {
+            final qIdx = url.indexOf('?');
+            if (qIdx != -1) {
+              url = '${url.substring(0, qIdx)}.png${url.substring(qIdx)}';
+            } else {
+              url = '$url.png';
+            }
+          }
+        }
+
         final isSvg = isSvgOrBadgeUrl(url);
         final isBadge = isBadgeUrl(url);
         final isIconOrLogo =
             !isBadge &&
             ((config.alt?.toLowerCase().contains('logo') ?? false) ||
                 (config.alt?.toLowerCase().contains('icon') ?? false) ||
+                (config.alt?.toLowerCase().contains('banner') ?? false) ||
                 url.toLowerCase().contains('icon') ||
-                url.toLowerCase().contains('logo'));
+                url.toLowerCase().contains('logo') ||
+                url.toLowerCase().contains('banner') ||
+                rawUrl.contains('#center'));
 
         final double? targetWidth =
-            config.width ?? (isIconOrLogo ? 96.0 : null);
+            config.width ?? (isIconOrLogo ? 100.0 : null);
         final double? targetHeight =
-            config.height ?? (isBadge ? 20.0 : (isIconOrLogo ? 96.0 : null));
+            config.height ?? (isBadge ? 20.0 : (isIconOrLogo ? 100.0 : null));
 
         final BoxConstraints constraints = isBadge
             ? BoxConstraints(
-                maxHeight: config.height ?? 22.0,
-                maxWidth: config.width ?? 240.0,
+                maxHeight: config.height ?? 20.0,
+                maxWidth: config.width ?? 220.0,
               )
             : isIconOrLogo
             ? BoxConstraints(
-                maxHeight: config.height != null ? config.height! + 10 : 120.0,
-                maxWidth: config.width != null ? config.width! + 10 : 120.0,
+                maxHeight: config.height != null ? config.height! + 10 : 130.0,
+                maxWidth: config.width != null ? config.width! + 10 : 130.0,
               )
             : BoxConstraints(
                 maxHeight: config.height ?? 320.0,
@@ -329,7 +430,7 @@ class ReadmeMarkdownView extends StatelessWidget {
               );
 
         final EdgeInsets padding = isBadge
-            ? const EdgeInsets.symmetric(vertical: 2, horizontal: 2)
+            ? const EdgeInsets.only(right: 5, bottom: 6)
             : const EdgeInsets.symmetric(vertical: 6);
 
         final Widget imageWidget;
@@ -354,7 +455,7 @@ class ReadmeMarkdownView extends StatelessWidget {
           );
         } else {
           imageWidget = ClipRRect(
-            borderRadius: BorderRadius.circular(isBadge ? 2 : 8),
+            borderRadius: BorderRadius.circular(isBadge ? 3 : 8),
             child: Image.network(
               url,
               width: targetWidth,
@@ -372,6 +473,18 @@ class ReadmeMarkdownView extends StatelessWidget {
                   errorBuilder: (ctx, err, st) => _buildErrorWidget(),
                 );
               },
+            ),
+          );
+        }
+
+        if (isIconOrLogo) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ConstrainedBox(
+                constraints: constraints,
+                child: imageWidget,
+              ),
             ),
           );
         }

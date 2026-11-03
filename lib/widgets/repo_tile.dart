@@ -125,7 +125,7 @@ class RepoTile extends StatelessWidget {
     return RepaintBoundary(
       child: GlassCard(
         enableBlur: false,
-        margin: const EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 8),
         padding: EdgeInsets.zero,
         child: Material(
           color: Colors.transparent,
@@ -134,7 +134,7 @@ class RepoTile extends StatelessWidget {
             splashColor: AppTheme.primaryCyan.withValues(alpha: 0.10),
             highlightColor: AppTheme.primaryCyan.withValues(alpha: 0.05),
             child: Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -251,16 +251,19 @@ class RepoTile extends StatelessWidget {
                           ],
                           Icon(
                             Icons.star_outline_rounded,
-                            size: 15,
+                            size: 14,
                             color: AppTheme.accentAmber,
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 4),
                           Text(
                             '${repo.stargazersCount}',
                             style: TextStyle(
                               color: AppTheme.textSecondary,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -269,13 +272,16 @@ class RepoTile extends StatelessWidget {
                             size: 14,
                             color: AppTheme.textMuted,
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 4),
                           Text(
                             '${repo.forksCount}',
                             style: TextStyle(
                               color: AppTheme.textSecondary,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
                             ),
                           ),
                         ],

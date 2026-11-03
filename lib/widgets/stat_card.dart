@@ -26,7 +26,7 @@ class StatCard extends StatelessWidget {
     return RepaintBoundary(
       child: GlassCard(
         enableBlur: false,
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -51,7 +51,7 @@ class StatCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Container(
-                  padding: const EdgeInsets.all(5.5),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: accentColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
@@ -64,7 +64,7 @@ class StatCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -73,13 +73,14 @@ class StatCard extends StatelessWidget {
                   value,
                   style: TextStyle(
                     color: AppTheme.textPrimary,
-                    fontSize: 21,
+                    fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: -0.5,
+                    letterSpacing: -0.4,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
                 if (subtitle != null) ...[
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 4),
                   Text(
                     subtitle!,
                     style: TextStyle(

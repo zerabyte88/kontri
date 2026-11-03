@@ -814,7 +814,7 @@ void main() {
         // Verify that AnimatedTierTitle exists in the commit habit banner
         expect(find.byType(AnimatedTierTitle), findsOneWidget);
 
-        // Verify vertical order: Title -> Name -> Username -> Location
+        // Verify vertical order: Name -> Subtitle (Username, Location) -> Tier Title
         final tierTitleTop = tester
             .getTopLeft(find.byType(AnimatedTierTitle))
             .dy;
@@ -825,7 +825,7 @@ void main() {
                 (w) =>
                     w is Text &&
                     w.data == '@zerabyte88' &&
-                    w.style?.fontSize == 12,
+                    w.style?.fontSize == 12.5,
               ),
             )
             .dy;
@@ -833,9 +833,9 @@ void main() {
             .getTopLeft(find.text('Planet Earth, Solar System'))
             .dy;
 
-        expect(tierTitleTop < nameTop, true);
         expect(nameTop < usernameTop, true);
-        expect(usernameTop < locationTop, true);
+        expect(usernameTop <= locationTop, true);
+        expect(locationTop < tierTitleTop, true);
 
         // Verify all years total contributions card is rendered (in default English)
         expect(find.text('Total Contributions (All Years)'), findsOneWidget);
@@ -845,13 +845,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.2.7',
+      'AppConfig provides accurate release and version telemetry for v1.2.8',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.2.7');
-        expect(AppConfig.buildNumber, '10270');
-        expect(AppConfig.fullVersion, 'v1.2.7 (Build 10270)');
-        expect(AppConfig.releaseTag, 'v1.2.7');
+        expect(AppConfig.appVersion, 'v1.2.8');
+        expect(AppConfig.buildNumber, '10280');
+        expect(AppConfig.fullVersion, 'v1.2.8 (Build 10280)');
+        expect(AppConfig.releaseTag, 'v1.2.8');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1584,6 +1584,27 @@ void main() {
         processedLogo,
         '![Kontri Logo](https://raw.githubusercontent.com/developer/awesome-project/main/assets/icons/app_icon.png#120x120)',
       );
+
+      // 9. Inline HTML formatting (strong, b, em, i, a, code) and GitHub alerts converted
+      const complexHtml = '''
+<strong>Portal dokumentasi</strong> dan <em>arsip digital</em>.
+<a href="#ringkasan">Ringkasan</a> • <a href="#tech-stack">Tech Stack</a>
+> [!WARNING]
+> Pre-Release Notice
+''';
+      final processedComplex = ReadmeMarkdownView.preprocessMarkdown(
+        complexHtml,
+        owner,
+        repo,
+        branch,
+      );
+      expect(processedComplex, contains('**Portal dokumentasi**'));
+      expect(processedComplex, contains('*arsip digital*'));
+      expect(
+        processedComplex,
+        contains('[Ringkasan](#ringkasan) • [Tech Stack](#tech-stack)'),
+      );
+      expect(processedComplex, contains('**⚠️ WARNING:**'));
     });
 
     testWidgets(

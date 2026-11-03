@@ -336,30 +336,34 @@ GitHub: https://github.com/${u.login}
   ) {
     final isHigher = peakTitle.tier < currentTitle.tier;
     final tierName = loc.getCommitTierCleanTitle(peakTitle.tier);
-    final badgeColor = isHigher ? AppTheme.accentAmber : AppTheme.primaryViolet;
+    final badgeColor = isHigher ? AppTheme.accentAmber : AppTheme.primaryCyan;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4.5),
       decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
+        color: badgeColor.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: badgeColor.withValues(alpha: 0.35),
-          width: 0.8,
+          color: badgeColor.withValues(alpha: 0.5),
+          width: 1.1,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.workspace_premium_rounded, size: 11, color: badgeColor),
-          const SizedBox(width: 3.5),
-          Text(
-            'Peak: $tierName',
-            style: TextStyle(
-              color: badgeColor,
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.2,
+          Icon(Icons.workspace_premium_outlined, size: 13, color: badgeColor),
+          const SizedBox(width: 4.5),
+          Flexible(
+            child: Text(
+              'Peak: $tierName',
+              style: TextStyle(
+                color: badgeColor,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -379,7 +383,7 @@ GitHub: https://github.com/${u.login}
 
     return GlassCard(
       enableBlur: false,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -398,7 +402,7 @@ GitHub: https://github.com/${u.login}
                           ? AppTheme.accentAmber
                           : AppTheme.primaryCyan,
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         isMax
@@ -406,7 +410,7 @@ GitHub: https://github.com/${u.login}
                             : 'Next Rank: $targetName',
                         style: TextStyle(
                           color: AppTheme.textPrimary,
-                          fontSize: 13,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.w600,
                         ),
                         maxLines: 1,
@@ -418,11 +422,11 @@ GitHub: https://github.com/${u.login}
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: (isMax ? AppTheme.accentAmber : AppTheme.primaryCyan)
                       .withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: (isMax ? AppTheme.accentAmber : AppTheme.primaryCyan)
                         .withValues(alpha: 0.3),
@@ -435,12 +439,13 @@ GitHub: https://github.com/${u.login}
                     color: isMax ? AppTheme.accentAmber : AppTheme.primaryCyan,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
@@ -545,6 +550,7 @@ GitHub: https://github.com/${u.login}
             color: color,
             fontSize: 11.5,
             fontWeight: isLagging ? FontWeight.w600 : FontWeight.w500,
+            fontFeatures: const [FontFeature.tabularFigures()],
           ),
         ),
       ],
@@ -648,22 +654,14 @@ GitHub: https://github.com/${u.login}
                                 padding: const EdgeInsets.all(2.5),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      AppTheme.primaryCyan.withValues(
-                                        alpha: 0.8,
-                                      ),
-                                      AppTheme.primaryViolet.withValues(
-                                        alpha: 0.8,
-                                      ),
-                                    ],
+                                  border: Border.all(
+                                    color: AppTheme.primaryCyan,
+                                    width: 2,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
                                       color: AppTheme.primaryCyan.withValues(
-                                        alpha: 0.18,
+                                        alpha: 0.25,
                                       ),
                                       blurRadius: 10,
                                       spreadRadius: 1,
@@ -671,7 +669,7 @@ GitHub: https://github.com/${u.login}
                                   ],
                                 ),
                                 child: CircleAvatar(
-                                  radius: 32,
+                                  radius: 34,
                                   backgroundColor: AppTheme.surfaceElevated,
                                   backgroundImage: user.avatarUrl.isNotEmpty
                                       ? ResizeImage(
@@ -687,7 +685,7 @@ GitHub: https://github.com/${u.login}
                                               : '?',
                                           style: TextStyle(
                                             color: AppTheme.primaryCyan,
-                                            fontSize: 18,
+                                            fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         )
@@ -700,20 +698,7 @@ GitHub: https://github.com/${u.login}
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    AnimatedTierTitle(
-                                      titleInfo: titleInfo,
-                                      fontSize: 11,
-                                      showBadgeContainer: true,
-                                    ),
-                                    if (cStats.peakTitle.tier <= 5) ...[
-                                      const SizedBox(height: 4),
-                                      _buildPeakTierBadge(
-                                        cStats.peakTitle,
-                                        titleInfo,
-                                        loc,
-                                      ),
-                                    ],
-                                    const SizedBox(height: 6),
+                                    // Line 1: Name
                                     Text(
                                       (user.name != null &&
                                               user.name!.trim().isNotEmpty)
@@ -721,168 +706,155 @@ GitHub: https://github.com/${u.login}
                                           : user.login,
                                       style: TextStyle(
                                         color: AppTheme.textPrimary,
-                                        fontSize: 17.5,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: -0.3,
                                       ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    const SizedBox(height: 4),
-                                    InkWell(
-                                      borderRadius: BorderRadius.circular(20),
-                                      onTap: _openUserProfile,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 3,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppTheme.primaryCyan
-                                              .withValues(alpha: 0.08),
+                                    const SizedBox(height: 3),
+                                    // Line 2: Subtitle Row (Username, Location, Company)
+                                    Wrap(
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      spacing: 6,
+                                      runSpacing: 4,
+                                      children: [
+                                        InkWell(
                                           borderRadius: BorderRadius.circular(
-                                            20,
+                                            4,
                                           ),
-                                          border: Border.all(
-                                            color: AppTheme.primaryCyan
-                                                .withValues(alpha: 0.25),
-                                            width: 0.8,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              '@${user.login}',
-                                              style: TextStyle(
-                                                color: AppTheme.primaryCyan,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
+                                          onTap: _openUserProfile,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                '@${user.login}',
+                                                style: TextStyle(
+                                                  color: AppTheme.textSecondary,
+                                                  fontSize: 12.5,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Icon(
-                                              Icons.open_in_new_rounded,
-                                              size: 11,
-                                              color: AppTheme.primaryCyan,
-                                            ),
-                                          ],
+                                              const SizedBox(width: 3.5),
+                                              Icon(
+                                                Icons.open_in_new_rounded,
+                                                size: 11.5,
+                                                color: AppTheme.textMuted,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                    if ((user.location != null &&
-                                            user.location!.trim().isNotEmpty) ||
-                                        (user.company != null &&
+                                        if (user.location != null &&
+                                            user.location!
+                                                .trim()
+                                                .isNotEmpty) ...[
+                                          Text(
+                                            '•',
+                                            style: TextStyle(
+                                              color: AppTheme.textMuted,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.location_on_outlined,
+                                                size: 12.5,
+                                                color: AppTheme.textMuted,
+                                              ),
+                                              const SizedBox(width: 3),
+                                              ConstrainedBox(
+                                                constraints:
+                                                    const BoxConstraints(
+                                                      maxWidth: 160,
+                                                    ),
+                                                child: Text(
+                                                  user.location!.trim(),
+                                                  style: TextStyle(
+                                                    color:
+                                                        AppTheme.textSecondary,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                        if (user.company != null &&
                                             user.company!
                                                 .trim()
-                                                .isNotEmpty)) ...[
-                                      const SizedBox(height: 6),
-                                      Wrap(
-                                        spacing: 6,
-                                        runSpacing: 4,
-                                        children: [
-                                          if (user.location != null &&
-                                              user.location!.trim().isNotEmpty)
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 7,
-                                                    vertical: 2.5,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: AppTheme.surfaceElevated
-                                                    .withValues(alpha: 0.6),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                border: Border.all(
-                                                  color: AppTheme.border
-                                                      .withValues(alpha: 0.6),
-                                                  width: 0.7,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                    Icons.location_on_outlined,
-                                                    size: 12,
-                                                    color: AppTheme.accentAmber,
-                                                  ),
-                                                  const SizedBox(width: 3.5),
-                                                  ConstrainedBox(
-                                                    constraints:
-                                                        const BoxConstraints(
-                                                          maxWidth: 180,
-                                                        ),
-                                                    child: Text(
-                                                      user.location!.trim(),
-                                                      style: TextStyle(
-                                                        color: AppTheme
-                                                            .textSecondary,
-                                                        fontSize: 11,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                                .isNotEmpty) ...[
+                                          Text(
+                                            '•',
+                                            style: TextStyle(
+                                              color: AppTheme.textMuted,
+                                              fontSize: 11,
                                             ),
-                                          if (user.company != null &&
-                                              user.company!.trim().isNotEmpty)
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 7,
-                                                    vertical: 2.5,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: AppTheme.surfaceElevated
-                                                    .withValues(alpha: 0.6),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                border: Border.all(
-                                                  color: AppTheme.border
-                                                      .withValues(alpha: 0.6),
-                                                  width: 0.7,
-                                                ),
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.business_outlined,
+                                                size: 12.5,
+                                                color: AppTheme.textMuted,
                                               ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                    Icons.business_outlined,
-                                                    size: 12,
+                                              const SizedBox(width: 3),
+                                              ConstrainedBox(
+                                                constraints:
+                                                    const BoxConstraints(
+                                                      maxWidth: 160,
+                                                    ),
+                                                child: Text(
+                                                  user.company!.trim(),
+                                                  style: TextStyle(
                                                     color:
-                                                        AppTheme.primaryViolet,
+                                                        AppTheme.textSecondary,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400,
                                                   ),
-                                                  const SizedBox(width: 3.5),
-                                                  ConstrainedBox(
-                                                    constraints:
-                                                        const BoxConstraints(
-                                                          maxWidth: 180,
-                                                        ),
-                                                    child: Text(
-                                                      user.company!.trim(),
-                                                      style: TextStyle(
-                                                        color: AppTheme
-                                                            .textSecondary,
-                                                        fontSize: 11,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ],
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
                                               ),
-                                            ),
+                                            ],
+                                          ),
                                         ],
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // Line 3: Badges Row (Current Tier + Peak Tier)
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 6,
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      children: [
+                                        AnimatedTierTitle(
+                                          titleInfo: titleInfo,
+                                          fontSize: 11.5,
+                                          showBadgeContainer: true,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 9,
+                                            vertical: 4,
+                                          ),
+                                        ),
+                                        if (cStats.peakTitle.tier <= 5)
+                                          _buildPeakTierBadge(
+                                            cStats.peakTitle,
+                                            titleInfo,
+                                            loc,
+                                          ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
@@ -942,14 +914,14 @@ GitHub: https://github.com/${u.login}
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
                     // Section: GitHub Contributions & Streak Statistics
                     Row(
                       children: [
                         Icon(
                           Icons.local_fire_department_rounded,
-                          size: 18,
+                          size: 16,
                           color: AppTheme.accentOrange,
                         ),
                         const SizedBox(width: 8),
@@ -958,7 +930,7 @@ GitHub: https://github.com/${u.login}
                             loc.streakStatsTitle,
                             style: TextStyle(
                               color: AppTheme.textPrimary,
-                              fontSize: 15,
+                              fontSize: 14.5,
                               fontWeight: FontWeight.w600,
                             ),
                             maxLines: 1,
@@ -967,7 +939,7 @@ GitHub: https://github.com/${u.login}
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -983,7 +955,7 @@ GitHub: https://github.com/${u.login}
                                   : loc.notActiveYetBadge,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: StatCard(
                               label: loc.longestStreak,
@@ -996,7 +968,7 @@ GitHub: https://github.com/${u.login}
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1011,7 +983,7 @@ GitHub: https://github.com/${u.login}
                               subtitle: loc.thisYearSubtitle,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: StatCard(
                               label: loc.allYearsContributions,
@@ -1024,16 +996,16 @@ GitHub: https://github.com/${u.login}
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     _buildTierProgressCard(cStats, loc),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
 
                     // Key Metrics Grid
                     Row(
                       children: [
                         Icon(
                           Icons.analytics_outlined,
-                          size: 18,
+                          size: 16,
                           color: AppTheme.primaryCyan,
                         ),
                         const SizedBox(width: 8),
@@ -1042,7 +1014,7 @@ GitHub: https://github.com/${u.login}
                             loc.accountOverviewTitle,
                             style: TextStyle(
                               color: AppTheme.textPrimary,
-                              fontSize: 15,
+                              fontSize: 14.5,
                               fontWeight: FontWeight.w600,
                             ),
                             maxLines: 1,
@@ -1051,7 +1023,7 @@ GitHub: https://github.com/${u.login}
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1065,7 +1037,7 @@ GitHub: https://github.com/${u.login}
                               subtitle: loc.acrossAllRepos,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: StatCard(
                               label: loc.publicRepos,
@@ -1078,7 +1050,7 @@ GitHub: https://github.com/${u.login}
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1091,7 +1063,7 @@ GitHub: https://github.com/${u.login}
                               accentColor: AppTheme.accentGreen,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: StatCard(
                               label: loc.totalForks,
@@ -1103,7 +1075,7 @@ GitHub: https://github.com/${u.login}
                         ],
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
                     // Language Chart
                     LanguageChart(languageCounts: widget.stats.languageCounts),
@@ -1111,7 +1083,7 @@ GitHub: https://github.com/${u.login}
 
                     // Activity Chart
                     ActivityChart(hourlyActivity: widget.stats.hourlyActivity),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
 
                     // Repositories Section Header
                     Row(
@@ -1122,7 +1094,7 @@ GitHub: https://github.com/${u.login}
                             children: [
                               Icon(
                                 Icons.folder_special_outlined,
-                                size: 18,
+                                size: 16,
                                 color: AppTheme.primaryCyan,
                               ),
                               const SizedBox(width: 8),
@@ -1131,7 +1103,7 @@ GitHub: https://github.com/${u.login}
                                   loc.repositoriesTitle,
                                   style: TextStyle(
                                     color: AppTheme.textPrimary,
-                                    fontSize: 15,
+                                    fontSize: 14.5,
                                     fontWeight: FontWeight.w600,
                                   ),
                                   maxLines: 1,
@@ -1141,8 +1113,8 @@ GitHub: https://github.com/${u.login}
                               const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 7,
-                                  vertical: 2,
+                                  horizontal: 8,
+                                  vertical: 3,
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppTheme.surfaceElevated,
@@ -1176,23 +1148,19 @@ GitHub: https://github.com/${u.login}
                           },
                           color: AppTheme.surfaceElevated,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(8),
                             side: BorderSide(color: AppTheme.border, width: 1),
                           ),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
-                              vertical: 5.5,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: AppTheme.primaryCyan.withValues(
-                                alpha: 0.08,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
+                              color: AppTheme.surfaceElevated,
+                              borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: AppTheme.primaryCyan.withValues(
-                                  alpha: 0.22,
-                                ),
+                                color: AppTheme.border,
                                 width: 0.8,
                               ),
                             ),
@@ -1202,22 +1170,22 @@ GitHub: https://github.com/${u.login}
                                 Icon(
                                   Icons.sort_rounded,
                                   size: 14,
-                                  color: AppTheme.primaryCyan,
+                                  color: AppTheme.textSecondary,
                                 ),
-                                const SizedBox(width: 5),
+                                const SizedBox(width: 6),
                                 Text(
                                   _getFilterLabel(_currentFilter, loc),
                                   style: TextStyle(
-                                    color: AppTheme.primaryCyan,
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w600,
+                                    color: AppTheme.textPrimary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                const SizedBox(width: 3),
+                                const SizedBox(width: 4),
                                 Icon(
                                   Icons.keyboard_arrow_down_rounded,
-                                  size: 15,
-                                  color: AppTheme.primaryCyan,
+                                  size: 14,
+                                  color: AppTheme.textMuted,
                                 ),
                               ],
                             ),
@@ -1281,7 +1249,7 @@ GitHub: https://github.com/${u.login}
               if (repos.length > 10)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 6, bottom: 24),
+                    padding: const EdgeInsets.only(top: 8, bottom: 24),
                     child: Center(
                       child: Wrap(
                         alignment: WrapAlignment.center,
@@ -1308,7 +1276,7 @@ GitHub: https://github.com/${u.login}
                               style: TextStyle(
                                 color: AppTheme.primaryCyan,
                                 fontWeight: FontWeight.w600,
-                                fontSize: 12.5,
+                                fontSize: 13,
                               ),
                             ),
                           ),
@@ -1324,7 +1292,7 @@ GitHub: https://github.com/${u.login}
                               style: TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontWeight: FontWeight.w500,
-                                fontSize: 12.5,
+                                fontSize: 13,
                               ),
                             ),
                           ),
@@ -1336,7 +1304,7 @@ GitHub: https://github.com/${u.login}
               else
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 6, bottom: 24),
+                    padding: const EdgeInsets.only(top: 8, bottom: 24),
                     child: Center(
                       child: TextButton.icon(
                         onPressed: _openUserRepositories,
@@ -1350,7 +1318,7 @@ GitHub: https://github.com/${u.login}
                           style: TextStyle(
                             color: AppTheme.textSecondary,
                             fontWeight: FontWeight.w500,
-                            fontSize: 12.5,
+                            fontSize: 13,
                           ),
                         ),
                       ),

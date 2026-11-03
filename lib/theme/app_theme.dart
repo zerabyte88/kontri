@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   static const String appName = 'Kontri';
-  static const String appVersion = 'v1.2.7';
-  static const String buildNumber = '10270';
-  static const String fullVersion = 'v1.2.7 (Build 10270)';
-  static const String releaseTag = 'v1.2.7';
+  static const String appVersion = 'v1.2.8';
+  static const String buildNumber = '10280';
+  static const String fullVersion = 'v1.2.8 (Build 10280)';
+  static const String releaseTag = 'v1.2.8';
   static const String githubRepoUrl = 'https://github.com/zerabyte88/kontri';
   static const String developerUsername = 'zerabyte88';
   static const String developerGithubUrl = 'https://github.com/zerabyte88';
