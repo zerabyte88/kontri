@@ -564,7 +564,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     scale: 0.85,
                     child: Switch(
                       value: animEnabled,
-                      activeThumbColor: AppTheme.primaryCyan,
                       onChanged: (val) {
                         AppThemeService.setBackgroundAnimation(
                           val,

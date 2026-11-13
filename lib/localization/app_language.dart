@@ -219,7 +219,9 @@ enum AppLanguage {
 
   static List<AppLanguage> get sortedAlphabetically {
     final list = List<AppLanguage>.from(AppLanguage.values);
-    list.sort((a, b) => a.name.compareTo(b.name));
+    list.sort(
+      (a, b) => a.nativeName.toLowerCase().compareTo(b.nativeName.toLowerCase()),
+    );
     return list;
   }
 }

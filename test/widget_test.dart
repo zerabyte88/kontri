@@ -716,11 +716,17 @@ void main() {
     test('AppLocalizations covers all 22 global languages and sortedAlphabetically is correct', () {
       expect(AppLanguage.values.length, 22);
 
-      // Verify sortedAlphabetically orders all 22 languages A-Z by English name
+      // Verify sortedAlphabetically orders all 22 languages A-Z by native name
       final sorted = AppLanguage.sortedAlphabetically;
       expect(sorted.length, 22);
       for (int i = 0; i < sorted.length - 1; i++) {
-        expect(sorted[i].name.compareTo(sorted[i + 1].name) <= 0, isTrue);
+        expect(
+          sorted[i].nativeName.toLowerCase().compareTo(
+                sorted[i + 1].nativeName.toLowerCase(),
+              ) <=
+              0,
+          isTrue,
+        );
       }
 
       // Verify all 22 languages return non-empty strings and pass quality standards
