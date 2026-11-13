@@ -33,20 +33,17 @@ class RepoDetailScreen extends StatefulWidget {
 class _RepoDetailScreenState extends State<RepoDetailScreen> {
   late final GitHubApiService _apiService;
 
-  // Tab State: 0 = README, 1 = Files, 2 = Commits
+  // 0 = README, 1 = Files, 2 = Commits
   int _selectedTab = 0;
 
-  // Commits State
   bool _isLoadingCommits = false;
   String? _commitsError;
   List<GitHubCommitInfo> _commits = [];
 
-  // README State
   bool _isLoadingReadme = true;
   String? _readmeContent;
   String? _readmeError;
 
-  // Repository Contents State
   bool _isLoadingContents = false;
   String _currentPath = '';
   final List<String> _pathStack = [];
@@ -54,7 +51,6 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
   String? _contentsError;
   final ScrollController _breadcrumbsScrollController = ScrollController();
 
-  // Search State
   bool _isSearching = false;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
@@ -475,15 +471,10 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. Repo Overview Card
                     _buildOverviewCard(loc, repoUrl),
                     const SizedBox(height: 16),
-
-                    // 2. Navigation Segments: README vs Files
                     _buildSegmentedTabBar(loc),
                     const SizedBox(height: 14),
-
-                    // 3. Active Tab Content
                     if (_selectedTab == 0)
                       _buildReadmeSection(loc, repoUrl)
                     else if (_selectedTab == 1)
@@ -792,8 +783,6 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
           const SizedBox(height: 16),
           Divider(height: 1, color: AppTheme.border),
           const SizedBox(height: 14),
-
-          // Metadata badges
           Wrap(
             spacing: 14,
             runSpacing: 10,
@@ -1085,7 +1074,6 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     );
   }
 
-  // Readme section
   Widget _buildReadmeSection(AppLocalizations loc, String repoUrl) {
     if (_isLoadingReadme) {
       return Container(
@@ -1197,7 +1185,6 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     );
   }
 
-  // Repository file tree
   Widget _buildFilesSection(AppLocalizations loc) {
     if (_isLoadingContents) {
       return Container(
@@ -1272,11 +1259,8 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Breadcrumb header
           _buildBreadcrumbsBar(),
           Divider(height: 1, color: AppTheme.border),
-
-          // File / Directory list
           if (_contents.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 20),
@@ -1548,7 +1532,6 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header with count & branch chip
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -1590,8 +1573,6 @@ class _RepoDetailScreenState extends State<RepoDetailScreen> {
           ],
         ),
         const SizedBox(height: 10),
-
-        // Commits List
         ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

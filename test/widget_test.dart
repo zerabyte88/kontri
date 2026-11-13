@@ -643,15 +643,23 @@ void main() {
         expect(zhHantLoc.searchHint, '搜尋...');
         expect(koLoc.searchHint, '검색...');
 
-        // Theme options (Snowfall, Midnight, Daylight, Sakura)
+        // Theme options (System, Light Mode, Dark Mode, Snowfall, Sunlight, Midnight, Sakura)
+        expect(idLoc.themeSystem, 'Sistem');
+        expect(idLoc.themeCleanLight, 'Light Mode');
+        expect(idLoc.themeAmoledPure, 'Dark Mode');
         expect(idLoc.themeDark, 'Snowfall');
+        expect(idLoc.themeLight, 'Sunlight');
         expect(idLoc.themeAmoled, 'Midnight');
-        expect(idLoc.themeLight, 'Daylight');
         expect(idLoc.themeAmoledJapanese, 'Sakura');
+        expect(enLoc.themeSystem, 'System');
+        expect(enLoc.themeCleanLight, 'Light Mode');
+        expect(enLoc.themeAmoledPure, 'Dark Mode');
         expect(enLoc.themeDark, 'Snowfall');
+        expect(enLoc.themeLight, 'Sunlight');
         expect(enLoc.themeAmoled, 'Midnight');
-        expect(enLoc.themeLight, 'Daylight');
         expect(enLoc.themeAmoledJapanese, 'Sakura');
+        expect(enLoc.themeName(AppThemeMode.system), 'System');
+        expect(idLoc.themeName(AppThemeMode.system), 'Sistem');
 
         // Filter labels
         expect(idLoc.filterPopular, 'Terpopuler');
@@ -845,13 +853,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.2.8',
+      'AppConfig provides accurate release and version telemetry for v1.2.9',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.2.8');
-        expect(AppConfig.buildNumber, '10280');
-        expect(AppConfig.fullVersion, 'v1.2.8 (Build 10280)');
-        expect(AppConfig.releaseTag, 'v1.2.8');
+        expect(AppConfig.appVersion, 'v1.2.9');
+        expect(AppConfig.buildNumber, '10290');
+        expect(AppConfig.fullVersion, 'v1.2.9 (Build 10290)');
+        expect(AppConfig.releaseTag, 'v1.2.9');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1016,6 +1024,208 @@ void main() {
       expect(result.first.title, '⭐ persisted/project (500 stars)');
       expect(service.isTagCachedOrOffline('trending'), true);
     });
+
+    test(
+      'TechNewsService parses github.com/trending HTML for daily/weekly/monthly',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+
+        const sampleHtml = '''
+<html><body>
+  <article class="Box-row">
+    <h2 class="h3 lh-condensed">
+      <a href="/vercel/next.js">
+        vercel / next.js
+      </a>
+    </h2>
+    <p class="col-9 color-fg-muted my-1 pr-4">
+      The React Framework &amp; Full-Stack &#39;Web&#39; Platform
+    </p>
+    <div class="f6 color-fg-muted mt-2">
+      <span itemprop="programmingLanguage">TypeScript</span>
+      <a href="/vercel/next.js/stargazers">
+        125,400
+      </a>
+      <span class="d-inline-block float-sm-right">
+        <svg></svg>
+        842 stars this week
+      </span>
+    </div>
+  </article>
+  <article class="Box-row">
+    <h2 class="h3 lh-condensed">
+      <a href="/rust-lang/rust">rust-lang/rust</a>
+    </h2>
+    <div class="f6 color-fg-muted mt-2">
+      <a href="/rust-lang/rust/stargazers">99,000</a>
+    </div>
+  </article>
+</body></html>
+''';
+
+        final requestedUrls = <String>[];
+        final client = MockClient((request) async {
+          requestedUrls.add(request.url.toString());
+          return http.Response(sampleHtml, 200);
+        });
+
+        final service = TechNewsService(client: client, storageService: storage);
+        final items = await service.fetchNews(
+          tag: 'trending',
+          trendingPeriod: TrendingPeriod.weekly,
+        );
+
+        expect(requestedUrls, ['https://github.com/trending?since=weekly']);
+        expect(items.length, 2);
+
+        expect(items[0].id, 'vercel/next.js'.hashCode);
+        expect(items[0].title, '⭐ vercel/next.js (125,400 stars • 842 stars this week)');
+        expect(items[0].description, "The React Framework & Full-Stack 'Web' Platform");
+        expect(items[0].url, 'https://github.com/vercel/next.js');
+        expect(items[0].authorName, 'vercel');
+        expect(items[0].authorAvatar, 'https://github.com/vercel.png?size=64');
+        expect(items[0].publishedDate, 'Trending TypeScript');
+        expect(items[0].tags, ['trending', 'weekly', 'github', 'typescript']);
+        expect(service.isTagCachedOrOffline('trending_weekly'), false);
+
+        expect(items[1].title, '⭐ rust-lang/rust (99,000 stars)');
+        expect(
+          items[1].description,
+          'Open-source repository trending on GitHub with active development.',
+        );
+        expect(items[1].publishedDate, 'Trending Code');
+        expect(items[1].tags, ['trending', 'weekly', 'github', 'code']);
+      },
+    );
+
+    test(
+      'TechNewsService falls back to GitHub Search API on 500, and to persisted cache if Search API fails',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+
+        // 1. HTML returns 500 -> falls back to Search API
+        var searchApiCalled = false;
+        final searchFallbackClient = MockClient((request) async {
+          if (request.url.host == 'github.com') {
+            return http.Response('Server Error', 500);
+          }
+          if (request.url.host == 'api.github.com') {
+            searchApiCalled = true;
+            return http.Response(
+              jsonEncode({
+                'items': [
+                  {
+                    'id': 999,
+                    'full_name': 'dart-lang/sdk',
+                    'stargazers_count': 10500,
+                    'language': 'Dart',
+                    'description': 'The Dart SDK',
+                    'html_url': 'https://github.com/dart-lang/sdk',
+                    'owner': {
+                      'login': 'dart-lang',
+                      'avatar_url': 'https://github.com/dart-lang.png',
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          return http.Response('Not found', 404);
+        });
+
+        final service1 = TechNewsService(
+          client: searchFallbackClient,
+          storageService: storage,
+        );
+        final searchResult = await service1.fetchNews(
+          tag: 'trending',
+          trendingPeriod: TrendingPeriod.monthly,
+          forceRefresh: true,
+        );
+
+        expect(searchApiCalled, true);
+        expect(searchResult.length, 1);
+        expect(searchResult.first.title, '⭐ dart-lang/sdk (10500 stars)');
+        expect(searchResult.first.tags, ['trending', 'monthly', 'github', 'dart']);
+        expect(service1.isTagCachedOrOffline('trending_monthly'), false);
+
+        // 2. Both HTML and Search API fail -> falls back to persisted cache for that period
+        final allFailClient = MockClient((request) async {
+          return http.Response('Unavailable', 503);
+        });
+
+        final service2 = TechNewsService(
+          client: allFailClient,
+          storageService: storage,
+        );
+        final persistedResult = await service2.fetchNews(
+          tag: 'trending',
+          trendingPeriod: TrendingPeriod.monthly,
+          forceRefresh: true,
+        );
+
+        expect(persistedResult.length, 1);
+        expect(persistedResult.first.title, '⭐ dart-lang/sdk (10500 stars)');
+        expect(service2.isTagCachedOrOffline('trending_monthly'), true);
+      },
+    );
+
+    test(
+      'TechNewsService caches TrendingPeriod daily, weekly, and monthly separately',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+
+        int networkCalls = 0;
+        final client = MockClient((request) async {
+          networkCalls++;
+          final since = request.url.queryParameters['since'] ?? 'daily';
+          return http.Response('''
+            <article class="Box-row">
+              <h2><a href="/org/repo-$since">org/repo-$since</a></h2>
+              <p>Repo for $since</p>
+              <span itemprop="programmingLanguage">Dart</span>
+              <a href="/org/repo-$since/stargazers">100</a>
+              <span class="d-inline-block float-sm-right">10 stars $since</span>
+            </article>
+          ''', 200);
+        });
+
+        final service = TechNewsService(client: client, storageService: storage);
+
+        final daily = await service.fetchNews(
+          tag: 'trending',
+          trendingPeriod: TrendingPeriod.daily,
+        );
+        final weekly = await service.fetchNews(
+          tag: 'trending',
+          trendingPeriod: TrendingPeriod.weekly,
+        );
+        final monthly = await service.fetchNews(
+          tag: 'trending',
+          trendingPeriod: TrendingPeriod.monthly,
+        );
+
+        expect(networkCalls, 3);
+        expect(daily.first.url, 'https://github.com/org/repo-daily');
+        expect(weekly.first.url, 'https://github.com/org/repo-weekly');
+        expect(monthly.first.url, 'https://github.com/org/repo-monthly');
+
+        // Re-fetching from in-memory cache should not trigger additional network calls
+        final dailyCached = await service.fetchNews(
+          tag: 'trending',
+          trendingPeriod: TrendingPeriod.daily,
+        );
+        expect(networkCalls, 3);
+        expect(dailyCached.first.url, 'https://github.com/org/repo-daily');
+      },
+    );
 
     testWidgets(
       'LanguageChart renders percentage without KB bytes and aligns in 2-column layout',
@@ -3374,6 +3584,88 @@ void main() {
 
       AppTheme.currentMode = AppThemeMode.cleanLight;
       expect(AppTheme.buttonPrimaryForeground, Colors.white);
+      AppTheme.currentMode = AppThemeMode.amoledSnowfall;
     });
+
+    testWidgets(
+      'AppThemeMode.system resolves dynamically to cleanLight or amoledPure based on platform brightness',
+      (tester) async {
+        expect(AppThemeMode.fromKey('system'), AppThemeMode.system);
+
+        final prevMode = AppTheme.currentMode;
+        addTearDown(() {
+          AppTheme.currentMode = prevMode;
+          tester.platformDispatcher.clearPlatformBrightnessTestValue();
+        });
+
+        AppTheme.currentMode = AppThemeMode.system;
+
+        tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
+        expect(AppThemeMode.system.resolved, AppThemeMode.cleanLight);
+        expect(AppThemeMode.system.isLight, isTrue);
+        expect(AppTheme.effectiveMode, AppThemeMode.cleanLight);
+        expect(AppTheme.background, const Color(0xFFF8FAFC));
+        expect(
+          AppTheme.getTheme(AppThemeMode.system).brightness,
+          Brightness.light,
+        );
+
+        tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+        expect(AppThemeMode.system.resolved, AppThemeMode.amoledPure);
+        expect(AppThemeMode.system.isLight, isFalse);
+        expect(AppTheme.effectiveMode, AppThemeMode.amoledPure);
+        expect(AppTheme.background, const Color(0xFF000000));
+        expect(
+          AppTheme.getTheme(AppThemeMode.system).brightness,
+          Brightness.dark,
+        );
+      },
+    );
+
+    testWidgets(
+      'SettingsScreen renders all 7 modern theme cards with aligned names and badges',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final storage = StorageService(prefs);
+        AppThemeService.init(storage);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLanguage.supportedLocales,
+            home: Scaffold(
+              body: SettingsScreen(
+                storageService: storage,
+                apiService: GitHubApiService(),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('System'), findsOneWidget);
+        expect(find.text('Light Mode'), findsOneWidget);
+        expect(find.text('Dark Mode'), findsOneWidget);
+        expect(find.text('Snowfall'), findsOneWidget);
+        expect(find.text('Sunlight'), findsOneWidget);
+        expect(find.text('Midnight'), findsOneWidget);
+        expect(find.text('Sakura'), findsOneWidget);
+
+        expect(find.text('Auto'), findsOneWidget);
+        expect(find.text('Static'), findsNWidgets(2));
+        expect(find.text('Live'), findsNWidgets(4));
+
+        await tester.tap(find.text('System'));
+        await tester.pumpAndSettle();
+        expect(AppThemeService.currentTheme, AppThemeMode.system);
+        expect(storage.getThemeMode(), 'system');
+      },
+    );
   });
 }

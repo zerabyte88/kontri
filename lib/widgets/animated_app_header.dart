@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../services/app_theme_service.dart';
 import '../theme/app_theme.dart';
 
-/// Global controller to synchronize header animation lifecycle state across the header.
 class HeaderAnimationState {
   static final ValueNotifier<bool> isPausedNotifier = ValueNotifier<bool>(
     false,
@@ -20,7 +19,6 @@ class HeaderAnimationState {
   }
 }
 
-/// App logo widget.
 class KontriLogo extends StatelessWidget {
   final double size;
   final Color color;
@@ -87,13 +85,10 @@ class _KontriLogoPainter extends CustomPainter {
     final bottomNode = Offset(w * 0.80, h * 0.74);
     final headNode = Offset(w * 0.82, h * 0.38);
 
-    // 1. Lower Git master branch line
     canvas.drawLine(baseNode, bottomNode, _linePaint);
 
-    // 2. Upper Git branch with ECG pulse waveform
     final pulsePath = Path()..moveTo(baseNode.dx, baseNode.dy);
 
-    // Branch curve upward
     pulsePath.cubicTo(
       w * 0.22,
       h * 0.52,
@@ -103,19 +98,17 @@ class _KontriLogoPainter extends CustomPainter {
       h * 0.46,
     );
 
-    // ECG cardiac pulse spike
-    pulsePath.lineTo(w * 0.44, h * 0.52); // Pre-dip
-    pulsePath.lineTo(w * 0.54, h * 0.14); // High pulse spike (R-wave peak)
-    pulsePath.lineTo(w * 0.64, h * 0.70); // Deep S-wave valley
-    pulsePath.lineTo(w * 0.72, h * 0.38); // Recovery
+    pulsePath.lineTo(w * 0.44, h * 0.52);
+    pulsePath.lineTo(w * 0.54, h * 0.14);
+    pulsePath.lineTo(w * 0.64, h * 0.70);
+    pulsePath.lineTo(w * 0.72, h * 0.38);
     pulsePath.lineTo(
       headNode.dx,
       headNode.dy,
-    ); // Connecting to HEAD release node
+    );
 
     canvas.drawPath(pulsePath, _linePaint);
 
-    // 3. Draw commit nodes (Origin, Main Branch, and HEAD Pulse Node)
     final nodeRadius = w * 0.12;
     final innerDotRadius = w * 0.055;
 
@@ -125,17 +118,14 @@ class _KontriLogoPainter extends CustomPainter {
       ..strokeWidth = strokeWidth * 0.9;
     final dotPaint = _glowPaint..color = color;
 
-    // Origin / Root Node
     canvas.drawCircle(baseNode, nodeRadius, _fillPaint);
     canvas.drawCircle(baseNode, nodeRadius, _strokePaint);
     canvas.drawCircle(baseNode, innerDotRadius, dotPaint);
 
-    // Bottom branch node
     canvas.drawCircle(bottomNode, nodeRadius * 0.85, _fillPaint);
     canvas.drawCircle(bottomNode, nodeRadius * 0.85, _strokePaint);
     canvas.drawCircle(bottomNode, innerDotRadius * 0.8, dotPaint);
 
-    // Active HEAD Pulse node with glowing aura (GPU-accelerated, zero blur overhead)
     final pulseBreath = 0.5 + 0.5 * math.sin(progress * 2 * math.pi);
     _glowPaint.color = color.withValues(alpha: 0.22 * pulseBreath);
     canvas.drawCircle(headNode, nodeRadius + 3.0 * pulseBreath, _glowPaint);
@@ -144,7 +134,6 @@ class _KontriLogoPainter extends CustomPainter {
     canvas.drawCircle(headNode, nodeRadius, _strokePaint);
     canvas.drawCircle(headNode, innerDotRadius, dotPaint);
 
-    // 4. Live traveling pulse spark along the pulse branch
     for (final metric in pulsePath.computeMetrics()) {
       final t = (progress * 2.0) % 1.0;
       final tangent = metric.getTangentForOffset(metric.length * t);
@@ -165,10 +154,7 @@ class _KontriLogoPainter extends CustomPainter {
   }
 }
 
-/// Full-width header background widget for [AppBar.flexibleSpace].
-///
-/// Kept for compatibility; ambient background animation is now unified
-/// across the entire application canvas by [AnimatedAppBackground].
+/// Kept for [AppBar.flexibleSpace] compatibility; ambient background is now rendered by [AnimatedAppBackground].
 class AnimatedHeaderBackground extends StatelessWidget {
   const AnimatedHeaderBackground({super.key});
 
@@ -178,7 +164,6 @@ class AnimatedHeaderBackground extends StatelessWidget {
   }
 }
 
-/// Header bar with app logo, title, and version.
 class AnimatedAppHeader extends StatelessWidget {
   const AnimatedAppHeader({super.key});
 
@@ -251,7 +236,7 @@ class AnimatedAppHeader extends StatelessWidget {
 }
 
 Color _getThemeAccentColor(AppThemeMode mode) {
-  switch (mode) {
+  switch (mode.resolved) {
     case AppThemeMode.amoledJapanese:
       return const Color(0xFFFF65A3);
     case AppThemeMode.amoled:
@@ -260,7 +245,7 @@ Color _getThemeAccentColor(AppThemeMode mode) {
       return const Color(0xFF0969DA);
     case AppThemeMode.amoledSnowfall:
       return const Color(0xFF58A6FF);
-    case AppThemeMode.amoledPure:
+    case AppThemeMode.amoledPure || AppThemeMode.system:
       return const Color(0xFF60A5FA);
     case AppThemeMode.cleanLight:
       return const Color(0xFF0EA5E9);

@@ -5,7 +5,7 @@
 
   **Minimalist GitHub analytics, contribution streaks, and repository explorer for Android.**
 
-  [![Release](https://img.shields.io/badge/Release-v1.2.8-06b6d4?style=flat-square&logo=github&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
+  [![Release](https://img.shields.io/badge/Release-v1.2.9-06b6d4?style=flat-square&logo=github&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
   [![Platform](https://img.shields.io/badge/Platform-Android-10b981?style=flat-square&logo=android&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
   [![Architecture](https://img.shields.io/badge/Arch-arm64--v8a-8b5cf6?style=flat-square&logo=arm&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
   [![Flutter](https://img.shields.io/badge/Flutter-3.13+-02569b?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
@@ -23,8 +23,8 @@
 - **Commit Timeline** : View commit history with author info, timestamps, and commit hashes.
 - **Contribution Tiers** : 6 badges evaluated over a rolling 365-day active window.
 - **Multi-Profile Dashboard** : Pin multiple GitHub user profiles.
-- **Tech Feed** : Trending repositories and developer articles from GitHub and Dev.to.
-- **AMOLED Themes** : 6 visual themes (*AMOLED Pure*, *Midnight*, *Snowfall*, *Sakura*, *Light*, *Clean Light*) with adjustable glassmorphism translucency.
+- **Tech Feed** : Live GitHub Trending repositories (daily, weekly, and monthly) and developer articles from Dev.to.
+- **Themes & Appearance** : 7 visual themes across static/system (*System*, *Light Mode*, *Dark Mode*) and live animated themes (*Snowfall*, *Sunlight*, *Midnight*, *Sakura*) with adjustable surface translucency and background animation toggle.
 - **Efficient Caching** : Conditional HTTP querying (`ETag` / 304 Not Modified) with optional Personal Access Token (PAT) support to increase rate limits to 5,000 req/hr.
 
 ---

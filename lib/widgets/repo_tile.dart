@@ -74,7 +74,6 @@ class RepoTile extends StatelessWidget {
     }
   }
 
-  // Authentic language color mapper for common programming languages
   Color _getLanguageColor(String? language) {
     switch (language?.toLowerCase()) {
       case 'dart':

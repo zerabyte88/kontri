@@ -22,7 +22,6 @@ class GitHubCommitInfo {
     return firstLine.isNotEmpty ? firstLine : 'commit';
   }
 
-  /// User-friendly relative time ago
   String get relativeTimeAgo {
     if (date == null) return 'Tidak ada aktivitas';
     final diff = DateTime.now().difference(date!);

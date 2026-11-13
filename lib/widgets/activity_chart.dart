@@ -13,7 +13,6 @@ class ActivityChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    // Group into 6 time intervals (each 4 hours)
     final intervals = [
       {'label': '00-04', 'count': 0},
       {'label': '04-08', 'count': 0},

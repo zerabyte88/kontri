@@ -41,13 +41,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String? _errorMessage;
   bool _isSearchFocused = false;
 
-  // News State & In-Memory Cache per Category
   String _selectedCategory = 'trending';
+  TrendingPeriod _selectedTrendingPeriod = TrendingPeriod.daily;
   late final PageController _newsPageController;
   final Map<String, List<TechNews>> _categoryNewsCache = {};
   final Map<String, bool> _categoryLoadingMap = {};
 
-  // Direct Capsule Glide State for Multi-Tab Jumps
+  String _newsCacheKey(String category) => category == 'trending'
+      ? 'trending_${_selectedTrendingPeriod.queryParam}'
+      : category;
+
   late final AnimationController _capsuleJumpController;
   Animation<double>? _capsuleJumpAnimation;
   double _capsuleStartLeft = 0.0;
@@ -58,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _capsuleToIndex = 0;
   bool _isCapsuleJumping = false;
 
-  // Local Storage Cache
   List<BookmarkedUser> _bookmarkedUsers = [];
   List<String> _allRecents = [];
   String? _loadingFavoriteUsername;
@@ -128,15 +130,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     String category, {
     bool refresh = false,
   }) async {
+    final cacheKey = _newsCacheKey(category);
     if (!refresh &&
-        _categoryNewsCache.containsKey(category) &&
-        _categoryNewsCache[category]!.isNotEmpty) {
+        _categoryNewsCache.containsKey(cacheKey) &&
+        _categoryNewsCache[cacheKey]!.isNotEmpty) {
       return;
     }
 
     if (mounted) {
       setState(() {
-        _categoryLoadingMap[category] = true;
+        _categoryLoadingMap[cacheKey] = true;
       });
     }
 
@@ -145,17 +148,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final news = await _newsService.fetchNews(
         tag: category,
         forceRefresh: refresh,
+        trendingPeriod: _selectedTrendingPeriod,
       );
       if (mounted) {
         setState(() {
-          _categoryNewsCache[category] = news;
-          _categoryLoadingMap[category] = false;
+          _categoryNewsCache[cacheKey] = news;
+          _categoryLoadingMap[cacheKey] = false;
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _categoryLoadingMap[category] = false;
+          _categoryLoadingMap[cacheKey] = false;
         });
       }
     }
@@ -536,7 +540,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Search Input with integrated dropdown
                       ValueListenableBuilder<TextEditingValue>(
                         valueListenable: _searchController,
                         builder: (context, searchValue, _) {
@@ -603,22 +606,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
 
                       const SizedBox(height: 24),
-
-                      // Bookmarks Section
                       _buildBookmarksSection(loc, bookmarkedUsers),
-
                       const SizedBox(height: 24),
-
-                      // Latest Tech & AI News Header
                       _buildTechNewsHeader(loc, categories),
-
                       const SizedBox(height: 16),
                     ],
                   ),
                 ),
               ),
 
-              // News Content in Smooth Interactive PageView
               SliverToBoxAdapter(
                 child: ExpandablePageView(
                   controller: _newsPageController,
@@ -715,7 +711,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Header
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 12, 8),
             child: Row(
@@ -769,7 +764,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           Divider(height: 1, color: AppTheme.border),
 
-          // Quick action if typed query does not exactly match
           if (_searchController.text.trim().isNotEmpty) ...[
             ListTile(
               dense: true,
@@ -804,7 +798,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Divider(height: 1, color: AppTheme.border),
           ],
 
-          // History items list
           if (filteredRecents.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -1092,7 +1085,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                       child: Row(
                         children: [
-                          // Avatar Photo with subtle border & loading overlay
                           SizedBox(
                             width: 38,
                             height: 38,
@@ -1176,8 +1168,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(width: 10),
-
-                          // User Info
                           Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -1205,8 +1195,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ],
                             ),
                           ),
-
-                          // Remove favorite button
                           IconButton(
                             icon: Icon(
                               Icons.close_rounded,
@@ -1236,28 +1224,93 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildTrendingPeriodBar(AppLocalizations loc) {
+    final periods = [
+      (TrendingPeriod.daily, loc.trendingDaily),
+      (TrendingPeriod.weekly, loc.trendingWeekly),
+      (TrendingPeriod.monthly, loc.trendingMonthly),
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border, width: 1.0),
+      ),
+      child: Row(
+        children: periods.map((entry) {
+          final period = entry.$1;
+          final label = entry.$2;
+          final isSelected = _selectedTrendingPeriod == period;
+
+          return Expanded(
+            child: GestureDetector(
+              key: ValueKey('trending_period_${period.queryParam}'),
+              onTap: () {
+                if (_selectedTrendingPeriod != period) {
+                  setState(() {
+                    _selectedTrendingPeriod = period;
+                  });
+                  _loadCategoryNews('trending');
+                }
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                padding: const EdgeInsets.symmetric(vertical: 7),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppTheme.primaryCyan.withValues(alpha: 0.16)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(9),
+                  border: isSelected
+                      ? Border.all(
+                          color: AppTheme.primaryCyan.withValues(alpha: 0.45),
+                          width: 1.0,
+                        )
+                      : null,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: isSelected
+                        ? AppTheme.primaryCyan
+                        : AppTheme.textSecondary,
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Widget _buildCategoryNewsPage(String category, AppLocalizations loc) {
-    final isLoading = _categoryLoadingMap[category] ?? false;
-    final newsList = _categoryNewsCache[category] ?? [];
+    final cacheKey = _newsCacheKey(category);
+    final isLoading = _categoryLoadingMap[cacheKey] ?? false;
+    final newsList = _categoryNewsCache[cacheKey] ?? [];
 
+    final Widget content;
     if (isLoading && newsList.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            TechNewsShimmerCard(),
-            SizedBox(height: 12),
-            TechNewsShimmerCard(),
-            SizedBox(height: 12),
-            TechNewsShimmerCard(),
-          ],
-        ),
+      content = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: const [
+          TechNewsShimmerCard(),
+          SizedBox(height: 12),
+          TechNewsShimmerCard(),
+          SizedBox(height: 12),
+          TechNewsShimmerCard(),
+        ],
       );
-    }
-
-    if (newsList.isEmpty) {
-      return Center(
+    } else if (newsList.isEmpty) {
+      content = Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 28),
           child: Text(
@@ -1269,11 +1322,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ),
       );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
-      child: Column(
+    } else {
+      content = Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           for (int i = 0; i < newsList.length; i++)
@@ -1281,6 +1331,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               padding: const EdgeInsets.only(bottom: 12),
               child: TechNewsCard(news: newsList[i]),
             ),
+        ],
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (category == 'trending') _buildTrendingPeriodBar(loc),
+          content,
         ],
       ),
     );
@@ -1291,13 +1352,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     List<Map<String, String>> categories,
   ) {
     final isCachedOffline = _newsService.isTagCachedOrOffline(
-      _selectedCategory,
+      _newsCacheKey(_selectedCategory),
     );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -1375,7 +1435,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         const SizedBox(height: 12),
 
-        // Category tab bar
         Builder(
           builder: (context) {
             final (widths, offsets) = _calculateCategoryMetrics(
@@ -1411,7 +1470,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     height: 32,
                     child: Stack(
                       children: [
-                        // Sliding capsule indicator
                         AnimatedBuilder(
                           animation: Listenable.merge([
                             _newsPageController,
@@ -1490,8 +1548,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             );
                           },
                         ),
-
-                        // Category tab labels
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -1592,7 +1648,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 }
 
-/// Dynamic-height PageView that measures its active page and animates container height smoothly.
 class ExpandablePageView extends StatefulWidget {
   final int itemCount;
   final Widget Function(BuildContext, int) itemBuilder;

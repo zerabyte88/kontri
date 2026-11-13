@@ -356,7 +356,6 @@ class GitHubApiService {
         return null;
       }
     } catch (_) {
-      // Graceful degradation: return null without throwing
       return null;
     }
     return null;
@@ -653,7 +652,6 @@ class GitHubApiService {
     final cacheKey = cleanUsername.toLowerCase();
     _isLastResponseNotModified = false;
 
-    // In-memory cache (10-minute TTL)
     if (!forceRefresh && _statsCache.containsKey(cacheKey)) {
       final cachedTime = storageService?.getHttpCacheTimestamp(
         'user_stats_$cacheKey',
@@ -664,7 +662,6 @@ class GitHubApiService {
       }
     }
 
-    // Persistent disk cache (10-minute TTL)
     if (!forceRefresh &&
         storageService != null &&
         storageService!.isHttpCacheValid(
@@ -679,7 +676,6 @@ class GitHubApiService {
     }
 
     try {
-      // Background contributions fetch
       final contribFuture = _fetchContributionsWithCache(
         cleanUsername,
         cacheKey,
@@ -693,7 +689,6 @@ class GitHubApiService {
         '$_baseUrl/users/$cleanUsername/events/public?per_page=100',
       );
 
-      // Conditional request ETags (304 Not Modified)
       final userEtag = storageService?.getHttpCacheEtag('user_$cacheKey');
       final reposEtag = storageService?.getHttpCacheEtag('repos_$cacheKey');
       final eventsEtag = storageService?.getHttpCacheEtag('events_$cacheKey');
@@ -754,13 +749,12 @@ class GitHubApiService {
         );
       }
 
-      // Flag when all responses are 304 Not Modified (zero quota consumed)
+      // 304 across all three endpoints consumes zero quota.
       _isLastResponseNotModified =
           (userRes.statusCode == 304 &&
           reposRes.statusCode == 304 &&
           eventsRes.statusCode == 304);
 
-      // 1. User profile (200 OK or 304 Not Modified)
       Map<String, dynamic> userData;
       if (userRes.statusCode == 304) {
         final cached = storageService?.getHttpCacheBody('user_$cacheKey');
@@ -785,7 +779,6 @@ class GitHubApiService {
       }
       final user = GitHubUser.fromJson(userData);
 
-      // 2. Repositories (200 OK or 304 Not Modified)
       final List<GitHubRepo> repos = [];
       bool reposUpdated = false;
       if (reposRes.statusCode == 304) {
@@ -815,7 +808,6 @@ class GitHubApiService {
       }
       repos.sort((a, b) => b.stargazersCount.compareTo(a.stargazersCount));
 
-      // 3. Public events (200 OK or 304 Not Modified)
       final List<Map<String, dynamic>> events = [];
       if (eventsRes.statusCode == 304) {
         final cached = storageService?.getHttpCacheBody('events_$cacheKey');
@@ -842,7 +834,6 @@ class GitHubApiService {
         );
       }
 
-      // 4. Language distribution (reuse cached breakdown on 304)
       final nonForkRepos = repos.where((r) => !r.isFork).toList();
       Map<String, int> aggregatedLanguages = {};
       final cachedLang = storageService?.getHttpCacheBody(
@@ -895,7 +886,6 @@ class GitHubApiService {
         );
       }
 
-      // Resolve contributions
       final fetchedContributions = await contribFuture;
       var contributionStats =
           fetchedContributions ?? ContributionStats.fromEvents(events);
@@ -922,7 +912,6 @@ class GitHubApiService {
         aggregatedLanguages: aggregatedLanguages,
       );
 
-      // Persist cache timestamp (10-minute TTL)
       await storageService?.saveHttpCache(
         key: 'user_stats_$cacheKey',
         body: 'valid',

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
 import 'app_language.dart';
 import 'app_translations_data.dart';
 
@@ -27,7 +28,6 @@ class AppLocalizations {
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
 
-  // Helper string translation lookup
   String _t(String key) {
     return appTranslations[language]?[key] ??
         appTranslations[AppLanguage.english]?[key] ??
@@ -35,7 +35,6 @@ class AppLocalizations {
         key;
   }
 
-  // App & General
   String get close => _t('close');
   String get cancel => _t('cancel');
   String get save => _t('save');
@@ -82,19 +81,20 @@ class AppLocalizations {
   String get networkError => _t('networkError');
   String get rateLimitExceeded => _t('rateLimitExceeded');
 
-  // Tech News
   String get techNewsTitle => _t('techNewsTitle');
   String get categoryAi => _t('categoryAi');
   String get categoryTech => _t('categoryTech');
   String get categoryOpenSource => _t('categoryOpenSource');
   String get categoryTrending => _t('categoryTrending');
+  String get trendingDaily => _t('trendingDaily');
+  String get trendingWeekly => _t('trendingWeekly');
+  String get trendingMonthly => _t('trendingMonthly');
   String get categoryGithub => _t('categoryGithub');
   String get categoryWebDev => _t('categoryWebDev');
   String get noNewsFound => _t('noNewsFound');
   String get offlineCached => _t('offlineCached');
   String get minRead => _t('minRead');
 
-  // Settings & Theme
   String get settingsTitle => _t('settingsTitle');
   String get settingsSubtitle => _t('settingsSubtitle');
   String get languageSectionTitle => _t('languageSectionTitle');
@@ -106,6 +106,7 @@ class AppLocalizations {
   String get themeOpacitySubtitle => _t('themeOpacitySubtitle');
   String get bgAnimationTitle => _t('bgAnimationTitle');
   String get bgAnimationSubtitle => _t('bgAnimationSubtitle');
+  String get themeSystem => _t('themeSystem');
   String get themeDark => _t('themeDark');
   String get themeDarkSubtitle => _t('themeDarkSubtitle');
   String get themeAmoled => _t('themeAmoled');
@@ -118,6 +119,16 @@ class AppLocalizations {
   String get themeAmoledPureSubtitle => _t('themeAmoledPureSubtitle');
   String get themeCleanLight => _t('themeCleanLight');
   String get themeCleanLightSubtitle => _t('themeCleanLightSubtitle');
+
+  String themeName(AppThemeMode mode) => switch (mode) {
+    AppThemeMode.system => themeSystem,
+    AppThemeMode.cleanLight => themeCleanLight,
+    AppThemeMode.amoledPure => themeAmoledPure,
+    AppThemeMode.amoledSnowfall => themeDark,
+    AppThemeMode.light => themeLight,
+    AppThemeMode.amoled => themeAmoled,
+    AppThemeMode.amoledJapanese => themeAmoledJapanese,
+  };
   String get settingsBypassShaderNotice => _t('settingsBypassShaderNotice');
   String get activeLanguageBadge => _t('activeLanguageBadge');
   String get resetLabel => _t('resetLabel');
@@ -138,6 +149,8 @@ class AppLocalizations {
       case 'active':
       case 'active_language_badge':
         return activeLanguageBadge;
+      case 'theme_system':
+        return themeSystem;
       case 'theme_dark':
         return themeDark;
       case 'theme_oled':
@@ -155,11 +168,9 @@ class AppLocalizations {
     }
   }
 
-  // Updates & About
   String get openInBrowser => _t('openInBrowser');
   String get developerRole => _t('developerRole');
 
-  // Rate Limit Status
   String get rateLimitStatus => _t('rateLimitStatus');
   String get personalTokenActive => _t('personalTokenActive');
   String get standardMode => _t('standardMode');
@@ -188,7 +199,6 @@ class AppLocalizations {
     return '$seconds $s';
   }
 
-  // Token Section
   String get githubTokenTitle => 'GitHub Personal Token';
   String get optionalBadge => _t('optionalBadge');
   String get tokenActiveBadge => _t('tokenActiveBadge');
@@ -202,7 +212,6 @@ class AppLocalizations {
   String get tokenSavedToast => _t('tokenSavedToast');
   String get tokenDeletedToast => _t('tokenDeletedToast');
 
-  // Developer Profile & Stats Detail
   String get profileReadmeTitle => _t('profileReadmeTitle');
   String get noBio => _t('noBio');
   String get noLocation => _t('noLocation');
@@ -212,7 +221,6 @@ class AppLocalizations {
   String get followers => _t('followers');
   String get following => _t('following');
 
-  // Activity & Rhythm
   String get activityRhythmTitle => _t('activityRhythmTitle');
   String get activityRhythmSubtitle => _t('activityRhythmSubtitle');
   String get peakLabel => _t('peakLabel');
@@ -225,13 +233,11 @@ class AppLocalizations {
   String get allYearsContributions => _t('allYearsContributions');
   String get daysUnit => _t('daysUnit');
 
-  // Top Languages
   String get topLanguagesTitle => _t('topLanguagesTitle');
   String get languageDistribution => _t('languageDistribution');
   String get otherLanguages => _t('otherLanguages');
   String get noLanguageData => _t('noLanguageData');
 
-  // Repositories List
   String get repositoriesTitle => _t('repositoriesTitle');
   String get totalCountBadge => _t('totalCountBadge');
   String get filterRepositories => _t('filterRepositories');
@@ -252,7 +258,6 @@ class AppLocalizations {
 
   String get showFewerRepos => _t('showFewerRepos');
 
-  // Repository Details Page
   String get readmeTitle => _t('readmeTitle');
   String get loadingReadme => _t('loadingReadme');
   String get noReadmeFound => _t('noReadmeFound');
@@ -267,7 +272,6 @@ class AppLocalizations {
   String get copyCode => _t('copyCode');
   String get codeCopied => _t('codeCopied');
 
-  // Repository Commits & Diff
   String get commitsTab =>
       (language == AppLanguage.indonesian || language == AppLanguage.malay)
       ? 'Commit'
@@ -300,7 +304,6 @@ class AppLocalizations {
     return '$count files changed';
   }
 
-  // Profile Action Toast
   String get shareProfile => _t('shareProfile');
   String get saveFavorite => _t('saveFavorite');
   String get removeFavorite => _t('removeFavorite');
@@ -318,7 +321,6 @@ class AppLocalizations {
   String get profileUpToDate => _t('profileUpToDate');
   String get summaryCopiedToast => _t('summaryCopiedToast');
 
-  // Hero Card Subtitles
   String get activeNowBadge => _t('activeNowBadge');
   String get notActiveYetBadge => _t('notActiveYetBadge');
   String get consistencyRecord => _t('consistencyRecord');

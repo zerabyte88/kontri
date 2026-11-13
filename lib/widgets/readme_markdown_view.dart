@@ -5,10 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/app_theme.dart';
 
-/// Reusable markdown viewer tailored for GitHub READMEs.
-///
-/// Features automatic badge/SVG detection, HTML badge parsing,
-/// relative URL normalization, and theme-conforming styling.
 class ReadmeMarkdownView extends StatelessWidget {
   final String markdown;
   final String owner;
@@ -25,7 +21,6 @@ class ReadmeMarkdownView extends StatelessWidget {
     this.onOpenUrl,
   });
 
-  /// Normalizes relative or GitHub blob image URLs to raw.githubusercontent.com.
   static String normalizeImageUrl(
     String url,
     String owner,
@@ -40,7 +35,6 @@ class ReadmeMarkdownView extends StatelessWidget {
       cleanUrl = cleanUrl.substring(1);
     }
 
-    // Relative path: resolve against raw.githubusercontent.com
     if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
       if (owner.isNotEmpty && repo.isNotEmpty) {
         return 'https://raw.githubusercontent.com/$owner/$repo/$branch/$cleanUrl';
@@ -48,7 +42,6 @@ class ReadmeMarkdownView extends StatelessWidget {
       return cleanUrl;
     }
 
-    // GitHub webpage blob: convert to raw content URL
     if (cleanUrl.contains('github.com') && cleanUrl.contains('/blob/')) {
       cleanUrl = cleanUrl
           .replaceFirst('github.com', 'raw.githubusercontent.com')
@@ -58,7 +51,6 @@ class ReadmeMarkdownView extends StatelessWidget {
     return cleanUrl;
   }
 
-  /// Extracts width and height from HTML attributes and returns a markdown fragment (e.g. `#120x120`).
   static String _extractDimensions(String attrs) {
     final widthMatch = RegExp(
       r"""width=["']?(\d+)["']?""",
@@ -76,8 +68,6 @@ class ReadmeMarkdownView extends StatelessWidget {
     return '';
   }
 
-  /// Preprocesses markdown string: converts HTML <a><img/></a> badges and standalone <img>
-  /// tags to Markdown format, strips HTML div/p align wrappers, and normalizes image paths.
   static String preprocessMarkdown(
     String raw,
     String owner,
@@ -86,7 +76,6 @@ class ReadmeMarkdownView extends StatelessWidget {
   ) {
     var text = raw;
 
-    // 1. Convert <a ... href="..."><img ... src="..." alt="..."></a> to [![alt](normalized_src)](href)
     final linkedImgRegex = RegExp(
       r"""<a\s+[^>]*href=["']([^"']+)["'][^>]*>\s*<img\s+([^>]+)>\s*<\/a>""",
       caseSensitive: false,
@@ -118,7 +107,6 @@ class ReadmeMarkdownView extends StatelessWidget {
       return '[![$alt]($normalizedSrc)]($href)';
     });
 
-    // 2. Convert standalone HTML <img ...> to ![alt](normalized_src)
     final standaloneImgRegex = RegExp(
       r"""<img\s+([^>]+)>""",
       caseSensitive: false,
@@ -147,8 +135,6 @@ class ReadmeMarkdownView extends StatelessWidget {
       return '![$alt]($normalizedSrc)';
     });
 
-    // 3. Convert remaining inline HTML tags to Markdown
-    // 3a. <strong> and <b> to **text**
     text = text.replaceAllMapped(
       RegExp(
         r'<(?:strong|b)\b[^>]*>(.*?)<\/(?:strong|b)>',
@@ -158,7 +144,6 @@ class ReadmeMarkdownView extends StatelessWidget {
       (m) => '**${m.group(1)}**',
     );
 
-    // 3b. <em> and <i> to *text*
     text = text.replaceAllMapped(
       RegExp(
         r'<(?:em|i)\b[^>]*>(.*?)<\/(?:em|i)>',
@@ -168,13 +153,11 @@ class ReadmeMarkdownView extends StatelessWidget {
       (m) => '*${m.group(1)}*',
     );
 
-    // 3c. <code> to `code`
     text = text.replaceAllMapped(
       RegExp(r'<code\b[^>]*>(.*?)<\/code>', caseSensitive: false, dotAll: true),
       (m) => '`${m.group(1)}`',
     );
 
-    // 3d. <a href="url">text</a> to [text](url)
     text = text.replaceAllMapped(
       RegExp(
         r"""<a\s+[^>]*href=["']([^"']*)["'][^>]*>(.*?)<\/a>""",
@@ -184,10 +167,8 @@ class ReadmeMarkdownView extends StatelessWidget {
       (m) => '[${m.group(2)}](${m.group(1)})',
     );
 
-    // 3e. <br> to markdown line break
     text = text.replaceAll(RegExp(r'<br\s*\/?>', caseSensitive: false), '  \n');
 
-    // 3f. GitHub Alert callouts: [!NOTE], [!WARNING], [!TIP], [!IMPORTANT], [!CAUTION]
     text = text.replaceAllMapped(
       RegExp(r'\[!(WARNING|CAUTION)\]', caseSensitive: false),
       (m) => '**⚠️ ${m.group(1)?.toUpperCase()}:**',
@@ -205,13 +186,12 @@ class ReadmeMarkdownView extends StatelessWidget {
       (m) => '**❗ ${m.group(1)?.toUpperCase()}:**',
     );
 
-    // 4. Strip <p align="...">, </p>, <div align="...">, </div>, <center>, </center> wrappers
     text = text.replaceAll(
       RegExp(r'<\/?(p|div|center)(\s+[^>]*)?>', caseSensitive: false),
       '',
     );
 
-    // 5. Clean up leading spaces that would trigger accidental markdown codeblocks
+    // Strip leading spaces that would trigger accidental markdown codeblocks.
     final lines = text.split('\n');
     final cleanedLines = lines.map((line) {
       final trimmed = line.trim();
@@ -228,7 +208,6 @@ class ReadmeMarkdownView extends StatelessWidget {
     }).toList();
     text = cleanedLines.join('\n');
 
-    // 6. Normalize standard Markdown images ![alt](src)
     final mdImgRegex = RegExp(r'!\[(.*?)\]\((.*?)\)');
     text = text.replaceAllMapped(mdImgRegex, (match) {
       final alt = match.group(1) ?? '';
@@ -248,7 +227,6 @@ class ReadmeMarkdownView extends StatelessWidget {
     return text;
   }
 
-  /// Determines whether the given image URL points to an SVG, badge, or shields service.
   static bool isSvgOrBadgeUrl(String url) {
     final lower = url.toLowerCase();
     if (lower.contains('.png') ||
@@ -277,7 +255,6 @@ class ReadmeMarkdownView extends StatelessWidget {
     return false;
   }
 
-  /// Determines whether the given image URL is a badge from known services or endpoints.
   static bool isBadgeUrl(String url) {
     final lower = url.toLowerCase();
     return lower.contains('shields.io') ||
@@ -381,8 +358,7 @@ class ReadmeMarkdownView extends StatelessWidget {
         final rawUrl = config.uri.toString();
         var url = rawUrl.split('#').first;
 
-        // Shields.io SVG workaround: convert shields.io URLs to .png format
-        // shields.io natively serves crisp pixel-perfect PNG badges, bypassing the flutter_svg text-scaling bug.
+        // Convert shields.io SVGs to .png to bypass flutter_svg text-scaling bug.
         if (url.contains('img.shields.io') ||
             url.contains('shields.io/badge/')) {
           if (url.contains('.svg')) {

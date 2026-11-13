@@ -79,8 +79,7 @@ class TechNews {
     };
   }
 
-  /// Extracts direct CDN / S3 URLs from dev.to dynamic proxy wrappers
-  /// preventing image timeouts and 403 blocks.
+  /// Extracts direct CDN/S3 URLs from dev.to proxy wrappers to avoid timeouts and 403s.
   static String? sanitizeImageUrl(String? rawUrl) {
     if (rawUrl == null || rawUrl.trim().isEmpty) return null;
     final trimmed = rawUrl.trim();

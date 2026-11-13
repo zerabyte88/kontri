@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/app_theme_service.dart';
 import '../theme/app_theme.dart';
 
-/// Reusable adaptive Glassmorphism card container.
-///
-/// Automatically reads [AppThemeService.surfaceOpacityNotifier].
-/// Uses pure alpha color transparency (zero [BackdropFilter]) to ensure
-/// smooth 60/120 FPS rendering without GPU offscreen buffering overhead.
+/// Uses alpha transparency without [BackdropFilter] to avoid GPU offscreen buffering overhead.
 class GlassCard extends StatelessWidget {
   final Widget child;
   final double? width;

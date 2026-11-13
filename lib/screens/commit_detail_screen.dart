@@ -237,15 +237,10 @@ class _CommitDetailScreenState extends State<CommitDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Commit Header & Message Summary Card
           _buildSummaryCard(detail, loc),
           const SizedBox(height: 14),
-
-          // 2. Changes Metric Bar
           _buildChangesMetricBar(detail, loc),
           const SizedBox(height: 14),
-
-          // 3. Changed Files List with Diff Viewers
           for (final file in detail.files) ...[
             _buildFileDiffCard(file),
             const SizedBox(height: 12),
@@ -265,7 +260,6 @@ class _CommitDetailScreenState extends State<CommitDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // SHA Chip & Copy
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -321,8 +315,6 @@ class _CommitDetailScreenState extends State<CommitDetailScreen> {
             ],
           ),
           const SizedBox(height: 12),
-
-          // First Line Message (Bold 15pt)
           Text(
             detail.firstLineMessage,
             style: TextStyle(
@@ -332,8 +324,6 @@ class _CommitDetailScreenState extends State<CommitDetailScreen> {
               height: 1.35,
             ),
           ),
-
-          // Body Message (13pt)
           if (detail.bodyMessage.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
@@ -348,8 +338,6 @@ class _CommitDetailScreenState extends State<CommitDetailScreen> {
           const SizedBox(height: 12),
           Divider(height: 1, color: AppTheme.border.withValues(alpha: 0.6)),
           const SizedBox(height: 12),
-
-          // Author Row
           Row(
             children: [
               if (detail.authorAvatarUrl != null &&
@@ -520,7 +508,6 @@ class _CommitDetailScreenState extends State<CommitDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Status badge, filename, diff line counts
           Row(
             children: [
               Container(
@@ -566,7 +553,6 @@ class _CommitDetailScreenState extends State<CommitDetailScreen> {
             ],
           ),
 
-          // Code Diff Box
           if (file.patch != null && file.patch!.isNotEmpty) ...[
             const SizedBox(height: 10),
             _buildDiffBox(file.patch!),

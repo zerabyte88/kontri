@@ -5,6 +5,16 @@ import 'package:http/http.dart' as http;
 import '../models/tech_news.dart';
 import 'storage_service.dart';
 
+enum TrendingPeriod {
+  daily('daily', 1),
+  weekly('weekly', 7),
+  monthly('monthly', 30);
+
+  final String queryParam;
+  final int fallbackDays;
+  const TrendingPeriod(this.queryParam, this.fallbackDays);
+}
+
 class TechNewsService {
   final http.Client _client;
   String? personalAccessToken;
@@ -33,23 +43,30 @@ class TechNewsService {
   Future<List<TechNews>> fetchNews({
     String tag = 'trending',
     bool forceRefresh = false,
+    TrendingPeriod trendingPeriod = TrendingPeriod.daily,
   }) async {
+    final cacheKey = tag == 'trending'
+        ? 'trending_${trendingPeriod.queryParam}'
+        : tag;
     final now = DateTime.now();
-    final cachedTime = _cacheTime[tag];
+    final cachedTime = _cacheTime[cacheKey];
     final isExpired =
         cachedTime == null || now.difference(cachedTime) >= cacheTtl;
 
     if (!forceRefresh &&
         !isExpired &&
-        _cache.containsKey(tag) &&
-        _cache[tag]!.isNotEmpty) {
-      return _cache[tag]!;
+        _cache.containsKey(cacheKey) &&
+        _cache[cacheKey]!.isNotEmpty) {
+      return _cache[cacheKey]!;
     }
 
     if (tag == 'trending') {
-      final repos = await fetchTrendingRepos(forceRefresh: forceRefresh);
-      _cache['trending'] = repos;
-      _cacheTime['trending'] = now;
+      final repos = await fetchTrendingRepos(
+        period: trendingPeriod,
+        forceRefresh: forceRefresh,
+      );
+      _cache[cacheKey] = repos;
+      _cacheTime[cacheKey] = now;
       return repos;
     }
 
@@ -77,11 +94,8 @@ class TechNewsService {
           return news;
         }
       }
-    } catch (_) {
-      // Fallback to cached or curated news if network fails or offline
-    }
+    } catch (_) {}
 
-    // Try reading last successful persisted cache
     final persisted = storageService?.getCachedNews(tag);
     if (persisted != null && persisted.isNotEmpty) {
       _cache[tag] = persisted;
@@ -97,14 +111,48 @@ class TechNewsService {
     return fallback;
   }
 
-  /// Fetches top trending active repositories from GitHub Search API.
-  /// Queries projects created in the last 14 days (falling back to 30 days if sparse)
-  /// sorted by stars descending, giving a true live picture of recent viral repositories.
-  Future<List<TechNews>> fetchTrendingRepos({bool forceRefresh = false}) async {
+  /// Fallback order: GitHub Trending HTML -> Search API -> persisted cache -> curated.
+  Future<List<TechNews>> fetchTrendingRepos({
+    TrendingPeriod period = TrendingPeriod.daily,
+    bool forceRefresh = false,
+  }) async {
+    final cacheKey = 'trending_${period.queryParam}';
+
     try {
-      final items =
-          await _queryGithubTrendingWindow(14) ??
-          await _queryGithubTrendingWindow(30);
+      final url = Uri.parse(
+        'https://github.com/trending?since=${period.queryParam}',
+      );
+      final response = await _client
+          .get(
+            url,
+            headers: const {
+              'User-Agent': 'Mozilla/5.0',
+              'Accept': 'text/html',
+            },
+          )
+          .timeout(const Duration(seconds: 9));
+
+      if (response.statusCode == 200) {
+        final parsed = _parseTrendingHtml(response.body, period);
+        if (parsed.isNotEmpty) {
+          _isOfflineOrCachedMap['trending'] = false;
+          _isOfflineOrCachedMap[cacheKey] = false;
+          await storageService?.saveCachedNews(cacheKey, parsed);
+          return parsed;
+        }
+      }
+    } catch (_) {}
+
+    try {
+      List<dynamic>? items = await _queryGithubTrendingWindow(
+        period.fallbackDays,
+      );
+      if (items == null && period.fallbackDays < 14) {
+        items = await _queryGithubTrendingWindow(14);
+      }
+      if (items == null && period.fallbackDays < 30) {
+        items = await _queryGithubTrendingWindow(30);
+      }
 
       if (items != null && items.isNotEmpty) {
         final newsList = items.map((item) {
@@ -116,34 +164,148 @@ class TechNewsService {
           return TechNews(
             id: (repo['id'] as num?)?.toInt() ?? 0,
             title: '⭐ $fullName ($stars stars)',
-            description: repo['description']?.toString() ?? 'Open-source repository trending on GitHub with active development.',
+            description:
+                repo['description']?.toString() ??
+                'Open-source repository trending on GitHub with active development.',
             url: repo['html_url']?.toString() ?? 'https://github.com',
             coverImage: null,
             authorName: owner?['login']?.toString() ?? 'github',
             authorAvatar: owner?['avatar_url']?.toString(),
             publishedDate: 'Trending $lang',
             readingTimeMinutes: 3,
-            tags: ['trending', 'github', lang.toLowerCase()],
+            tags: ['trending', period.queryParam, 'github', lang.toLowerCase()],
           );
         }).toList();
 
         _isOfflineOrCachedMap['trending'] = false;
-        await storageService?.saveCachedNews('trending', newsList);
+        _isOfflineOrCachedMap[cacheKey] = false;
+        await storageService?.saveCachedNews(cacheKey, newsList);
         return newsList;
       }
-    } catch (_) {
-      // Fallback on network or rate limit failure
-    }
+    } catch (_) {}
 
-    // Try reading last successful persisted cache
-    final persisted = storageService?.getCachedNews('trending');
+    var persisted = storageService?.getCachedNews(cacheKey);
+    if ((persisted == null || persisted.isEmpty) &&
+        period == TrendingPeriod.daily) {
+      persisted = storageService?.getCachedNews('trending');
+    }
     if (persisted != null && persisted.isNotEmpty) {
       _isOfflineOrCachedMap['trending'] = true;
+      _isOfflineOrCachedMap[cacheKey] = true;
       return persisted;
     }
 
     _isOfflineOrCachedMap['trending'] = true;
+    _isOfflineOrCachedMap[cacheKey] = true;
     return _getFallbackNews('trending');
+  }
+
+  List<TechNews> _parseTrendingHtml(String html, TrendingPeriod period) {
+    final articleRegex = RegExp(
+      r'<article[^>]*class="[^"]*Box-row[^"]*"[^>]*>([\s\S]*?)</article>',
+      caseSensitive: false,
+    );
+    final h2HrefRegex = RegExp(
+      r'<h2[^>]*>[\s\S]*?<a[^>]*href="([^"]+)"',
+      caseSensitive: false,
+    );
+    final descRegex = RegExp(
+      r'<p[^>]*>([\s\S]*?)</p>',
+      caseSensitive: false,
+    );
+    final langRegex = RegExp(
+      r'<span[^>]*itemprop="programmingLanguage"[^>]*>([\s\S]*?)</span>',
+      caseSensitive: false,
+    );
+    final periodStarsRegex = RegExp(
+      r'<span[^>]*class="[^"]*d-inline-block\s+float-sm-right[^"]*"[^>]*>([\s\S]*?)</span>',
+      caseSensitive: false,
+    );
+
+    final results = <TechNews>[];
+    for (final match in articleRegex.allMatches(html).take(15)) {
+      final articleHtml = match.group(1) ?? '';
+      final hrefMatch = h2HrefRegex.firstMatch(articleHtml);
+      if (hrefMatch == null) continue;
+
+      var fullName = hrefMatch.group(1)!.trim();
+      if (fullName.startsWith('/')) {
+        fullName = fullName.substring(1);
+      }
+      if (fullName.isEmpty || !fullName.contains('/')) continue;
+      final owner = fullName.split('/').first;
+
+      final descMatch = descRegex.firstMatch(articleHtml);
+      final rawDesc = descMatch != null
+          ? _cleanHtmlText(descMatch.group(1)!)
+          : '';
+      final description = rawDesc.isNotEmpty
+          ? rawDesc
+          : 'Open-source repository trending on GitHub with active development.';
+
+      final langMatch = langRegex.firstMatch(articleHtml);
+      final rawLang = langMatch != null
+          ? _cleanHtmlText(langMatch.group(1)!)
+          : '';
+      final lang = rawLang.isNotEmpty ? rawLang : 'Code';
+
+      final starsHref = RegExp.escape('/$fullName/stargazers');
+      final totalStarsMatch = RegExp(
+        '<a[^>]*href="$starsHref"[^>]*>([\\s\\S]*?)</a>',
+        caseSensitive: false,
+      ).firstMatch(articleHtml);
+      final totalStars = totalStarsMatch != null
+          ? _cleanHtmlText(totalStarsMatch.group(1)!)
+          : '';
+
+      final periodStarsMatch = periodStarsRegex.firstMatch(articleHtml);
+      final periodStars = periodStarsMatch != null
+          ? _cleanHtmlText(periodStarsMatch.group(1)!)
+          : '';
+
+      final String title;
+      if (periodStars.isNotEmpty && totalStars.isNotEmpty) {
+        title = '⭐ $fullName ($totalStars stars • $periodStars)';
+      } else if (periodStars.isNotEmpty) {
+        title = '⭐ $fullName ($periodStars)';
+      } else if (totalStars.isNotEmpty) {
+        title = '⭐ $fullName ($totalStars stars)';
+      } else {
+        title = '⭐ $fullName';
+      }
+
+      results.add(
+        TechNews(
+          id: fullName.hashCode,
+          title: title,
+          description: description,
+          url: 'https://github.com/$fullName',
+          coverImage: null,
+          authorName: owner,
+          authorAvatar: 'https://github.com/$owner.png?size=64',
+          publishedDate: 'Trending $lang',
+          readingTimeMinutes: 3,
+          tags: ['trending', period.queryParam, 'github', lang.toLowerCase()],
+        ),
+      );
+    }
+
+    return results;
+  }
+
+  String _cleanHtmlText(String input) {
+    return input
+        .replaceAll(RegExp(r'<svg[\s\S]*?</svg>', caseSensitive: false), ' ')
+        .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&apos;', "'")
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
   }
 
   Future<List<dynamic>?> _queryGithubTrendingWindow(int days) async {
@@ -327,7 +489,6 @@ class TechNewsService {
         ),
       ];
     } else {
-      // Default: AI
       return [
         const TechNews(
           id: 301,

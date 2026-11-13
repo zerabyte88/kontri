@@ -296,49 +296,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final rateLimit =
         _rateLimit ?? GitHubRateLimit.defaultLimit(hasToken: hasToken);
 
-    final themeOptions = [
-      {
-        'id': AppThemeMode.amoledSnowfall,
-        'title': loc.themeDark,
-        'icon': Icons.ac_unit_rounded,
-        'accent': const Color(0xFF38BDF8),
-        'badge': 'AMOLED',
-      },
-      {
-        'id': AppThemeMode.amoled,
-        'title': loc.themeAmoled,
-        'icon': Icons.nightlight_round,
-        'accent': const Color(0xFFA78BFA),
-        'badge': 'AMOLED',
-      },
-      {
-        'id': AppThemeMode.amoledJapanese,
-        'title': loc.themeAmoledJapanese,
-        'icon': Icons.local_florist_rounded,
-        'accent': const Color(0xFFF472B6),
-        'badge': 'AMOLED',
-      },
-      {
-        'id': AppThemeMode.amoledPure,
-        'title': loc.themeAmoledPure,
-        'icon': Icons.brightness_2_outlined,
-        'accent': const Color(0xFF60A5FA),
-        'badge': 'STATIC',
-      },
-      {
-        'id': AppThemeMode.light,
-        'title': loc.themeLight,
-        'icon': Icons.light_mode_outlined,
-        'accent': const Color(0xFF0284C7),
-        'badge': 'LIGHT',
-      },
-      {
-        'id': AppThemeMode.cleanLight,
-        'title': loc.themeCleanLight,
-        'icon': Icons.wb_sunny_outlined,
-        'accent': const Color(0xFF0EA5E9),
-        'badge': 'STATIC',
-      },
+    final staticThemes = [
+      _ThemeGridItem(
+        mode: AppThemeMode.system,
+        title: loc.themeSystem,
+        icon: Icons.brightness_auto_rounded,
+        accent: const Color(0xFF2563EB),
+        badge: 'Auto',
+      ),
+      _ThemeGridItem(
+        mode: AppThemeMode.cleanLight,
+        title: loc.themeCleanLight,
+        icon: Icons.light_mode_rounded,
+        accent: const Color(0xFF0EA5E9),
+        badge: 'Static',
+      ),
+      _ThemeGridItem(
+        mode: AppThemeMode.amoledPure,
+        title: loc.themeAmoledPure,
+        icon: Icons.dark_mode_rounded,
+        accent: const Color(0xFF60A5FA),
+        badge: 'Static',
+      ),
+    ];
+
+    final animatedThemes = [
+      _ThemeGridItem(
+        mode: AppThemeMode.amoledSnowfall,
+        title: loc.themeDark,
+        icon: Icons.ac_unit_rounded,
+        accent: const Color(0xFF38BDF8),
+        badge: 'Live',
+      ),
+      _ThemeGridItem(
+        mode: AppThemeMode.light,
+        title: loc.themeLight,
+        icon: Icons.wb_sunny_rounded,
+        accent: const Color(0xFFFBBF24),
+        badge: 'Live',
+      ),
+      _ThemeGridItem(
+        mode: AppThemeMode.amoled,
+        title: loc.themeAmoled,
+        icon: Icons.nights_stay_rounded,
+        accent: const Color(0xFFA78BFA),
+        badge: 'Live',
+      ),
+      _ThemeGridItem(
+        mode: AppThemeMode.amoledJapanese,
+        title: loc.themeAmoledJapanese,
+        icon: Icons.local_florist_rounded,
+        accent: const Color(0xFFF472B6),
+        badge: 'Live',
+      ),
     ];
 
     return Scaffold(
@@ -366,19 +376,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           children: [
-            // Appearance and visual effects
-            _buildAppearanceCard(context, loc, currentTheme, themeOptions),
+            _buildAppearanceCard(
+              context,
+              loc,
+              currentTheme,
+              staticThemes,
+              animatedThemes,
+            ),
             const SizedBox(height: 12),
-
-            // Interface language
             _buildLanguageCard(context, loc, currentLang),
             const SizedBox(height: 12),
-
-            // GitHub token and rate limit
             _buildTokenCard(context, loc, hasToken, rateLimit),
             const SizedBox(height: 12),
-
-            // About, developer, and updates
             _buildAboutCard(context, loc),
             const SizedBox(height: 28),
           ],
@@ -387,15 +396,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Appearance card
   Widget _buildAppearanceCard(
     BuildContext context,
     AppLocalizations loc,
     AppThemeMode currentTheme,
-    List<Map<String, dynamic>> themeOptions,
+    List<_ThemeGridItem> staticThemes,
+    List<_ThemeGridItem> animatedThemes,
   ) {
-    final theme = Theme.of(context);
-
     return _buildModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,127 +413,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: loc.themeSectionSubtitle,
           ),
           const SizedBox(height: 14),
-          GridView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              mainAxisExtent: 76,
-            ),
-            itemCount: themeOptions.length,
-            itemBuilder: (context, index) {
-              final item = themeOptions[index];
-              final mode = item['id'] as AppThemeMode;
-              final isSelected = currentTheme == mode;
-              final accent = item['accent'] as Color;
-              final badge = item['badge'] as String;
-
-              return Material(
-                color: isSelected
-                    ? accent.withAlpha(25)
-                    : theme.colorScheme.surfaceContainerHighest.withAlpha(35),
-                borderRadius: BorderRadius.circular(12),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: () {
-                    AppThemeService.changeTheme(mode, widget.storageService);
-                    widget.onSettingsChanged?.call();
-                    if (mounted) setState(() {});
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isSelected
-                            ? accent
-                            : theme.colorScheme.outline.withAlpha(30),
-                        width: isSelected ? 1.6 : 1.0,
-                      ),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 2),
-                            child: Icon(
-                              item['icon'] as IconData,
-                              size: 18,
-                              color: isSelected
-                                  ? accent
-                                  : theme.colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 22),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                item['title'] as String,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 12.5,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w600,
-                                  color: isSelected
-                                      ? accent
-                                      : theme.colorScheme.onSurface,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 7,
-                                  vertical: 1.5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: accent.withAlpha(20),
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(
-                                    color: accent.withAlpha(120),
-                                    width: 1.0,
-                                  ),
-                                ),
-                                child: Text(
-                                  badge,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: accent,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          _buildThemeRow(context, staticThemes, currentTheme, gap: 8),
+          const SizedBox(height: 8),
+          _buildThemeRow(context, animatedThemes, currentTheme, gap: 6),
           const SizedBox(height: 16),
           Divider(height: 1, color: AppTheme.border.withAlpha(40)),
           const SizedBox(height: 14),
-
-          // Surface Opacity Slider
           ValueListenableBuilder<double>(
             valueListenable: AppThemeService.surfaceOpacityNotifier,
             builder: (context, opacity, _) {
@@ -627,8 +519,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 6),
           Divider(height: 1, color: AppTheme.border.withAlpha(40)),
           const SizedBox(height: 12),
-
-          // Background Animation Switch
           ValueListenableBuilder<bool>(
             valueListenable: AppThemeService.bgAnimationEnabledNotifier,
             builder: (context, animEnabled, _) {
@@ -694,7 +584,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Interface language card
   Widget _buildLanguageCard(
     BuildContext context,
     AppLocalizations loc,
@@ -757,7 +646,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // GitHub token card
   Widget _buildTokenCard(
     BuildContext context,
     AppLocalizations loc,
@@ -791,8 +679,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 12),
-
-          // Slim Quota indicator
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -829,8 +715,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           const SizedBox(height: 14),
-
-          // Token Input Field
           TextField(
             controller: _tokenController,
             obscureText: _obscureToken,
@@ -896,7 +780,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // About & developer card
   Widget _buildAboutCard(BuildContext context, AppLocalizations loc) {
     final theme = Theme.of(context);
 
@@ -923,8 +806,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           const SizedBox(height: 12),
-
-          // Detail rows
           _buildDetailRow(theme, loc.appVersionLabel, AppConfig.appVersion),
           const SizedBox(height: 6),
           _buildDetailRow(theme, loc.buildNumberLabel, AppConfig.buildNumber),
@@ -937,8 +818,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
 
           const SizedBox(height: 12),
-
-          // Developer profile
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -1244,4 +1123,132 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     return rowContent;
   }
+
+  Widget _buildThemeRow(
+    BuildContext context,
+    List<_ThemeGridItem> items,
+    AppThemeMode currentTheme, {
+    required double gap,
+  }) {
+    return Row(
+      children: [
+        for (int i = 0; i < items.length; i++) ...[
+          if (i > 0) SizedBox(width: gap),
+          Expanded(
+            child: _buildThemeCard(
+              context,
+              items[i],
+              isSelected: currentTheme == items[i].mode,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildThemeCard(
+    BuildContext context,
+    _ThemeGridItem item, {
+    required bool isSelected,
+  }) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final accent = item.accent;
+
+    return Material(
+      color: isSelected
+          ? accent.withValues(alpha: isDark ? 0.16 : 0.10)
+          : cs.surfaceContainerHighest.withValues(alpha: isDark ? 0.35 : 0.45),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          AppThemeService.changeTheme(item.mode, widget.storageService);
+          widget.onSettingsChanged?.call();
+          if (mounted) setState(() {});
+        },
+        child: Container(
+          height: 78,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected
+                  ? accent
+                  : cs.outlineVariant.withValues(alpha: isDark ? 0.18 : 0.25),
+              width: isSelected ? 1.8 : 1.0,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                item.icon,
+                size: 20,
+                color: isSelected ? accent : cs.onSurface,
+              ),
+              const SizedBox(height: 4),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  item.title,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected ? accent : cs.onSurface,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 3),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 5,
+                  vertical: 1.5,
+                ),
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: isDark ? 0.18 : 0.10),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: accent.withValues(alpha: isDark ? 0.50 : 0.35),
+                    width: 0.9,
+                  ),
+                ),
+                child: Text(
+                  item.badge,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.w700,
+                    color: accent,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeGridItem {
+  const _ThemeGridItem({
+    required this.mode,
+    required this.title,
+    required this.icon,
+    required this.accent,
+    required this.badge,
+  });
+
+  final AppThemeMode mode;
+  final String title;
+  final IconData icon;
+  final Color accent;
+  final String badge;
 }

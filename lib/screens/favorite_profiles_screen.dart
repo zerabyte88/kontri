@@ -64,7 +64,7 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
             }
           }
         } catch (_) {
-          // Ignore network errors during silent background enrichment
+          // Ignore network errors during background enrichment
         }
       }
     }
@@ -218,7 +218,6 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Toolbar with Column count selector
             _buildToolbar(loc),
             Expanded(
               child: _bookmarks.isEmpty
@@ -249,7 +248,6 @@ class _FavoriteProfilesScreenState extends State<FavoriteProfilesScreen> {
             ),
           ),
           const Spacer(),
-          // 1 to 2 Modern Segmented Control Pill
           Container(
             padding: const EdgeInsets.all(2.5),
             decoration: BoxDecoration(

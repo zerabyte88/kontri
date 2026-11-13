@@ -6,7 +6,6 @@ import '../services/app_theme_service.dart';
 import '../theme/app_theme.dart';
 import 'animated_app_header.dart';
 
-/// Root-level persistent animated background widget.
 class AnimatedAppBackground extends StatefulWidget {
   final Widget child;
   const AnimatedAppBackground({super.key, required this.child});
@@ -20,7 +19,7 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
   late final AnimationController _controller;
 
   bool get _isCurrentThemeStatic {
-    final mode = AppThemeService.currentThemeNotifier.value;
+    final mode = AppThemeService.currentThemeNotifier.value.resolved;
     return mode == AppThemeMode.amoledPure || mode == AppThemeMode.cleanLight;
   }
 
@@ -73,9 +72,10 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
     return ValueListenableBuilder<AppThemeMode>(
       valueListenable: AppThemeService.currentThemeNotifier,
       builder: (context, currentTheme, _) {
+        final resolvedTheme = currentTheme.resolved;
         final isStatic =
-            currentTheme == AppThemeMode.amoledPure ||
-            currentTheme == AppThemeMode.cleanLight;
+            resolvedTheme == AppThemeMode.amoledPure ||
+            resolvedTheme == AppThemeMode.cleanLight;
         return Stack(
           children: [
             RepaintBoundary(
@@ -84,7 +84,7 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
                     ? CustomPaint(
                         painter: _FullAppBgPainter(
                           progress: 0.0,
-                          themeMode: currentTheme,
+                          themeMode: resolvedTheme,
                         ),
                         size: Size.infinite,
                       )
@@ -93,7 +93,7 @@ class _AnimatedAppBackgroundState extends State<AnimatedAppBackground>
                         builder: (ctx, _) => CustomPaint(
                           painter: _FullAppBgPainter(
                             progress: _controller.value,
-                            themeMode: currentTheme,
+                            themeMode: resolvedTheme,
                           ),
                           size: Size.infinite,
                         ),
@@ -124,11 +124,9 @@ class _FullAppBgPainter extends CustomPainter {
     ..strokeCap = StrokeCap.round;
   static final Paint _glow = Paint();
 
-  // Cached static background shaders
   static Size? _cachedMoonSize;
   static Shader? _cachedMoonShader;
 
-  // Dynamic particles for snowfall and daylight themes
   static final List<_BackgroundParticle> _particles = _initParticles();
 
   static List<_BackgroundParticle> _initParticles() {
@@ -149,7 +147,6 @@ class _FullAppBgPainter extends CustomPainter {
     });
   }
 
-  // 14 Sakura petals (AMOLED Sakura)
   static const List<_PC> _petals = [
     _PC(bx: 0.05, sp: 1, sw: 14.0, sz: 6.2, ph: 0.05),
     _PC(bx: 0.14, sp: 2, sw: 16.0, sz: 7.5, ph: 0.15),
@@ -167,7 +164,6 @@ class _FullAppBgPainter extends CustomPainter {
     _PC(bx: 0.18, sp: 2, sw: 20.0, sz: 8.2, ph: 0.92),
   ];
 
-  // Stars (AMOLED Night)
   static const List<_SC> _stars = [
     _SC(x: 0.04, y: 0.04, sz: 2.2, ph: 0.12, sp: true),
     _SC(x: 0.11, y: 0.18, sz: 1.4, ph: 0.65),
@@ -203,7 +199,6 @@ class _FullAppBgPainter extends CustomPainter {
     _SC(x: 0.97, y: 0.78, sz: 1.9, ph: 0.18, sp: true),
   ];
 
-  // 6 Meteors traversing full screen (AMOLED Night - Seamless Continuous Loops)
   static const List<_Meteor> _meteors = [
     _Meteor(
       startXRatio: 0.88,
@@ -260,7 +255,7 @@ class _FullAppBgPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0) return;
-    switch (themeMode) {
+    switch (themeMode.resolved) {
       case AppThemeMode.amoledJapanese:
         _drawSakura(canvas, size);
       case AppThemeMode.amoled:
@@ -269,7 +264,7 @@ class _FullAppBgPainter extends CustomPainter {
         _paintSnowfallVillage(canvas, size);
       case AppThemeMode.light:
         _paintLightDaylight(canvas, size);
-      case AppThemeMode.amoledPure:
+      case AppThemeMode.amoledPure || AppThemeMode.system:
         _fill.color = const Color(0xFF000000);
         canvas.drawRect(Offset.zero & size, _fill);
       case AppThemeMode.cleanLight:
@@ -278,9 +273,6 @@ class _FullAppBgPainter extends CustomPainter {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // 1. AMOLED SAKURA THEME (Zen Ethereal Moonlit Sakura)
-  // ---------------------------------------------------------------------------
   void _drawSakura(Canvas canvas, Size size) {
     _fill.color = const Color(0xFF000000);
     canvas.drawRect(Offset.zero & size, _fill);
@@ -288,18 +280,15 @@ class _FullAppBgPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Full moon element
     final moonCenter = Offset(w * 0.36, h * 0.21);
     const moonR = 21.0;
     final moonGlow = 0.85 + 0.15 * math.sin(progress * 2 * math.pi);
 
-    // Outer Rose-Gold Halo
     _glow.color = const Color(0xFFFF7AA5).withValues(alpha: 0.08 * moonGlow);
     canvas.drawCircle(moonCenter, moonR + 18.0, _glow);
     _glow.color = const Color(0xFFFFD4E8).withValues(alpha: 0.14 * moonGlow);
     canvas.drawCircle(moonCenter, moonR + 9.0, _glow);
 
-    // Moon Disc: Soft rose-pearl silver gradient so it does not clash with white text
     final moonBounds = Rect.fromCircle(center: moonCenter, radius: moonR);
     if (_cachedMoonSize != size || _cachedMoonShader == null) {
       _cachedMoonSize = size;
@@ -318,16 +307,13 @@ class _FullAppBgPainter extends CustomPainter {
     canvas.drawCircle(moonCenter, moonR, _fill);
     _fill.shader = null;
 
-    // Subtle Soft Lunar Craters / Shading
     _fill.color = const Color(0xFFE2B4C8).withValues(alpha: 0.32);
     canvas.drawCircle(moonCenter.translate(-5, -4), 5.0, _fill);
     canvas.drawCircle(moonCenter.translate(6, 3), 4.0, _fill);
     canvas.drawCircle(moonCenter.translate(1, 6), 2.8, _fill);
 
-    // 2. Artistic Sumi-e Sakura Bough (Hanging from top-right with micro-sway)
     _drawSumiESakuraBough(canvas, size);
 
-    // 3. 14 Drifting Sakura Petals
     for (final p in _petals) {
       final t = (progress * p.sp + p.ph) % 1.0;
       final x = (p.bx * w) + math.sin(t * 2 * math.pi + p.ph) * p.sw;
@@ -337,7 +323,6 @@ class _FullAppBgPainter extends CustomPainter {
       canvas.save();
       canvas.translate(x, y);
       canvas.rotate((t * 2 * math.pi) + p.ph);
-      // Oval petal with cleft hint
       canvas.drawOval(
         Rect.fromCenter(
           center: Offset.zero,
@@ -346,7 +331,6 @@ class _FullAppBgPainter extends CustomPainter {
         ),
         _fill,
       );
-      // Delicate inner highlight
       _fill.color = const Color(0xFFFFD4E8).withValues(alpha: opacity * 0.50);
       canvas.drawOval(
         Rect.fromCenter(
@@ -359,7 +343,6 @@ class _FullAppBgPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // 4. Stardust / Sparkle Puffs
     _drawSparkle(
       canvas,
       Offset(w * 0.14, h * 0.12),
@@ -397,7 +380,6 @@ class _FullAppBgPainter extends CustomPainter {
     final h = size.height;
     final sway = math.sin(progress * 2 * math.pi) * 2.5;
 
-    // Bough & branches
     _stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
@@ -492,7 +474,6 @@ class _FullAppBgPainter extends CustomPainter {
       _stroke,
     );
 
-    // Flowers
     void drawFlower(Offset center, double radius, double rot) {
       canvas.save();
       canvas.translate(center.dx, center.dy);
@@ -550,7 +531,6 @@ class _FullAppBgPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // Buds
     void drawBud(Offset center, double radius, double rot) {
       canvas.save();
       canvas.translate(center.dx, center.dy);
@@ -582,7 +562,6 @@ class _FullAppBgPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // Place Flowers at branch nodes and clusters
     drawFlower(Offset(w * 0.86, h * 0.09 + sway * 0.3), 13.0, 0.2);
     drawFlower(Offset(w * 0.78, h * 0.14 + sway * 0.6), 14.5, 0.8);
     drawFlower(Offset(w * 0.69, h * 0.19 + sway * 0.8), 15.0, 0.4);
@@ -592,7 +571,6 @@ class _FullAppBgPainter extends CustomPainter {
     drawFlower(Offset(w * 0.62, h * 0.32 + sway * 1.2), 12.5, 0.9);
     drawFlower(Offset(w * 0.94, h * 0.05 + sway * 0.2), 11.0, 0.1);
 
-    // Place Buds
     drawBud(Offset(w * 0.65, h * 0.04 + sway * 0.15), 7.0, -0.4);
     drawBud(Offset(w * 0.55, h * 0.35 + sway * 1.25), 6.5, 0.8);
     drawBud(Offset(w * 0.38, h * 0.32 + sway * 1.35), 6.0, 0.3);
@@ -600,14 +578,10 @@ class _FullAppBgPainter extends CustomPainter {
     drawBud(Offset(w * 0.83, h * 0.18 + sway * 0.7), 7.0, 1.1);
   }
 
-  // ---------------------------------------------------------------------------
-  // 2. AMOLED NIGHT THEME (Continuous Multi-Meteor Shower)
-  // ---------------------------------------------------------------------------
   void _drawAmoledNight(Canvas canvas, Size size) {
     _fill.color = const Color(0xFF000000);
     canvas.drawRect(Offset.zero & size, _fill);
 
-    // Stars
     for (final s in _stars) {
       final pos = Offset(s.x * size.width, s.y * size.height);
       final twinkle =
@@ -619,10 +593,8 @@ class _FullAppBgPainter extends CustomPainter {
       canvas.drawCircle(pos, s.sz * (0.7 + 0.3 * twinkle), _fill);
     }
 
-    // Glowing Crescent Moon
     _drawCrescent(canvas, Offset(size.width * 0.78, size.height * 0.12));
 
-    // 6 Full-Screen Meteors
     for (final m in _meteors) {
       _drawContinuousMeteor(canvas, size, m);
     }
@@ -693,13 +665,10 @@ class _FullAppBgPainter extends CustomPainter {
     canvas.drawCircle(Offset(headX, headY), m.headSize, _fill);
   }
 
-  // Snowfall theme rendering
   void _paintSnowfallVillage(Canvas canvas, Size size) {
-    // Pure AMOLED Black Canvas Fill
     _fill.color = const Color(0xFF000000);
     canvas.drawRect(Offset.zero & size, _fill);
 
-    // A. Distant Snow Hill (Background rolling slope)
     final backHillPath = Path();
     final backHillBaseY = size.height * 0.83;
     backHillPath.moveTo(0, backHillBaseY + 14);
@@ -728,14 +697,12 @@ class _FullAppBgPainter extends CustomPainter {
       ).createShader(Offset.zero & size);
     canvas.drawPath(backHillFill, backHillPaint);
 
-    // Snow cap on distant hill
     final backHillSnowPaint = Paint()
       ..strokeWidth = 2.0
       ..style = PaintingStyle.stroke
       ..color = const Color(0xFF94A3B8).withAlpha(55);
     canvas.drawPath(backHillPath, backHillSnowPaint);
 
-    // Distant pines
     _drawSnowyPine(
       canvas,
       Offset(size.width * 0.07, backHillBaseY + 10),
@@ -758,7 +725,6 @@ class _FullAppBgPainter extends CustomPainter {
       isDistant: true,
     );
 
-    // Distant cabins
     _drawSnowyCabin(
       canvas,
       Offset(size.width * 0.20, backHillBaseY + 6),
@@ -778,7 +744,6 @@ class _FullAppBgPainter extends CustomPainter {
       isDistant: true,
     );
 
-    // B. Foreground Village Hill (Main layer)
     final hillPath = Path();
     final hillBaseY = size.height * 0.88;
     hillPath.moveTo(0, hillBaseY - 10);
@@ -804,7 +769,6 @@ class _FullAppBgPainter extends CustomPainter {
       ).createShader(Offset.zero & size);
     canvas.drawPath(hillFill, hillPaint);
 
-    // Crisp Snow Ridge Crest along main hill
     final snowRidgePaint = Paint()
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke
@@ -817,13 +781,11 @@ class _FullAppBgPainter extends CustomPainter {
       ).createShader(Offset.zero & size);
     canvas.drawPath(hillPath, snowRidgePaint);
 
-    // Foreground pines
     _drawSnowyPine(canvas, Offset(size.width * 0.04, hillBaseY - 8), 22, 36);
     _drawSnowyPine(canvas, Offset(size.width * 0.34, hillBaseY + 14), 20, 32);
     _drawSnowyPine(canvas, Offset(size.width * 0.60, hillBaseY - 14), 22, 35);
     _drawSnowyPine(canvas, Offset(size.width * 0.95, hillBaseY - 2), 24, 38);
 
-    // Village cabins
     _drawSnowyCabin(
       canvas,
       Offset(size.width * 0.16, hillBaseY + 6),
@@ -865,7 +827,6 @@ class _FullAppBgPainter extends CustomPainter {
       hasChimney: true,
     );
 
-    // D. Falling Snowflakes in crystalline #CFF0FF
     const snowBaseColor = Color(0xFFCFF0FF);
     for (int i = 0; i < _particles.length; i++) {
       final p = _particles[i];
@@ -943,9 +904,9 @@ class _FullAppBgPainter extends CustomPainter {
             const Color(0xFF194432).withAlpha(210),
           ]
         : [
-            const Color(0xFF143628), // Deep base pine
-            const Color(0xFF1B4332), // Rich evergreen green
-            const Color(0xFF22543D), // Vibrant pine crown
+            const Color(0xFF143628),
+            const Color(0xFF1B4332),
+            const Color(0xFF22543D),
           ];
 
     for (int tier = 0; tier < 3; tier++) {
@@ -1000,7 +961,7 @@ class _FullAppBgPainter extends CustomPainter {
 
     final wallColor = isDistant
         ? const Color(0xFF1A2230).withAlpha(190)
-        : const Color(0xFF27211D); // Warm dark medieval wood
+        : const Color(0xFF27211D);
     canvas.drawRect(bodyRect, Paint()..color = wallColor);
 
     if (!isDistant && width >= 26) {
@@ -1145,13 +1106,10 @@ class _FullAppBgPainter extends CustomPainter {
     );
   }
 
-  // Light theme rendering
   void _paintLightDaylight(Canvas canvas, Size size) {
-    // Base Slate 50 Sky Canvas Fill
     _fill.color = const Color(0xFFF8FAFC);
     canvas.drawRect(Offset.zero & size, _fill);
 
-    // A. Warm Sunlight Flare in top right corner
     final sunCenter = Offset(size.width * 0.92, -10.0);
     final sunPulse = (math.sin(progress * 2 * math.pi) + 1) / 2;
     final sunRadius = size.width * 0.6;
@@ -1167,7 +1125,6 @@ class _FullAppBgPainter extends CustomPainter {
       ).createShader(Rect.fromCircle(center: sunCenter, radius: sunRadius));
     canvas.drawCircle(sunCenter, sunRadius, sunGlowPaint);
 
-    // B. Upward drifting sunlight motes & warm breeze particles
     for (int i = 0; i < _particles.length; i++) {
       final p = _particles[i];
       final currentProgress = (1.0 - (p.y + progress * p.cycles) % 1.0);
@@ -1184,12 +1141,12 @@ class _FullAppBgPainter extends CustomPainter {
           .clamp(0, 255);
 
       final color = p.variant == 0
-          ? const Color(0xFFF59E0B) // Amber sunlight
+          ? const Color(0xFFF59E0B)
           : (p.variant == 1
-                ? const Color(0xFF0284C7) // Sky azure
+                ? const Color(0xFF0284C7)
                 : (p.variant == 2
-                      ? const Color(0xFFFBBF24) // Gold solar mote
-                      : const Color(0xFF38BDF8))); // Light sky
+                      ? const Color(0xFFFBBF24)
+                      : const Color(0xFF38BDF8)));
 
       _fill.color = color.withAlpha(alpha);
       canvas.drawCircle(Offset(xPos, yPos), p.size * 1.3, _fill);
@@ -1214,15 +1171,13 @@ class _FullAppBgPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _FullAppBgPainter old) {
     if (old.themeMode != themeMode) return true;
-    // Quantize progress to ~60 FPS steps (720 steps over 12-second cycle).
-    // On 120Hz displays, skips 50% of redundant frames while maintaining silky smooth 60 FPS motion.
+    // Quantize to ~60 FPS (720 steps / 12s) to skip redundant frames on 120Hz displays.
     final oldStep = (old.progress * 720).floor();
     final newStep = (progress * 720).floor();
     return oldStep != newStep;
   }
 }
 
-// Background particle and star models
 class _PC {
   final double bx;
   final int sp;

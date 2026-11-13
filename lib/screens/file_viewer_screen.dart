@@ -101,7 +101,7 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
         });
       }
     } catch (_) {
-      // Graceful degradation: silent fallback
+      // Optional commit metadata; ignore fetch failures
     }
   }
 
@@ -417,7 +417,6 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
 
     return Column(
       children: [
-        // File telemetry bar
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
@@ -453,7 +452,6 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
           ),
         ),
 
-        // Code Viewer with line numbers
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
@@ -463,7 +461,6 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Line numbers column
                   Padding(
                     padding: const EdgeInsets.only(right: 12),
                     child: Column(
@@ -483,16 +480,12 @@ class _FileViewerScreenState extends State<FileViewerScreen> {
                       }),
                     ),
                   ),
-
-                  // Divider between line numbers and code
                   Container(
                     width: 1,
                     height: (totalLines * 20).toDouble(),
                     color: AppTheme.border.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 12),
-
-                  // Code lines column
                   SelectableText(
                     _content ?? '',
                     style: TextStyle(

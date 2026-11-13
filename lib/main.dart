@@ -53,7 +53,7 @@ SOFTWARE.''',
   runApp(KontriApp(storageService: storageService, apiService: apiService));
 }
 
-class KontriApp extends StatelessWidget {
+class KontriApp extends StatefulWidget {
   final StorageService storageService;
   final GitHubApiService apiService;
 
@@ -62,6 +62,30 @@ class KontriApp extends StatelessWidget {
     required this.storageService,
     required this.apiService,
   });
+
+  @override
+  State<KontriApp> createState() => _KontriAppState();
+}
+
+class _KontriAppState extends State<KontriApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    if (AppThemeService.currentTheme == AppThemeMode.system) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +113,8 @@ class KontriApp extends StatelessWidget {
                 return AnimatedAppBackground(child: child ?? const SizedBox());
               },
               home: HomeScreen(
-                storageService: storageService,
-                apiService: apiService,
+                storageService: widget.storageService,
+                apiService: widget.apiService,
               ),
             );
           },

@@ -81,11 +81,9 @@ class _RunningTextState extends State<RunningText> {
         continue;
       }
 
-      // Initial pause at start
       if (!await _delay(widget.pauseDuration)) break;
       if (!mounted || _disposed || !_scrollController!.hasClients) break;
 
-      // Animate smoothly to end
       final duration = Duration(
         milliseconds: (maxScroll * 35).clamp(1000, 7000).toInt(),
       );
@@ -100,11 +98,9 @@ class _RunningTextState extends State<RunningText> {
         break;
       }
 
-      // Pause at end
       if (!await _delay(widget.pauseDuration)) break;
       if (!mounted || _disposed || !_scrollController!.hasClients) break;
 
-      // Animate back to start
       try {
         await _scrollController!.animateTo(
           0.0,
@@ -138,13 +134,10 @@ class _RunningTextState extends State<RunningText> {
         final textWidth = painter.width;
         final availableWidth = constraints.maxWidth;
 
-        // If text comfortably fits within available space, render standard Text
         if (!availableWidth.isFinite || textWidth <= availableWidth) {
           return Text(widget.text, style: effectiveStyle, maxLines: 1);
         }
 
-        // When text overflows:
-        // Manual mode: user can freely scroll horizontally with touch
         if (!widget.autoScroll) {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -153,7 +146,6 @@ class _RunningTextState extends State<RunningText> {
           );
         }
 
-        // Auto ping-pong scroll mode
         _scrollController ??= ScrollController();
         if (!_isLoopRunning) {
           WidgetsBinding.instance.addPostFrameCallback(

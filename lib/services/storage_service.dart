@@ -22,7 +22,6 @@ class StorageService {
     return StorageService(prefs);
   }
 
-  // Bookmarks
   List<String> getBookmarks() {
     return _prefs.getStringList(_keyBookmarks) ?? [];
   }
@@ -174,7 +173,6 @@ class StorageService {
     await _prefs.setInt(_keyFavoriteGridColumns, clamped);
   }
 
-  // Recent History
   List<String> getRecentSearches() {
     return _prefs.getStringList(_keyHistory) ?? [];
   }
@@ -187,7 +185,6 @@ class StorageService {
     list.removeWhere((item) => item.toLowerCase() == clean.toLowerCase());
     list.insert(0, clean);
 
-    // Keep max 10
     if (list.length > 10) {
       list.removeRange(10, list.length);
     }
@@ -205,7 +202,6 @@ class StorageService {
     await _prefs.remove(_keyHistory);
   }
 
-  // Token
   String? getToken() {
     return _prefs.getString(_keyToken);
   }
@@ -218,7 +214,6 @@ class StorageService {
     }
   }
 
-  // Language
   static const String _keyLanguage = 'kontri_app_language';
 
   String getLanguageCode() {
@@ -229,7 +224,6 @@ class StorageService {
     await _prefs.setString(_keyLanguage, code);
   }
 
-  // Theme Settings
   static const String _keyThemeMode = 'kontri_theme_mode';
   static const String _keyJapaneseEasterEgg = 'kontri_japanese_theme_unlocked';
 
@@ -249,7 +243,6 @@ class StorageService {
     await _prefs.setBool(_keyJapaneseEasterEgg, unlocked);
   }
 
-  // Surface Opacity & Glassmorphism Setting
   static const String _keySurfaceOpacity = 'kontri_surface_opacity';
 
   double getSurfaceOpacity() {
@@ -260,7 +253,6 @@ class StorageService {
     await _prefs.setDouble(_keySurfaceOpacity, opacity.clamp(0.50, 1.00));
   }
 
-  // Background Animation Performance Setting
   static const String _keyBgAnimationEnabled = 'kontri_bg_animation_enabled';
 
   bool isBackgroundAnimationEnabled() {
@@ -271,7 +263,6 @@ class StorageService {
     await _prefs.setBool(_keyBgAnimationEnabled, enabled);
   }
 
-  // Cached Tech News & Trending Repos
   static const String _keyCachedNewsPrefix = 'kontri_cached_news_';
   static const String _keyCachedNewsTimePrefix = 'kontri_cached_news_time_';
 
@@ -303,7 +294,6 @@ class StorageService {
     return DateTime.fromMillisecondsSinceEpoch(epoch);
   }
 
-  // HTTP & ETag Response Cache
   static const String _keyHttpCachePrefix = 'kontri_http_cache_';
   static const String _keyHttpEtagPrefix = 'kontri_http_etag_';
   static const String _keyHttpTimePrefix = 'kontri_http_time_';
@@ -372,7 +362,6 @@ class StorageService {
     await _prefs.remove('$_keyHttpTimePrefix$cleanKey');
   }
 
-  // Peak Contribution Tier Persistence
   static const String _keyPeakTierPrefix = 'kontri_peak_tier_';
 
   int getPeakTier(String username) {

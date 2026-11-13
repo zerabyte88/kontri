@@ -641,7 +641,6 @@ GitHub: https://github.com/${u.login}
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // User Header Card
                     GlassCard(
                       enableBlur: false,
                       padding: const EdgeInsets.all(16),
@@ -698,7 +697,6 @@ GitHub: https://github.com/${u.login}
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    // Line 1: Name
                                     Text(
                                       (user.name != null &&
                                               user.name!.trim().isNotEmpty)
@@ -714,7 +712,6 @@ GitHub: https://github.com/${u.login}
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     const SizedBox(height: 3),
-                                    // Line 2: Subtitle Row (Username, Location, Company)
                                     Wrap(
                                       crossAxisAlignment:
                                           WrapCrossAlignment.center,
@@ -831,7 +828,6 @@ GitHub: https://github.com/${u.login}
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    // Line 3: Badges Row (Current Tier + Peak Tier)
                                     Wrap(
                                       spacing: 8,
                                       runSpacing: 6,
@@ -915,8 +911,6 @@ GitHub: https://github.com/${u.login}
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Section: GitHub Contributions & Streak Statistics
                     Row(
                       children: [
                         Icon(
@@ -999,8 +993,6 @@ GitHub: https://github.com/${u.login}
                     const SizedBox(height: 12),
                     _buildTierProgressCard(cStats, loc),
                     const SizedBox(height: 24),
-
-                    // Key Metrics Grid
                     Row(
                       children: [
                         Icon(
@@ -1076,16 +1068,10 @@ GitHub: https://github.com/${u.login}
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Language Chart
                     LanguageChart(languageCounts: widget.stats.languageCounts),
                     const SizedBox(height: 16),
-
-                    // Activity Chart
                     ActivityChart(hourlyActivity: widget.stats.hourlyActivity),
                     const SizedBox(height: 24),
-
-                    // Repositories Section Header
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

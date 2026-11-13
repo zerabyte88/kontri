@@ -13,7 +13,6 @@ class CommitTitleInfo {
     required this.tier,
   });
 
-  /// Nama title bersih tanpa ikon atau emoji
   String get cleanTitle {
     return title.replaceAll(RegExp(r'^[^\w\s]+\s*'), '').trim();
   }
@@ -151,7 +150,6 @@ class ContributionStats {
     );
   }
 
-  /// Calculates progress towards next tier using dual conditions.
   static ({
     double progress,
     String? laggingMetric,
@@ -234,8 +232,6 @@ class ContributionStats {
     );
   }
 
-  /// Evaluates commit titles based on a rolling 365-day window:
-  /// Both contributions and active days criteria must be met.
   static CommitTitleInfo determineTitle({
     int currentStreak = 0,
     int longestStreak = 0,
@@ -274,8 +270,6 @@ class ContributionStats {
     }
   }
 
-  /// Computes current and longest consecutive daily contribution streaks.
-  /// Handles multi-year arrays, leap years, timezone offsets, and non-chronological lists.
   static ({int current, int longest}) calculateStreaks(
     Map<DateTime, int> dayCounts,
   ) {
@@ -321,7 +315,7 @@ class ContributionStats {
     if (lastActiveDate != null) {
       final diffLocal = todayLocal.difference(lastActiveDate).inDays;
 
-      // Active streak: last commit is today (0), yesterday (1), or within 1 day timezone skew (-1)
+      // Allow -1..1 day diff for timezone skew.
       if (diffLocal >= -1 && diffLocal <= 1) {
         DateTime cur = lastActiveDate;
         while (true) {
@@ -358,7 +352,6 @@ class ContributionStats {
     final lastYear = yearly[lastYearKey] ?? 0;
     final total = yearly.values.fold(0, (sum, count) => sum + count);
 
-    // Parse daily contributions array
     final Map<DateTime, int> dayCounts = {};
     if (json['contributions'] is List) {
       final list = json['contributions'] as List;
@@ -455,8 +448,7 @@ class ContributionStats {
     );
   }
 
-  /// Resilient fallback if third-party contributions API is unreachable:
-  /// Uses public events (PushEvents) to estimate streaks and commits.
+  /// Fallback using public PushEvents when the contributions API is unreachable.
   factory ContributionStats.fromEvents(List<Map<String, dynamic>> events) {
     final now = DateTime.now();
     final currentYear = now.year;

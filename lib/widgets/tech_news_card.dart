@@ -126,7 +126,6 @@ class TechNewsCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Tags row
                       if (news.tags.isNotEmpty)
                         Wrap(
                           spacing: 6,
@@ -157,8 +156,6 @@ class TechNewsCard extends StatelessWidget {
                           }).toList(),
                         ),
                       const SizedBox(height: 8),
-
-                      // Title
                       Text(
                         news.title,
                         maxLines: 2,
@@ -171,8 +168,6 @@ class TechNewsCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 6),
-
-                      // Description
                       if (news.description.isNotEmpty)
                         Text(
                           news.description,
@@ -185,8 +180,6 @@ class TechNewsCard extends StatelessWidget {
                           ),
                         ),
                       const SizedBox(height: 12),
-
-                      // Meta footer
                       Row(
                         children: [
                           if (news.authorAvatar != null &&
@@ -333,7 +326,6 @@ class TechNewsCard extends StatelessWidget {
   }
 }
 
-/// Skeleton shimmer placeholder card for news while loading or transitioning.
 class TechNewsShimmerCard extends StatefulWidget {
   const TechNewsShimmerCard({super.key});
 
@@ -380,7 +372,6 @@ class _TechNewsShimmerCardState extends State<TechNewsShimmerCard>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Tag placeholders
               Row(
                 children: [
                   Container(
@@ -403,7 +394,6 @@ class _TechNewsShimmerCardState extends State<TechNewsShimmerCard>
                 ],
               ),
               const SizedBox(height: 12),
-              // Title lines
               Container(
                 width: double.infinity,
                 height: 15,
@@ -422,7 +412,6 @@ class _TechNewsShimmerCardState extends State<TechNewsShimmerCard>
                 ),
               ),
               const SizedBox(height: 12),
-              // Description line
               Container(
                 width: double.infinity,
                 height: 11,
@@ -432,7 +421,6 @@ class _TechNewsShimmerCardState extends State<TechNewsShimmerCard>
                 ),
               ),
               const SizedBox(height: 14),
-              // Meta row
               Row(
                 children: [
                   Container(

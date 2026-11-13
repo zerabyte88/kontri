@@ -11,14 +11,14 @@ class LanguageChart extends StatelessWidget {
   const LanguageChart({super.key, required this.languageCounts});
 
   static const List<Color> _palette = [
-    Color(0xFF3178C6), // TypeScript / Dart Blue
-    Color(0xFFF1E05A), // JavaScript Amber / Gold
-    Color(0xFF3572A5), // Python Blue
-    Color(0xFF3FB950), // Emerald Green
-    Color(0xFFE34C26), // HTML Orange / Coral
-    Color(0xFFBC8CFF), // Purple
-    Color(0xFF00ADD8), // Go Cyan
-    Color(0xFF8B949E), // Muted Slate
+    Color(0xFF3178C6),
+    Color(0xFFF1E05A),
+    Color(0xFF3572A5),
+    Color(0xFF3FB950),
+    Color(0xFFE34C26),
+    Color(0xFFBC8CFF),
+    Color(0xFF00ADD8),
+    Color(0xFF8B949E),
   ];
 
   @override
@@ -38,11 +38,9 @@ class LanguageChart extends StatelessWidget {
       );
     }
 
-    // Sort by count/bytes descending
     final sortedEntries = languageCounts.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    // Limit to top 5 + "Lainnya"
     final topEntries = sortedEntries.take(5).toList();
     final otherBytes = sortedEntries
         .skip(5)

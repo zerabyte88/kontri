@@ -32,12 +32,12 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     super.initState();
     final tier = widget.titleInfo.tier;
     final durationMs = switch (tier) {
-      1 => 1600, // fast energetic burning dragonflame
-      2 => 1800, // fast energetic electric crackle
-      3 => 2400, // digital matrix rhythm
-      4 => 2600, // golden sunlight sweep
-      5 => 3200, // calm cosmic drift
-      _ => 3000, // gentle organic breath
+      1 => 1600,
+      2 => 1800,
+      3 => 2400,
+      4 => 2600,
+      5 => 3200,
+      _ => 3000,
     };
     _controller = AnimationController(
       vsync: this,
@@ -82,9 +82,7 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     );
   }
 
-  /// Tier 1 (Mythic Archmage): Arcane Dragonflame with floating magical rune embers
   Widget _buildTier1ArcaneDragonEffect(String title, double t) {
-    // Multi-harmonic burning flame physics (vertical ascending lick & micro-flicker)
     final auraPulse = (math.sin(t * 2 * math.pi) + 1) / 2;
     final microFlutter =
         math.sin(t * 8 * math.pi) * 0.07 + math.sin(t * 16 * math.pi) * 0.03;
@@ -95,11 +93,9 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     );
     final auraIntensity = flameIntensity;
 
-    // Dynamic heat haze shadow flicker
     final shadowAlpha = (0.70 + 0.30 * flameIntensity).clamp(0.0, 1.0);
     final shadowBlur = 4.5 + 5.5 * flameIntensity;
 
-    // Vertical ascending flame: strictly zero horizontal tilt/sway
     final textWidget = ShaderMask(
       blendMode: BlendMode.srcIn,
       shaderCallback: (bounds) {
@@ -107,11 +103,11 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           begin: Alignment(0.0, 1.15 + microFlutter * 0.4),
           end: Alignment(0.0, -0.95 - flameSurge * 0.55 + microFlutter),
           colors: const [
-            Color(0xFFE11D48), // Deep ruby dragon ember (anchored base)
-            Color(0xFF9333EA), // Arcane royal violet
-            Color(0xFFF97316), // Dragon flame orange (rising flame)
-            Color(0xFFFBBF24), // Celestial solar gold
-            Color(0xFFFFFBEB), // White-hot arcane starfire (tongue tip)
+            Color(0xFFE11D48),
+            Color(0xFF9333EA),
+            Color(0xFFF97316),
+            Color(0xFFFBBF24),
+            Color(0xFFFFFBEB),
           ],
           stops: const [0.0, 0.25, 0.55, 0.82, 1.0],
         ).createShader(bounds);
@@ -142,7 +138,6 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
       ),
     );
 
-    // Overlay orbital drifting arcane rune spark particles
     final enchantedWidget = CustomPaint(
       painter: _ArcaneRuneEmbersPainter(progress: t),
       child: textWidget,
@@ -206,9 +201,7 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     );
   }
 
-  /// Tier 2 (Diamond Vanguard): Glacial Thunderstorm Crystal & Lightning Arc
   Widget _buildTier2GlacialThunderEffect(String title, double t) {
-    // High-frequency crystal spark & electric micro-jitter
     final crackle =
         math.sin(t * 8 * math.pi) * 0.18 + math.sin(t * 16 * math.pi) * 0.09;
     final pulse = (math.sin(t * 2 * math.pi) + 1) / 2;
@@ -221,12 +214,12 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           begin: Alignment(sweep - 1.2, -0.4),
           end: Alignment(sweep + 1.2, 0.4),
           colors: const [
-            Color(0xFF0284C7), // Deep glacial cyan base
             Color(0xFF0284C7),
-            Color(0xFF00E5FF), // Diamond crystal cyan
-            Color(0xFFF0FDF4), // Glacial frost white core
-            Color(0xFF818CF8), // Electric arc violet
-            Color(0xFF00E5FF), // Diamond crystal cyan
+            Color(0xFF0284C7),
+            Color(0xFF00E5FF),
+            Color(0xFFF0FDF4),
+            Color(0xFF818CF8),
+            Color(0xFF00E5FF),
             Color(0xFF0284C7),
             Color(0xFF0284C7),
           ],
@@ -307,7 +300,6 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     );
   }
 
-  /// Tier 3 (Platinum Artisan): Sacred Emerald Blade Sweep
   Widget _buildTier3SacredBladeEffect(String title, double t) {
     final pulse = (math.sin(t * 2 * math.pi) + 1) / 2;
     final sweep = -2.8 + 5.6 * t;
@@ -319,12 +311,12 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           begin: Alignment(sweep - 1.2, -0.2),
           end: Alignment(sweep + 1.2, 0.2),
           colors: const [
-            Color(0xFF047857), // Forged deep emerald
             Color(0xFF047857),
-            Color(0xFF10B981), // Living jade
-            Color(0xFF00FF87), // Radiant sacred emerald
-            Color(0xFFF8FAFC), // Pure blade glint highlight
-            Color(0xFF6EE7B7), // Mint platinum sheen
+            Color(0xFF047857),
+            Color(0xFF10B981),
+            Color(0xFF00FF87),
+            Color(0xFFF8FAFC),
+            Color(0xFF6EE7B7),
             Color(0xFF047857),
             Color(0xFF047857),
           ],
@@ -388,7 +380,6 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     );
   }
 
-  /// Tier 4 (Gold Adventurer): Sunburst Guild Crest Radiance
   Widget _buildTier4SunburstGuildEffect(String title, double t) {
     final pulse = (math.sin(t * 2 * math.pi) + 1) / 2;
     final sweep = -2.6 + 5.2 * t;
@@ -400,11 +391,11 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           begin: Alignment(sweep - 1.2, -0.3),
           end: Alignment(sweep + 1.2, 0.3),
           colors: const [
-            Color(0xFFB45309), // Warm antique bronze-gold
             Color(0xFFB45309),
-            Color(0xFFF59E0B), // Radiant amber gold
-            Color(0xFFFFFBEB), // Sunfire crest glint
-            Color(0xFFFCD34D), // Gilded gold
+            Color(0xFFB45309),
+            Color(0xFFF59E0B),
+            Color(0xFFFFFBEB),
+            Color(0xFFFCD34D),
             Color(0xFFB45309),
             Color(0xFFB45309),
           ],
@@ -468,7 +459,6 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     );
   }
 
-  /// Tier 5 (Silver Explorer): Moonlit Silver Mist
   Widget _buildTier5MoonlitMistEffect(String title, double t) {
     final pulse = (math.sin(t * 2 * math.pi) + 1) / 2;
     final sweep = -2.6 + 5.2 * t;
@@ -480,11 +470,11 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
           begin: Alignment(sweep - 1.2, 0.0),
           end: Alignment(sweep + 1.2, 0.0),
           colors: const [
-            Color(0xFF64748B), // Slate silver base
             Color(0xFF64748B),
-            Color(0xFFCBD5E1), // Cool moonlit silver
-            Color(0xFFF8FAFC), // Pure starlight highlight
-            Color(0xFFDDD6FE), // Soft twilight stardust
+            Color(0xFF64748B),
+            Color(0xFFCBD5E1),
+            Color(0xFFF8FAFC),
+            Color(0xFFDDD6FE),
             Color(0xFF64748B),
             Color(0xFF64748B),
           ],
@@ -548,9 +538,7 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
     );
   }
 
-  /// Tier 6 (Bronze Novice): Living Verdant Dewdrop Pulse
   Widget _buildTier6VerdantDewEffect(String title, double t) {
-    // Gentle natural breath rhythm
     final breath = (math.sin(t * 2 * math.pi) + 1) / 2;
 
     final textWidget = Text(
@@ -616,7 +604,6 @@ class _AnimatedTierTitleState extends State<AnimatedTierTitle>
   }
 }
 
-/// Lightweight hardware-accelerated canvas painter rendering floating arcane rune sparks
 class _ArcaneRuneEmbersPainter extends CustomPainter {
   final double progress;
 
@@ -631,49 +618,49 @@ class _ArcaneRuneEmbersPainter extends CustomPainter {
       size: 1.6,
       phase: 0.00,
       color: Color(0xFFE11D48),
-    ), // Ruby
+    ),
     _RuneSparkSpec(
       xRatio: 0.22,
       size: 1.3,
       phase: 0.25,
       color: Color(0xFF9333EA),
-    ), // Violet
+    ),
     _RuneSparkSpec(
       xRatio: 0.38,
       size: 1.9,
       phase: 0.50,
       color: Color(0xFFF59E0B),
-    ), // Gold
+    ),
     _RuneSparkSpec(
       xRatio: 0.52,
       size: 1.4,
       phase: 0.75,
       color: Color(0xFFC026D3),
-    ), // Magenta
+    ),
     _RuneSparkSpec(
       xRatio: 0.68,
       size: 1.7,
       phase: 0.12,
       color: Color(0xFFF97316),
-    ), // Dragon flame
+    ),
     _RuneSparkSpec(
       xRatio: 0.82,
       size: 1.4,
       phase: 0.38,
       color: Color(0xFFFBBF24),
-    ), // Gold
+    ),
     _RuneSparkSpec(
       xRatio: 0.94,
       size: 1.8,
       phase: 0.62,
       color: Color(0xFF9333EA),
-    ), // Violet
+    ),
     _RuneSparkSpec(
       xRatio: 0.44,
       size: 1.2,
       phase: 0.88,
       color: Color(0xFFE11D48),
-    ), // Ruby
+    ),
   ];
 
   @override

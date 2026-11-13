@@ -4,7 +4,7 @@ class GitHubCommitFile {
   final int additions;
   final int deletions;
   final int changes;
-  final String? patch; // unified diff patch
+  final String? patch;
 
   const GitHubCommitFile({
     required this.filename,

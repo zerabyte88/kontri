@@ -69,7 +69,6 @@ class GitHubRepo {
     );
   }
 
-  /// Extracts repository owner from htmlUrl (e.g., https://github.com/zerabyte88/kontri -> zerabyte88)
   String? get owner {
     try {
       final uri = Uri.tryParse(htmlUrl);
@@ -80,7 +79,6 @@ class GitHubRepo {
     return null;
   }
 
-  /// Formatted repository size string (e.g. 512 KB, 14.2 MB)
   String get formattedSize {
     if (size < 1024) {
       return '$size KB';
@@ -89,10 +87,8 @@ class GitHubRepo {
     }
   }
 
-  /// The timestamp of the latest commit pushed or repo update
   DateTime? get latestActivityDate => pushedAt ?? updatedAt ?? createdAt;
 
-  /// Returns user-friendly Indonesian relative time (e.g., '2 jam lalu', '3 hari lalu')
   String get relativeTimeAgo {
     final date = latestActivityDate;
     if (date == null) return 'Tidak ada aktivitas';
@@ -115,7 +111,6 @@ class GitHubRepo {
     }
   }
 
-  /// Whether there was commit activity within the past 14 days
   bool get isRecentlyActive {
     final date = latestActivityDate;
     if (date == null) return false;
