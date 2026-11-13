@@ -115,17 +115,6 @@ class _FullAppBgPainter extends CustomPainter {
   _FullAppBgPainter({required this.progress, required this.themeMode});
 
   static final Paint _fill = Paint()..style = PaintingStyle.fill;
-  static final Paint _stroke = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeCap = StrokeCap.round
-    ..strokeJoin = StrokeJoin.round;
-  static final Paint _sparkle = Paint()
-    ..strokeWidth = 1.0
-    ..strokeCap = StrokeCap.round;
-  static final Paint _glow = Paint();
-
-  static Size? _cachedMoonSize;
-  static Shader? _cachedMoonShader;
 
   static final List<_BackgroundParticle> _particles = _initParticles();
 
@@ -147,119 +136,18 @@ class _FullAppBgPainter extends CustomPainter {
     });
   }
 
-  static const List<_PC> _petals = [
-    _PC(bx: 0.05, sp: 1, sw: 14.0, sz: 6.2, ph: 0.05),
-    _PC(bx: 0.14, sp: 2, sw: 16.0, sz: 7.5, ph: 0.15),
-    _PC(bx: 0.22, sp: 1, sw: 13.0, sz: 6.5, ph: 0.28),
-    _PC(bx: 0.31, sp: 2, sw: 18.0, sz: 7.8, ph: 0.42),
-    _PC(bx: 0.39, sp: 1, sw: 12.0, sz: 5.8, ph: 0.57),
-    _PC(bx: 0.47, sp: 2, sw: 17.0, sz: 7.6, ph: 0.70),
-    _PC(bx: 0.55, sp: 1, sw: 15.0, sz: 6.8, ph: 0.82),
-    _PC(bx: 0.63, sp: 2, sw: 19.0, sz: 8.0, ph: 0.10),
-    _PC(bx: 0.70, sp: 1, sw: 13.0, sz: 6.2, ph: 0.25),
-    _PC(bx: 0.78, sp: 2, sw: 16.0, sz: 7.4, ph: 0.38),
-    _PC(bx: 0.85, sp: 1, sw: 14.0, sz: 5.6, ph: 0.52),
-    _PC(bx: 0.91, sp: 2, sw: 17.0, sz: 7.0, ph: 0.66),
-    _PC(bx: 0.96, sp: 1, sw: 12.0, sz: 6.0, ph: 0.80),
-    _PC(bx: 0.18, sp: 2, sw: 20.0, sz: 8.2, ph: 0.92),
-  ];
-
-  static const List<_SC> _stars = [
-    _SC(x: 0.04, y: 0.04, sz: 2.2, ph: 0.12, sp: true),
-    _SC(x: 0.11, y: 0.18, sz: 1.4, ph: 0.65),
-    _SC(x: 0.19, y: 0.08, sz: 2.4, ph: 0.38, sp: true),
-    _SC(x: 0.25, y: 0.30, sz: 1.2, ph: 0.85),
-    _SC(x: 0.33, y: 0.14, sz: 1.5, ph: 0.28),
-    _SC(x: 0.38, y: 0.42, sz: 2.0, ph: 0.90),
-    _SC(x: 0.46, y: 0.22, sz: 1.3, ph: 0.55),
-    _SC(x: 0.52, y: 0.06, sz: 2.4, ph: 0.42, sp: true),
-    _SC(x: 0.60, y: 0.32, sz: 1.6, ph: 0.18),
-    _SC(x: 0.68, y: 0.10, sz: 1.4, ph: 0.88),
-    _SC(x: 0.75, y: 0.50, sz: 2.3, ph: 0.08, sp: true),
-    _SC(x: 0.82, y: 0.24, sz: 1.5, ph: 0.52),
-    _SC(x: 0.89, y: 0.15, sz: 1.3, ph: 0.35),
-    _SC(x: 0.95, y: 0.38, sz: 1.8, ph: 0.75),
-    _SC(x: 0.08, y: 0.60, sz: 1.0, ph: 0.25, cl: Color(0xFF80DEEA)),
-    _SC(x: 0.20, y: 0.72, sz: 0.9, ph: 0.70, cl: Color(0xFFE0F7FA)),
-    _SC(x: 0.31, y: 0.55, sz: 2.1, ph: 0.40, sp: true),
-    _SC(x: 0.44, y: 0.68, sz: 1.0, ph: 0.85, cl: Color(0xFF80DEEA)),
-    _SC(x: 0.56, y: 0.80, sz: 1.2, ph: 0.60),
-    _SC(x: 0.63, y: 0.65, sz: 0.9, ph: 0.22, cl: Color(0xFFE0F7FA)),
-    _SC(x: 0.70, y: 0.78, sz: 2.0, ph: 0.48, sp: true),
-    _SC(x: 0.78, y: 0.58, sz: 1.1, ph: 0.30),
-    _SC(x: 0.85, y: 0.72, sz: 1.4, ph: 0.78),
-    _SC(x: 0.93, y: 0.88, sz: 1.6, ph: 0.15),
-    _SC(x: 0.14, y: 0.88, sz: 1.2, ph: 0.50),
-    _SC(x: 0.28, y: 0.94, sz: 0.9, ph: 0.62, cl: Color(0xFF80DEEA)),
-    _SC(x: 0.41, y: 0.90, sz: 1.5, ph: 0.33),
-    _SC(x: 0.55, y: 0.96, sz: 1.0, ph: 0.88),
-    _SC(x: 0.66, y: 0.92, sz: 2.2, ph: 0.05, sp: true),
-    _SC(x: 0.79, y: 0.85, sz: 1.3, ph: 0.44),
-    _SC(x: 0.88, y: 0.95, sz: 1.1, ph: 0.70),
-    _SC(x: 0.97, y: 0.78, sz: 1.9, ph: 0.18, sp: true),
-  ];
-
-  static const List<_Meteor> _meteors = [
-    _Meteor(
-      startXRatio: 0.88,
-      startYRatio: -0.06,
-      speed: 1.0,
-      phase: 0.02,
-      length: 190,
-      headSize: 2.6,
-    ),
-    _Meteor(
-      startXRatio: 1.18,
-      startYRatio: 0.08,
-      speed: 1.0,
-      phase: 0.18,
-      length: 160,
-      headSize: 2.1,
-      color: Color(0xFF80DEEA),
-    ),
-    _Meteor(
-      startXRatio: 0.62,
-      startYRatio: -0.08,
-      speed: 1.0,
-      phase: 0.36,
-      length: 210,
-      headSize: 2.8,
-    ),
-    _Meteor(
-      startXRatio: 1.02,
-      startYRatio: 0.14,
-      speed: 1.0,
-      phase: 0.54,
-      length: 175,
-      headSize: 2.3,
-    ),
-    _Meteor(
-      startXRatio: 0.48,
-      startYRatio: -0.05,
-      speed: 1.0,
-      phase: 0.72,
-      length: 180,
-      headSize: 2.5,
-      color: Color(0xFFE0F7FA),
-    ),
-    _Meteor(
-      startXRatio: 1.26,
-      startYRatio: 0.20,
-      speed: 1.0,
-      phase: 0.88,
-      length: 195,
-      headSize: 2.7,
-    ),
-  ];
-
   @override
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0) return;
     switch (themeMode.resolved) {
       case AppThemeMode.amoledJapanese:
-        _drawSakura(canvas, size);
+        _fill.color = const Color(0xFF000000);
+        canvas.drawRect(Offset.zero & size, _fill);
+        _paintSakuraWithBranches(canvas, size);
       case AppThemeMode.amoled:
-        _drawAmoledNight(canvas, size);
+        _fill.color = const Color(0xFF000000);
+        canvas.drawRect(Offset.zero & size, _fill);
+        _paintMoonMeteors(canvas, size);
       case AppThemeMode.amoledSnowfall:
         _paintSnowfallVillage(canvas, size);
       case AppThemeMode.light:
@@ -273,396 +161,354 @@ class _FullAppBgPainter extends CustomPainter {
     }
   }
 
-  void _drawSakura(Canvas canvas, Size size) {
-    _fill.color = const Color(0xFF000000);
-    canvas.drawRect(Offset.zero & size, _fill);
+  void _paintMoonMeteors(Canvas canvas, Size size) {
+    final moonCenter = Offset(size.width * 0.83, 72.0);
+    final moonPulse = (math.sin(progress * 2 * math.pi) + 1) / 2;
 
-    final w = size.width;
-    final h = size.height;
-
-    final moonCenter = Offset(w * 0.36, h * 0.21);
-    const moonR = 21.0;
-    final moonGlow = 0.85 + 0.15 * math.sin(progress * 2 * math.pi);
-
-    _glow.color = const Color(0xFFFF7AA5).withValues(alpha: 0.08 * moonGlow);
-    canvas.drawCircle(moonCenter, moonR + 18.0, _glow);
-    _glow.color = const Color(0xFFFFD4E8).withValues(alpha: 0.14 * moonGlow);
-    canvas.drawCircle(moonCenter, moonR + 9.0, _glow);
-
-    final moonBounds = Rect.fromCircle(center: moonCenter, radius: moonR);
-    if (_cachedMoonSize != size || _cachedMoonShader == null) {
-      _cachedMoonSize = size;
-      _cachedMoonShader = RadialGradient(
-        center: const Alignment(-0.25, -0.25),
-        radius: 0.9,
+    final haloRadius = 44.0 + moonPulse * 4.0;
+    final haloPaint = Paint()
+      ..shader = RadialGradient(
         colors: [
-          const Color(0xFFFFF0F5).withValues(alpha: 0.92),
-          const Color(0xFFFFDEEB).withValues(alpha: 0.88),
-          const Color(0xFFF3C7DA).withValues(alpha: 0.82),
+          const Color(0xFFE2E8F0).withAlpha((36 + 14 * moonPulse).toInt()),
+          const Color(0xFF818CF8).withAlpha(12),
+          Colors.transparent,
         ],
-        stops: const [0.0, 0.65, 1.0],
-      ).createShader(moonBounds);
-    }
-    _fill.shader = _cachedMoonShader;
-    canvas.drawCircle(moonCenter, moonR, _fill);
-    _fill.shader = null;
+        stops: const [0.0, 0.45, 1.0],
+      ).createShader(Rect.fromCircle(center: moonCenter, radius: haloRadius));
+    canvas.drawCircle(moonCenter, haloRadius, haloPaint);
 
-    _fill.color = const Color(0xFFE2B4C8).withValues(alpha: 0.32);
-    canvas.drawCircle(moonCenter.translate(-5, -4), 5.0, _fill);
-    canvas.drawCircle(moonCenter.translate(6, 3), 4.0, _fill);
-    canvas.drawCircle(moonCenter.translate(1, 6), 2.8, _fill);
+    const moonRadius = 16.5;
+    final moonDiscPaint = Paint()
+      ..color = const Color(0xFFF8FAFC).withAlpha(245)
+      ..style = PaintingStyle.fill;
 
-    _drawSumiESakuraBough(canvas, size);
-
-    for (final p in _petals) {
-      final t = (progress * p.sp + p.ph) % 1.0;
-      final x = (p.bx * w) + math.sin(t * 2 * math.pi + p.ph) * p.sw;
-      final y = -p.sz + t * (h + p.sz * 2);
-      final opacity = (math.sin(t * math.pi) * 0.85).clamp(0.0, 1.0);
-      _fill.color = const Color(0xFFFF85BF).withValues(alpha: opacity * 0.90);
-      canvas.save();
-      canvas.translate(x, y);
-      canvas.rotate((t * 2 * math.pi) + p.ph);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset.zero,
-          width: p.sz * 1.5,
-          height: p.sz * 0.85,
+    final moonPath = Path()
+      ..addOval(Rect.fromCircle(center: moonCenter, radius: moonRadius));
+    final shadowPath = Path()
+      ..addOval(
+        Rect.fromCircle(
+          center: Offset(moonCenter.dx - 6.2, moonCenter.dy - 3.2),
+          radius: moonRadius * 0.95,
         ),
-        _fill,
       );
-      _fill.color = const Color(0xFFFFD4E8).withValues(alpha: opacity * 0.50);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: const Offset(-1, 0),
-          width: p.sz * 0.9,
-          height: p.sz * 0.45,
-        ),
-        _fill,
-      );
-      canvas.restore();
-    }
-
-    _drawSparkle(
-      canvas,
-      Offset(w * 0.14, h * 0.12),
-      progress,
-      const Color(0xFFFFD4E8),
+    final crescentPath = Path.combine(
+      PathOperation.difference,
+      moonPath,
+      shadowPath,
     );
-    _drawSparkle(
-      canvas,
-      Offset(w * 0.52, h * 0.10),
-      progress + 0.35,
-      const Color(0xFFFF7AA5),
-    );
-    _drawSparkle(
-      canvas,
-      Offset(w * 0.66, h * 0.22),
-      progress + 0.70,
-      const Color(0xFFFFD1E3),
-    );
-    _drawSparkle(
-      canvas,
-      Offset(w * 0.82, h * 0.14),
-      progress + 0.20,
-      const Color(0xFFFFE485),
-    );
-    _drawSparkle(
-      canvas,
-      Offset(w * 0.20, h * 0.28),
-      progress + 0.50,
-      const Color(0xFFFFB3D1),
-    );
-  }
+    canvas.drawPath(crescentPath, moonDiscPaint);
 
-  void _drawSumiESakuraBough(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    final sway = math.sin(progress * 2 * math.pi) * 2.5;
+    final rimPaint = Paint()
+      ..color = const Color(0xFFFDE68A).withAlpha((140 + 70 * moonPulse).toInt())
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.9;
+    canvas.drawPath(crescentPath, rimPaint);
 
-    _stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..color = const Color(0xFF260D1B).withValues(alpha: 0.90)
-      ..strokeWidth = 9.0;
-    final mainBranch = Path()
-      ..moveTo(w * 1.05, -h * 0.02)
-      ..cubicTo(
-        w * 0.90,
-        h * 0.08 + sway * 0.3,
-        w * 0.75,
-        h * 0.16 + sway * 0.7,
-        w * 0.58,
-        h * 0.24 + sway,
-      );
-    canvas.drawPath(mainBranch, _stroke);
+    for (int i = 0; i < _particles.length; i++) {
+      final p = _particles[i];
+      final xPos = p.x * size.width;
+      final yPos = p.y * size.height;
 
-    _stroke
-      ..color = const Color(0xFF451832).withValues(alpha: 0.55)
-      ..strokeWidth = 3.0;
-    final barkDetail = Path()
-      ..moveTo(w * 1.02, -h * 0.01)
-      ..cubicTo(
-        w * 0.88,
-        h * 0.08 + sway * 0.3,
-        w * 0.74,
-        h * 0.16 + sway * 0.7,
-        w * 0.60,
-        h * 0.23 + sway,
-      );
-    canvas.drawPath(barkDetail, _stroke);
-
-    _stroke
-      ..color = const Color(0xFF2E1020).withValues(alpha: 0.85)
-      ..strokeWidth = 4.5;
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.86, h * 0.09 + sway * 0.3)
-        ..cubicTo(
-          w * 0.82,
-          h * 0.04 + sway * 0.2,
-          w * 0.76,
-          h * 0.02 + sway * 0.1,
-          w * 0.70,
-          h * 0.01 + sway * 0.1,
-        ),
-      _stroke,
-    );
-
-    _stroke.strokeWidth = 4.0;
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.74, h * 0.16 + sway * 0.7)
-        ..cubicTo(
-          w * 0.72,
-          h * 0.24 + sway * 0.9,
-          w * 0.66,
-          h * 0.29 + sway * 1.1,
-          w * 0.62,
-          h * 0.32 + sway * 1.2,
-        ),
-      _stroke,
-    );
-
-    _stroke.strokeWidth = 3.2;
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.60, h * 0.23 + sway)
-        ..cubicTo(
-          w * 0.52,
-          h * 0.24 + sway * 1.1,
-          w * 0.46,
-          h * 0.27 + sway * 1.2,
-          w * 0.42,
-          h * 0.30 + sway * 1.3,
-        ),
-      _stroke,
-    );
-
-    _stroke.strokeWidth = 2.4;
-    canvas.drawPath(
-      Path()
-        ..moveTo(w * 0.80, h * 0.13 + sway * 0.5)
-        ..cubicTo(
-          w * 0.78,
-          h * 0.10 + sway * 0.4,
-          w * 0.75,
-          h * 0.08 + sway * 0.3,
-          w * 0.73,
-          h * 0.07 + sway * 0.3,
-        ),
-      _stroke,
-    );
-
-    void drawFlower(Offset center, double radius, double rot) {
-      canvas.save();
-      canvas.translate(center.dx, center.dy);
-      canvas.rotate(rot);
-
-      for (int i = 0; i < 5; i++) {
-        final angle = i * (2 * math.pi / 5);
-        final petalDist = radius * 0.60;
-        final petalCenter = Offset(
-          math.cos(angle) * petalDist,
-          math.sin(angle) * petalDist,
-        );
-
-        canvas.save();
-        canvas.translate(petalCenter.dx, petalCenter.dy);
-        canvas.rotate(angle);
-
-        _fill.color = const Color(0xFFFF6097).withValues(alpha: 0.85);
-        canvas.drawOval(
-          Rect.fromCenter(
-            center: Offset.zero,
-            width: radius * 0.75,
-            height: radius * 0.50,
-          ),
-          _fill,
-        );
-
-        _fill.color = const Color(0xFFFFD4E8).withValues(alpha: 0.90);
-        canvas.drawOval(
-          Rect.fromCenter(
-            center: Offset(radius * 0.15, 0),
-            width: radius * 0.60,
-            height: radius * 0.38,
-          ),
-          _fill,
-        );
-
-        canvas.restore();
-      }
-
-      _fill.color = const Color(0xFFFF4081).withValues(alpha: 0.90);
-      canvas.drawCircle(Offset.zero, radius * 0.28, _fill);
-
-      _fill.color = const Color(0xFFFFE485);
-      canvas.drawCircle(Offset.zero, radius * 0.18, _fill);
-
-      for (int i = 0; i < 5; i++) {
-        final a = i * (2 * math.pi / 5) + 0.3;
-        final px = math.cos(a) * (radius * 0.26);
-        final py = math.sin(a) * (radius * 0.26);
-        _fill.color = const Color(0xFFFFF9C4);
-        canvas.drawCircle(Offset(px, py), 1.0, _fill);
-      }
-
-      canvas.restore();
-    }
-
-    void drawBud(Offset center, double radius, double rot) {
-      canvas.save();
-      canvas.translate(center.dx, center.dy);
-      canvas.rotate(rot);
-
-      _fill.color = const Color(0xFF381024).withValues(alpha: 0.85);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: const Offset(-2, 0),
-          width: radius * 0.9,
-          height: radius * 0.5,
-        ),
-        _fill,
-      );
-
-      _fill.color = const Color(0xFFFF528F).withValues(alpha: 0.95);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: const Offset(2, 0),
-          width: radius * 0.85,
-          height: radius * 0.55,
-        ),
-        _fill,
-      );
-
-      _fill.color = const Color(0xFFFFB3D1);
-      canvas.drawCircle(const Offset(3, -1), radius * 0.22, _fill);
-
-      canvas.restore();
-    }
-
-    drawFlower(Offset(w * 0.86, h * 0.09 + sway * 0.3), 13.0, 0.2);
-    drawFlower(Offset(w * 0.78, h * 0.14 + sway * 0.6), 14.5, 0.8);
-    drawFlower(Offset(w * 0.69, h * 0.19 + sway * 0.8), 15.0, 0.4);
-    drawFlower(Offset(w * 0.58, h * 0.24 + sway), 13.5, 1.2);
-    drawFlower(Offset(w * 0.42, h * 0.30 + sway * 1.3), 12.0, 0.6);
-    drawFlower(Offset(w * 0.70, h * 0.02 + sway * 0.1), 11.5, 1.5);
-    drawFlower(Offset(w * 0.62, h * 0.32 + sway * 1.2), 12.5, 0.9);
-    drawFlower(Offset(w * 0.94, h * 0.05 + sway * 0.2), 11.0, 0.1);
-
-    drawBud(Offset(w * 0.65, h * 0.04 + sway * 0.15), 7.0, -0.4);
-    drawBud(Offset(w * 0.55, h * 0.35 + sway * 1.25), 6.5, 0.8);
-    drawBud(Offset(w * 0.38, h * 0.32 + sway * 1.35), 6.0, 0.3);
-    drawBud(Offset(w * 0.74, h * 0.06 + sway * 0.25), 6.5, -0.2);
-    drawBud(Offset(w * 0.83, h * 0.18 + sway * 0.7), 7.0, 1.1);
-  }
-
-  void _drawAmoledNight(Canvas canvas, Size size) {
-    _fill.color = const Color(0xFF000000);
-    canvas.drawRect(Offset.zero & size, _fill);
-
-    for (final s in _stars) {
-      final pos = Offset(s.x * size.width, s.y * size.height);
       final twinkle =
-          0.25 + 0.75 * (0.5 + 0.5 * math.sin((progress + s.ph) * 2 * math.pi));
-      final alpha = (twinkle * 0.9).clamp(0.0, 1.0);
-      final starColor = s.cl.withValues(alpha: alpha);
-      if (s.sp) _drawSparkle(canvas, pos, (progress + s.ph) % 1.0, starColor);
-      _fill.color = starColor;
-      canvas.drawCircle(pos, s.sz * (0.7 + 0.3 * twinkle), _fill);
+          (math.sin(progress * 2 * math.pi * p.twinkleFreq + p.phase) + 1) / 2;
+      final alpha = (30 + 220 * twinkle).toInt().clamp(0, 255);
+
+      final starColor = p.variant == 0
+          ? const Color(0xFFFFFFFF)
+          : (p.variant == 1
+                ? const Color(0xFF93C5FD)
+                : const Color(0xFFFDE68A));
+
+      _fill.color = starColor.withAlpha(alpha);
+      final r = (p.size * 0.32).clamp(0.8, 2.2);
+      canvas.drawCircle(Offset(xPos, yPos), r, _fill);
+
+      if (p.size > 5.2 && twinkle > 0.6) {
+        final flareLen = (twinkle - 0.6) * 11.0;
+        final flarePaint = Paint()
+          ..color = starColor.withAlpha((190 * twinkle).toInt().clamp(0, 255))
+          ..strokeWidth = 0.8
+          ..style = PaintingStyle.stroke;
+        canvas.drawLine(
+          Offset(xPos - flareLen, yPos),
+          Offset(xPos + flareLen, yPos),
+          flarePaint,
+        );
+        canvas.drawLine(
+          Offset(xPos, yPos - flareLen),
+          Offset(xPos, yPos + flareLen),
+          flarePaint,
+        );
+      }
     }
 
-    _drawCrescent(canvas, Offset(size.width * 0.78, size.height * 0.12));
+    final meteors = [
+      (
+        start: 0.08,
+        end: 0.26,
+        sX: 0.85,
+        sY: 0.04,
+        dx: -0.52,
+        dy: 0.44,
+        len: 120.0,
+      ),
+      (
+        start: 0.42,
+        end: 0.60,
+        sX: 0.62,
+        sY: 0.02,
+        dx: -0.58,
+        dy: 0.48,
+        len: 145.0,
+      ),
+      (
+        start: 0.74,
+        end: 0.92,
+        sX: 0.94,
+        sY: 0.12,
+        dx: -0.48,
+        dy: 0.40,
+        len: 125.0,
+      ),
+    ];
 
-    for (final m in _meteors) {
-      _drawContinuousMeteor(canvas, size, m);
+    for (final m in meteors) {
+      if (progress >= m.start && progress <= m.end) {
+        final t = (progress - m.start) / (m.end - m.start);
+        final envelope = math.sin(t * math.pi);
+
+        final headX = (m.sX + m.dx * t) * size.width;
+        final headY = (m.sY + m.dy * t) * size.height;
+
+        final dir = Offset(m.dx, m.dy);
+        final dirNorm = dir / dir.distance;
+        final tailOffset = dirNorm * (m.len * envelope);
+        final tailX = headX - tailOffset.dx;
+        final tailY = headY - tailOffset.dy;
+
+        final trailPaint = Paint()
+          ..strokeWidth = 1.8 * envelope
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..shader = LinearGradient(
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
+            colors: [
+              const Color(0xFFFFFFFF).withAlpha((240 * envelope).toInt().clamp(0, 255)),
+              const Color(0xFF38BDF8).withAlpha((180 * envelope).toInt().clamp(0, 255)),
+              const Color(0xFF818CF8).withAlpha((60 * envelope).toInt().clamp(0, 255)),
+              Colors.transparent,
+            ],
+            stops: const [0.0, 0.25, 0.7, 1.0],
+          ).createShader(Rect.fromPoints(Offset(headX, headY), Offset(tailX, tailY)));
+
+        canvas.drawLine(Offset(tailX, tailY), Offset(headX, headY), trailPaint);
+
+        _fill.color = Colors.white.withAlpha((255 * envelope).toInt().clamp(0, 255));
+        canvas.drawCircle(Offset(headX, headY), 2.2 * envelope, _fill);
+      }
     }
   }
 
-  void _drawCrescent(Canvas canvas, Offset center) {
-    const moonRadius = 11.0;
-    final pulse = 0.7 + 0.3 * math.sin(progress * 2 * math.pi);
-    _glow.color = const Color(0xFF00E5FF).withValues(alpha: 0.08 * pulse);
-    canvas.drawCircle(center, moonRadius + 7.0, _glow);
-    _glow.color = const Color(0xFF00E5FF).withValues(alpha: 0.18 * pulse);
-    canvas.drawCircle(center, moonRadius + 3.5, _glow);
-    final crescent = Path()
-      ..moveTo(center.dx, center.dy - moonRadius)
-      ..arcToPoint(
-        Offset(center.dx, center.dy + moonRadius),
-        radius: const Radius.circular(moonRadius),
-        clockwise: false,
-      )
-      ..arcToPoint(
-        Offset(center.dx, center.dy - moonRadius),
-        radius: const Radius.circular(moonRadius * 1.35),
-        clockwise: true,
-      )
-      ..close();
-    _fill.color = const Color(0xFFE0F7FA).withValues(alpha: 0.92);
-    canvas.drawPath(crescent, _fill);
-  }
+  void _paintSakuraWithBranches(Canvas canvas, Size size) {
+    final windSway = math.sin(progress * 2 * math.pi) * 2.0;
 
-  void _drawContinuousMeteor(Canvas canvas, Size size, _Meteor m) {
-    final tCycle = (progress * m.speed + m.phase) % 1.0;
-    const transitFraction = 0.42;
-    if (tCycle > transitFraction) return;
+    final branchPaint = Paint()
+      ..color = const Color(0xFF26141D)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
 
-    final p = tCycle / transitFraction;
-    const angle = 36.0 * math.pi / 180.0;
-    final cosA = math.cos(angle);
-    final sinA = math.sin(angle);
+    final branchDetailPaint = Paint()
+      ..color = const Color(0xFF3E1E2D)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
 
-    final totalDistance = (size.width + size.height) * 1.35;
-    final startX = size.width * m.startXRatio;
-    final startY = size.height * m.startYRatio;
+    final brPath = Path();
+    brPath.moveTo(size.width + 12, -8);
+    brPath.cubicTo(
+      size.width * 0.90,
+      12 + windSway,
+      size.width * 0.78,
+      28 + windSway,
+      size.width * 0.68,
+      42 + windSway,
+    );
+    branchPaint.strokeWidth = 5.2;
+    canvas.drawPath(brPath, branchPaint);
+    branchDetailPaint.strokeWidth = 2.0;
+    canvas.drawPath(brPath, branchDetailPaint);
 
-    final headX = startX - cosA * totalDistance * p;
-    final headY = startY + sinA * totalDistance * p;
+    final twig1 = Path();
+    twig1.moveTo(size.width * 0.78, 28 + windSway);
+    twig1.quadraticBezierTo(
+      size.width * 0.74,
+      52 + windSway,
+      size.width * 0.64,
+      68 + windSway,
+    );
+    branchPaint.strokeWidth = 2.6;
+    canvas.drawPath(twig1, branchPaint);
 
-    final envelope = (math.sin(p * math.pi)).clamp(0.0, 1.0);
+    final twig2 = Path();
+    twig2.moveTo(size.width * 0.88, 14 + windSway);
+    twig2.quadraticBezierTo(
+      size.width * 0.86,
+      36 + windSway,
+      size.width * 0.80,
+      54 + windSway,
+    );
+    branchPaint.strokeWidth = 2.2;
+    canvas.drawPath(twig2, branchPaint);
 
-    const steps = 7;
-    for (int i = 0; i < steps; i++) {
-      final f1 = i / steps;
-      final f2 = (i + 1) / steps;
-      final x1 = headX + cosA * m.length * f1;
-      final y1 = headY - sinA * m.length * f1;
-      final x2 = headX + cosA * m.length * f2;
-      final y2 = headY - sinA * m.length * f2;
+    final blPath = Path();
+    blPath.moveTo(-10, -6);
+    blPath.cubicTo(
+      size.width * 0.12,
+      16 - windSway,
+      size.width * 0.22,
+      32 - windSway,
+      size.width * 0.32,
+      46 - windSway,
+    );
+    branchPaint.strokeWidth = 4.8;
+    canvas.drawPath(blPath, branchPaint);
+    branchDetailPaint.strokeWidth = 1.8;
+    canvas.drawPath(blPath, branchDetailPaint);
 
-      final alpha = (envelope * (1.0 - f1) * 0.85).clamp(0.0, 1.0);
-      _stroke
-        ..strokeWidth = (m.headSize * (1.0 - f1 * 0.75)).clamp(0.8, 3.5)
-        ..color = m.color.withValues(alpha: alpha);
-      canvas.drawLine(Offset(x1, y1), Offset(x2, y2), _stroke);
+    final blTwig = Path();
+    blTwig.moveTo(size.width * 0.20, 29 - windSway);
+    blTwig.quadraticBezierTo(
+      size.width * 0.24,
+      52 - windSway,
+      size.width * 0.28,
+      72 - windSway,
+    );
+    branchPaint.strokeWidth = 2.2;
+    canvas.drawPath(blTwig, branchPaint);
+
+    final flowers = [
+      (x: size.width * 0.88, y: 15.0 + windSway, scale: 9.5),
+      (x: size.width * 0.78, y: 30.0 + windSway, scale: 11.0),
+      (x: size.width * 0.72, y: 44.0 + windSway, scale: 8.5),
+      (x: size.width * 0.65, y: 69.0 + windSway, scale: 10.0),
+      (x: size.width * 0.80, y: 55.0 + windSway, scale: 8.0),
+      (x: size.width * 0.94, y: 32.0 + windSway, scale: 7.5),
+      (x: size.width * 0.12, y: 18.0 - windSway, scale: 9.0),
+      (x: size.width * 0.22, y: 33.0 - windSway, scale: 11.5),
+      (x: size.width * 0.32, y: 47.0 - windSway, scale: 8.5),
+      (x: size.width * 0.28, y: 73.0 - windSway, scale: 9.5),
+      (x: size.width * 0.05, y: 36.0 - windSway, scale: 7.0),
+    ];
+
+    for (final f in flowers) {
+      _drawSakuraBlossom(canvas, Offset(f.x, f.y), f.scale);
     }
 
-    _fill.color = m.color.withValues(alpha: envelope * 0.45);
-    canvas.drawCircle(Offset(headX, headY), m.headSize * 2.2, _fill);
-    _fill.color = Colors.white.withValues(alpha: envelope * 0.95);
-    canvas.drawCircle(Offset(headX, headY), m.headSize, _fill);
+    for (int i = 0; i < _particles.length; i++) {
+      final p = _particles[i];
+      final currentProgress = (p.y + progress * p.cycles) % 1.0;
+      final yPos = currentProgress * size.height;
+
+      final sway =
+          math.sin(progress * 2 * math.pi * p.swayFreq + p.phase) *
+          p.swayAmplitude;
+      final xPos = (p.x * size.width + sway) % size.width;
+
+      final rot = progress * 2 * math.pi * p.rotCycles + p.phase;
+      final petalScale = p.size;
+      final edgeFade = math.sin(currentProgress * math.pi);
+
+      canvas.save();
+      canvas.translate(xPos, yPos);
+      canvas.rotate(rot);
+
+      if (p.variant == 0) {
+        final alpha = (140 * edgeFade).toInt().clamp(0, 255);
+        _fill.color = const Color(0xFFFFB7C5).withAlpha(alpha);
+        canvas.drawCircle(Offset.zero, 1.8, _fill);
+      } else {
+        final baseAlpha = p.variant == 1 ? 165 : 135;
+        final alpha = (baseAlpha * edgeFade).toInt().clamp(0, 255);
+        _fill.color =
+            (p.variant == 1 ? const Color(0xFFF472B6) : const Color(0xFFFDA4AF))
+                .withAlpha(alpha);
+
+        final path = Path();
+        path.moveTo(0, -petalScale);
+        path.cubicTo(
+          petalScale * 0.9,
+          -petalScale * 0.4,
+          petalScale * 0.8,
+          petalScale * 0.6,
+          0,
+          petalScale,
+        );
+        path.cubicTo(
+          -petalScale * 0.8,
+          petalScale * 0.6,
+          -petalScale * 0.9,
+          -petalScale * 0.4,
+          0,
+          -petalScale,
+        );
+        path.close();
+
+        canvas.drawPath(path, _fill);
+      }
+
+      canvas.restore();
+    }
+  }
+
+  void _drawSakuraBlossom(Canvas canvas, Offset center, double scale) {
+    final petalPaint = Paint()
+      ..color = const Color(0xFFFFB7C5).withAlpha(225)
+      ..style = PaintingStyle.fill;
+
+    final centerPaint = Paint()
+      ..color = const Color(0xFFBE185D).withAlpha(240)
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < 5; i++) {
+      final angle = (i * 2 * math.pi / 5) - (math.pi / 2);
+      final petalCenter = Offset(
+        center.dx + math.cos(angle) * (scale * 0.55),
+        center.dy + math.sin(angle) * (scale * 0.55),
+      );
+
+      canvas.save();
+      canvas.translate(petalCenter.dx, petalCenter.dy);
+      canvas.rotate(angle);
+
+      final pPath = Path();
+      pPath.moveTo(0, -scale * 0.5);
+      pPath.cubicTo(
+        scale * 0.45,
+        -scale * 0.2,
+        scale * 0.4,
+        scale * 0.35,
+        0,
+        scale * 0.5,
+      );
+      pPath.cubicTo(
+        -scale * 0.4,
+        scale * 0.35,
+        -scale * 0.45,
+        -scale * 0.2,
+        0,
+        -scale * 0.5,
+      );
+      pPath.close();
+
+      canvas.drawPath(pPath, petalPaint);
+      canvas.restore();
+    }
+
+    canvas.drawCircle(center, scale * 0.22, centerPaint);
+    final corePaint = Paint()
+      ..color = const Color(0xFFFFD0E0).withAlpha(255)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, scale * 0.10, corePaint);
   }
 
   void _paintSnowfallVillage(Canvas canvas, Size size) {
@@ -1153,21 +999,6 @@ class _FullAppBgPainter extends CustomPainter {
     }
   }
 
-  void _drawSparkle(Canvas canvas, Offset center, double phase, Color color) {
-    final arm = 2.0 + 1.5 * (0.5 + 0.5 * math.sin(phase * 2 * math.pi));
-    _sparkle.color = color;
-    canvas.drawLine(
-      Offset(center.dx - arm, center.dy),
-      Offset(center.dx + arm, center.dy),
-      _sparkle,
-    );
-    canvas.drawLine(
-      Offset(center.dx, center.dy - arm),
-      Offset(center.dx, center.dy + arm),
-      _sparkle,
-    );
-  }
-
   @override
   bool shouldRepaint(covariant _FullAppBgPainter old) {
     if (old.themeMode != themeMode) return true;
@@ -1176,57 +1007,6 @@ class _FullAppBgPainter extends CustomPainter {
     final newStep = (progress * 720).floor();
     return oldStep != newStep;
   }
-}
-
-class _PC {
-  final double bx;
-  final int sp;
-  final double sw;
-  final double sz;
-  final double ph;
-  const _PC({
-    required this.bx,
-    required this.sp,
-    required this.sw,
-    required this.sz,
-    required this.ph,
-  });
-}
-
-class _SC {
-  final double x;
-  final double y;
-  final double sz;
-  final double ph;
-  final bool sp;
-  final Color cl;
-  const _SC({
-    required this.x,
-    required this.y,
-    required this.sz,
-    required this.ph,
-    this.sp = false,
-    this.cl = const Color(0xFF00E5FF),
-  });
-}
-
-class _Meteor {
-  final double startXRatio;
-  final double startYRatio;
-  final double speed;
-  final double phase;
-  final double length;
-  final double headSize;
-  final Color color;
-  const _Meteor({
-    required this.startXRatio,
-    required this.startYRatio,
-    required this.speed,
-    required this.phase,
-    required this.length,
-    required this.headSize,
-    this.color = const Color(0xFF00E5FF),
-  });
 }
 
 class _BackgroundParticle {

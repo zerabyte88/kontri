@@ -238,9 +238,9 @@ class AnimatedAppHeader extends StatelessWidget {
 Color _getThemeAccentColor(AppThemeMode mode) {
   switch (mode.resolved) {
     case AppThemeMode.amoledJapanese:
-      return const Color(0xFFFF65A3);
+      return const Color(0xFFF472B6);
     case AppThemeMode.amoled:
-      return const Color(0xFF00E5FF);
+      return const Color(0xFFA78BFA);
     case AppThemeMode.light:
       return const Color(0xFF0969DA);
     case AppThemeMode.amoledSnowfall:

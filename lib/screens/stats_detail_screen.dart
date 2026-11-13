@@ -329,48 +329,6 @@ GitHub: https://github.com/${u.login}
     );
   }
 
-  Widget _buildPeakTierBadge(
-    CommitTitleInfo peakTitle,
-    CommitTitleInfo currentTitle,
-    AppLocalizations loc,
-  ) {
-    final isHigher = peakTitle.tier < currentTitle.tier;
-    final tierName = loc.getCommitTierCleanTitle(peakTitle.tier);
-    final badgeColor = isHigher ? AppTheme.accentAmber : AppTheme.primaryCyan;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4.5),
-      decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: badgeColor.withValues(alpha: 0.5),
-          width: 1.1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.workspace_premium_outlined, size: 13, color: badgeColor),
-          const SizedBox(width: 4.5),
-          Flexible(
-            child: Text(
-              'Peak: $tierName',
-              style: TextStyle(
-                color: badgeColor,
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.2,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTierProgressCard(
     ContributionStats cStats,
     AppLocalizations loc,
@@ -828,28 +786,14 @@ GitHub: https://github.com/${u.login}
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 6,
-                                      crossAxisAlignment:
-                                          WrapCrossAlignment.center,
-                                      children: [
-                                        AnimatedTierTitle(
-                                          titleInfo: titleInfo,
-                                          fontSize: 11.5,
-                                          showBadgeContainer: true,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 9,
-                                            vertical: 4,
-                                          ),
-                                        ),
-                                        if (cStats.peakTitle.tier <= 5)
-                                          _buildPeakTierBadge(
-                                            cStats.peakTitle,
-                                            titleInfo,
-                                            loc,
-                                          ),
-                                      ],
+                                    AnimatedTierTitle(
+                                      titleInfo: titleInfo,
+                                      fontSize: 11.5,
+                                      showBadgeContainer: true,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 9,
+                                        vertical: 4,
+                                      ),
                                     ),
                                   ],
                                 ),

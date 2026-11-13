@@ -338,7 +338,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _ThemeGridItem(
         mode: AppThemeMode.amoled,
         title: loc.themeAmoled,
-        icon: Icons.nights_stay_rounded,
+        icon: Icons.nightlight_round,
         accent: const Color(0xFFA78BFA),
         badge: 'Live',
       ),

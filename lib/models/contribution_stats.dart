@@ -83,7 +83,6 @@ class ContributionStats {
   final Map<String, int> yearlyTotals;
   final int rolling365Contributions;
   final int rolling365ActiveDays;
-  final CommitTitleInfo peakTitle;
   final double nextTierProgress;
   final String? nextTierLaggingMetric;
   final int nextTierContributionsRequired;
@@ -100,13 +99,12 @@ class ContributionStats {
     required this.yearlyTotals,
     this.rolling365Contributions = 0,
     this.rolling365ActiveDays = 0,
-    CommitTitleInfo? peakTitle,
     this.nextTierProgress = 1.0,
     this.nextTierLaggingMetric,
     this.nextTierContributionsRequired = 0,
     this.nextTierActiveDaysRequired = 0,
     this.nextTierName,
-  }) : peakTitle = peakTitle ?? commitTitle;
+  });
 
   ContributionStats copyWith({
     int? thisYearContributions,
@@ -118,7 +116,6 @@ class ContributionStats {
     Map<String, int>? yearlyTotals,
     int? rolling365Contributions,
     int? rolling365ActiveDays,
-    CommitTitleInfo? peakTitle,
     double? nextTierProgress,
     String? nextTierLaggingMetric,
     int? nextTierContributionsRequired,
@@ -138,7 +135,6 @@ class ContributionStats {
       rolling365Contributions:
           rolling365Contributions ?? this.rolling365Contributions,
       rolling365ActiveDays: rolling365ActiveDays ?? this.rolling365ActiveDays,
-      peakTitle: peakTitle ?? this.peakTitle,
       nextTierProgress: nextTierProgress ?? this.nextTierProgress,
       nextTierLaggingMetric:
           nextTierLaggingMetric ?? this.nextTierLaggingMetric,
@@ -381,7 +377,6 @@ class ContributionStats {
 
     int rollingContrib = 0;
     int rollingActive = 0;
-    final Map<int, ({int contrib, int active})> yearlyBreakdown = {};
 
     for (final entry in dayCounts.entries) {
       final date = entry.key;
@@ -393,13 +388,6 @@ class ContributionStats {
           rollingActive++;
         }
       }
-
-      final y = date.year;
-      final existing = yearlyBreakdown[y] ?? (contrib: 0, active: 0);
-      yearlyBreakdown[y] = (
-        contrib: existing.contrib + count,
-        active: existing.active + (count > 0 ? 1 : 0),
-      );
     }
 
     final title = determineTitle(
@@ -410,18 +398,6 @@ class ContributionStats {
       rollingContributions: rollingContrib,
       rollingActiveDays: rollingActive,
     );
-
-    int peakTierNum = title.tier;
-    for (final entry in yearlyBreakdown.entries) {
-      final yearTier = determineTitle(
-        rollingContributions: entry.value.contrib,
-        rollingActiveDays: entry.value.active,
-      );
-      if (yearTier.tier < peakTierNum) {
-        peakTierNum = yearTier.tier;
-      }
-    }
-    final peakTitle = CommitTitleInfo.getInfoForTier(peakTierNum);
 
     final progressInfo = calculateNextTierProgress(
       currentTier: title.tier,
@@ -439,7 +415,6 @@ class ContributionStats {
       yearlyTotals: yearly,
       rolling365Contributions: rollingContrib,
       rolling365ActiveDays: rollingActive,
-      peakTitle: peakTitle,
       nextTierProgress: progressInfo.progress,
       nextTierLaggingMetric: progressInfo.laggingMetric,
       nextTierContributionsRequired: progressInfo.contribRequired,
@@ -538,7 +513,6 @@ class ContributionStats {
             },
       rolling365Contributions: rollingContrib,
       rolling365ActiveDays: rollingActive,
-      peakTitle: title,
       nextTierProgress: progressInfo.progress,
       nextTierLaggingMetric: progressInfo.laggingMetric,
       nextTierContributionsRequired: progressInfo.contribRequired,

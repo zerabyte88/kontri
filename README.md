@@ -5,7 +5,7 @@
 
   **Minimalist GitHub analytics, contribution streaks, and repository explorer for Android.**
 
-  [![Release](https://img.shields.io/badge/Release-v1.2.9-06b6d4?style=flat-square&logo=github&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
+  [![Release](https://img.shields.io/badge/Release-v1.3.0-06b6d4?style=flat-square&logo=github&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
   [![Platform](https://img.shields.io/badge/Platform-Android-10b981?style=flat-square&logo=android&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
   [![Architecture](https://img.shields.io/badge/Arch-arm64--v8a-8b5cf6?style=flat-square&logo=arm&logoColor=white)](https://github.com/zerabyte88/kontri/releases/latest)
   [![Flutter](https://img.shields.io/badge/Flutter-3.13+-02569b?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)

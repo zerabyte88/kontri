@@ -611,22 +611,11 @@ class GitHubApiService {
             )
           : {};
       final contribBody = storageService!.getHttpCacheBody('contrib_$cacheKey');
-      var contrib = contribBody != null
+      final contrib = contribBody != null
           ? ContributionStats.fromContributionsApi(
               jsonDecode(contribBody) as Map<String, dynamic>,
             )
           : ContributionStats.fromEvents(events);
-
-      final storedPeak = storageService!.getPeakTier(user.login);
-      if (storedPeak < contrib.peakTitle.tier) {
-        contrib = contrib.copyWith(
-          peakTitle: CommitTitleInfo.getInfoForTier(storedPeak),
-        );
-      } else if (contrib.peakTitle.tier < storedPeak) {
-        unawaited(
-          storageService!.savePeakTier(user.login, contrib.peakTitle.tier),
-        );
-      }
 
       return UserStats.calculate(
         user: user,
@@ -887,22 +876,8 @@ class GitHubApiService {
       }
 
       final fetchedContributions = await contribFuture;
-      var contributionStats =
+      final contributionStats =
           fetchedContributions ?? ContributionStats.fromEvents(events);
-
-      if (storageService != null) {
-        final storedPeak = storageService!.getPeakTier(user.login);
-        if (storedPeak < contributionStats.peakTitle.tier) {
-          contributionStats = contributionStats.copyWith(
-            peakTitle: CommitTitleInfo.getInfoForTier(storedPeak),
-          );
-        } else if (contributionStats.peakTitle.tier < storedPeak) {
-          await storageService!.savePeakTier(
-            user.login,
-            contributionStats.peakTitle.tier,
-          );
-        }
-      }
 
       final calculated = UserStats.calculate(
         user: user,

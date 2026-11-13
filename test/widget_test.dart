@@ -855,13 +855,13 @@ void main() {
     );
 
     test(
-      'AppConfig provides accurate release and version telemetry for v1.2.9',
+      'AppConfig provides accurate release and version telemetry for v1.3.0',
       () {
         expect(AppConfig.appName, 'Kontri');
-        expect(AppConfig.appVersion, 'v1.2.9');
-        expect(AppConfig.buildNumber, '10290');
-        expect(AppConfig.fullVersion, 'v1.2.9 (Build 10290)');
-        expect(AppConfig.releaseTag, 'v1.2.9');
+        expect(AppConfig.appVersion, 'v1.3.0');
+        expect(AppConfig.buildNumber, '10300');
+        expect(AppConfig.fullVersion, 'v1.3.0 (Build 10300)');
+        expect(AppConfig.releaseTag, 'v1.3.0');
         expect(AppConfig.license, 'MIT License');
         expect(AppConfig.githubRepoUrl, contains('github.com'));
       },
@@ -1290,7 +1290,7 @@ void main() {
 
         // Verify distinct primary accents
         expect(darkTheme.primaryColor, const Color(0xFF38BDF8));
-        expect(amoledTheme.primaryColor, const Color(0xFF00E5FF));
+        expect(amoledTheme.primaryColor, const Color(0xFFA78BFA));
         expect(sakuraTheme.primaryColor, const Color(0xFFF472B6));
         expect(pureTheme.primaryColor, const Color(0xFF60A5FA));
         expect(lightTheme.primaryColor, const Color(0xFF2563EB));
@@ -1298,7 +1298,7 @@ void main() {
 
         // Verify card surfaces
         expect(darkTheme.cardTheme.color, const Color(0xFF0C1322));
-        expect(amoledTheme.cardTheme.color, const Color(0xFF101012));
+        expect(amoledTheme.cardTheme.color, const Color(0xFF111620));
         expect(sakuraTheme.cardTheme.color, const Color(0xFF140D13));
         expect(pureTheme.cardTheme.color, const Color(0xFF101012));
         expect(lightTheme.cardTheme.color, const Color(0xFFFFFFFF));
@@ -3566,11 +3566,11 @@ void main() {
 
     test('AppTheme primary action button colors conform to readability specifications', () {
       AppTheme.currentMode = AppThemeMode.amoled;
-      expect(AppTheme.buttonPrimaryForeground, const Color(0xFF0A0F1D));
-      expect(AppTheme.buttonPrimaryBackground, const Color(0xFF00E5FF));
+      expect(AppTheme.buttonPrimaryForeground, Colors.white);
+      expect(AppTheme.buttonPrimaryBackground, const Color(0xFFA78BFA));
 
       AppTheme.currentMode = AppThemeMode.amoledJapanese;
-      expect(AppTheme.buttonPrimaryForeground, const Color(0xFF1E0A14));
+      expect(AppTheme.buttonPrimaryForeground, Colors.black);
       expect(AppTheme.buttonPrimaryBackground, const Color(0xFFF472B6));
 
       AppTheme.currentMode = AppThemeMode.amoledPure;
