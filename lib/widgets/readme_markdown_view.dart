@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -470,7 +470,7 @@ class ReadmeMarkdownView extends StatelessWidget {
           child: ConstrainedBox(constraints: constraints, child: imageWidget),
         );
       },
-      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+      styleSheet: MarkdownStyleSheet(
         p: TextStyle(
           color: AppTheme.textSecondary,
           fontSize: 13.5,
@@ -498,6 +498,18 @@ class ReadmeMarkdownView extends StatelessWidget {
           fontSize: 13.5,
           fontWeight: FontWeight.w600,
         ),
+        h5: TextStyle(
+          color: AppTheme.textPrimary,
+          fontSize: 13.5,
+          fontWeight: FontWeight.w600,
+        ),
+        h6: TextStyle(
+          color: AppTheme.textPrimary,
+          fontSize: 13.5,
+          fontWeight: FontWeight.w600,
+        ),
+        listBullet: TextStyle(color: AppTheme.textSecondary, fontSize: 13.5),
+        checkbox: TextStyle(color: AppTheme.primaryCyan, fontSize: 13.5),
         code: TextStyle(
           color: AppTheme.primaryCyan,
           backgroundColor: AppTheme.surfaceElevated,
